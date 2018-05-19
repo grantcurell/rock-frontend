@@ -1,2 +1,4 @@
 
 rpmbuild/\.remote-sync\.json
+
+ceph-deploy/\.remote-sync\.json
