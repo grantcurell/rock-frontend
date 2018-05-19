@@ -7,7 +7,7 @@ on the type of distribution/version we are dealing with.
 import logging
 from ceph_deploy import exc
 from ceph_deploy.util import versions
-from ceph_deploy.hosts import debian, centos, fedora, suse, remotes, rhel
+from ceph_deploy.hosts import debian, centos, fedora, suse, remotes, rhel, photon
 from ceph_deploy.connection import get_connection
 
 logger = logging.getLogger()
@@ -68,7 +68,7 @@ def get(hostname,
     module.distro = module.normalized_name
     module.is_el = module.normalized_name in ['redhat', 'centos', 'fedora', 'scientific', 'oracle', 'virtuozzo']
     module.is_rpm = module.normalized_name in ['redhat', 'centos',
-                                               'fedora', 'scientific', 'suse', 'oracle', 'virtuozzo']
+                                               'fedora', 'scientific', 'suse', 'oracle', 'virtuozzo', 'photon']
     module.is_deb = not module.is_rpm
     module.release = release
     module.codename = codename
@@ -97,7 +97,8 @@ def _get_distro(distro, fallback=None, use_rhceph=False):
         'redhat': centos,
         'fedora': fedora,
         'suse': suse,
-        'virtuozzo' : centos
+        'virtuozzo' : centos,
+        'photon': photon
         }
 
     if distro == 'redhat' and use_rhceph:
@@ -118,6 +119,8 @@ def _normalized_distro_name(distro):
         return 'suse'
     elif distro.startswith('centos'):
         return 'centos'
+    elif distro.startswith('photon'):
+        return 'photon'
     elif distro.startswith('linuxmint'):
         return 'ubuntu'
     elif distro.startswith('virtuozzo'):

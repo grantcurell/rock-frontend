@@ -181,6 +181,13 @@ class Yum(RPMManagerBase):
     executable = 'yum'
     name = 'yum'
 
+class Tdnf(RPMManagerBase):
+    """
+    The Tdnf Package manager
+    """
+
+    executable = 'tdnf'
+    name = 'tdnf'
 
 class Apt(PackageManager):
     """

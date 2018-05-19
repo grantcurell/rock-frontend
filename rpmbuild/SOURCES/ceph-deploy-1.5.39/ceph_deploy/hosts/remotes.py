@@ -14,6 +14,12 @@ def platform_information(_linux_distribution=None):
     """ detect platform information from remote host """
     linux_distribution = _linux_distribution or platform.linux_distribution
     distro, release, codename = linux_distribution()
+
+    if 'photon' in distro.lower():
+        distro = 'photon'
+        release = '2.0'
+        codename = 'photon'
+
     if not codename and 'debian' in distro.lower():  # this could be an empty string in Debian
         debian_codenames = {
             '10': 'buster',
