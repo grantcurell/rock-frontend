@@ -20,4 +20,4 @@ def choose_init(module):
     return 'systemd'
 
 def get_packager(module):
-        return pkg_managers.Tdnf(module)
+        return pkg_managers.Yum(module)

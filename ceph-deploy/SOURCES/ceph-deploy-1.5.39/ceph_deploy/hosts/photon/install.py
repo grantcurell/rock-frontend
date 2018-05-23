@@ -15,7 +15,7 @@ def install(distro, version_kind, version, adjust_repos, **kw):
     gpgcheck = kw.pop('gpgcheck', 1)
 
     logger = distro.conn.logger
-    release = distro.release
+    release = 'el7'
     machine = distro.machine_type
 
     if version_kind in ['stable', 'testing']:
@@ -24,24 +24,17 @@ def install(distro, version_kind, version, adjust_repos, **kw):
         key = 'autobuild'
 
     if adjust_repos:
-        if distro.packager.name == 'yum':
-            distro.packager.install('yum-plugin-priorities')
-            # haven't been able to determine necessity of check_obsoletes with DNF
-            distro.conn.remote_module.enable_yum_priority_obsoletes()
-            logger.warning('check_obsoletes has been enabled for Yum priorities plugin')
 
         if version_kind in ['stable', 'testing']:
             distro.packager.add_repo_gpg_key(gpg.url(key))
 
             if version_kind == 'stable':
-                url = 'https://download.ceph.com/rpm-{version}/fc{release}/'.format(
+                url = 'https://download.ceph.com/rpm-{version}/{release}/'.format(
                     version=version,
-                    release=release,
+                    release=release
                     )
             elif version_kind == 'testing':
-                url = 'https://download.ceph.com/rpm-testing/fc{release}'.format(
-                    release=release,
-                    )
+                url = 'https://download.ceph.com/rpm-testing/el7/'
 
             remoto.process.run(
                 distro.conn,
@@ -51,7 +44,7 @@ def install(distro, version_kind, version, adjust_repos, **kw):
                     '--replacepkgs',
                     '--force',
                     '--quiet',
-                    '{url}noarch/ceph-release-1-0.fc{release}.noarch.rpm'.format(
+                    '{url}noarch/ceph-release-1-1.{release}.noarch.rpm'.format(
                         url=url,
                         release=release,
                         ),
@@ -68,7 +61,7 @@ def install(distro, version_kind, version, adjust_repos, **kw):
             logger.info('repo file will be created manually')
             mirror_install(
                 distro,
-                'http://gitbuilder.ceph.com/ceph-rpm-fc{release}-{machine}-basic/{sub}/{version}/'.format(
+                'http://gitbuilder.ceph.com/ceph-rpm-fc22-{machine}-basic/{sub}/{version}/'.format(
                     release=release.split(".", 1)[0],
                     machine=machine,
                     sub='ref' if version_kind == 'dev' else 'sha1',
