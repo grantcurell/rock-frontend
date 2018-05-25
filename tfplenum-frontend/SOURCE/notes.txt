@@ -7,5 +7,6 @@ source /usr/bin/virtualenvwrapper.sh
 mkvirtualenv my-venv
 workon my-venv
 pip install Flask
+pip install flask-wtf
 
 ...
