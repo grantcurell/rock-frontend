@@ -4,7 +4,18 @@
 {% block title %}Home{% endblock %}
 {% block body %}
 <div class="jumbotron">
-  <h1>Flask Is Awesome</h1>
+  <h1>Inventory Configuration</h1>
   <p class="lead">And I'm glad to be learning so much about it!</p>
 </div>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.dns_ip.description }}<br>
+        {{ form.dns_ip.label }}  {{ form.dns_ip(size=16) }}<br>
+        {% for error in form.dns_ip.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
 {% endblock %}
