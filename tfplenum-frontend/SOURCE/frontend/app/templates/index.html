@@ -4,18 +4,21 @@
 {% block title %}Home{% endblock %}
 {% block body %}
 <div class="jumbotron">
-  <h1>Inventory Configuration</h1>
-  <p class="lead">And I'm glad to be learning so much about it!</p>
+  <h1>Inventory Configurator</h1>
+  <p class="lead">We're really trying to make this easier!</p>
 </div>
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
+        {{ form.dns_ip.label }}<br>
+        {{ form.dns_ip(size=16) }}<br>
+        <small id="passwordHelpBlock" class="form-text text-muted">
         {{ form.dns_ip.description }}<br>
-        {{ form.dns_ip.label }}  {{ form.dns_ip(size=16) }}<br>
+        </small>
         {% for error in form.dns_ip.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </p>
-    <p>{{ form.submit() }}</p>
+    <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
 </form>
 {% endblock %}

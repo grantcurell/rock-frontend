@@ -12,5 +12,5 @@ class InventoryForm(FlaskForm):
      it to default  unless you have a specific reason to use a different DNS   \
      server. Keep in mind  you will need to manually provide all required DNS  \
      entries on your separate  DNS Server or the kit will break."              \
-     , validators=[IPAddress(ipv4=True)])
+     , validators=[IPAddress(ipv4=True)], render_kw={"placeholder": "192.168.1.50"})
     submit = SubmitField('Save Inventory')
