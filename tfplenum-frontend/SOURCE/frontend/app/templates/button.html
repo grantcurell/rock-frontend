@@ -1,6 +1,10 @@
   <div class="input-group mb-3">
     <div class="input-group-prepend">
-      <button class="btn btn-outline-secondary" type="button">{{ button_text }}</button>
+      <span class="input-group-text" id="">{{ button_label }}</span>
     </div>
-    <input type="text" class="form-control" placeholder="{{ button_placeholder }}" aria-label="" aria-describedby="basic-addon1">
+    <!--<input type="text" class="form-control" placeholder="{{ button_placeholder }}" aria-label="" aria-describedby="basic-addon1">-->
+    {{ button_name(class="form-control") }}
+    <div class="input-group-append">
+      <button class="btn btn-primary active" type="button">{{ button_text }}</button>
+    </div>
   </div>

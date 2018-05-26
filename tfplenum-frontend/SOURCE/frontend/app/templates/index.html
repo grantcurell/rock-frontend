@@ -10,23 +10,19 @@
 <form action="/" method="post" role=form>
   {{ form.hidden_tag() }}
   <h2>Configure Host Machines</h2>
-    <!--<div class="alert alert-success" role="alert">
-      <h4 class="alert-heading">Well done!</h4>
-      <p>Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how spacing within an alert works with this kind of content.</p>
-      <hr>
-      <p class="mb-0">Whenever you need to, be sure to use margin utilities to keep things nice and tidy.</p>
-    </div>-->
-    {% with button_text="Submit", button_placeholder="Enter the number of sensors you would like to use in your kit" %}
+    {% with button_name=form.number_of_sensors, button_label=form.number_of_sensors_label, button_text=form.number_of_sensors_button_text %}
       {% include "button.html" %}
     {% endwith %}
-  <p><button class="btn btn-primary" type="submit">Collect Data</button></p>
-</form>
-<hr>
-<form action="/" method="post" role=form>
+    {% for error in form.number_of_sensors.errors %}
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+    {% endfor %}
+  <hr>
   {{ form.hidden_tag() }}
   <h2>Configure Inventory Settings</h2>
   <p>
-    {% with text_input_name=form.dns_ip, text_input_field=form.dns_ip.label, text_input_description=form.dns_ip.description, text_input_placeholder=form.dns_ip.placeholder %}
+    {% with text_input_name=form.dns_ip, text_input_field=form.dns_ip_label, text_input_description=form.dns_ip.description %}
       {% include "text_input.html" %}
     {% endwith %}
     {% for error in form.dns_ip.errors %}
