@@ -26,7 +26,7 @@
   {{ form.hidden_tag() }}
   <h2>Configure Inventory Settings</h2>
   <p>
-    {% with text_input_name='dns_ip', text_input_field=form.dns_ip.label, text_input_description=form.dns_ip.description, text_input_placeholder=form.dns_ip.placeholder %}
+    {% with text_input_name=form.dns_ip, text_input_field=form.dns_ip.label, text_input_description=form.dns_ip.description, text_input_placeholder=form.dns_ip.placeholder %}
       {% include "text_input.html" %}
     {% endwith %}
     {% for error in form.dns_ip.errors %}

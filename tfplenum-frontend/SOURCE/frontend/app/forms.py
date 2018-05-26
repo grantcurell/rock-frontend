@@ -26,4 +26,4 @@ class InventoryForm(FlaskForm):
    entries on your separate  DNS Server or the kit will break."              \
   , validators=[IPAddress(ipv4=True)]
   , label = 'DNS IP Address'
-  , placeholder = "192.168.1.50")
+  , render_kw={"placeholder": "192.168.1.50"})

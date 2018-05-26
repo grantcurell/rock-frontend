@@ -2,7 +2,9 @@
   <div class="input-group-prepend">
     <span class="input-group-text" id="">{{ text_input_field }}</span>
   </div>
-  <input name={{ text_input_name }} type="text" class="form-control" placeholder="{{ text_input_placeholder }}" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+  <!--<input name={{ text_input_name }} type="text" class="form-control" placeholder="{{ text_input_placeholder }}"
+  aria-label="Default" aria-describedby="inputGroup-sizing-default"> -->
+  {{ text_input_name(class="form-control") }}
 </div>
 <small class="form-text text-muted">
   {{ text_input_description }}<br>
