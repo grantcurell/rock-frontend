@@ -12,15 +12,13 @@
   </head>
   <body>
     <div class="container">
-      <div class="header clearfix">
-        <nav>
-          <ul class="nav nav-pills pull-right">
-            <li role="presentation"><a href="/">Home</a></li>
-            <li role="presentation"><a href="/about">About</a></li>
-            <li role="presentation"><a href="http://flask.pocoo.org" target="_blank">More About Flask</a></li>
-          </ul>
-        </nav>
-      </div>
+      <nav class="navbar navbar-dark bg-primary">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
+          </li>
+        </ul>
+      </nav>
       {% with messages = get_flashed_messages() %}
       {% if messages %}
       <ul>
