@@ -1,10 +1,8 @@
 <div class="input-group mb-3">
   <div class="input-group-prepend">
-    <span class="input-group-text" id="">{{ text_input_field }}</span>
+    <span class="input-group-text">{{ text_input_field }}</span>
   </div>
-  <!--<input name={{ text_input_name }} type="text" class="form-control" placeholder="{{ text_input_placeholder }}"
-  aria-label="Default" aria-describedby="inputGroup-sizing-default"> -->
-  {{ text_input_name(class="form-control") }}
+  <input type="text" class="form-control" placeholder="{{ text_input_placeholder }}">
 </div>
 {% if text_input_description is defined %}
 <p>

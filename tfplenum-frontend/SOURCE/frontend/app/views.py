@@ -14,8 +14,6 @@ def add_numbers():
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     form = InventoryForm()
-    if form.validate_on_submit():
-        flash('Request for inventory file submitted.')
     return render_template('index.html', title='Configure Inventory', form=form)
 
 @app.route('/about')

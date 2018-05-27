@@ -78,15 +78,16 @@ $( document ).ready( function () {
 			email: "Please enter a valid email address",
 			agree: "Please accept our policy"
 		},
-		errorElement: "em",
+		errorElement: "div",
 		errorPlacement: function ( error, element ) {
 			// Add the `help-block` class to the error element
-			error.addClass( "help-block" );
+			error.addClass( "invalid-feedback" );
 
 			if ( element.prop( "type" ) === "checkbox" ) {
 				error.insertAfter( element.parent( "label" ) );
 			} else {
-				error.insertAfter( element );
+        // input-group-append is the class for the button we are appending
+				error.insertAfter( element.next( $(".input-group-append") ));
 			}
 		},
 		highlight: function ( element, errorClass, validClass ) {

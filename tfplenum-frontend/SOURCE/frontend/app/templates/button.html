@@ -9,15 +9,9 @@
 -->
 <div class="input-group mb-3">
   <div class="input-group-prepend">
-    <span class="input-group-text" id="">{{ button_label }}</span>
+    <span class="input-group-text">{{ button_label }}</span>
   </div>
-  {{ button_form_pointer(class="form-control") }}
-  <div class="valid-feedback">
-    Looks good!
-  </div>
-  <div class="invalid-feedback">
-    Please choose a username.
-  </div>
+  <input type="text" class="form-control" placeholder="{{ button_placeholder }}">
   <div class="input-group-append">
     <button id="{{ button_id }}" class="btn btn-primary" type="submit">{{ button_text }}</button>
   </div>
