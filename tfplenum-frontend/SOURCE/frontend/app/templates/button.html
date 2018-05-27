@@ -1,10 +1,25 @@
+<!--
+# button_id (string): The id which will be used to identify the button created
+# botton_form_pointer (WTForm Field): A pointer to the WTForm Field class which
+#                                     the button will use to take input from
+# button_label (string): The text which will affix the left side of the input field
+# button_text (string): The text for the button itself
+# button_description (string): This is optional. If you want to provide a description
+#                              below the button you can do so with this option.
+-->
 <div class="input-group mb-3">
   <div class="input-group-prepend">
     <span class="input-group-text" id="">{{ button_label }}</span>
   </div>
-  <!--<input type="text" class="form-control" placeholder="{{ button_placeholder }}" aria-label="" aria-describedby="basic-addon1">-->
-  {{ button_name(class="form-control") }}
+  {{ button_form_pointer(class="form-control") }}
   <div class="input-group-append">
     <button id="{{ button_id }}" class="btn btn-primary" type="button">{{ button_text }}</button>
   </div>
 </div>
+{% if button_description is defined %}
+<p>
+  <small class="form-text text-muted">
+    {{ button_description }}<br>
+  </small>
+</p>
+{% endif %}

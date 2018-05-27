@@ -12,7 +12,6 @@
 <script type="text/javascript">
     {% include "foozandfuncs.js" %}
 </script>
-    <!-- The contents of myscript.js will be loaded inside the script tag -->
 {% endblock %}
 <div class="jumbotron">
   <h1>Inventory Configurator</h1>
@@ -20,8 +19,8 @@
 </div>
 <form action="/" method="post" role=form>
   {{ form.hidden_tag() }}
-  <h2>Configure Host Machines</h2>
-    {% with button_id=form.number_of_sensors_id, button_name=form.number_of_sensors, button_label=form.number_of_sensors_label, button_text=form.number_of_sensors_button_text %}
+  <h2>Kit Layout</h2>
+    {% with button_id=form.number_of_sensors_id, button_form_pointer=form.number_of_sensors, button_label=form.number_of_sensors_label, button_text=form.number_of_sensors_button_text %}
       {% include "button.html" %}
     {% endwith %}
     {% for error in form.number_of_sensors.errors %}
@@ -29,13 +28,8 @@
       {{ error }}
     </div>
     {% endfor %}
-    <p id="demo"></p>
   <hr>
-  <p><input type=text size=5 name=a> +
-     <input type=text size=5 name=b> =
-     <span id=result>?</span>
-  <p><a href=# id=calculate>calculate server side</a>
-  <h2>Configure Inventory Settings</h2>
+  <h2>General Settings</h2>
   <p>
     {% with text_input_name=form.dns_ip, text_input_field=form.dns_ip_label, text_input_description=form.dns_ip.description %}
       {% include "text_input.html" %}
@@ -47,6 +41,12 @@
     {% endfor %}
   </p>
   <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
+  <hr>
+  <h2>Server Settings</h2>
+  <hr>
+  <h2>Sensor Settings</h2>
+  <div id=sensor></div>
+  <hr>
 </form>
 
 {% endblock %}

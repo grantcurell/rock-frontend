@@ -14,12 +14,6 @@ $(document).ready(function() {
 
 $(document).ready(function(){
     $("#{{ form.number_of_sensors_id }}").click(function(){
-        $("p").hide();
+        alert("Value: " + $("#number_of_sensors").val())
     });
 });
-
-
-
-//function displayDate() {
-//    document.getElementById("demo").innerHTML = Date();
-//}
