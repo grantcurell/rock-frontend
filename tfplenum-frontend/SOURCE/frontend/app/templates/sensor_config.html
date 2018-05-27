@@ -1,0 +1,10 @@
+<p>
+  {% with text_input_name=form.dns_ip, text_input_field=form.dns_ip_label, text_input_description=form.dns_ip.description %}
+    {% include "text_input.html" %}
+  {% endwith %}
+  {% for error in form.dns_ip.errors %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  {% endfor %}
+</p>

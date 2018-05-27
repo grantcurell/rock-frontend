@@ -8,8 +8,9 @@ class InventoryForm(FlaskForm):
   number_of_sensors_label = 'Number of Sensors'
   number_of_sensors_button_text = 'Submit'
   number_of_sensors = IntegerField(
-  validators=[NumberRange(min=1, message='You must have at least one sensor')] \
-  , render_kw={"placeholder": "Enter the number of sensors you plan to run in your kit"})
+  #validators=[NumberRange(min=1, message='You must have at least one sensor')] \
+  #,
+   render_kw={"placeholder": "Enter the number of sensors you plan to run in your kit"})
 
   dns_ip_label = 'DNS IP Address'
   dns_ip = StringField(

@@ -17,7 +17,7 @@
   <h1>Inventory Configurator</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
-<form action="/" method="post" role=form>
+<form id='form_sensor' action="/" method="post" role=form class="needs-validation" novalidate>
   {{ form.hidden_tag() }}
   <h2>Kit Layout</h2>
     {% with button_id=form.number_of_sensors_id, button_form_pointer=form.number_of_sensors, button_label=form.number_of_sensors_label, button_text=form.number_of_sensors_button_text %}
@@ -28,8 +28,10 @@
       {{ error }}
     </div>
     {% endfor %}
-  <hr>
-  <h2>General Settings</h2>
+</form>
+<hr>
+<h2>General Settings</h2>
+<form id='form_general_settings' action="/" method="post" role=form class="needs-validation" novalidate>
   <p>
     {% with text_input_name=form.dns_ip, text_input_field=form.dns_ip_label, text_input_description=form.dns_ip.description %}
       {% include "text_input.html" %}
