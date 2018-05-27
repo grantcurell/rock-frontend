@@ -1,22 +1,14 @@
 <!-- index.html-->
 
+<!-- jquery selector list https://www.w3schools.com/Jquery/jquery_selectors.asp -->
+<!-- ID SELECTOR: $("#test") -->
+<!-- CLASS SELECTOR $(".test")  -->
+
+<script type=text/javascript src="{{ url_for('static', filename='foozandfuncs/foozandfuncs.js') }}"></script>
+
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block body %}
-<script type=text/javascript>
-  $(function() {
-    $('a#calculate').bind('click', function() {
-      $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
-        a: $('input[name="a"]').val(),
-        b: $('input[name="b"]').val()
-      }, function(data) {
-        $("#result").text(data.result);
-      });
-      return false;
-    });
-  });
-</script>
-
 <div class="jumbotron">
   <h1>Inventory Configurator</h1>
   <p class="lead">We're really trying to make this easier!</p>
@@ -24,7 +16,7 @@
 <form action="/" method="post" role=form>
   {{ form.hidden_tag() }}
   <h2>Configure Host Machines</h2>
-    {% with button_name=form.number_of_sensors, button_label=form.number_of_sensors_label, button_text=form.number_of_sensors_button_text %}
+    {% with button_function='displayDate', button_name=form.number_of_sensors, button_label=form.number_of_sensors_label, button_text=form.number_of_sensors_button_text %}
       {% include "button.html" %}
     {% endwith %}
     {% for error in form.number_of_sensors.errors %}
@@ -32,6 +24,7 @@
       {{ error }}
     </div>
     {% endfor %}
+    <p id="demo"></p>
   <hr>
   <p><input type=text size=5 name=a> +
      <input type=text size=5 name=b> =

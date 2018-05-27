@@ -6,6 +6,10 @@
     <title>{% block title %}{% endblock %}</title>
     <!-- Load jquery -->
     <script type=text/javascript src="{{ url_for('static', filename='jquery/jquery-3.3.1.js') }}"></script>
+    <!-- Load AngularJS
+    <script src="{{ url_for('static', filename='angularjs/angularjs-1.6.10') }}"></script>-->
+    <!-- Include popper.js -->
+    <script type=text/javascript src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
     <!-- Bootstrap core CSS -->
     <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet">
     <!-- Add Bootstrap's jquery extension -->
