@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired, IPAddress, NumberRange
 
 class InventoryForm(FlaskForm):
 
+  number_of_sensors_id = 'num_sensors'
   number_of_sensors_label = 'Number of Sensors'
   number_of_sensors_button_text = 'Submit'
   number_of_sensors = IntegerField(

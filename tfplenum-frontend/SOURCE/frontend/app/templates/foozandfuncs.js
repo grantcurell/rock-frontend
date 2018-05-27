@@ -13,13 +13,13 @@ $(document).ready(function() {
 
 
 $(document).ready(function(){
-    $("button").click(function(){
+    $("#{{ form.number_of_sensors_id }}").click(function(){
         $("p").hide();
     });
 });
 
 
 
-function displayDate() {
-    document.getElementById("demo").innerHTML = Date();
-}
+//function displayDate() {
+//    document.getElementById("demo").innerHTML = Date();
+//}
