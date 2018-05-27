@@ -3,6 +3,20 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block body %}
+<script type=text/javascript>
+  $(function() {
+    $('a#calculate').bind('click', function() {
+      $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
+        a: $('input[name="a"]').val(),
+        b: $('input[name="b"]').val()
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+
 <div class="jumbotron">
   <h1>Inventory Configurator</h1>
   <p class="lead">We're really trying to make this easier!</p>
@@ -19,7 +33,10 @@
     </div>
     {% endfor %}
   <hr>
-  {{ form.hidden_tag() }}
+  <p><input type=text size=5 name=a> +
+     <input type=text size=5 name=b> =
+     <span id=result>?</span>
+  <p><a href=# id=calculate>calculate server side</a>
   <h2>Configure Inventory Settings</h2>
   <p>
     {% with text_input_name=form.dns_ip, text_input_field=form.dns_ip_label, text_input_description=form.dns_ip.description %}
@@ -34,22 +51,4 @@
   <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
 </form>
 
-<script type=text/javascript>
-  $(function() {
-    $('a#calculate').bind('click', function() {
-      $.getJSON($SCRIPT_ROOT + '/_add_numbers', {
-        a: $('input[name="a"]').val(),
-        b: $('input[name="b"]').val()
-      }, function(data) {
-        $("#result").text(data.result);
-      });
-      return false;
-    });
-  });
-</script>
-<h1>jQuery Example</h1>
-<p><input type=text size=5 name=a> +
-   <input type=text size=5 name=b> =
-   <span id=result>?</span>
-<p><a href=# id=calculate>calculate server side</a>
 {% endblock %}
