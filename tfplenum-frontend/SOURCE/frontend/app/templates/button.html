@@ -11,7 +11,13 @@
   <div class="input-group-prepend">
     <span class="input-group-text">{{ button_label }}</span>
   </div>
-  <input name='{{ button_name }}' type="text" class="form-control" placeholder="{{ button_placeholder }}">
+  <input name="{{ button_id }}" type="text" class="form-control" placeholder="{{ button_placeholder }}">
+  <div class="valid-feedback">
+    Looks good!
+  </div>
+  <div class="invalid-feedback">
+    Please choose a username.
+  </div>
   <div class="input-group-append">
     <button class="btn btn-primary" type="submit">{{ button_text }}</button>
   </div>
