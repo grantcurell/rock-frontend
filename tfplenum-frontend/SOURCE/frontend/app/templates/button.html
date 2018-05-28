@@ -13,9 +13,9 @@
   <div class="input-group-prepend">
     <span class="input-group-text">{{ button_label }}</span>
   </div>
-  <input name="{{ button_id }}" type="{{ button_field_type | default("text", true) }}" {{ button_constraint }} class="form-control" placeholder="{{ button_placeholder }}" {{ 'required' if button_required is defined }}>
+  <input name="{{ button_field_id }}" type="{{ button_field_type | default("text", true) }}" {{ button_constraint }} class="form-control" placeholder="{{ button_placeholder }}" {{ 'required' if button_required is defined }}>
   <div class="input-group-append">
-    <button class="btn btn-primary" type="submit">{{ button_text }}</button>
+    <button class="btn btn-primary" id="{{ button_id }}" type="button">{{ button_text }}</button>
   </div>
   <div class="valid-feedback">
   {{ button_valid_feedback | default("Looks good!", true) }}

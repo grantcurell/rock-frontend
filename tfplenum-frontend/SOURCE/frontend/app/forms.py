@@ -1,10 +1,10 @@
 
 # https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation
 class Field:
-    def __init__(self, id=None, label=None, description=None, placeholder=None,
-                 input_type=None, html5_constraint=None, required=True, valid_feedback=None,
-                 invalid_feedback=None):
-      self.id = id
+    def __init__(self, form_name=None, label=None, description=None, placeholder=None,
+                 input_type='text', html5_constraint=None, valid_feedback=None,
+                 invalid_feedback=None, required=True):
+      self.field_id = form_name + '_field'
       self.label = label
       self.description = description
       self.placeholder = placeholder
@@ -19,34 +19,36 @@ class Field:
 class Button(Field, object):
     def __init__(self, button_text=None, **kwargs):
         super(Button, self).__init__(**kwargs)
+        self.button_id = kwargs.get('form_name') + '_button'
         self.button_text = button_text
 
 class InventoryForm:
 
   number_of_servers = Button(
-    id = 'num_servers' \
-  , label = 'Number of Servers' \
-  , button_text = 'Submit' \
-  , placeholder = "Enter the number of servers you plan to run in your kit" \
-  , input_type = 'number' \
-  , html5_constraint = 'min=1' \
-  , required = True \
-  , valid_feedback = 'Looks good! Configure your sensors in the \'Server Settings\' section below.' \
+    form_name = 'number_of_servers'
+  , label = 'Number of Servers'
+  , button_text = 'Submit'
+  , placeholder = "Enter the number of servers you plan to run in your kit"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , required = True
+  , valid_feedback = 'Looks good! Configure your sensors in the \'Server Settings\' section below.'
   , invalid_feedback = 'You must have at least one server.')
 
   number_of_sensors = Button(
-    id = 'num_sensors' \
-  , label = 'Number of Sensors' \
-  , button_text = 'Submit' \
-  , placeholder = "Enter the number of sensors you plan to run in your kit" \
-  , input_type = 'number' \
-  , html5_constraint = 'min=1' \
-  , required = True \
-  , valid_feedback = 'Looks good! Configure your sensors in the \'Sensor Settings\' section below.' \
+    form_name = 'number_of_servers'
+  , label = 'Number of Sensors'
+  , button_text = 'Submit'
+  , placeholder = "Enter the number of sensors you plan to run in your kit"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , required = True
+  , valid_feedback = 'Looks good! Configure your sensors in the \'Sensor Settings\' section below.'
   , invalid_feedback = 'You must have at least one sensor.')
 
   dns_ip = Field(
-    label = 'DNS IP Address' \
+    form_name = 'dns_ip'
+  , label = 'DNS IP Address'
   , description =
   "The IP address of the system DNS server. You may define this or it will   \
    default  to using the master server's management IP. We suggest you leave \

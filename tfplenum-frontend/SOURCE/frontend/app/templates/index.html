@@ -14,7 +14,8 @@
 </div>
 <h2>Kit Layout</h2>
 <form id='form_servers' action="/" method="post" role=form class="needs-validation" novalidate>
-  {% with button_id = form.number_of_servers.id
+  {% with button_field_id = form.number_of_servers.field_id
+        , button_id = form.number_of_servers.button_id
         , button_label = form.number_of_servers.label
         , button_text = form.number_of_servers.button_text
         , button_placeholder = form.number_of_servers.placeholder
@@ -26,8 +27,9 @@
     {% include "button.html" %}
   {% endwith %}
 </form>
-<form id='form_sensor' action="/" method="post" role=form class="needs-validation" novalidate>
-  {% with button_id = form.number_of_sensors.id
+<form id='form_sensors' action="/" method="post" role=form class="needs-validation" novalidate>
+  {% with button_field_id = form.number_of_sensors.field_id
+        , button_id = form.number_of_sensors.button_id
         , button_label = form.number_of_sensors.label
         , button_text=form.number_of_sensors.button_text
         , button_placeholder = form.number_of_sensors.placeholder
