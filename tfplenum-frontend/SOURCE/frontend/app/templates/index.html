@@ -19,7 +19,7 @@
 </div>
 <form id='form_sensor' action="/" method="post" role=form class="needs-validation" novalidate>
   <h2>Kit Layout</h2>
-    {% with button_id=form.number_of_sensors.id, button_label=form.number_of_sensors.label, button_text=form.number_of_sensors.button_text, button_placeholder=form.number_of_sensors.placeholder %}
+    {% with button_id=form.number_of_sensors.id, button_label=form.number_of_sensors.label, button_text=form.number_of_sensors.button_text, button_placeholder=form.number_of_sensors.placeholder, button_field_type=form.number_of_sensors.input_type, button_constraint=form.number_of_sensors.html5_constraint, button_required=form.number_of_sensors.required %}
       {% include "button.html" %}
     {% endwith %}
     {% for error in form.number_of_sensors.errors %}

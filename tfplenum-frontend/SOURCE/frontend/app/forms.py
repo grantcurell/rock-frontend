@@ -1,17 +1,18 @@
 
 
 class Field:
-    def __init__(self, id=None, label=None, description=None, placeholder=None):
+    def __init__(self, id=None, label=None, description=None, placeholder=None, input_type=None, html5_constraint=None, required=True):
       self.id = id
       self.label = label
       self.description = description
       self.placeholder = placeholder
+      self.input_type = input_type
+      self.html5_constraint = html5_constraint
 
-#class Bootstrap_StringField(StringField):
- # def __init__(self, label=None, placeholder=None, **kwargs):
-#    super(Bootstrap_StringField, self).__init__(**kwargs)
-#    self.label = label
-#    self.placeholder = placeholder
+      if required:
+          self.required = 'required'
+      else:
+          self.required = ''
 
 class Button(Field, object):
     def __init__(self, button_text=None, **kwargs):
@@ -24,8 +25,10 @@ class InventoryForm:
     id = 'num_sensors' \
   , label = 'Number of Sensors' \
   , button_text = 'Submit' \
-  , placeholder = "Enter the number of sensors you plan to run in your kit")
-
+  , placeholder = "Enter the number of sensors you plan to run in your kit" \
+  , input_type = 'number' \
+  , html5_constraint = 'min=1' \
+  , required = True)
 
   dns_ip = Field(
     label = 'DNS IP Address' \

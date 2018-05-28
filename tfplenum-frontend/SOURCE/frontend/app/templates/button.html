@@ -1,25 +1,27 @@
 <!--
-# button_id (string): The id which will be used to identify the button created
-# botton_form_pointer (WTForm Field): A pointer to the WTForm Field class which
-#                                     the button will use to take input from
+# button_id (string): The id which will be used to identify the input field
 # button_label (string): The text which will affix the left side of the input field
 # button_text (string): The text for the button itself
 # button_description (string): This is optional. If you want to provide a description
 #                              below the button you can do so with this option.
+# button_placeholder (string): The placeholder text which will appear in the text field
+# button_valid_feedback (string): The feedback to show if the field is correct
+# button_invalid_feedback (string): The feedback to show if the user inputs something
+#                                   incorrect.
 -->
 <div class="input-group mb-3">
   <div class="input-group-prepend">
     <span class="input-group-text">{{ button_label }}</span>
   </div>
-  <input name="{{ button_id }}" type="text" class="form-control" placeholder="{{ button_placeholder }}">
-  <div class="valid-feedback">
-    Looks good!
-  </div>
-  <div class="invalid-feedback">
-    Please choose a username.
-  </div>
+  <input name="{{ button_id }}" type="{{ button_field_type | default("text", true) }}" {{ button_constraint }} class="form-control" placeholder="{{ button_placeholder }}" {{ button_required }}>
   <div class="input-group-append">
     <button class="btn btn-primary" type="submit">{{ button_text }}</button>
+  </div>
+  <div class="valid-feedback">
+  {{ button_valid_feedback | default("Looks good!", true) }}
+  </div>
+  <div class="invalid-feedback">
+  {{ button_invalid_feedback | default("This field is required", true) }}
   </div>
 </div>
 {% if button_description is defined %}
