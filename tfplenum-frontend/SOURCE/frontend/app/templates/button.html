@@ -11,9 +11,9 @@
   <div class="input-group-prepend">
     <span class="input-group-text">{{ button_label }}</span>
   </div>
-  <input type="text" class="form-control" placeholder="{{ button_placeholder }}">
+  <input name='{{ button_name }}' type="text" class="form-control" placeholder="{{ button_placeholder }}">
   <div class="input-group-append">
-    <button id="{{ button_id }}" class="btn btn-primary" type="submit">{{ button_text }}</button>
+    <button class="btn btn-primary" type="submit">{{ button_text }}</button>
   </div>
 </div>
 {% if button_description is defined %}
