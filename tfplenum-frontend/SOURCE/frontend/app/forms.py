@@ -23,6 +23,10 @@ class Button(Field, object):
         self.button_id = kwargs.get('form_name') + '_button'
         self.button_text = button_text
 
+class CheckBox:
+    def __init__(self, tooltip_text):
+        self.tooltip_text = tooltip_text
+
 class InventoryForm:
 
   number_of_servers = Button(
@@ -34,6 +38,15 @@ class InventoryForm:
   , html5_constraint = 'min=1'
   , required = True
   , invalid_feedback = 'You must have at least one server.')
+
+  server_is_master_server_checkbox = CheckBox(
+  "There can only be one master server. It is a bit like the Highlander that way.\
+   The master server is special in that it runs the Kubernetes master and is     \
+   responsible for deploying services out to all the other hosts in the cluster. \
+   This server should be fairly beefy. By default, this server will also provide \
+   DNS to the rest of the kit for internal services. WARNING: If this server     \
+   fails, the entire kit goes down with it!!!"
+  )
 
   number_of_sensors = Button(
     form_name = 'number_of_sensors'

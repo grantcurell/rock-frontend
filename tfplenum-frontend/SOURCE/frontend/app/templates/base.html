@@ -4,12 +4,12 @@
 <html lang="en">
   <head>
     <title>{% block title %}{% endblock %}</title>
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet">
     <!-- Load jquery -->
     <script type=text/javascript src="{{ url_for('static', filename='jquery/jquery-3.3.1.js') }}"></script>
     <!-- Include popper.js -->
-    <!-- <script type=text/javascript src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script> -->
-    <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet">
+    <script type=text/javascript src="{{ url_for('static', filename='bootstrap/js/popper.min.js') }}"></script>
     <!-- Add Bootstrap's jquery extension -->
     <script type=text/javascript src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
   </head>

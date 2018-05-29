@@ -26,11 +26,12 @@
         , button_valid_feedback = form.number_of_servers.valid_feedback %}
     {% include "button.html" %}
   {% endwith %}
-  <!-- This is extended by servers.html. It is not actually blank as it might seem.
-       Check out foozandfuncs to see how this modification happens. You can search
-       for the id server_accordion. -->
-  <div class="accordion" id="server_accordion"></div>
+
 </form>
+<!-- This is extended by servers.html. It is not actually blank as it might seem.
+     Check out foozandfuncs to see how this modification happens. You can search
+     for the id server_accordion. -->
+<div class="accordion" id="{{ [form.number_of_servers.form_name, 'accordion'] | join('_') }}"></div>
 <br>
 <form id='{{ form.number_of_sensors.form_name }}' role=form class="needs-validation" novalidate>
   {% with button_field_id = form.number_of_sensors.field_id

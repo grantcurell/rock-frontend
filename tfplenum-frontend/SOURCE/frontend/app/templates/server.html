@@ -1,4 +1,17 @@
 
+<script>
+  $(document).ready(function(){
+
+    // This function activates all tooltips on the page
+    // See: https://getbootstrap.com/docs/4.1/components/tooltips/ for explanation
+    $('[data-toggle="tooltip"]').tooltip();
+
+    //$('#is_master_server_1').change(function() {
+    //  alert($(this).parent().parent().text())
+    //})
+  });
+</script>
+
 {# This loop goes from 0 to server_count #}
 {% for i in range(server_count) %}
 <div class="server_slide card">
@@ -11,7 +24,14 @@
   </div>
   <div id="{{ ['server_collapse', i+1] | join('_') }}" class="collapse show" aria-labelledby="{{ ['server_accordion_header', i+1] | join('_') }}">
     <div class="card-body">
-      This is the server {{ i + 1 }} body
+      <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="{{ ['is_master_server', i+1] | join('_') }}">
+          <label id='{{ ['is_master_server_label', i+1] | join('_') }}' class="form-check-label" for="{{ ['is_master_server', i+1] | join('_') }}" data-toggle="tooltip" data-placement="right" title='{{ form.server_is_master_server_checkbox.tooltip_text }}'>
+            Is Master Server
+          </label>
+        </div>
+      </form>
     </div>
   </div>
 </div>

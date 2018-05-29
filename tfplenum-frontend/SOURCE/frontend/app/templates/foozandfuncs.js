@@ -21,7 +21,7 @@ $( document ).ready(function() {
       $.get("{{ url_for('_server') }}", { server_count: $( 'input[name={{ form.number_of_servers.field_id }}]' ).val() }, function(data){
         // The hide method is here because effects only work if the element
         // begins in a hidden state
-        $( "#server_accordion" ).html(data).hide().slideDown("slow");
+        $( "#{{ [form.number_of_servers.form_name, 'accordion'] | join('_') }}" ).html(data).hide().slideDown("slow");
       });
     }
     $( "#{{ form.number_of_servers.form_name }}" ).addClass('was-validated');
