@@ -6,9 +6,27 @@
     // See: https://getbootstrap.com/docs/4.1/components/tooltips/ for explanation
     $('[data-toggle="tooltip"]').tooltip();
 
-    //$('#is_master_server_1').change(function() {
-    //  alert($(this).parent().parent().text())
-    //})
+    // The event object generated here represents the input field of the checkbox
+    // selected. target is the DOM element that initated the event. See: https://learn.jquery.com/events/event-basics/
+    // The object in this case will be an HTMLInputElement. The parent class of this,
+    // Element, has the attribute ID.
+    {% for i in range(server_count) %}
+    $("#{{ ['is_master_server', i+1] | join('_') }}").change(event, function() {
+      //alert("HERE")
+      if ($( '#' + event.target.id ).is(':checked')) {
+        //alert("HERE1")
+        $( ".master_server_checkbox" ).not( "#" + event.target.id ).each(function() {
+          //alert("here")
+          $( "#" + this.id ).prop( "disabled", false );
+        });
+      } else {
+        //alert("HERE2")
+        $( ".master_server_checkbox" ).not( "#" + event.target.id ).each(function() {
+          $( "#" + this.id ).prop( "disabled", true );
+        });
+      }
+    })
+    {% endfor %}
   });
 </script>
 
@@ -26,9 +44,9 @@
     <div class="card-body">
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" value="" id="{{ ['is_master_server', i+1] | join('_') }}">
+          <input class="form-check-input master_server_checkbox" type="checkbox" value="" id="{{ ['is_master_server', i+1] | join('_') }}">
           <label id='{{ ['is_master_server_label', i+1] | join('_') }}' class="form-check-label" for="{{ ['is_master_server', i+1] | join('_') }}" data-toggle="tooltip" data-placement="right" title='{{ form.server_is_master_server_checkbox.tooltip_text }}'>
-            Is Master Server
+            Is Kubernetes master server?
           </label>
         </div>
       </form>

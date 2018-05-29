@@ -40,7 +40,8 @@ class InventoryForm:
   , invalid_feedback = 'You must have at least one server.')
 
   server_is_master_server_checkbox = CheckBox(
-  "There can only be one master server. It is a bit like the Highlander that way.\
+  "This is not the ESXi/VM server. This is for Kubernetes server only.           \
+   There can only be one master server. It is a bit like the Highlander that way.\
    The master server is special in that it runs the Kubernetes master and is     \
    responsible for deploying services out to all the other hosts in the cluster. \
    This server should be fairly beefy. By default, this server will also provide \
