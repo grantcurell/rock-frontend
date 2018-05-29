@@ -1,38 +1,45 @@
-/*
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function() {
-  'use strict';
-  window.addEventListener('load', function() {
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    var forms = document.getElementsByClassName('needs-validation');
-    // Loop over them and prevent submission
-    // See https://stackoverflow.com/questions/32922445/js-array-prototype-filter-call-can-someone-explain-me-how-this-piece-of-code
-    // for a nice explanation of what's going on here. I just modified the bootstrap
-    // code here: https://getbootstrap.com/docs/4.1/components/forms/#custom-styles
-    var validation = Array.prototype.filter.call(forms, function(form) {
-      $('#{{ form.number_of_servers.button_id }}').on('click', function (event) {
-        if (form.checkValidity() === false) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      })
-    });
-  }, false);
-})();
-*/
 
 $( document ).ready(function() {
+
+  // Server events: this function handles when a user presses submit on the
+  // number of servers button.
   // See: https://api.jquery.com/click/
   $('#{{ form.number_of_servers.button_id }}').click(function (event) {
     // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
     // selection set. To access the DOM properties you have to select the first
     // item. checkValidity is an HTML5 built in function we are calling against
     // the element.
-    if ($( "#form_servers" )[0].checkValidity() === false) {
+    if ($( "#{{ form.number_of_servers.form_name }}" )[0].checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
+    } else {
+      // This will contact the server, run the _server route, and the value provided
+      // here will be used in the server.html template as the loop count variable
+      // to determine how many server forms should be made. (IE if the user types
+      // 5 in Number of Servers it will be transfered as the variable server_count)
+      // here.
+      $.get("{{ url_for('_server') }}", { server_count: $( 'input[name={{ form.number_of_servers.field_id }}]' ).val() }, function(data){
+        // The hide method is here because effects only work if the element
+        // begins in a hidden state
+        $( "#server_accordion" ).html(data).hide().slideDown("slow");
+      });
     }
-    $( "#form_servers" ).addClass('was-validated');
+    $( "#{{ form.number_of_servers.form_name }}" ).addClass('was-validated');
+  });
+
+  // Sensors events: this function handles when a user presses submit on the
+  // number of sensors button. See the function above for an explanation of the
+  // different parts.
+  $('#{{ form.number_of_sensors.button_id }}').click(function (event) {
+    if ($( "#{{ form.number_of_sensors.form_name }}" )[0].checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+      alert("HERE")
+    } else {
+      $.get("{{ url_for('_server') }}", { server_count: $( 'input[name={{ form.number_of_sensors.field_id }}]' ).val() }, function(data){
+        $( "#server_accordion" ).html(data).hide().slideDown("slow");
+      });
+    }
+    $( "#{{ form.number_of_sensors.form_name }}" ).addClass('was-validated');
   });
 });

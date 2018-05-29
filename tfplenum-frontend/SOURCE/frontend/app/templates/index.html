@@ -9,11 +9,11 @@
 </script>
 {% endblock %}
 <div class="jumbotron">
-  <h1>Inventory Configurator</h1>
+  <h1>TFPlenum Configurator</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
-<h2>Kit Layout</h2>
-<form id='form_servers' action="/" method="post" role=form class="needs-validation" novalidate>
+<h2>Host Settings</h2>
+<form id='{{ form.number_of_servers.form_name }}' role=form class="needs-validation" novalidate>
   {% with button_field_id = form.number_of_servers.field_id
         , button_id = form.number_of_servers.button_id
         , button_label = form.number_of_servers.label
@@ -26,8 +26,13 @@
         , button_valid_feedback = form.number_of_servers.valid_feedback %}
     {% include "button.html" %}
   {% endwith %}
+  <!-- This is extended by servers.html. It is not actually blank as it might seem.
+       Check out foozandfuncs to see how this modification happens. You can search
+       for the id server_accordion. -->
+  <div class="accordion" id="server_accordion"></div>
 </form>
-<form id='form_sensors' action="/" method="post" role=form class="needs-validation" novalidate>
+<br>
+<form id='{{ form.number_of_sensors.form_name }}' role=form class="needs-validation" novalidate>
   {% with button_field_id = form.number_of_sensors.field_id
         , button_id = form.number_of_sensors.button_id
         , button_label = form.number_of_sensors.label

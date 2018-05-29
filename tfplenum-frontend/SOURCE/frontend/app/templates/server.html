@@ -1,0 +1,18 @@
+
+{# This loop goes from 0 to server_count #}
+{% for i in range(server_count) %}
+<div class="server_slide card">
+  <div class="card-header" id="{{ ['server_accordion_header', i+1] | join('_') }}">
+    <h5 class="mb-0">
+      <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ ['server_collapse', i+1] | join('_') }}" aria-expanded="true" aria-controls="{{ ['server_collapse', i+1] | join('_') }}">
+        Server {{ i + 1 }}
+      </button>
+    </h5>
+  </div>
+  <div id="{{ ['server_collapse', i+1] | join('_') }}" class="collapse show" aria-labelledby="{{ ['server_accordion_header', i+1] | join('_') }}">
+    <div class="card-body">
+      This is the server {{ i + 1 }} body
+    </div>
+  </div>
+</div>
+{% endfor %}

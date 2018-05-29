@@ -4,6 +4,7 @@ class Field:
     def __init__(self, form_name=None, label=None, description=None, placeholder=None,
                  input_type='text', html5_constraint=None, valid_feedback=None,
                  invalid_feedback=None, required=True):
+      self.form_name = 'form_' + form_name
       self.field_id = form_name + '_field'
       self.label = label
       self.description = description
@@ -28,22 +29,20 @@ class InventoryForm:
     form_name = 'number_of_servers'
   , label = 'Number of Servers'
   , button_text = 'Submit'
-  , placeholder = "Enter the number of servers you plan to run in your kit"
+  , placeholder = "Enter the number of servers you have"
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , required = True
-  , valid_feedback = 'Looks good! Configure your sensors in the \'Server Settings\' section below.'
   , invalid_feedback = 'You must have at least one server.')
 
   number_of_sensors = Button(
-    form_name = 'number_of_servers'
+    form_name = 'number_of_sensors'
   , label = 'Number of Sensors'
   , button_text = 'Submit'
-  , placeholder = "Enter the number of sensors you plan to run in your kit"
+  , placeholder = "Enter the number of sensors you have"
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , required = True
-  , valid_feedback = 'Looks good! Configure your sensors in the \'Sensor Settings\' section below.'
   , invalid_feedback = 'You must have at least one sensor.')
 
   dns_ip = Field(

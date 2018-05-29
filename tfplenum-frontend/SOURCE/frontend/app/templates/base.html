@@ -12,9 +12,6 @@
     <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet">
     <!-- Add Bootstrap's jquery extension -->
     <script type=text/javascript src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
-    <script type=text/javascript>
-      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-    </script>
   </head>
   <body>
     <div class="container">
