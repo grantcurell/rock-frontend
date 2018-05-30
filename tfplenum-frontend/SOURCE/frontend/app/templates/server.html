@@ -36,38 +36,38 @@
 
 {# This loop goes from 0 to server_count #}
 {% for i in range(server_count) %}
-<form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>
-  <div class="server_slide card">
-    <div class="card-header" id="{{ ['server_accordion_header', i+1] | join('_') }}">
-      <h5 class="mb-0">
-        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ ['server_collapse', i+1] | join('_') }}" aria-expanded="true" aria-controls="{{ ['server_collapse', i+1] | join('_') }}">
-          Server {{ i + 1 }}
-        </button>
-      </h5>
-    </div>
-    <div id="{{ ['server_collapse', i+1] | join('_') }}" class="c-ollapse show" aria-labelledby="{{ ['server_accordion_header', i+1] | join('_') }}">
-      <div class="card-body">
-        {% with button_field_id = form.host_server.field_id + '_' + ((i+1) | string)
-              , button_id = form.host_server.button_id + '_' + ((i+1) | string)
-              , button_label = form.host_server.label
-              , button_text=form.host_server.button_text
-              , button_placeholder = form.host_server.placeholder
-              , button_field_type = form.host_server.input_type
-              , button_constraint = form.host_server.html5_constraint
-              , button_required = form.host_server.required
-              , button_invalid_feedback = form.host_server.invalid_feedback
-              , button_valid_feedback = form.host_server.valid_feedback %}
-          {% include "button.html" %}
-        {% endwith %}
-        <br>
-        <div class="form-check">
-          <input class="form-check-input master_server_checkbox" type="checkbox" value="" id="{{ ['is_master_server', i+1] | join('_') }}">
-          <label id='{{ ['is_master_server_label', i+1] | join('_') }}' class="form-check-label" for="{{ ['is_master_server', i+1] | join('_') }}" data-toggle="tooltip" data-placement="right" title='{{ form.server_is_master_server_checkbox.tooltip_text }}'>
-            Is Kubernetes master server?
-          </label>
-        </div>
+<div class="server_slide card">
+  <div class="card-header" id="{{ ['server_accordion_header', i+1] | join('_') }}">
+    <h5 class="mb-0">
+      <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ ['server_collapse', i+1] | join('_') }}" aria-expanded="true" aria-controls="{{ ['server_collapse', i+1] | join('_') }}">
+        Server {{ i + 1 }}
+      </button>
+    </h5>
+  </div>
+  <div id="{{ ['server_collapse', i+1] | join('_') }}" class="c-ollapse show" aria-labelledby="{{ ['server_accordion_header', i+1] | join('_') }}">
+    <div class="card-body">
+      {% with button_form_name = ['server_form', i+1] | join('_')
+            , button_field_id = form.host_server.field_id + '_' + ((i+1) | string)
+            , button_id = form.host_server.button_id + '_' + ((i+1) | string)
+            , button_label = form.host_server.label
+            , button_text=form.host_server.button_text
+            , button_placeholder = form.host_server.placeholder
+            , button_field_type = form.host_server.input_type
+            , button_constraint = form.host_server.html5_constraint
+            , button_required = form.host_server.required
+            , button_invalid_feedback = form.host_server.invalid_feedback
+            , button_valid_feedback = form.host_server.valid_feedback %}
+        {% include "button.html" %}
+      {% endwith %}
+      <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>
+      <div class="form-check">
+        <input class="form-check-input master_server_checkbox" type="checkbox" value="" id="{{ ['is_master_server', i+1] | join('_') }}">
+        <label id='{{ ['is_master_server_label', i+1] | join('_') }}' class="form-check-label" for="{{ ['is_master_server', i+1] | join('_') }}" data-toggle="tooltip" data-placement="right" title='{{ form.server_is_master_server_checkbox.tooltip_text }}'>
+          Is Kubernetes master server?
+        </label>
       </div>
+      </form>
     </div>
   </div>
-</form>
+</div>
 {% endfor %}

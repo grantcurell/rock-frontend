@@ -1,14 +1,35 @@
-<!--
-# button_id (string): The id which will be used to identify the input field
-# button_label (string): The text which will affix the left side of the input field
-# button_text (string): The text for the button itself
-# button_description (string): This is optional. If you want to provide a description
-#                              below the button you can do so with this option.
-# button_placeholder (string): The placeholder text which will appear in the text field
-# button_valid_feedback (string): The feedback to show if the field is correct
-# button_invalid_feedback (string): The feedback to show if the user inputs something
-#                                   incorrect.
--->
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    // Server events: this function handles when a user presses submit on the
+    // number of servers button.
+    // See: https://api.jquery.com/click/
+    $('#{{ button_id }}').click(function (event) {
+      // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
+      // selection set. To access the DOM properties you have to select the first
+      // item. checkValidity is an HTML5 built in function we are calling against
+      // the element.
+      if ($( "#{{ button_form_name }}" )[0].checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      } else {
+        // This will contact the server, run the _server route, and the value provided
+        // here will be used in the server.html template as the loop count variable
+        // to determine how many server forms should be made. (IE if the user types
+        // 5 in Number of Servers it will be transfered as the variable server_count)
+        // here.
+        $.get("{{ url_for('_server') }}", { server_count: $( 'input[name={{ button_field_id }}]' ).val() }, function(data){
+          // The hide method is here because effects only work if the element
+          // begins in a hidden state
+          $( "#{{ [button_form_name, 'accordion'] | join('_') }}" ).html(data).hide().slideDown("slow");
+        });
+      }
+      $( "#{{ button_form_name }}" ).addClass('was-validated');
+    });
+});
+</script>
+
+<form id='{{ button_form_name }}' role=form class="needs-validation" novalidate>
 <div class="input-group mb-3">
   <div class="input-group-prepend">
     <span class="input-group-text">{{ button_label }}</span>
@@ -31,3 +52,4 @@
   </small>
 </p>
 {% endif %}
+</form>

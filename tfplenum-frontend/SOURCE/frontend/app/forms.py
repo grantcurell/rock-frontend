@@ -17,6 +17,15 @@ class Field:
       if required:
           self.required = 'required'
 
+# button_id (string): The id which will be used to identify the input field
+# button_label (string): The text which will affix the left side of the input field
+# button_text (string): The text for the button itself
+# button_description (string): This is optional. If you want to provide a description
+#                              below the button you can do so with this option.
+# button_placeholder (string): The placeholder text which will appear in the text field
+# button_valid_feedback (string): The feedback to show if the field is correct
+# button_invalid_feedback (string): The feedback to show if the user inputs something
+#                                   incorrect.
 class Button(Field, object):
     def __init__(self, button_text=None, **kwargs):
         super(Button, self).__init__(**kwargs)
@@ -54,9 +63,10 @@ class InventoryForm:
   , label = 'Management IP Address'
   , button_text = 'Gather Facts'
   , placeholder = "Server's management IP address"
-  , input_type = 'number'
-  , html5_constraint = 'min=1'
+  , input_type = 'text'
+  , html5_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
   , required = True
+  , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
   , invalid_feedback = 'You must input the server management IP address.')
 
   number_of_sensors = Button(
