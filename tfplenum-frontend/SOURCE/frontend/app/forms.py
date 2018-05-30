@@ -40,7 +40,7 @@ class InventoryForm:
   , invalid_feedback = 'You must have at least one server.')
 
   server_is_master_server_checkbox = CheckBox(
-  "This is not the ESXi/VM server. This is for Kubernetes server only.           \
+  "This is not the ESXi/VM server. This is for the Kubernetes master server only.\
    There can only be one master server. It is a bit like the Highlander that way.\
    The master server is special in that it runs the Kubernetes master and is     \
    responsible for deploying services out to all the other hosts in the cluster. \
@@ -48,6 +48,16 @@ class InventoryForm:
    DNS to the rest of the kit for internal services. WARNING: If this server     \
    fails, the entire kit goes down with it!!!"
   )
+
+  host_server = Button(
+    form_name = 'host_server_form'
+  , label = 'Management IP Address'
+  , button_text = 'Gather Facts'
+  , placeholder = "Server's management IP address"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , required = True
+  , invalid_feedback = 'You must input the server management IP address.')
 
   number_of_sensors = Button(
     form_name = 'number_of_sensors'
