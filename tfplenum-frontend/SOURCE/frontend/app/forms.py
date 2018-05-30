@@ -27,10 +27,11 @@ class Field:
 # button_invalid_feedback (string): The feedback to show if the user inputs something
 #                                   incorrect.
 class Button(Field, object):
-    def __init__(self, button_text=None, **kwargs):
+    def __init__(self, button_text=None, reaction_file=None, **kwargs):
         super(Button, self).__init__(**kwargs)
         self.button_id = kwargs.get('form_name') + '_button'
         self.button_text = button_text
+        self.reaction_file = reaction_file
 
 class CheckBox:
     def __init__(self, tooltip_text):
@@ -46,7 +47,8 @@ class InventoryForm:
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , required = True
-  , invalid_feedback = 'You must have at least one server.')
+  , invalid_feedback = 'You must have at least one server.'
+  , reaction_file = 'button_reaction_number_of_servers.js')
 
   server_is_master_server_checkbox = CheckBox(
   "This is not the ESXi/VM server. This is for the Kubernetes master server only.\

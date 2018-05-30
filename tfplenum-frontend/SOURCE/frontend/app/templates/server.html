@@ -56,7 +56,8 @@
             , button_constraint = form.host_server.html5_constraint
             , button_required = form.host_server.required
             , button_invalid_feedback = form.host_server.invalid_feedback
-            , button_valid_feedback = form.host_server.valid_feedback %}
+            , button_valid_feedback = form.host_server.valid_feedback
+            , button_callback_url = form.number_of_servers.callback_url %}
         {% include "button.html" %}
       {% endwith %}
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>
