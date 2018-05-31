@@ -25,4 +25,6 @@ def kit_configuration():
 
 @app.route('/help')
 def help():
-    return render_template("help.html")
+    form = InventoryForm()
+    print form.server_is_master_server_checkbox.description
+    return render_template("help.html", form=form)

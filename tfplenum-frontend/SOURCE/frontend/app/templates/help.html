@@ -2,11 +2,30 @@
 
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block navbar %}
+{% with navbar_elements = form.navbar_elements
+      , current_page = 'help' %}
+{% include "navbar.html" %}
+{% endwith %}
+{% endblock %}
 {% block body %}
 <div class="jumbotron">
-  <h1>TFPlenum Help</h1>
+  <h1 class="display-4">TFPlenum Help</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
 <h2>Host Settings</h2>
+<dl class="row">
+  <dt class="col-sm-3">{{ form.server_is_master_server_checkbox.label }}<a name="{{ 'anchor_' + form.server_is_master_server_checkbox.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ form.server_is_master_server_checkbox.description }}</dd>
+</dl>
+<h2>General Settings</h2>
+<dl class="row">
+  <dt class="col-sm-3">{{ form.dns_ip.label }}<a name="{{ 'anchor_' + form.dns_ip.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ form.dns_ip.description }}</dd>
+</dl>
 <h2>Sensor Settings</h2>
+<dl class="row">
+  <dt class="col-sm-3">{{ form.sensor_storage_type.label }}<a name="{{ 'anchor_' + form.sensor_storage_type.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ form.sensor_storage_type.description }}</dd>
+</dl>
 {% endblock %}

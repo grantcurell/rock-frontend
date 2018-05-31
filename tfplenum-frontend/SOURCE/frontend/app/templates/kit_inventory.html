@@ -3,16 +3,14 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block navbar %}
-<div>
 {% with navbar_elements = form.navbar_elements
       , current_page = 'kit_configuration' %}
 {% include "navbar.html" %}
 {% endwith %}
-</div>
 {% endblock %}
 {% block body %}
 <div class="jumbotron">
-  <h1>TFPlenum Kit Configuration</h1>
+  <h1 class="display-4">TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
 <h2>Host Settings</h2>
@@ -70,7 +68,6 @@
 {% with dropdown_form_name = form.sensor_storage_type.form_name
       , dropdown_id = form.sensor_storage_type.dropdown_id
       , dropdown_label = form.sensor_storage_type.label
-      , dropdown_description = form.sensor_storage_type.description
       , dropdown_options = form.sensor_storage_type.options
       , dropdown_text = form.sensor_storage_type.dropdown_text %}
   {% include "dropdown.html" %}

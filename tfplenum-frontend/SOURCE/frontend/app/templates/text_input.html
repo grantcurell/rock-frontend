@@ -18,7 +18,9 @@
 <form id='{{ text_input_form_name }}' role=form class="needs-validation" novalidate>
 <div class="input-group mb-3">
   <div class="input-group-prepend">
+    <a href="{{ url_for('help') + '#anchor_' + text_input_label | replace(' ','_') }}">
     <span class="input-group-text">{{ text_input_label }}</span>
+    </a>
   </div>
   <input name="{{ text_input_field_id }}" id="{{ text_input_field_id }}" type="{{ text_input_field_type | default("text", true) }}" {{ text_input_constraint }} class="form-control" placeholder="{{ text_input_placeholder }}" {{ 'required' if text_input_required is defined }}>
   <div class="valid-feedback">

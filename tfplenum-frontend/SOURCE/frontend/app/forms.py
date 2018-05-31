@@ -33,8 +33,9 @@ class Button(Field, object):
         self.reaction_file = reaction_file
 
 class CheckBox:
-    def __init__(self, tooltip_text):
-        self.tooltip_text = tooltip_text
+    def __init__(self, label=None, description='the fuck'):
+        self.label = label
+        self.description = description
 
 class DropDown:
     def __init__(self, form_name=None, label=None, description=None, options=None, dropdown_text=None):
@@ -66,14 +67,14 @@ class InventoryForm:
   , reaction_file = 'button_reaction_number_of_servers.js')
 
   server_is_master_server_checkbox = CheckBox(
-  "This is not the ESXi/VM server. This is for the Kubernetes master server only.\
+  label = "Is Kubernetes master server?"
+  , description = "This is not the ESXi/VM server. This is for the Kubernetes master server only.\
    There can only be one master server. It is a bit like the Highlander that way.\
    The master server is special in that it runs the Kubernetes master and is     \
    responsible for deploying services out to all the other hosts in the cluster. \
    This server should be fairly beefy. By default, this server will also provide \
    DNS to the rest of the kit for internal services. WARNING: If this server     \
-   fails, the entire kit goes down with it!!!"
-  )
+   fails, the entire kit goes down with it!!!")
 
   host_server = Button(
     form_name = 'host_server'
@@ -131,5 +132,4 @@ class InventoryForm:
    default  to using the master server's management IP. We suggest you leave \
    it to default  unless you have a specific reason to use a different DNS   \
    server. Keep in mind  you will need to manually provide all required DNS  \
-   entries on your separate  DNS Server or the kit will break."              \
-  )
+   entries on your separate  DNS Server or the kit will break.")
