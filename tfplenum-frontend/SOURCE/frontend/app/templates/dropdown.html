@@ -1,0 +1,27 @@
+
+
+<form id='{{ dropdown_form_name }}' role=form class="needs-validation" novalidate>
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text">{{ dropdown_label }}</span>
+  </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {{ dropdown_text }}
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      {% for option in dropdown_options %}
+      <a class="dropdown-item" href="#">{{ option }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% if dropdown_description is defined %}
+<p>
+  <small class="form-text text-muted">
+    {{ dropdown_description }}<br>
+  </small>
+</p>
+{% endif %}
+<hr>
+</form>

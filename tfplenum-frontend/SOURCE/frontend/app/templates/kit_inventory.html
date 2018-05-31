@@ -42,21 +42,22 @@
 {% endwith %}
 <hr>
 <h2>General Settings</h2>
-<form id='form_general_settings' action="/" method="post" role=form class="needs-validation" novalidate>
-  <p>
-    {% with text_input_field = form.dns_ip.label
-          , text_input_description = form.dns_ip.description
-          , text_input_placeholder = form.dns_ip.placeholder %}
-      {% include "text_input.html" %}
-    {% endwith %}
-  </p>
-  <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
-  <hr>
-  <h2>Server Settings</h2>
-  <hr>
-  <h2>Sensor Settings</h2>
-  <div id=sensor></div>
-  <hr>
-</form>
-
+{% with text_input_form_name = form.dns_ip.form_name
+      , text_input_field_id = form.dns_ip.field_id
+      , text_input_label = form.dns_ip.label
+      , text_input_text = form.dns_ip.text_input_text
+      , text_input_placeholder = form.dns_ip.placeholder
+      , text_input_field_type = form.dns_ip.input_type
+      , text_input_constraint = form.dns_ip.html5_constraint
+      , text_input_required = form.dns_ip.required
+      , text_input_invalid_feedback = form.dns_ip.invalid_feedback
+      , text_input_valid_feedback = form.dns_ip.valid_feedback
+      , text_input_reaction_file = form.dns_ip.reaction_file %}
+  {% include "text_input.html" %}
+{% endwith %}
+<hr>
+<h2>Server Settings</h2>
+<hr>
+<h2>Sensor Settings</h2>
+<p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
 {% endblock %}

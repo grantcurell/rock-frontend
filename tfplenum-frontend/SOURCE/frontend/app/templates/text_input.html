@@ -1,8 +1,32 @@
+<script type="text/javascript">
+  $(document).ready(function(){
+    // See: https://api.jquery.com/keyup/
+    $('#{{ text_input_field_id }}').keyup(function (event) {
+      // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
+      // selection set. To access the DOM properties you have to select the first
+      // item. checkValidity is an HTML5 built in function we are calling against
+      // the element.
+      if ($( "#{{ text_input_form_name }}" )[0].checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      $( "#{{ text_input_form_name }}" ).addClass('was-validated');
+    });
+});
+</script>
+
+<form id='{{ text_input_form_name }}' role=form class="needs-validation" novalidate>
 <div class="input-group mb-3">
   <div class="input-group-prepend">
-    <span class="input-group-text">{{ text_input_field }}</span>
+    <span class="input-group-text">{{ text_input_label }}</span>
   </div>
-  <input type="text" class="form-control" placeholder="{{ text_input_placeholder }}">
+  <input name="{{ text_input_field_id }}" id="{{ text_input_field_id }}" type="{{ text_input_field_type | default("text", true) }}" {{ text_input_constraint }} class="form-control" placeholder="{{ text_input_placeholder }}" {{ 'required' if text_input_required is defined }}>
+  <div class="valid-feedback">
+  {{ text_input_valid_feedback | default("Looks good!", true) }}
+  </div>
+  <div class="invalid-feedback">
+  {{ text_input_invalid_feedback | default("This field is required", true) }}
+  </div>
 </div>
 {% if text_input_description is defined %}
 <p>
@@ -11,3 +35,4 @@
   </small>
 </p>
 {% endif %}
+</form>

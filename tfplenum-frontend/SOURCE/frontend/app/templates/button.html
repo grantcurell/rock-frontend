@@ -22,6 +22,21 @@
       }
       $( "#{{ button_form_name }}" ).addClass('was-validated');
     });
+
+    // This function is only here so that validity appears as soon as they start
+    // typing. It is effectively identical to the above except that it does not
+    // include a reaction if the input is valid
+    $('#{{ button_field_id }}').keyup(function (event) {
+      // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
+      // selection set. To access the DOM properties you have to select the first
+      // item. checkValidity is an HTML5 built in function we are calling against
+      // the element.
+      if ($( "#{{ button_form_name }}" )[0].checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      $( "#{{ button_form_name }}" ).addClass('was-validated');
+    });
 });
 </script>
 
@@ -30,7 +45,7 @@
   <div class="input-group-prepend">
     <span class="input-group-text">{{ button_label }}</span>
   </div>
-  <input name="{{ button_field_id }}" type="{{ button_field_type | default("text", true) }}" {{ button_constraint }} class="form-control" placeholder="{{ button_placeholder }}" {{ 'required' if button_required is defined }}>
+  <input name="{{ button_field_id }}" id="{{ button_field_id }}" type="{{ button_field_type | default("text", true) }}" {{ button_constraint }} class="form-control" placeholder="{{ button_placeholder }}" {{ 'required' if button_required is defined }}>
   <div class="input-group-append">
     <button class="btn btn-primary" id="{{ button_id }}" type="button">{{ button_text }}</button>
   </div>

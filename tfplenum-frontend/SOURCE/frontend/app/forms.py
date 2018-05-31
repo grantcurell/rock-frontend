@@ -37,7 +37,17 @@ class CheckBox:
     def __init__(self, tooltip_text):
         self.tooltip_text = tooltip_text
 
+class DropDown:
+    def __init__(self, form_name=None, label=None, description=None, options=None):
+        self.form_name = 'form_' + form_name
+        self.label = label
+        self.description = description
+        self.options = options
+
+
 class InventoryForm:
+
+  ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
 
   number_of_servers = Button(
     form_name = 'number_of_servers'
@@ -61,12 +71,12 @@ class InventoryForm:
   )
 
   host_server = Button(
-    form_name = 'host_server_form'
+    form_name = 'host_server'
   , label = 'Management IP Address'
   , button_text = 'Gather Facts'
   , placeholder = "Server's management IP address"
   , input_type = 'text'
-  , html5_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
+  , html5_constraint = ip_constraint
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
   , invalid_feedback = 'You must input the server management IP address.')
@@ -81,13 +91,23 @@ class InventoryForm:
   , required = True
   , invalid_feedback = 'You must have at least one sensor.')
 
+  sensor_storage_type = DropDown(
+    form_name = 'sensor_storage_type'
+  , label = 'Sensor Storage Type'
+  , description = 'Balls'
+  , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage'])
+
   dns_ip = Field(
     form_name = 'dns_ip'
   , label = 'DNS IP Address'
+  , placeholder = "192.168.1.50"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address'
   , description =
   "The IP address of the system DNS server. You may define this or it will   \
    default  to using the master server's management IP. We suggest you leave \
    it to default  unless you have a specific reason to use a different DNS   \
    server. Keep in mind  you will need to manually provide all required DNS  \
    entries on your separate  DNS Server or the kit will break."              \
-  , placeholder = "192.168.1.50")
+  )
