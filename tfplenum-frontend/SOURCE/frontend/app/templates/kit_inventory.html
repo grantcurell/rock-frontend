@@ -59,5 +59,13 @@
 <h2>Server Settings</h2>
 <hr>
 <h2>Sensor Settings</h2>
+{% with dropdown_form_name = form.sensor_storage_type.form_name
+      , dropdown_id = form.sensor_storage_type.dropdown_id
+      , dropdown_label = form.sensor_storage_type.label
+      , dropdown_description = form.sensor_storage_type.description
+      , dropdown_options = form.sensor_storage_type.options
+      , dropdown_text = form.sensor_storage_type.dropdown_text %}
+  {% include "dropdown.html" %}
+{% endwith %}
 <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
 {% endblock %}

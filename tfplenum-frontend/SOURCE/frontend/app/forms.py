@@ -38,12 +38,13 @@ class CheckBox:
         self.tooltip_text = tooltip_text
 
 class DropDown:
-    def __init__(self, form_name=None, label=None, description=None, options=None):
+    def __init__(self, form_name=None, label=None, description=None, options=None, dropdown_text=None):
         self.form_name = 'form_' + form_name
+        self.dropdown_id = form_name + '_dropdown'
         self.label = label
         self.description = description
         self.options = options
-
+        self.dropdown_text = dropdown_text
 
 class InventoryForm:
 
@@ -94,8 +95,9 @@ class InventoryForm:
   sensor_storage_type = DropDown(
     form_name = 'sensor_storage_type'
   , label = 'Sensor Storage Type'
-  , description = 'Balls'
-  , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage'])
+  , description = 'Bed'
+  , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage']
+  , dropdown_text = 'Storage Type')
 
   dns_ip = Field(
     form_name = 'dns_ip'

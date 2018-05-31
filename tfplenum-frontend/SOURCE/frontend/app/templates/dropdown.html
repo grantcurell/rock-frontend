@@ -1,4 +1,13 @@
-
+<script type="text/javascript">
+  $(document).ready(function(){
+    {% for option in ( dropdown_options | map(replace(" ","_")) %}
+    $("#{{ dropdown_id }}").click(function(event){
+      $(".btn:first-child").text($(this).text());
+      $(".btn:first-child").val($(this).text());
+    });
+    {% endfor %}
+  });
+</script>
 
 <form id='{{ dropdown_form_name }}' role=form class="needs-validation" novalidate>
 <div class="input-group mb-3">
@@ -6,12 +15,12 @@
     <span class="input-group-text">{{ dropdown_label }}</span>
   </div>
   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="{{ dropdown_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       {{ dropdown_text }}
     </button>
-    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <div class="dropdown-menu" aria-labelledby="{{ dropdown_id }}">
       {% for option in dropdown_options %}
-      <a class="dropdown-item" href="#">{{ option }}</a>
+      <button class="dropdown-item" type=button>{{ option }}</button>
       {% endfor %}
     </div>
   </div>
