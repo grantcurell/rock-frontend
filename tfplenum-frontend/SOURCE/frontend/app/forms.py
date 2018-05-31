@@ -95,7 +95,23 @@ class InventoryForm:
   sensor_storage_type = DropDown(
     form_name = 'sensor_storage_type'
   , label = 'Sensor Storage Type'
-  , description = 'Bed'
+  , description =
+  "The kit can use two types of storage for PCAP. One is clustered Ceph storage \
+  and the other is a disk on the sensor itself. The advantage to clustered storage \
+  is that all hard drives given to Ceph are treated like one \"mega hard drive\". \
+  This means that you may have PCAP come in on sensor 1, but if its disk is filling \
+  up, it can just write that data to the disk on sensor 2 because it is also part \
+  of the Ceph cluster. The downside is that now all of the internal kit traffic \
+  must traverse the internal kit network backbone. If you have a 10Gb/s link, this \
+  may not be a big deal to you. If you only have a 1Gb/s link, this will likely be \
+  a bottleneck. However, if you aren't capturing a lot of traffic, this may not \
+  be a big deal to you. In direct attached storage mode, you will write the data \
+  directly to a locally attached disk or folder on the sensor. This obviously is \
+  much faster, but has the downside in that once that disk is full, the data has \
+  to roll even if there is space available elsewhere in the kit. Regardless of your \
+  decision, this only applies to PCAP. Everything else will use clustered storage \
+  with Ceph. Though, that traffic is only a fraction of what PCAP consumes in most \
+  cases."
   , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage']
   , dropdown_text = 'Storage Type')
 
