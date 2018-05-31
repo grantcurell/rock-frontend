@@ -18,11 +18,11 @@ def _gather_host_facts():
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index.html', methods=['GET', 'POST'])
-@app.route('/kit_inventory', methods=['GET', 'POST'])
-def index():
+@app.route('/kit_configuration', methods=['GET', 'POST'])
+def kit_configuration():
     form = InventoryForm()
     return render_template('kit_inventory.html', title='Configure Inventory', form=form)
 
-@app.route('/about')
-def about():
-    return render_template("about.html")
+@app.route('/help')
+def help():
+    return render_template("help.html")

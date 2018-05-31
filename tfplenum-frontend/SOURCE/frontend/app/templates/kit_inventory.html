@@ -2,9 +2,17 @@
 
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% block navbar %}
+<div>
+{% with navbar_elements = form.navbar_elements
+      , current_page = 'kit_configuration' %}
+{% include "navbar.html" %}
+{% endwith %}
+</div>
+{% endblock %}
 {% block body %}
 <div class="jumbotron">
-  <h1>TFPlenum Configurator</h1>
+  <h1>TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
 <h2>Host Settings</h2>

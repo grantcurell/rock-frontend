@@ -1,4 +1,3 @@
-
 # https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation
 class Field:
     def __init__(self, form_name=None, label=None, description=None, placeholder=None,
@@ -49,6 +48,11 @@ class DropDown:
 class InventoryForm:
 
   ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
+
+  navbar_elements = {
+    'Kit Configuration': 'kit_configuration'
+  , 'Help': 'help'
+  }
 
   number_of_servers = Button(
     form_name = 'number_of_servers'
