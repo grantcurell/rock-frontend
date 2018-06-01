@@ -6,6 +6,6 @@ export WORKON_HOME=~/Envs
 source /usr/bin/virtualenvwrapper.sh
 mkvirtualenv my-venv
 workon my-venv
-pip install Flask flask-wtf flask-sijax
+pip install Flask
 
 ...
