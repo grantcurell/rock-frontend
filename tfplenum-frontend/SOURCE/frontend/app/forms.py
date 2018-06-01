@@ -91,7 +91,8 @@ class InventoryForm:
   , html5_constraint = ip_constraint
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
-  , invalid_feedback = 'You must input the server management IP address.')
+  , invalid_feedback = 'You must input the server management IP address.'
+  , reaction_file = 'button_reaction_gather_facts.js')
 
   # Sensor form
 

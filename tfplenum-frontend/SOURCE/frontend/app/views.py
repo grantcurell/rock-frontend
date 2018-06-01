@@ -9,13 +9,14 @@ from app.forms import InventoryForm, HelpPage
 def _server():
     # This request wil be received from jquery on the client side
     server_count = request.args.get('server_count', 0, type=int)
-
     form = InventoryForm()
+    print 'HEER'
+    print form.host_server.reaction_file
     return render_template("server.html", form=form, server_count=server_count)
 
 @app.route('/_gather_host_facts')
 def _gather_host_facts():
-    pass
+    print 'here'
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index.html', methods=['GET', 'POST'])

@@ -1,44 +1,37 @@
 <script type="text/javascript">
   $(document).ready(function(){
     // See: https://api.jquery.com/keyup/
-    $('#{{ text_input_field_id }}').keyup(function (event) {
+    $('#{{ object.field_id }}').keyup(function (event) {
       // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
       // selection set. To access the DOM properties you have to select the first
       // item. checkValidity is an HTML5 built in function we are calling against
       // the element.
-      if ($( "#{{ text_input_form_name }}" )[0].checkValidity() === false) {
+      if ($( "#{{ object.form_name }}" )[0].checkValidity() === false) {
         event.preventDefault();
         event.stopPropagation();
       }
-      $( "#{{ text_input_form_name }}" ).addClass('was-validated');
+      $( "#{{ object.form_name }}" ).addClass('was-validated');
     });
 });
 </script>
 
-<form id='{{ text_input_form_name }}' role=form class="needs-validation" novalidate>
+<form id='{{ object.form_name }}' role=form class="needs-validation" novalidate>
 <div class="input-group mb-3">
   <div class="input-group-prepend">
-    <a href="{{ url_for('help') + '#anchor_' + text_input_label | replace(' ','_') }}">
-    <span class="input-group-text">{{ text_input_label }}</span>
+    <a href="{{ url_for('help') + '#anchor_' + object.label | replace(' ','_') }}">
+    <span class="input-group-text">{{ object.label }}</span>
     </a>
   </div>
-  <input name="{{ text_input_field_id }}" id="{{ text_input_field_id }}" type="{{ text_input_field_type | default("text", true) }}" {{ text_input_constraint if text_input_constraint is not none }} class="form-control" placeholder="{{ text_input_placeholder }}" {{ 'required' if text_input_required is not none }}>
-  {% if text_input_valid_feedback is not none %}
+  <input name="{{ object.field_id }}" id="{{ object.field_id }}" type="{{ object.input_type | default("text", true) }}" {{ object.html5_constraint if object.html5_constraint is not none }} class="form-control" placeholder="{{ object.placeholder }}" {{ 'required' if object.required is not none }}>
+  {% if object.valid_feedback is not none %}
     <div class="valid-feedback">
-    {{ text_input_valid_feedback | default("Looks good!", true) }}
+    {{ object.valid_feedback | default("Looks good!", true) }}
     </div>
   {% endif %}
-  {% if text_input_invalid_feedback is not none %}
+  {% if object.invalid_feedback is not none %}
     <div class="invalid-feedback">
-    {{ text_input_invalid_feedback | default("This field is required", true) }}
+    {{ object.invalid_feedback | default("This field is required", true) }}
     </div>
   {% endif %}
 </div>
-{% if text_input_description is not none %}
-  <p>
-    <small class="form-text text-muted">
-      {{ text_input_description }}<br>
-    </small>
-  </p>
-{% endif %}
 </form>
