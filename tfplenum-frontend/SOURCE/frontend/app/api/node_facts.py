@@ -24,10 +24,10 @@ class Node(object):
     def set_memory(self, memory_mb):
         self.memory_mb = float(memory_mb)
         self.memory_gb = float((memory_mb / 1024))
-    
+
     def set_interfaces(self, interfaces):
         self.interfaces = interfaces
-    
+
     def set_cpu_cores(self, cpu_cores):
         self.cpu_cores = int(cpu_cores)
 
@@ -48,7 +48,7 @@ class Interface(object):
         name (str): Name of interface
         ip_address (str): Ip Address of interface not all interfaces have an ip address
         mac_address (str): Mac address of interface not all interfaces have a mac address
-        
+
     """
 
     def __init__(self, name, ip_address, mac_address):
@@ -69,18 +69,18 @@ class Disk(object):
         name (str): Name of disk / storage device
         size_gb (float): Size of storage device in GB
         size_tb (float): Size of storage device in TB
-        
+
     """
 
     def __init__(self, name):
-        self.name = name        
+        self.name = name
 
     def set_size(self, ansible_size):
-        sizestr = ansible_size.encode("utf-8")        
+        sizestr = ansible_size.encode("utf-8")
         sizesplit = sizestr.split(" ")
-        
+
         self.size_gb = 0
-        self.size_tb = 0 
+        self.size_tb = 0
 
         size = float(sizesplit[0])
 
@@ -101,10 +101,10 @@ def create_tmp_inventory(server):
 
     Arguments:
         server (str): fully qualified domain name of server
-    
+
     Return:
         None
-        
+
     """
 
     file = open("/tmp/inventory.yml", "w")
@@ -119,10 +119,10 @@ def ansible_setup(server, passwd):
     Arguments:
         server (str): fully qualified domain name of server
         passwd (str): password to server to create ansible ssh connection
-    
+
     Return:
         Json object: Json object from ansible setup output
-        
+
     """
 
     p = os.popen("ansible -m setup " + server + " -i /tmp/inventory.yml -e ansible_ssh_pass=" +
@@ -135,13 +135,13 @@ def transform(json_object):
     """Function transforms json object to node object:
 
     Arguments:
-        json_object (Json): json object from ansible setup        
-    
+        json_object (Json): json object from ansible setup
+
     Return:
         node (Node object): Node object as specified above
-        
+
     """
-    
+
     # Get Disk
     ansible_devices = json_object['ansible_facts']['ansible_devices']
     disks = []
@@ -182,7 +182,7 @@ def transform(json_object):
     node.set_interfaces(interfaces)
     node.set_cpu_cores(cores)
     node.set_disks(disks)
-    
+
     # Return Node object
     return node
 
@@ -192,11 +192,11 @@ def get_system_info(server, passwd):
 
     Arguments:
         server (str): fully qualified domain name of server
-        passwd (str): password to server to create ansible ssh connection        
-    
+        passwd (str): password to server to create ansible ssh connection
+
     Return:
         node (Node object): Node object as specified above
-        
+
     """
 
     # Create Temporary Ansible Inventory
@@ -204,7 +204,7 @@ def get_system_info(server, passwd):
 
     # Connect to server and run ansible setup
     json_object = ansible_setup(server, passwd)
-    
+
     # Return node object
     return transform(json_object)
 
