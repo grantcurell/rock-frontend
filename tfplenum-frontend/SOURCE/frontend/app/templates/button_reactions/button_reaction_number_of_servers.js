@@ -3,8 +3,8 @@
 // to determine how many server forms should be made. (IE if the user types
 // 5 in Number of Servers it will be transfered as the variable server_count)
 // here.
-$.get("{{ url_for('_server') }}", { server_count: $( 'input[name={{ button_field_id }}]' ).val() }, function(data){
+$.get("{{ url_for('_server') }}", { server_count: $( 'input[name={{ object.field_id }}]' ).val() }, function(data){
   // The hide method is here because effects only work if the element
   // begins in a hidden state
-  $( "#{{ [button_form_name, 'accordion'] | join('_') }}" ).html(data).hide().slideDown("slow");
+  $( "#{{ [object.form_name, 'accordion'] | join('_') }}" ).html(data).hide().slideDown("slow");
 });

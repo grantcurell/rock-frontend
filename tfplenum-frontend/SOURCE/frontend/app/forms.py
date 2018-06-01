@@ -55,10 +55,6 @@ class InventoryForm:
   , 'Help': 'help'
   }
 
-  self.host_settings = [self.server_is_master_server_checkbox]
-  self.general_settings = [self.dns_ip]
-  self.moloch_settings = [self.sensor_storage_type, self.moloch_bpf]
-
   ###########################
   # Host Settings           #
   ###########################

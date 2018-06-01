@@ -42,18 +42,10 @@
   </div>
   <div id="{{ ['server_collapse', i+1] | join('_') }}" class="c-ollapse show" aria-labelledby="{{ ['server_accordion_header', i+1] | join('_') }}">
     <div class="card-body">
-      {% with button_form_name = ['server_form', i+1] | join('_')
-            , button_field_id = form.host_server.field_id + '_' + ((i+1) | string)
-            , button_id = form.host_server.button_id + '_' + ((i+1) | string)
-            , button_label = form.host_server.label
-            , button_text=form.host_server.button_text
-            , button_placeholder = form.host_server.placeholder
-            , button_field_type = form.host_server.input_type
-            , button_constraint = form.host_server.html5_constraint
-            , button_required = form.host_server.required
-            , button_invalid_feedback = form.host_server.invalid_feedback
-            , button_valid_feedback = form.host_server.valid_feedback
-            , button_callback_url = form.number_of_servers.callback_url %}
+      {% with object = form.host_server
+            , object.form_name = ['server_form', i+1] | join('_')
+            , object.field_id = form.host_server.field_id + '_' + ((i+1) | string)
+            , object.id = form.host_server.button_id + '_' + ((i+1) | string) %}
         {% include "button.html" %}
       {% endwith %}
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>

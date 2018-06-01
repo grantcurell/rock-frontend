@@ -22,19 +22,19 @@
     <span class="input-group-text">{{ text_input_label }}</span>
     </a>
   </div>
-  <input name="{{ text_input_field_id }}" id="{{ text_input_field_id }}" type="{{ text_input_field_type | default("text", true) }}" {{ text_input_constraint if text_input_constraint is defined }} class="form-control" placeholder="{{ text_input_placeholder }}" {{ 'required' if text_input_required is defined }}>
-  {% if text_input_valid_feedback is defined %}
+  <input name="{{ text_input_field_id }}" id="{{ text_input_field_id }}" type="{{ text_input_field_type | default("text", true) }}" {{ text_input_constraint if text_input_constraint is not none }} class="form-control" placeholder="{{ text_input_placeholder }}" {{ 'required' if text_input_required is not none }}>
+  {% if text_input_valid_feedback is not none %}
     <div class="valid-feedback">
     {{ text_input_valid_feedback | default("Looks good!", true) }}
     </div>
   {% endif %}
-  {% if text_input_invalid_feedback is defined %}
+  {% if text_input_invalid_feedback is not none %}
     <div class="invalid-feedback">
     {{ text_input_invalid_feedback | default("This field is required", true) }}
     </div>
   {% endif %}
 </div>
-{% if text_input_description is defined %}
+{% if text_input_description is not none %}
   <p>
     <small class="form-text text-muted">
       {{ text_input_description }}<br>
