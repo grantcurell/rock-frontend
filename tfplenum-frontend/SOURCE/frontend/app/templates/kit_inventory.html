@@ -31,11 +31,21 @@
 <h2>Server Settings</h2>
 <hr>
 <h2>Sensor Settings</h2>
+<h3>Moloch Settings</h3>
 {% with object = form.sensor_storage_type %}
   {% include "dropdown.html" %}
 {% endwith %}
-<h3>Moloch Settings</h3>
+{% with object = form.moloch_pcap_folder %}
+  {% include "text_input.html" %}
+{% endwith %}
+<h4>Advanced Moloch Settings</h4>
+<div class="alert alert-danger" role="alert">
+Use these at your own risk!
+</div>
 {% with object = form.moloch_bpf %}
+  {% include "text_input.html" %}
+{% endwith %}
+{% with object = form.moloch_dontSaveBPFs %}
   {% include "text_input.html" %}
 {% endwith %}
 <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>

@@ -37,6 +37,8 @@ class Button(Field, object):
     # This is a mammoth hack because Jinja2 doesn't allow assignment within
     # templates. To get around this, I provide this method which simply modifies
     # various fields within the object and then returns the copy of the object.
+    # This allows the code to effectively modify the object - without modifying
+    # the object.
     def change_values(self, form_name, field_id, object_id):
         copy_of_self = copy.deepcopy(self)
         copy_of_self.form_name = form_name
@@ -165,6 +167,23 @@ class InventoryForm:
   , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage']
   , dropdown_text = 'Storage Type')
 
+  moloch_pcap_folder = Field(
+     form_name = 'moloch_pcap_folder'
+   , label = 'Moloch PCAP Folder'
+   , placeholder = "/pcap"
+   , input_type = 'text'
+   , html5_constraint = ip_constraint
+   , invalid_feedback = 'You must enter a valid Linux path'
+   , required = True
+   , description =
+   "This is the folder to which Moloch will write its PCAP data. \
+   This must be defined if you are going to use Moloch in direct disk access mode \
+   which is the default. We recommend you dedicate a separate disk to PCAP, in which \
+   case this will become a mount point. However this can also be a folder. by itself. \
+   If you chose to use a separate disk for PCAP you can define that on a per-host \
+   basis in the \"Sensor\" section of \"Host Settings\". This will drastically improve \
+   system performance.")
+
   # Moloch Settings
 
   moloch_bpf = Field(
@@ -197,8 +216,28 @@ class InventoryForm:
   for Moloch's description. If you enter a filter here, Moloch will ONLY process \
   the packets it matches and will discard everything it does NOT match.")
 
+  moloch_dontSaveBPFs = Field(
+    form_name = 'moloch_dontSaveBPFs'
+  , label = 'Moloch Don\'t Save BPF Filter'
+  , placeholder = "WARNING: MOLOCH WILL NOT WORK IF THIS IS WRONG"
+  , input_type = 'text'
+  , required = False
+  , description =
+  "See https://biot.com/capstats/bpf.html for a full description of different BPF \
+  filters. We strongly recommend you test any BPF filters you choose to use with \
+  tcpdump before you submit them here. There is no built in validator in this web \
+  UI for BPF filters. (Though feel free to write one and push it to us.) If you get \
+  this wrong, Moloch will not work correctly. See https://github.com/aol/moloch/wiki/Settings \
+  for Moloch's description. If you enter a filter here, Moloch will ONLY save the \
+  PCAP for the packets it matches and will discard everything it does NOT match.<br>\
+  This expects a semicolon ';' separated list of bpf filters which when matched \
+  for a session causes the remaining pcap from being saved for the session. It is \
+  possible to specify the number of packets to save per filter by ending with a \
+  :num. For example dontSaveBPFs = port 22:5 will only save 5 packets for port 22 \
+  sessions. Currently only the initial packet is matched against the bpfs.")
+
 class HelpPage(InventoryForm):
     def __init__(self):
         self.host_settings = [self.server_is_master_server_checkbox]
         self.general_settings = [self.dns_ip]
-        self.moloch_settings = [self.sensor_storage_type, self.moloch_bpf]
+        self.moloch_settings = [self.sensor_storage_type, self.moloch_pcap_folder, self.moloch_bpf, self.moloch_dontSaveBPFs]
