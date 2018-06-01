@@ -1,3 +1,5 @@
+import copy
+
 # https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation
 class Field:
     def __init__(self, form_name, label, html5_constraint=None, valid_feedback=None,
@@ -31,6 +33,16 @@ class Button(Field, object):
         self.button_id = kwargs.get('form_name') + '_button'
         self.button_text = button_text
         self.reaction_file = reaction_file
+
+    # This is a mammoth hack because Jinja2 doesn't allow assignment within
+    # templates. To get around this, I provide this method which simply modifies
+    # various fields within the object and then returns the copy of the object.
+    def change_values(self, form_name, field_id, object_id):
+        copy_of_self = copy.deepcopy(self)
+        copy_of_self.form_name = form_name
+        copy_of_self.field_id = form_name
+        copy_of_self.object_id = object_id
+        return copy_of_self
 
 class CheckBox:
     def __init__(self, label, description=None):

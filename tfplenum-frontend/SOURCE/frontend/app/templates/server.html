@@ -42,11 +42,11 @@
   </div>
   <div id="{{ ['server_collapse', i+1] | join('_') }}" class="c-ollapse show" aria-labelledby="{{ ['server_accordion_header', i+1] | join('_') }}">
     <div class="card-body">
-      {% with object = form.host_server
-            , object.form_name = ['server_form', i+1] | join('_')
-            , object.field_id = form.host_server.field_id + '_' + ((i+1) | string)
-            , object.id = form.host_server.button_id + '_' + ((i+1) | string) %}
-        {% include "button.html" %}
+      {% with object = form.host_server.change_values(
+        (['server_form', i+1] | join('_')),
+         (form.host_server.field_id + '_' + ((i+1) | string)),
+         (form.host_server.button_id + '_' + ((i+1) | string))) %}
+         {% include "button.html" %}
       {% endwith %}
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>
       <div class="form-check">
