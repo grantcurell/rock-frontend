@@ -1,5 +1,15 @@
 #!/usr/bin/python
 
+# Example Usage:
+# n = get_system_info('server1', 'password')
+# print(n)
+
+# Example how to get interfaces from node
+# for i in n.interfaces:
+#    print("Name: " + i.name)
+#    print("Ip Address: " + i.ip_address)
+#    print("Mac: " +i.mac_address)
+
 import sys
 import json
 import os
@@ -207,14 +217,3 @@ def get_system_info(server, passwd):
 
     # Return node object
     return transform(json_object)
-
-
-# Example Usage:
-n = get_system_info('server1', 'password')
-print(n)
-
-# Example how to get interfaces from node
-for i in n.interfaces:
-    print("Name: " + i.name)
-    print("Ip Address: " + i.ip_address)
-    print("Mac: " +i.mac_address)

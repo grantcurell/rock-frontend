@@ -51,14 +51,12 @@
 {% with text_input_form_name = form.dns_ip.form_name
       , text_input_field_id = form.dns_ip.field_id
       , text_input_label = form.dns_ip.label
-      , text_input_text = form.dns_ip.text_input_text
       , text_input_placeholder = form.dns_ip.placeholder
       , text_input_field_type = form.dns_ip.input_type
       , text_input_constraint = form.dns_ip.html5_constraint
       , text_input_required = form.dns_ip.required
       , text_input_invalid_feedback = form.dns_ip.invalid_feedback
-      , text_input_valid_feedback = form.dns_ip.valid_feedback
-      , text_input_reaction_file = form.dns_ip.reaction_file %}
+      , text_input_valid_feedback = form.dns_ip.valid_feedback %}
   {% include "text_input.html" %}
 {% endwith %}
 <hr>
@@ -71,6 +69,15 @@
       , dropdown_options = form.sensor_storage_type.options
       , dropdown_text = form.sensor_storage_type.dropdown_text %}
   {% include "dropdown.html" %}
+{% endwith %}
+<h3>Moloch Settings</h3>
+{% with text_input_form_name = form.moloch_bpf.form_name
+      , text_input_field_id = form.moloch_bpf.field_id
+      , text_input_label = form.moloch_bpf.label
+      , text_input_placeholder = form.moloch_bpf.placeholder
+      , text_input_field_type = form.moloch_bpf.input_type
+      , text_input_required = form.moloch_bpf.required %}
+  {% include "text_input.html" %}
 {% endwith %}
 <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
 {% endblock %}

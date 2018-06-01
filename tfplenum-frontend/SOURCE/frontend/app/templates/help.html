@@ -14,18 +14,25 @@
   <p class="lead">We're really trying to make this easier!</p>
 </div>
 <h2>Host Settings</h2>
+{% for setting in form.host_settings %}
 <dl class="row">
-  <dt class="col-sm-3">{{ form.server_is_master_server_checkbox.label }}<a name="{{ 'anchor_' + form.server_is_master_server_checkbox.label | replace(' ','_') }}"></a></dt>
-  <dd class="col-sm-9">{{ form.server_is_master_server_checkbox.description }}</dd>
+  <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ setting.description }}</dd>
 </dl>
+{% endfor %}
 <h2>General Settings</h2>
+{% for setting in form.general_settings %}
 <dl class="row">
-  <dt class="col-sm-3">{{ form.dns_ip.label }}<a name="{{ 'anchor_' + form.dns_ip.label | replace(' ','_') }}"></a></dt>
-  <dd class="col-sm-9">{{ form.dns_ip.description }}</dd>
+  <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ setting.description }}</dd>
 </dl>
+{% endfor %}
 <h2>Sensor Settings</h2>
+<h3>Moloch Settings</h3>
+{% for setting in form.moloch_settings %}
 <dl class="row">
-  <dt class="col-sm-3">{{ form.sensor_storage_type.label }}<a name="{{ 'anchor_' + form.sensor_storage_type.label | replace(' ','_') }}"></a></dt>
-  <dd class="col-sm-9">{{ form.sensor_storage_type.description }}</dd>
+  <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ setting.description }}</dd>
 </dl>
+{% endfor %}
 {% endblock %}

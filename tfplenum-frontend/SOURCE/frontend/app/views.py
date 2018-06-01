@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from api.node_facts import Node
-from app.forms import InventoryForm
+from app.forms import InventoryForm, HelpPage
 
 @app.route('/_server')
 def _server():
@@ -26,6 +26,6 @@ def kit_configuration():
 
 @app.route('/help')
 def help():
-    form = InventoryForm()
+    form = HelpPage()
     print form.server_is_master_server_checkbox.description
     return render_template("help.html", form=form)

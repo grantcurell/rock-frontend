@@ -1,8 +1,8 @@
 # https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation
 class Field:
-    def __init__(self, form_name=None, label=None, description=None, placeholder=None,
-                 input_type='text', html5_constraint=None, valid_feedback=None,
-                 invalid_feedback=None, required=True):
+    def __init__(self, form_name, label, html5_constraint=None, valid_feedback=None,
+                 invalid_feedback=None, required=False, description=None, placeholder=None,
+                 input_type='text'):
       self.form_name = 'form_' + form_name
       self.field_id = form_name + '_field'
       self.label = label
@@ -26,19 +26,19 @@ class Field:
 # button_invalid_feedback (string): The feedback to show if the user inputs something
 #                                   incorrect.
 class Button(Field, object):
-    def __init__(self, button_text=None, reaction_file=None, **kwargs):
+    def __init__(self, button_text, reaction_file=None, **kwargs):
         super(Button, self).__init__(**kwargs)
         self.button_id = kwargs.get('form_name') + '_button'
         self.button_text = button_text
         self.reaction_file = reaction_file
 
 class CheckBox:
-    def __init__(self, label=None, description='the fuck'):
+    def __init__(self, label, description=None):
         self.label = label
         self.description = description
 
 class DropDown:
-    def __init__(self, form_name=None, label=None, description=None, options=None, dropdown_text=None):
+    def __init__(self, form_name, label, options, dropdown_text, description=None):
         self.form_name = 'form_' + form_name
         self.dropdown_id = form_name + '_dropdown'
         self.label = label
@@ -54,6 +54,16 @@ class InventoryForm:
     'Kit Configuration': 'kit_configuration'
   , 'Help': 'help'
   }
+
+  self.host_settings = [self.server_is_master_server_checkbox]
+  self.general_settings = [self.dns_ip]
+  self.moloch_settings = [self.sensor_storage_type, self.moloch_bpf]
+
+  ###########################
+  # Host Settings           #
+  ###########################
+
+  # Server form
 
   number_of_servers = Button(
     form_name = 'number_of_servers'
@@ -87,6 +97,8 @@ class InventoryForm:
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
   , invalid_feedback = 'You must input the server management IP address.')
 
+  # Sensor form
+
   number_of_sensors = Button(
     form_name = 'number_of_sensors'
   , label = 'Number of Sensors'
@@ -97,9 +109,33 @@ class InventoryForm:
   , required = True
   , invalid_feedback = 'You must have at least one sensor.')
 
+  ###########################
+  # General Settings        #
+  ###########################
+
+  dns_ip = Field(
+    form_name = 'dns_ip'
+  , label = 'DNS IP Address'
+  , placeholder = "192.168.1.50"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address'
+  , required = False
+  , description =
+  "The IP address of the system DNS server. You may define this or it will   \
+   default  to using the master server's management IP. We suggest you leave \
+   it to default  unless you have a specific reason to use a different DNS   \
+   server. Keep in mind  you will need to manually provide all required DNS  \
+   entries on your separate  DNS Server or the kit will break.")
+
+  ###########################
+  # Sensor Settings         #
+  ###########################
+
   sensor_storage_type = DropDown(
     form_name = 'sensor_storage_type'
   , label = 'Sensor Storage Type'
+  #, required = True TODO NEED TO ADD A DEFAULT
   , description =
   "The kit can use two types of storage for PCAP. One is clustered Ceph storage \
   and the other is a disk on the sensor itself. The advantage to clustered storage \
@@ -120,16 +156,40 @@ class InventoryForm:
   , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage']
   , dropdown_text = 'Storage Type')
 
-  dns_ip = Field(
-    form_name = 'dns_ip'
-  , label = 'DNS IP Address'
-  , placeholder = "192.168.1.50"
+  # Moloch Settings
+
+  moloch_bpf = Field(
+    form_name = 'moloch_bpf'
+  , label = 'Moloch BPF Filter'
+  , placeholder = "WARNING: MOLOCH WILL NOT WORK IF THIS IS WRONG"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
-  , invalid_feedback = 'You must enter a valid IP address'
+  , required = False
   , description =
-  "The IP address of the system DNS server. You may define this or it will   \
-   default  to using the master server's management IP. We suggest you leave \
-   it to default  unless you have a specific reason to use a different DNS   \
-   server. Keep in mind  you will need to manually provide all required DNS  \
-   entries on your separate  DNS Server or the kit will break.")
+  "See https://biot.com/capstats/bpf.html for a full description of different BPF \
+  filters. We strongly recommend you test any BPF filters you choose to use with \
+  tcpdump before you submit them here. There is no built in validator in this web \
+  UI for BPF filters. (Though feel free to write one and push it to us.) If you get \
+  this wrong, Moloch will not work correctly. See https://github.com/aol/moloch/wiki/Settings \
+  for Moloch's description. If you enter a filter here, Moloch will ONLYprocess \
+  the packets it matches and will discard everything it does NOT match.")
+
+  moloch_bpf = Field(
+    form_name = 'moloch_bpf'
+  , label = 'Moloch BPF Filter'
+  , placeholder = "WARNING: MOLOCH WILL NOT WORK IF THIS IS WRONG"
+  , input_type = 'text'
+  , required = False
+  , description =
+  "See https://biot.com/capstats/bpf.html for a full description of different BPF \
+  filters. We strongly recommend you test any BPF filters you choose to use with \
+  tcpdump before you submit them here. There is no built in validator in this web \
+  UI for BPF filters. (Though feel free to write one and push it to us.) If you get \
+  this wrong, Moloch will not work correctly. See https://github.com/aol/moloch/wiki/Settings \
+  for Moloch's description. If you enter a filter here, Moloch will ONLY process \
+  the packets it matches and will discard everything it does NOT match.")
+
+class HelpPage(InventoryForm):
+    def __init__(self):
+        self.host_settings = [self.server_is_master_server_checkbox]
+        self.general_settings = [self.dns_ip]
+        self.moloch_settings = [self.sensor_storage_type, self.moloch_bpf]
