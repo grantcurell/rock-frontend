@@ -106,7 +106,7 @@ class InventoryForm:
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
   , invalid_feedback = 'You must input the server management IP address.'
-  , reaction_file = 'button_reaction_gather_facts.js')
+  , reaction_file = 'button_reaction_gather_server_facts.js')
 
   # Sensor form
 
@@ -118,6 +118,7 @@ class InventoryForm:
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , required = True
+  , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
   , invalid_feedback = 'You must have at least one sensor.')
 
   ###########################

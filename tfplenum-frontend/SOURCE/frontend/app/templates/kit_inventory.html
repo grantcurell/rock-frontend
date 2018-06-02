@@ -17,9 +17,12 @@
 <!-- This is extended by servers.html. It is not actually blank as it might seem.
      Check out foozandfuncs to see how this modification happens. You can search
      for the id server_accordion. -->
+{% with object = form.number_of_servers %}
+  {% include "button.html" %}
+{% endwith %}
 <div class="accordion" id="{{ [form.number_of_servers.form_name, 'accordion'] | join('_') }}"></div>
 <br>
-{% with object = form.number_of_servers %}
+{% with object = form.number_of_sensors %}
   {% include "button.html" %}
 {% endwith %}
 <hr>

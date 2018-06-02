@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# 
+#
 # Example Usage:
 # n = get_system_info('192.168.1.20', 'password')
 # print(n)
@@ -118,11 +118,12 @@ def ansible_setup(server_ip, passwd):
         Json object: Json object from ansible setup output
 
     """
-    
+
+    os.environ['ANSIBLE_HOST_KEY_CHECKING' ] = 'False'
     p = os.popen("ansible all -m setup -e ansible_ssh_pass=" + passwd + " -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
     json_object = json.loads(p)
 
-    if 'unreachable' in json_object:        
+    if 'unreachable' in json_object:
         raise Exception("Error: " + json_object['msg'])
 
     return json_object

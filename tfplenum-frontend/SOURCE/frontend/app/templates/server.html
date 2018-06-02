@@ -30,6 +30,17 @@
   });
 </script>
 
+<div class="card">
+  <div class="card-header">
+    Total Server Resources
+  </div>
+  <div class="card-body">
+    <p class="card-text">CPUs Available: <span id="server_cpus_available"></span></p>
+    <p class="card-text">Memory Available: <span id="server_cpus_available"></span></p>
+    <p class="card-text">Drive Space Available: <span id="server_cpus_available"></span></p>
+    <a href="#" class="btn btn-primary">Gather Facts for All Servers</a>
+  </div>
+</div>
 {# This loop goes from 0 to server_count #}
 {% for i in range(server_count) %}
 <div class="server_slide card">
