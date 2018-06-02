@@ -17,17 +17,10 @@ def _gather_server_facts():
     # This request wil be received from jquery on the client side
     server_management_ip = request.args.get('management_ip')
     print server_management_ip
-    n = get_system_info(server_management_ip, 'I.am.ghost.47')
-    '''
-    for i in n.interfaces:
-        print("Name: " + i.name)
-        print("Ip Address: " + i.ip_address)
-        print("Mac: " +i.mac_address)
-    '''
-    print n
-    for disk in n.disks:
-        print disk.name
-    return jsonify(memory_available=n.memory_mb)
+    node = get_system_info(server_management_ip, 'I.am.ghost.47')
+    return jsonify(cpus_available=node.cpu_cores,
+                   memory_available=node.memory_gb,
+                   disks= json.dumps([disk. __dict__ for disk in node.disks]))
 
 @app.route('/_gather_sensor_facts')
 def _gather_sensor_facts():

@@ -8,9 +8,12 @@
 //@ sourceURL=button_reaction_gather_server_facts.js
 
 $.getJSON("{{ url_for('_gather_server_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val() }, function(data){
-  var items = [];
-  $.each( data, function( key, val ) {
-    items.push(val);
-  });
-  $( "#server_memory_available" ).replaceWith(items.join( "" ));
+  var current_total_cpus = parseInt($( "#server_cpus_available" ).text());
+  current_total_cpus = data.cpus_available + current_total_cpus;
+  $( "#server_cpus_available" ).replaceWith('<span id="server_cpus_available">' + current_total_cpus + '</span>');
+  var current_total_memory = parseFloat($( "#server_memory_available" ).text());
+  current_total_memory = data.memory_available + current_total_memory;
+  $( "#server_memory_available" ).replaceWith('<span id="server_memory_available">' + current_total_memory.toFixed(2) + '</span>');
+  $( "#{{ object.args[0] }}" ).replaceWith(data.cpus_available);
+  $( "#{{ object.args[1] }}" ).replaceWith(data.memory_available.toFixed(2));
 });

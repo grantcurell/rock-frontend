@@ -18,15 +18,12 @@ class Field:
       if required:
           self.required = 'required'
 
-# button_id (string): The id which will be used to identify the input field
-# button_label (string): The text which will affix the left side of the input field
-# button_text (string): The text for the button itself
-# button_description (string): This is optional. If you want to provide a description
-#                              below the button you can do so with this option.
-# button_placeholder (string): The placeholder text which will appear in the text field
-# button_valid_feedback (string): The feedback to show if the field is correct
-# button_invalid_feedback (string): The feedback to show if the user inputs something
-#                                   incorrect.
+# button_text (str): The text you want displayed on the button itself
+# reaction_file (str): A file containing the javascript you would like executed
+#                      when someone clicks the button. This will be included as
+#                      part of the else condition.
+# For all other arguments see field. This class inherits from field so any argument
+# which may be applied to field may also be applied here.
 class Button(Field, object):
     def __init__(self, button_text, reaction_file=None, **kwargs):
         super(Button, self).__init__(**kwargs)
@@ -39,11 +36,25 @@ class Button(Field, object):
     # various fields within the object and then returns the copy of the object.
     # This allows the code to effectively modify the object - without modifying
     # the object.
-    def change_values(self, form_name, field_id, button_id):
+
+    # This function is meant for use when you have something like a for loop
+    # in Jinja and you need to provide different variables to a button on each
+    # iteration of the loop.
+    # form_name (str): The updated form name you would like returned with the copy
+    #                  of your object.
+    # field_id (str): The updated field id you would like returned.
+    # button_id (strp): The updated button id you would like returned.
+    # args: See: https://stackoverflow.com/questions/3394835/args-and-kwargs
+    #       for a good explanation of args. This is for providing arbitrary arguments
+    #       to your reaction file. For example, you could provide a new argument
+    #       called 'server_1'. Within the reaction file, you could access this
+    #       by calling object.args[0]
+    def change_values(self, form_name, field_id, button_id, *args):
         copy_of_self = copy.deepcopy(self)
         copy_of_self.form_name = form_name
         copy_of_self.field_id = field_id
         copy_of_self.button_id = button_id
+        copy_of_self.args = args
         return copy_of_self
 
 class CheckBox:
