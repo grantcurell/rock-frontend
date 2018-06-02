@@ -33,8 +33,9 @@ class Node(object):
         self.hostname = fqdn
 
     def set_memory(self, memory_mb):
-        self.memory_mb = float(memory_mb)
-        self.memory_gb = float((memory_mb / 1024))
+        mem = float(memory_mb)
+        self.memory_mb = mem
+        self.memory_gb = (mem / 1024)
 
     def set_interfaces(self, interfaces):
         self.interfaces = interfaces
@@ -48,7 +49,7 @@ class Node(object):
     def __str__(self):
         p_interfaces = '\n'.join([str(x) for x in self.interfaces])
         p_disks = '\n'.join([str(x) for x in self.disks])
-        return "Hostname: %s\nInterface List:\n%s\nCPU Cores: %s\nMemory MB: %s\nMemory GB: %s\nDisk List:\n%s\n" % (self.hostname, p_interfaces, self.cpu_cores, self.memory_mb, self.memory_gb, p_disks)
+        return "Hostname: %s\nInterface List:\n%s\nCPU Cores: %s\nMemory MB: %.2f\nMemory GB: %.2f\nDisk List:\n%s\n" % (self.hostname, p_interfaces, self.cpu_cores, self.memory_mb, self.memory_gb, p_disks)
 
 class Interface(object):
 
@@ -103,7 +104,7 @@ class Disk(object):
             self.size_tb = size
 
     def __str__(self):
-        return "Disk: %s Size GB: %s Size TB: %s" % (self.name, self.size_gb, self.size_tb)
+        return "Disk: %s Size GB: %.2f Size TB: %.2f" % (self.name, self.size_gb, self.size_tb)
 
 
 def ansible_setup(server_ip, passwd):
@@ -123,8 +124,7 @@ def ansible_setup(server_ip, passwd):
     # The following runs ansible setup module on the target node
     # sed magic removes the "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
     p = os.popen("ansible all -m setup -e ansible_ssh_pass=" + passwd + " -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
-    json_object = json.loads(p)
-    print(json.dumps(json_object))
+    json_object = json.loads(p)    
 
     if 'unreachable' in json_object:
         raise Exception("Error: " + json_object['msg'])
@@ -148,7 +148,7 @@ def transform(json_object):
         disks = []
         for i, k in ansible_devices.items():
             # We only want logical volume disks
-            if k['model'] == "LOGICAL VOLUME":
+            if k['model'] != None and k['removable'] != "1":
                 disk = Disk(i)
                 disk.set_size(k['size'])
                 disks.append(disk)
