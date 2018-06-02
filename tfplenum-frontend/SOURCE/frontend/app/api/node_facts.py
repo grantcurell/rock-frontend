@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
+# 
 # Example Usage:
-# n = get_system_info('server1', 'password')
+# n = get_system_info('192.168.1.20', 'password')
 # print(n)
 
 # Example how to get interfaces from node
@@ -105,24 +106,7 @@ class Disk(object):
         return "Disk: %s Size GB: %s Size TB: %s" % (self.name, self.size_gb, self.size_tb)
 
 
-def create_tmp_inventory(server):
-
-    """Function creates a temporary inventory file based off server hostname provided:
-
-    Arguments:
-        server (str): fully qualified domain name of server
-
-    Return:
-        None
-
-    """
-
-    file = open("/tmp/inventory.yml", "w")
-    file.write("[all]")
-    file.write("\n" + server)
-    file.close()
-
-def ansible_setup(server, passwd):
+def ansible_setup(server_ip, passwd):
 
     """Function opens ansible process to run setup on specified server and returns a json object:
 
@@ -134,10 +118,13 @@ def ansible_setup(server, passwd):
         Json object: Json object from ansible setup output
 
     """
-
-    p = os.popen("ansible -m setup " + server + " -i /tmp/inventory.yml -e ansible_ssh_pass=" +
-                 passwd + " | sed '1 s/^.*|.*=>.*$/{/g'").read()
+    
+    p = os.popen("ansible all -m setup -e ansible_ssh_pass=" + passwd + " -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
     json_object = json.loads(p)
+
+    if 'unreachable' in json_object:        
+        raise Exception("Error: " + json_object['msg'])
+
     return json_object
 
 def transform(json_object):
@@ -151,57 +138,59 @@ def transform(json_object):
         node (Node object): Node object as specified above
 
     """
+    try:
+        # Get Disk
+        ansible_devices = json_object['ansible_facts']['ansible_devices']
+        disks = []
+        for i, k in ansible_devices.items():
+            # We only want logical volume disks
+            if k['model'] == "LOGICAL VOLUME":
+                disk = Disk(i)
+                disk.set_size(k['size'])
+                disks.append(disk)
 
-    # Get Disk
-    ansible_devices = json_object['ansible_facts']['ansible_devices']
-    disks = []
-    for i, k in ansible_devices.items():
-        # We only want logical volume disks
-        if k['model'] == "LOGICAL VOLUME":
-            disk = Disk(i)
-            disk.set_size(k['size'])
-            disks.append(disk)
+        # Get Interfaces
+        interfaces = []
+        for i in json_object['ansible_facts']['ansible_interfaces']:
+            ip=""
+            mac=""
+            # Do not return interfaces with veth, cni, docker or flannel
+            if "veth" not in i and "cni" not in i and "docker" not in i and "flannel" not in i and "virbr0" not in i:
+                name="ansible_" + i
+                interface=json_object['ansible_facts'][name]
+                if 'ipv4' in interface:
+                    ip=interface['ipv4']['address']
+                if 'macaddress' in interface:
+                    mac=interface['macaddress']
+                interfaces.append(Interface(i, ip, mac))
 
-    # Get Interfaces
-    interfaces = []
-    for i in json_object['ansible_facts']['ansible_interfaces']:
-        name="ansible_" + i
-        interface=json_object['ansible_facts'][name]
-        ip=""
-        mac=""
-        # Do not return interfaces with veth, cni, docker or flannel
-        if "veth" not in i and "cni" not in i and "docker" not in i and "flannel" not in i:
-            if 'ipv4' in interface:
-                ip=interface['ipv4']['address']
-            if 'macaddress' in interface:
-                mac=interface['macaddress']
-            interfaces.append(Interface(i, ip, mac))
+        # Get Memory
+        memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
 
-    # Get Memory
-    memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
+        # Get Cores
+        cores=json_object['ansible_facts']['ansible_processor_cores']
 
-    # Get Cores
-    cores=json_object['ansible_facts']['ansible_processor_cores']
+        # Get FQDN
+        fqdn=json_object['ansible_facts']['ansible_fqdn']
 
-    # Get FQDN
-    fqdn=json_object['ansible_facts']['ansible_fqdn']
+        # Create node object
+        node = Node(fqdn)
+        node.set_memory(memory)
+        node.set_interfaces(interfaces)
+        node.set_cpu_cores(cores)
+        node.set_disks(disks)
 
-    # Create node object
-    node = Node(fqdn)
-    node.set_memory(memory)
-    node.set_interfaces(interfaces)
-    node.set_cpu_cores(cores)
-    node.set_disks(disks)
+        # Return Node object
+        return node
+    except KeyError:
+        raise KeyError("Error: Unable to process ansible json")
 
-    # Return Node object
-    return node
-
-def get_system_info(server, passwd):
+def get_system_info(server_ip, passwd):
 
     """Main function to gather system information on server:
 
     Arguments:
-        server (str): fully qualified domain name of server
+        server_ip (str): ip address of server
         passwd (str): password to server to create ansible ssh connection
 
     Return:
@@ -209,11 +198,8 @@ def get_system_info(server, passwd):
 
     """
 
-    # Create Temporary Ansible Inventory
-    create_tmp_inventory(server)
-
     # Connect to server and run ansible setup
-    json_object = ansible_setup(server, passwd)
+    json_object = ansible_setup(server_ip, passwd)
 
     # Return node object
     return transform(json_object)
