@@ -21,8 +21,8 @@ class Node(object):
 
     Attributes:
         hostname (str): Fully qualified domain name of server
+        memory_mb (float): Available memory in MB
         memory_gb (float): Available memory in GB
-        memory_tb (float): Available memory in TB
         interfaces (list): List of Interface Objects
         cpu_cores (int): Available CPU Cores
         disks (list): List of Disk Objects
@@ -122,6 +122,7 @@ def ansible_setup(server_ip, passwd):
     os.environ['ANSIBLE_HOST_KEY_CHECKING' ] = 'False'
     p = os.popen("ansible all -m setup -e ansible_ssh_pass=" + passwd + " -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
     json_object = json.loads(p)
+    print(json.dumps(json_object))
 
     if 'unreachable' in json_object:
         raise Exception("Error: " + json_object['msg'])

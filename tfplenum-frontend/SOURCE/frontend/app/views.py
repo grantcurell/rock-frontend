@@ -18,11 +18,16 @@ def _gather_server_facts():
     server_management_ip = request.args.get('management_ip')
     print server_management_ip
     n = get_system_info(server_management_ip, 'I.am.ghost.47')
+    '''
     for i in n.interfaces:
         print("Name: " + i.name)
         print("Ip Address: " + i.ip_address)
         print("Mac: " +i.mac_address)
-    return jsonify(interface_name=i.name)
+    '''
+    print n
+    for disk in n.disks:
+        print disk.name
+    return jsonify(memory_available=n.memory_mb)
 
 @app.route('/_gather_sensor_facts')
 def _gather_sensor_facts():
