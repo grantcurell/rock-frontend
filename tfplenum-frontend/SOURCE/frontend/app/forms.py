@@ -39,11 +39,11 @@ class Button(Field, object):
     # various fields within the object and then returns the copy of the object.
     # This allows the code to effectively modify the object - without modifying
     # the object.
-    def change_values(self, form_name, field_id, object_id):
+    def change_values(self, form_name, field_id, button_id):
         copy_of_self = copy.deepcopy(self)
         copy_of_self.form_name = form_name
-        copy_of_self.field_id = form_name
-        copy_of_self.object_id = object_id
+        copy_of_self.field_id = field_id
+        copy_of_self.button_id = button_id
         return copy_of_self
 
 class CheckBox:

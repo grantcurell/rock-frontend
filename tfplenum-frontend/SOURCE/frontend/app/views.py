@@ -16,13 +16,12 @@ def _server():
 def _gather_host_facts():
     # This request wil be received from jquery on the client side
     server_management_ip = request.args.get('server_management_ip')
-    '''
+    print server_management_ip
     n = get_system_info(server_management_ip, 'I.am.ghost.47')
     for i in n.interfaces:
         print("Name: " + i.name)
         print("Ip Address: " + i.ip_address)
         print("Mac: " +i.mac_address)
-    '''
     return render_template('host_facts.html')
 
 @app.route('/', methods=['GET', 'POST'])
