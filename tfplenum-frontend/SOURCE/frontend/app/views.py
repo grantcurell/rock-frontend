@@ -17,6 +17,30 @@ def _gather_server_facts():
     # This request wil be received from jquery on the client side
     server_management_ip = request.args.get('management_ip')
     print server_management_ip
+    n = get_system_info(server_management_ip, 'redhat')
+    '''
+    for i in n.interfaces:
+        print("Name: " + i.name)
+        print("Ip Address: " + i.ip_address)
+        print("Mac: " +i.mac_address)
+    '''
+    print n
+    
+    # This is how you can marshal (serialize) a node object to json
+    # print(n.marshal())
+
+    # Array of disk objects to json
+    # disks_json = json.dumps([disk.__dict__ for disk in n.disks])
+    # print(disks_json)
+
+    # Array of interface objects to json
+    # interfaces_json = json.dumps([interface.__dict__ for disk in n.interfaces])
+    # print(interfaces_json)
+
+
+    
+
+    return jsonify(memory_available=n.memory_mb)
     node = get_system_info(server_management_ip, 'I.am.ghost.47')
     return jsonify(cpus_available=node.cpu_cores,
                    memory_available=node.memory_gb,

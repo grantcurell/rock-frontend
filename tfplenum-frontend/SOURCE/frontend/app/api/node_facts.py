@@ -30,7 +30,8 @@ class Node(object):
     """
 
     def __init__(self, fqdn):
-        self.hostname = fqdn
+        f = fqdn.encode("utf-8")
+        self.hostname = f
 
     def set_memory(self, memory_mb):
         mem = float(memory_mb)
@@ -50,6 +51,12 @@ class Node(object):
         p_interfaces = '\n'.join([str(x) for x in self.interfaces])
         p_disks = '\n'.join([str(x) for x in self.disks])
         return "Hostname: %s\nInterface List:\n%s\nCPU Cores: %s\nMemory MB: %.2f\nMemory GB: %.2f\nDisk List:\n%s\n" % (self.hostname, p_interfaces, self.cpu_cores, self.memory_mb, self.memory_gb, p_disks)
+   
+    def marshal(self):
+        node = self        
+        setattr(node,'interfaces',json.dumps([interface.__dict__ for interface in node.interfaces]))
+        setattr(node,'disks',json.dumps([disk.__dict__ for disk in node.disks]))
+        return self.__dict__
 
 class Interface(object):
 
@@ -70,6 +77,8 @@ class Interface(object):
 
     def __str__(self):
         return "Interface: %s Ip: %s Mac: %s" % (self.name, self.ip_address, self.mac_address)
+    
+    
 
 
 class Disk(object):
