@@ -9,6 +9,16 @@
 {% endwith %}
 {% endblock %}
 {% block body %}
+<!-- This disables the enter key. We want this because we don't want the user
+     to accidentally hit enter which would reset the entire form. -->
+<script>
+  $(document).keypress(
+    function(event){
+      if (event.which == '13') {
+        event.preventDefault();
+      }
+    });
+</script>
 <div class="jumbotron">
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>

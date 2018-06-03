@@ -14,6 +14,31 @@ $.getJSON("{{ url_for('_gather_server_facts') }}", { management_ip: $( 'input[na
   var current_total_memory = parseFloat($( "#server_memory_available" ).text());
   current_total_memory = data.memory_available + current_total_memory;
   $( "#server_memory_available" ).replaceWith('<span id="server_memory_available">' + current_total_memory.toFixed(2) + '</span>');
+
+  // args[0] correlates to server_{{ i + 1}}_cpus_available in server.html
   $( "#{{ object.args[0] }}" ).replaceWith(data.cpus_available);
+
+  // args[1] correlates to server_{{ i + 1}}_memory_available in server.html
   $( "#{{ object.args[1] }}" ).replaceWith(data.memory_available.toFixed(2));
+
+  var total_disk_space = 0;
+  $.each( JSON.parse(data.disks), function( index, value ) {
+    total_disk_space += value.size_gb;
+  });
+
+  // args[2] correlates to server_{{ i + 1}}_disk_space_available in server.html
+  $( "#{{ object.args[2] }}" ).replaceWith(total_disk_space.toFixed(2));
+
+  // args[3] correlates to server_{{ i + 1}}_hostname in server.html
+  $( "#{{ object.args[3] }}" ).replaceWith(" - " + data.hostname);  
+
+  // This causes the gather facts button and the number of servers button to be
+  // disabled so that users can't accidentally blow away their own form data
+  if(current_total_cpus > 0) {
+    $( "#{{ object.button_id }}" ).prop( "disabled", true );
+    $( "#{{ object.field_id }}" ).prop( "disabled", true );
+    $( "#{{ form.number_of_servers.button_id }}" ).prop( "disabled", true );
+    $( "#{{ form.number_of_servers.field_id }}" ).prop( "disabled", true );
+  }
+
 });

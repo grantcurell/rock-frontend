@@ -27,8 +27,6 @@
       });
     })
     {% endfor %}
-
-
   });
 </script>
 
@@ -39,8 +37,7 @@
   <div class="card-body">
     <p class="card-text">CPU Cores Available: <span id="server_cpus_available">0</span></p>
     <p class="card-text">Memory Available: <span id="server_memory_available">0</span> GB</p>
-    <p class="card-text">Total Drive Space Available: <span id="server_disk_space_available">0</span> GB</p>
-    <a href="#" class="btn btn-primary">Gather Facts for All Servers</a>
+    <p class="card-text">Clustered Storage Available: <span id="server_disk_space_available">0</span> GB</p>
   </div>
 </div>
 {# This loop goes from 0 to server_count #}
@@ -49,20 +46,20 @@
   <div class="card-header" id="{{ ['server_accordion_header', i+1] | join('_') }}">
     <h5 class="mb-0">
       <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ ['server_collapse', i+1] | join('_') }}" aria-expanded="true" aria-controls="{{ ['server_collapse', i+1] | join('_') }}">
-        Server {{ i + 1 }}
+        Server {{ i + 1 }}<span id="server_{{ i + 1 }}_hostname"></span>
       </button>
     </h5>
   </div>
   <div id="{{ ['server_collapse', i+1] | join('_') }}" class="c-ollapse show" aria-labelledby="{{ ['server_accordion_header', i+1] | join('_') }}">
     <div class="card-body">
-      <div class="card" style="width: 18rem;">
+      <div class="card" style="width: 20rem;">
         <div class="card-header">
           Server {{ i + 1 }} Resources
         </div>
         <ul class="list-group list-group-flush">
           <li class="list-group-item">CPU Cores Available: <span id="server_{{ i + 1}}_cpus_available">0</span></li>
-          <li class="list-group-item">Memory Available: <span id="server_{{ i + 1}}_memory_available">0</span> GB</li>
-          <li class="list-group-item border-bottom">Total Drive Space Available: <span id="server_{{ i + 1}}_disk_space_available">0</span> GB</li>
+          <li class="list-group-item">Memory Available: <span id="server_{{ i + 1 }}_memory_available">0</span> GB</li>
+          <li class="list-group-item border-bottom">Total Drive Space Available: <span id="server_{{ i + 1 }}_disk_space_available">0</span> GB</li>
         </ul>
       </div>
       <br>
@@ -72,7 +69,8 @@
          (form.host_server.button_id + '_' + ((i+1) | string)),
          ('server_' + ((i+1) | string) + '_cpus_available'),
          ('server_' + ((i+1) | string) + '_memory_available'),
-         ('server_' + ((i+1) | string) + '_disk_available')) %}
+         ('server_' + ((i+1) | string) + '_disk_space_available'),
+         ('server_' + ((i+1) | string) + '_hostname')) %}
          {% include "button.html" %}
       {% endwith %}
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>

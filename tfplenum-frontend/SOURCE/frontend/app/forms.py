@@ -115,7 +115,7 @@ class InventoryForm:
   , input_type = 'text'
   , html5_constraint = ip_constraint
   , required = True
-  , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
+  , valid_feedback = 'Looks good! Now hit \"Gather Facts\"! Heads up, once you add a server successfully, you can\'t remove it!'
   , invalid_feedback = 'You must input the server management IP address.'
   , reaction_file = 'button_reaction_gather_server_facts.js')
 
