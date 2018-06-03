@@ -1,4 +1,32 @@
 
+<script>
+// Adding this allows this code to be identified in a browser debugger
+//@ sourceURL=ceph_disk_list
+
+  $(document).ready(function(){
+
+    {% for disk in disks %}
+    $('#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}').on('click', function (event) {
+
+      if($( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}" ).hasClass( "active" )) {
+        {% if isServer %}
+        var updated_total_clustered_storage = parseFloat($( "#server_clustered_storage_available" ).text()) - {{ disk['size_gb'] }};
+        $( "#server_clustered_storage_available" ).replaceWith('<span id="server_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
+        {% endif %}
+        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}" ).removeClass( "active" );
+      } else {
+        {% if isServer %}
+        var updated_total_clustered_storage = parseFloat($( "#server_clustered_storage_available" ).text()) + {{ disk['size_gb'] }};
+        $( "#server_clustered_storage_available" ).replaceWith('<span id="server_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
+        {% endif %}
+        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}" ).addClass( "active" );
+      }
+    });
+    {% endfor %}
+
+  });
+</script>
+
 <div class="card" style="width: 20rem;">
   <div class="card-header">
     Ceph Drives
@@ -9,10 +37,10 @@
   </div>
   <div class="btn-group-vertical" role="group">
     {% for disk in disks %}
-    <button type="button" class="btn btn-primary" id="{{ [form.use_in_ceph_cluster_checkbox.checkbox_id, disk['name']] | join('_') }}">{{ disk['name'] }}</button>
+    <button type="button" class="btn btn-primary" id="{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}">{{ disk['name'] }}</button>
     {% endfor %}
   </div>
 </div>
-<a href="{{ url_for('help') + '#anchor_' + form.use_in_ceph_cluster_checkbox.label | replace(' ','_') }}" target="_blank">
+<a href="{{ url_for('help') + '#anchor_' + form.use_in_ceph_cluster.label | replace(' ','_') }}" target="_blank">
   <label>What is this?</label>
 </a>

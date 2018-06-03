@@ -23,7 +23,7 @@ $.getJSON("{{ url_for('_gather_server_facts') }}", { management_ip: $( 'input[na
 
   var total_disk_space = 0;
   $.each( JSON.parse(data.disks), function( index, value ) {
-    total_disk_space += value.size_gb;
+    total_disk_space = value.size_gb + total_disk_space;
   });
 
   // args[2] correlates to server_{{ i + 1}}_disk_space_available in server.html
@@ -32,17 +32,12 @@ $.getJSON("{{ url_for('_gather_server_facts') }}", { management_ip: $( 'input[na
   // args[3] correlates to server_{{ i + 1}}_hostname in server.html
   $( "#{{ object.args[3] }}" ).replaceWith(" - " + data.hostname);
 
-  // This will contact the server, run the _ceph_drives_list route, and the value provided
-  // here will be used in the server.html template as the loop count variable
-  // to determine how many server forms should be made. (IE if the user types
-  // 5 in Number of Servers it will be transfered as the variable server_count)
-  // here.
-  $.get("{{ url_for('_ceph_drives_list') }}", { device_count: Object.keys(JSON.parse(data.disks)).length, disks: data.disks }, function(data){
+  // args[4] correlates to i (the server number) in server.html
+  $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "True" }, function(data){
     // The hide method is here because effects only work if the element
     // begins in a hidden state
     $( "#server_ceph_drive_list" ).html(data).hide().slideDown("slow");
   });
-
 
   // This causes the gather facts button and the number of servers button to be
   // disabled so that users can't accidentally blow away their own form data

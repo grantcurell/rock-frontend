@@ -57,6 +57,14 @@ class Button(Field, object):
         copy_of_self.args = args
         return copy_of_self
 
+class GenericButton:
+    def __init__(self, form_name, label, description=None):
+        self.form_name = form_name
+        self.generic_button_id = form_name + 'generic_button'
+        self.css_class = form_name + '_generic_button_class'
+        self.label = label
+        self.description = description
+
 class CheckBox:
     def __init__(self, form_name, label, description=None):
         self.form_name = form_name
@@ -103,7 +111,8 @@ class InventoryForm:
   server_is_master_server_checkbox = CheckBox(
     form_name = "server_is_master_server_checkbox"
   , label = "Is Kubernetes master server?"
-  , description = "This is not the ESXi/VM server. This is for the Kubernetes master server only.\
+  , description =
+  "This is not the ESXi/VM server. This is for the Kubernetes master server only.\
    There can only be one master server. It is a bit like the Highlander that way.\
    The master server is special in that it runs the Kubernetes master and is     \
    responsible for deploying services out to all the other hosts in the cluster. \
@@ -138,10 +147,19 @@ class InventoryForm:
 
   # Server and Sensor forms
 
-  use_in_ceph_cluster_checkbox = CheckBox(
-    form_name = 'use_in_ceph_cluster_box'
+  use_in_ceph_cluster = GenericButton(
+    form_name = 'use_in_ceph_cluster'
   , label = "Use drive in ceph cluster?"
-  , description = "Balls")
+  , description =
+  "Use this field to mark the disks you will use for Ceph. You can choose to select \
+  none. In this case, Ceph will still be installed and active on the machine so that \
+  Kubernetes works properly however, none of its disks will be in the Ceph cluster. \
+  This is common on the sensors. You may choose to use direct attached storage for \
+  your PCAP on one drive and then use the other for your OS. In which case, Moloch \
+  can still write over the network to a clustered drive on another machine for its \
+  metadata which is light weight especially compared to PCAP. You can select multiple \
+  drives if you would like. Make sure you don't select the OS' drive as Ceph will \
+  format and overwrite any drives you select.")
 
   ###########################
   # General Settings        #
@@ -261,6 +279,6 @@ class InventoryForm:
 
 class HelpPage(InventoryForm):
     def __init__(self):
-        self.host_settings = [self.server_is_master_server_checkbox, self.use_in_ceph_cluster_checkbox]
+        self.host_settings = [self.server_is_master_server_checkbox, self.use_in_ceph_cluster]
         self.general_settings = [self.dns_ip]
         self.moloch_settings = [self.sensor_storage_type, self.moloch_pcap_folder, self.moloch_bpf, self.moloch_dontSaveBPFs]

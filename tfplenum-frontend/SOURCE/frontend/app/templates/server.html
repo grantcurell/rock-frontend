@@ -37,7 +37,7 @@
   <div class="card-body">
     <p class="card-text">CPU Cores Available: <span id="server_cpus_available">0</span></p>
     <p class="card-text">Memory Available: <span id="server_memory_available">0</span> GB</p>
-    <p class="card-text">Clustered Storage Available: <span id="server_disk_space_available">0</span> GB</p>
+    <p class="card-text">Clustered Storage Available: <span id="server_clustered_storage_available">0</span> GB</p>
   </div>
 </div>
 {# This loop goes from 0 to server_count #}
@@ -70,7 +70,8 @@
          ('server_' + ((i+1) | string) + '_cpus_available'),
          ('server_' + ((i+1) | string) + '_memory_available'),
          ('server_' + ((i+1) | string) + '_disk_space_available'),
-         ('server_' + ((i+1) | string) + '_hostname')) %}
+         ('server_' + ((i+1) | string) + '_hostname'),
+         i) %}
          {% include "button.html" %}
       {% endwith %}
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form>

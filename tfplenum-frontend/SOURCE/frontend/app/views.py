@@ -27,15 +27,22 @@ def _gather_server_facts():
 def _ceph_drives_list():
 
     # This request wil be received from jquery on the client side
-    device_count = request.args.get('device_count')
+    device_number = request.args.get('device_number')
     # json.loads takes the json we received and converts it to a python dict
     # Ex, the JSON looks like: [{u'size_gb': 20.0, u'name': u'sdb', u'size_tb': 0.01953125}, {u'size_gb': 20.0, u'name': u'sda', u'size_tb': 0.01953125}]
     # While this looks like a dictionary, it is actually just a  string. json loads
     # makes it a dictionary we can operate on.
     disks = json.loads(request.args.get('disks'))
 
+    # This is here so you can reuse the code in ceph_disk_list. It will be true
+    # if the entity sending the request is a server and false if it is a sensor
+    if request.args.get('isServer') == "True":
+        isServer = True
+    else:
+        isServer = False
+
     form = InventoryForm()
-    return render_template("ceph_disk_list.html", form=form, device_count=int(device_count), disks=disks)
+    return render_template("ceph_disk_list.html", form=form, device_number=device_number, disks=disks, isServer=isServer)
 
 @app.route('/_gather_sensor_facts')
 def _gather_sensor_facts():
