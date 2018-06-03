@@ -18,7 +18,7 @@
 <form id='{{ object.form_name }}' role=form class="needs-validation" novalidate>
 <div class="input-group mb-3">
   <div class="input-group-prepend">
-    <a href="{{ url_for('help') + '#anchor_' + object.label | replace(' ','_') }}">
+    <a href="{{ url_for('help') + '#anchor_' + object.label | replace(' ','_') }}" target="_blank">
     <span class="input-group-text">{{ object.label }}</span>
     </a>
   </div>

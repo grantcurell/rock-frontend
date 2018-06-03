@@ -4,6 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from api.node_facts import *
 from app.forms import InventoryForm, HelpPage
+import json
 
 @app.route('/_server')
 def _server():
@@ -21,6 +22,20 @@ def _gather_server_facts():
                    memory_available=node.memory_gb,
                    disks= json.dumps([disk. __dict__ for disk in node.disks]),
                    hostname=node.hostname)
+
+@app.route('/_ceph_drives_list')
+def _ceph_drives_list():
+
+    # This request wil be received from jquery on the client side
+    device_count = request.args.get('device_count')
+    # json.loads takes the json we received and converts it to a python dict
+    # Ex, the JSON looks like: [{u'size_gb': 20.0, u'name': u'sdb', u'size_tb': 0.01953125}, {u'size_gb': 20.0, u'name': u'sda', u'size_tb': 0.01953125}]
+    # While this looks like a dictionary, it is actually just a  string. json loads
+    # makes it a dictionary we can operate on.
+    disks = json.loads(request.args.get('disks'))
+
+    form = InventoryForm()
+    return render_template("ceph_disk_list.html", form=form, device_count=int(device_count), disks=disks)
 
 @app.route('/_gather_sensor_facts')
 def _gather_sensor_facts():

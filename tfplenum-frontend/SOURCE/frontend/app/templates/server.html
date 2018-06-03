@@ -9,13 +9,13 @@
     // The object in this case will be an HTMLInputElement. The parent class of this,
     // Element, has the attribute ID.
     {% for i in range(server_count) %}
-    $("#{{ ['is_master_server', i+1] | join('_') }}").change(event, function() {
+    $("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}").change(event, function() {
 
       // This loops over each checkbox this ISN'T the checkbox that was clicked
       // and flips its disabled status to be the opposite of what it currently is.
       // This has the effect of only allowing one of the master server checkboxes
       // to be selected at any given time.
-      $( ".master_server_checkbox" ).not( "#" + event.target.id ).each(function() {
+      $( ".{{ form.server_is_master_server_checkbox.css_class }}" ).not( "#" + event.target.id ).each(function() {
         // This checks to see if the checkbox is or is not already disabled
         // If it is, it flips it to be the opposite.
         // See: https://stackoverflow.com/questions/14913845/jquery-checking-for-disabled-attribute-and-adding-removing-it
@@ -73,16 +73,22 @@
          ('server_' + ((i+1) | string) + '_hostname')) %}
          {% include "button.html" %}
       {% endwith %}
-      <form id='{{ ['server_form', i+1] | join('_') }}' role=form class="needs-validation" novalidate>
+      <form id='{{ ['server_form', i+1] | join('_') }}' role=form>
       <div class="form-check">
-        <input class="form-check-input master_server_checkbox" type="checkbox" value="" id="{{ ['is_master_server', i+1] | join('_') }}">
-        <label id='{{ ['is_master_server_label', i+1] | join('_') }}' class="form-check-label" for="{{ ['is_master_server', i+1] | join('_') }}">
+        <input class="form-check-input {{ form.server_is_master_server_checkbox.css_class }}" type="checkbox" value="" id="{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}">
+        <label class="form-check-label" for="{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}">
           {{ form.server_is_master_server_checkbox.label }}
         </label>
       </div>
-      <a href="{{ url_for('help') + '#anchor_' + form.server_is_master_server_checkbox.label | replace(' ','_') }}">
+      <a href="{{ url_for('help') + '#anchor_' + form.server_is_master_server_checkbox.label | replace(' ','_') }}" target="_blank">
         <label>What is this?</label>
       </a>
+      </form>
+
+      <br>
+
+      <form id='{{ ['server_form', i+1] | join('_') }}' role=form>
+        <div id="server_ceph_drive_list"></div>
       </form>
     </div>
   </div>

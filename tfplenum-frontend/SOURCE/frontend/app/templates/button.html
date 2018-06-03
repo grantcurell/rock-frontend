@@ -55,11 +55,4 @@
   {{ object.invalid_feedback | default("This field is required", true) }}
   </div>
 </div>
-{% if button_description is not none %}
-<p>
-  <small class="form-text text-muted">
-    {{ button_description }}<br>
-  </small>
-</p>
-{% endif %}
 </form>

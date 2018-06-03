@@ -1,0 +1,18 @@
+
+<div class="card" style="width: 20rem;">
+  <div class="card-header">
+    Ceph Drives
+  </div>
+  <div class="card-body">
+    <p class="card-text">Select which drives on the host, if any, that you would like to add to the Ceph cluster.</p>
+    <p class="card-text text-danger">Make sure you do not select the operating system's drive! Ceph will overwrite it!</p>
+  </div>
+  <div class="btn-group-vertical" role="group">
+    {% for disk in disks %}
+    <button type="button" class="btn btn-primary" id="{{ [form.use_in_ceph_cluster_checkbox.checkbox_id, disk['name']] | join('_') }}">{{ disk['name'] }}</button>
+    {% endfor %}
+  </div>
+</div>
+<a href="{{ url_for('help') + '#anchor_' + form.use_in_ceph_cluster_checkbox.label | replace(' ','_') }}" target="_blank">
+  <label>What is this?</label>
+</a>

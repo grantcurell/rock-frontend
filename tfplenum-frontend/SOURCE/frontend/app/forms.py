@@ -58,7 +58,10 @@ class Button(Field, object):
         return copy_of_self
 
 class CheckBox:
-    def __init__(self, label, description=None):
+    def __init__(self, form_name, label, description=None):
+        self.form_name = form_name
+        self.checkbox_id = form_name + '_checkbox'
+        self.css_class = form_name + '_checkbox_class'
         self.label = label
         self.description = description
 
@@ -98,7 +101,8 @@ class InventoryForm:
   , reaction_file = 'button_reaction_number_of_servers.js')
 
   server_is_master_server_checkbox = CheckBox(
-  label = "Is Kubernetes master server?"
+    form_name = "server_is_master_server_checkbox"
+  , label = "Is Kubernetes master server?"
   , description = "This is not the ESXi/VM server. This is for the Kubernetes master server only.\
    There can only be one master server. It is a bit like the Highlander that way.\
    The master server is special in that it runs the Kubernetes master and is     \
@@ -131,6 +135,13 @@ class InventoryForm:
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
   , invalid_feedback = 'You must have at least one sensor.')
+
+  # Server and Sensor forms
+
+  use_in_ceph_cluster_checkbox = CheckBox(
+    form_name = 'use_in_ceph_cluster_box'
+  , label = "Use drive in ceph cluster?"
+  , description = "Balls")
 
   ###########################
   # General Settings        #
@@ -250,6 +261,6 @@ class InventoryForm:
 
 class HelpPage(InventoryForm):
     def __init__(self):
-        self.host_settings = [self.server_is_master_server_checkbox]
+        self.host_settings = [self.server_is_master_server_checkbox, self.use_in_ceph_cluster_checkbox]
         self.general_settings = [self.dns_ip]
         self.moloch_settings = [self.sensor_storage_type, self.moloch_pcap_folder, self.moloch_bpf, self.moloch_dontSaveBPFs]
