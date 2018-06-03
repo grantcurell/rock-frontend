@@ -13,15 +13,15 @@
   <h1 class="display-4">TFPlenum Help</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
-<h2>Host Settings</h2>
-{% for setting in form.host_settings %}
+<h2>Common Settings</h2>
+{% for setting in form.common_settings %}
 <dl class="row">
   <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>
   <dd class="col-sm-9">{{ setting.description }}</dd>
 </dl>
 {% endfor %}
-<h2>General Settings</h2>
-{% for setting in form.general_settings %}
+<h2>Server Settings</h2>
+{% for setting in form.server_settings %}
 <dl class="row">
   <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>
   <dd class="col-sm-9">{{ setting.description }}</dd>

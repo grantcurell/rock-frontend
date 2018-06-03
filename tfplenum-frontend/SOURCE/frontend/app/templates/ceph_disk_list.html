@@ -6,20 +6,24 @@
   $(document).ready(function(){
 
     {% for disk in disks %}
-    $('#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}').on('click', function (event) {
+    $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number] | join('_') }}" ).on('click', function (event) {
 
-      if($( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}" ).hasClass( "active" )) {
+      if($( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number] | join('_') }}" ).hasClass( "active" )) {
         {% if isServer %}
         var updated_total_clustered_storage = parseFloat($( "#server_clustered_storage_available" ).text()) - {{ disk['size_gb'] }};
         $( "#server_clustered_storage_available" ).replaceWith('<span id="server_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
         {% endif %}
-        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}" ).removeClass( "active" );
+        var updated_total_clustered_storage = parseFloat($( "#system_clustered_storage_available" ).text()) - {{ disk['size_gb'] }};
+        $( "#system_clustered_storage_available" ).replaceWith('<span id="system_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
+        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number] | join('_') }}" ).removeClass( "active" );
       } else {
         {% if isServer %}
         var updated_total_clustered_storage = parseFloat($( "#server_clustered_storage_available" ).text()) + {{ disk['size_gb'] }};
         $( "#server_clustered_storage_available" ).replaceWith('<span id="server_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
         {% endif %}
-        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}" ).addClass( "active" );
+        var updated_total_clustered_storage = parseFloat($( "#system_clustered_storage_available" ).text()) + {{ disk['size_gb'] }};
+        $( "#system_clustered_storage_available" ).replaceWith('<span id="system_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
+        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number] | join('_') }}" ).addClass( "active" );
       }
     });
     {% endfor %}
@@ -37,7 +41,7 @@
   </div>
   <div class="btn-group-vertical" role="group">
     {% for disk in disks %}
-    <button type="button" class="btn btn-primary" id="{{ [form.use_in_ceph_cluster.generic_button_id, disk['name']] | join('_') }}">{{ disk['name'] }}</button>
+    <button type="button" class="btn btn-primary" id="{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number] | join('_') }}">{{ disk['name'] }}</button>
     {% endfor %}
   </div>
 </div>

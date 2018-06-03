@@ -71,7 +71,7 @@
          ('server_' + ((i+1) | string) + '_memory_available'),
          ('server_' + ((i+1) | string) + '_disk_space_available'),
          ('server_' + ((i+1) | string) + '_hostname'),
-         i) %}
+         i+1) %}
          {% include "button.html" %}
       {% endwith %}
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form>
@@ -89,7 +89,7 @@
       <br>
 
       <form id='{{ ['server_form', i+1] | join('_') }}' role=form>
-        <div id="server_ceph_drive_list"></div>
+        <div id="{{ ['server_ceph_drive_list', i+1] | join('_') }}"></div>
       </form>
     </div>
   </div>

@@ -279,6 +279,6 @@ class InventoryForm:
 
 class HelpPage(InventoryForm):
     def __init__(self):
-        self.host_settings = [self.server_is_master_server_checkbox, self.use_in_ceph_cluster]
-        self.general_settings = [self.dns_ip]
+        self.server_settings = [self.server_is_master_server_checkbox]
+        self.common_settings = [self.dns_ip, self.use_in_ceph_cluster]
         self.moloch_settings = [self.sensor_storage_type, self.moloch_pcap_folder, self.moloch_bpf, self.moloch_dontSaveBPFs]

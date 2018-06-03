@@ -8,12 +8,18 @@
 //@ sourceURL=button_reaction_gather_server_facts.js
 
 $.getJSON("{{ url_for('_gather_server_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val() }, function(data){
-  var current_total_cpus = parseInt($( "#server_cpus_available" ).text());
-  current_total_cpus = data.cpus_available + current_total_cpus;
+
+  current_total_cpus = data.cpus_available + parseInt($( "#server_cpus_available" ).text());
   $( "#server_cpus_available" ).replaceWith('<span id="server_cpus_available">' + current_total_cpus + '</span>');
-  var current_total_memory = parseFloat($( "#server_memory_available" ).text());
-  current_total_memory = data.memory_available + current_total_memory;
+
+  current_total_memory = data.memory_available + parseFloat($( "#server_memory_available" ).text());
   $( "#server_memory_available" ).replaceWith('<span id="server_memory_available">' + current_total_memory.toFixed(2) + '</span>');
+
+  current_total_cpus = data.cpus_available + parseInt($( "#system_cpus_available" ).text());
+  $( "#system_cpus_available" ).replaceWith('<span id="system_cpus_available">' + current_total_cpus + '</span>');
+
+  current_total_memory = data.memory_available + parseFloat($( "#system_memory_available" ).text());
+  $( "#system_memory_available" ).replaceWith('<span id="server_memory_available">' + current_total_memory.toFixed(2) + '</span>');
 
   // args[0] correlates to server_{{ i + 1}}_cpus_available in server.html
   $( "#{{ object.args[0] }}" ).replaceWith(data.cpus_available);
@@ -36,7 +42,7 @@ $.getJSON("{{ url_for('_gather_server_facts') }}", { management_ip: $( 'input[na
   $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "True" }, function(data){
     // The hide method is here because effects only work if the element
     // begins in a hidden state
-    $( "#server_ceph_drive_list" ).html(data).hide().slideDown("slow");
+    $( "#{{ ['server_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
   });
 
   // This causes the gather facts button and the number of servers button to be

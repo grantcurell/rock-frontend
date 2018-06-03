@@ -23,7 +23,22 @@
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
-<h2>Host Settings</h2>
+<div class="card">
+  <div class="card-header">
+    Total System Resources
+  </div>
+  <div class="card-body">
+    <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span></p>
+    <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB</p>
+    <p class="card-text">Clustered Storage Available: <span id="system_clustered_storage_available">0</span> GB</p>
+  </div>
+</div>
+<h2>Common Settings</h2>
+{% with object = form.dns_ip %}
+  {% include "text_input.html" %}
+{% endwith %}
+<hr>
+<h2>Server Settings</h2>
 {% with object = form.number_of_servers %}
   {% include "button.html" %}
 {% endwith %}
@@ -32,18 +47,12 @@
      for the id server_accordion. -->
 <div class="accordion" id="{{ [form.number_of_servers.form_name, 'accordion'] | join('_') }}"></div>
 <br>
+<hr>
+<h2>Sensor Settings</h2>
 {% with object = form.number_of_sensors %}
   {% include "button.html" %}
 {% endwith %}
 <hr>
-<h2>General Settings</h2>
-{% with object = form.dns_ip %}
-  {% include "text_input.html" %}
-{% endwith %}
-<hr>
-<h2>Server Settings</h2>
-<hr>
-<h2>Sensor Settings</h2>
 <h3>Moloch Settings</h3>
 {% with object = form.sensor_storage_type %}
   {% include "dropdown.html" %}
