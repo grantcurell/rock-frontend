@@ -26,7 +26,6 @@ class Node(object):
         interfaces (list): List of Interface Objects
         cpu_cores (int): Available CPU Cores
         disks (list): List of Disk Objects
-
     """
 
     def __init__(self, fqdn):
@@ -90,11 +89,12 @@ class Disk(object):
         name (str): Name of disk / storage device
         size_gb (float): Size of storage device in GB
         size_tb (float): Size of storage device in TB
-
+        hasRoot (bool): Flag indicating whether or not a disk has the root of a filesystem present
     """
 
     def __init__(self, name):
         self.name = name
+        self.hasRoot = False
 
     def set_size(self, ansible_size):
         sizestr = ansible_size.encode("utf-8")
@@ -161,6 +161,8 @@ def transform(json_object):
                 disk = Disk(i)
                 disk.set_size(k['size'])
                 disks.append(disk)
+            if k['mount'] == "/"#if k['mount'] != None:
+                disk.hasRoot = True#print("HEY")
 
         # Get Interfaces
         interfaces = []
