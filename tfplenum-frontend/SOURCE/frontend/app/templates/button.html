@@ -1,3 +1,6 @@
+<!-- Object comes from the caller of this template and should be an instance of class
+     button in forms.py-->
+
 <script type="text/javascript">
   $(document).ready(function(){
     // Server events: this function handles when a user presses submit on the
@@ -9,6 +12,7 @@
       // item. checkValidity is an HTML5 built in function we are calling against
       // the element.
       if ($( "#{{ object.form_name }}" )[0].checkValidity() === false) {
+        alert("WHAT")
         event.preventDefault();
         event.stopPropagation();
       } else {

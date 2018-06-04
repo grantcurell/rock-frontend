@@ -23,6 +23,12 @@
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
+<h2>Common Settings</h2>
+{% with object = form.dns_ip %}
+  {% include "text_input.html" %}
+{% endwith %}
+<hr>
+<h2>Total System Resources</h2>
 <div class="card">
   <div class="card-header">
     Total System Resources
@@ -34,12 +40,10 @@
     <p class="card-text">Total Ceph Drives: <span id="system_total_ceph_drives">0</span></p>
   </div>
 </div>
-<h2>Common Settings</h2>
-{% with object = form.dns_ip %}
-  {% include "text_input.html" %}
-{% endwith %}
 <hr>
 <h2>Server Settings</h2>
+<h3>Elasticsearch Settings</h3>
+<h3>Host Settings</h3>
 {% with object = form.number_of_servers %}
   {% include "button.html" %}
 {% endwith %}
@@ -50,10 +54,6 @@
 <br>
 <hr>
 <h2>Sensor Settings</h2>
-{% with object = form.number_of_sensors %}
-  {% include "button.html" %}
-{% endwith %}
-<hr>
 <h3>Moloch Settings</h3>
 {% with object = form.sensor_storage_type %}
   {% include "dropdown.html" %}
@@ -71,5 +71,11 @@ Use these at your own risk!
 {% with object = form.moloch_dontSaveBPFs %}
   {% include "text_input.html" %}
 {% endwith %}
+<h3>Host Settings</h3>
+{% with object = form.number_of_sensors %}
+  {% include "button.html" %}
+{% endwith %}
+<div class="accordion" id="{{ [form.number_of_sensors.form_name, 'accordion'] | join('_') }}"></div>
+<hr>
 <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
 {% endblock %}

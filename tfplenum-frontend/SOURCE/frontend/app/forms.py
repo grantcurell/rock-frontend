@@ -1,6 +1,16 @@
 import copy
 
 # https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation
+# form_name (str): The name which will be applied to the form in which this field is placed
+# label (str): The label which will be applied to the field. Ex: Number of Sensors
+# html5_constrant: See https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation
+# valid_feedback (str): The message to display when the user types something which
+#                       meets the above defined validation constraint
+# invalid_feedback (str): The message tobe displayed when the constraint is not met
+# required (bool): Whether the field is or is not required
+# description (str): The description which you would like to appear in the help page
+# placeholder (str): The placeholder text which will appear inside of the field
+# input_type: See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
 class Field:
     def __init__(self, form_name, label, html5_constraint=None, valid_feedback=None,
                  invalid_feedback=None, required=False, description=None, placeholder=None,
@@ -92,7 +102,26 @@ class InventoryForm:
   }
 
   ###########################
-  # Host Settings           #
+  # Common Settings         #
+  ###########################
+
+  dns_ip = Field(
+    form_name = 'dns_ip'
+  , label = 'DNS IP Address'
+  , placeholder = "192.168.1.50"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address'
+  , required = False
+  , description =
+  "The IP address of the system DNS server. You may define this or it will   \
+   default  to using the master server's management IP. We suggest you leave \
+   it to default  unless you have a specific reason to use a different DNS   \
+   server. Keep in mind  you will need to manually provide all required DNS  \
+   entries on your separate  DNS Server or the kit will break.")
+
+  ###########################
+  # Server Settings         #
   ###########################
 
   # Server form
@@ -130,9 +159,21 @@ class InventoryForm:
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"! Heads up, once you add a server successfully, you can\'t remove it!'
   , invalid_feedback = 'You must input the server management IP address.'
-  , reaction_file = 'button_reaction_gather_server_facts.js')
+  , reaction_file = 'button_reaction_gather_device_facts.js')
 
   # Sensor form
+
+  host_sensor = Button(
+    form_name = 'host_sensor'
+  , label = 'Management IP Address'
+  , button_text = 'Gather Facts'
+  , placeholder = "Sensor's management IP address"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , required = True
+  , valid_feedback = 'Looks good! Now hit \"Gather Facts\"! Heads up, once you add a sensor successfully, you can\'t remove it!'
+  , invalid_feedback = 'You must input the sensor management IP address.'
+  , reaction_file = 'button_reaction_gather_device_facts.js')
 
   number_of_sensors = Button(
     form_name = 'number_of_sensors'
@@ -143,7 +184,8 @@ class InventoryForm:
   , html5_constraint = 'min=1'
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
-  , invalid_feedback = 'You must have at least one sensor.')
+  , invalid_feedback = 'You must have at least one sensor.'
+  , reaction_file = 'button_reaction_number_of_sensors.js')
 
   # Server and Sensor forms
 
@@ -160,25 +202,6 @@ class InventoryForm:
   metadata which is light weight especially compared to PCAP. You can select multiple \
   drives if you would like. Make sure you don't select the OS' drive as Ceph will \
   format and overwrite any drives you select.")
-
-  ###########################
-  # General Settings        #
-  ###########################
-
-  dns_ip = Field(
-    form_name = 'dns_ip'
-  , label = 'DNS IP Address'
-  , placeholder = "192.168.1.50"
-  , input_type = 'text'
-  , html5_constraint = ip_constraint
-  , invalid_feedback = 'You must enter a valid IP address'
-  , required = False
-  , description =
-  "The IP address of the system DNS server. You may define this or it will   \
-   default  to using the master server's management IP. We suggest you leave \
-   it to default  unless you have a specific reason to use a different DNS   \
-   server. Keep in mind  you will need to manually provide all required DNS  \
-   entries on your separate  DNS Server or the kit will break.")
 
   ###########################
   # Sensor Settings         #

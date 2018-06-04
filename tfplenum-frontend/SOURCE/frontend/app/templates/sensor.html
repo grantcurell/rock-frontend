@@ -1,0 +1,63 @@
+
+<script>
+  // Adding this allows this code to be identified in a browser debugger
+  //@ sourceURL=sensor.js
+  $(document).ready(function(){
+
+  });
+</script>
+
+<div class="card">
+  <div class="card-header">
+    Total Sensor Resources
+  </div>
+  <div class="card-body">
+    <p class="card-text">CPU Cores Available: <span id="sensor_cpus_available">0</span></p>
+    <p class="card-text">Memory Available: <span id="sensor_memory_available">0</span> GB</p>
+    <p class="card-text">Clustered Storage Available: <span id="sensor_clustered_storage_available">0</span> GB</p>
+  </div>
+</div>
+{# This loop goes from 0 to sensor_count #}
+{% for i in range(sensor_count) %}
+<div class="sensor_slide card">
+  <div class="card-header" id="{{ ['sensor_accordion_header', i+1] | join('_') }}">
+    <h5 class="mb-0">
+      <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ ['sensor_collapse', i+1] | join('_') }}" aria-expanded="true" aria-controls="{{ ['sensor_collapse', i+1] | join('_') }}">
+        Sensor {{ i + 1 }}<span id="sensor_{{ i + 1 }}_hostname"></span>
+      </button>
+    </h5>
+  </div>
+  <div id="{{ ['sensor_collapse', i+1] | join('_') }}" class="c-ollapse show" aria-labelledby="{{ ['sensor_accordion_header', i+1] | join('_') }}">
+    <div class="card-body">
+      <div class="card" style="width: 20rem;">
+        <div class="card-header">
+          Sensor {{ i + 1 }} Resources
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">CPU Cores Available: <span id="sensor_{{ i + 1}}_cpus_available">0</span></li>
+          <li class="list-group-item">Memory Available: <span id="sensor_{{ i + 1 }}_memory_available">0</span> GB</li>
+          <li class="list-group-item border-bottom">Total Drive Space Available: <span id="sensor_{{ i + 1 }}_disk_space_available">0</span> GB</li>
+        </ul>
+      </div>
+      <br>
+      {% with object = form.host_sensor.change_values(
+        (['sensor_form', i+1] | join('_')),
+         (form.host_sensor.field_id + '_' + ((i+1) | string)),
+         (form.host_sensor.button_id + '_' + ((i+1) | string)),
+         ('sensor_' + ((i+1) | string) + '_cpus_available'),
+         ('sensor_' + ((i+1) | string) + '_memory_available'),
+         ('sensor_' + ((i+1) | string) + '_disk_space_available'),
+         ('sensor_' + ((i+1) | string) + '_hostname'),
+         i+1,
+         'sensor') %}
+         {% include "button.html" %}
+      {% endwith %}
+      <br>
+
+      <form id='{{ ['sensor_form', i+1] | join('_') }}' role=form>
+        <div id="{{ ['sensor_ceph_drive_list', i+1] | join('_') }}"></div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}

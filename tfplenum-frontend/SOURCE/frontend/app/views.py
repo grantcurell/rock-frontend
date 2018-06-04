@@ -13,11 +13,18 @@ def _server():
     form = InventoryForm()
     return render_template("server.html", form=form, server_count=server_count)
 
-@app.route('/_gather_server_facts')
-def _gather_server_facts():
+@app.route('/_sensor')
+def _sensor():
     # This request wil be received from jquery on the client side
-    server_management_ip = request.args.get('management_ip')
-    node = get_system_info(server_management_ip, 'I.am.ghost.47')
+    sensor_count = request.args.get('sensor_count', 0, type=int)
+    form = InventoryForm()
+    return render_template("sensor.html", form=form, sensor_count=sensor_count)
+
+@app.route('/_gather_device_facts')
+def _gather_device_facts():
+    # This request wil be received from jquery on the client side
+    management_ip = request.args.get('management_ip')
+    node = get_system_info(management_ip, 'I.am.ghost.47')
     return jsonify(cpus_available=node.cpu_cores,
                    memory_available=node.memory_gb,
                    disks= json.dumps([disk. __dict__ for disk in node.disks]),
