@@ -70,7 +70,7 @@ class Button(Field, object):
 class GenericButton:
     def __init__(self, form_name, label, description=None):
         self.form_name = form_name
-        self.generic_button_id = form_name + 'generic_button'
+        self.generic_button_id = form_name + '_generic_button'
         self.css_class = form_name + '_generic_button_class'
         self.label = label
         self.description = description

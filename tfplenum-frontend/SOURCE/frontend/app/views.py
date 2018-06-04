@@ -44,12 +44,12 @@ def _ceph_drives_list():
     # This is here so you can reuse the code in ceph_disk_list. It will be true
     # if the entity sending the request is a server and false if it is a sensor
     if request.args.get('isServer') == "True":
-        isServer = True
+        device_type = 'server'
     else:
-        isServer = False
+        device_type = 'sensor'
 
     form = InventoryForm()
-    return render_template("ceph_disk_list.html", form=form, device_number=device_number, disks=disks, isServer=isServer)
+    return render_template("ceph_disk_list.html", form=form, device_number=device_number, disks=disks, device_type=device_type)
 
 @app.route('/_gather_sensor_facts')
 def _gather_sensor_facts():
