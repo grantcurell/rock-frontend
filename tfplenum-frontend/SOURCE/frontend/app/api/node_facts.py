@@ -161,8 +161,6 @@ def transform(json_object):
                 disk = Disk(i)
                 disk.set_size(k['size'])
                 disks.append(disk)
-            if k['mount'] == "/"#if k['mount'] != None:
-                disk.hasRoot = True#print("HEY")
 
         # Get Interfaces
         interfaces = []
@@ -179,6 +177,18 @@ def transform(json_object):
                     mac=interface['macaddress']
                 interfaces.append(Interface(i, ip, mac))
 
+        # Determine location of root
+        for i in json_object['ansible_facts']['ansible_mounts']:
+           if i["mount"] == "/" or i["mount"] == "/boot":
+                #Loop through all ansible device link uuids
+                for j in json_object['ansible_facts']['ansible_device_links']['uuids']:
+                     #enumerate all possible uuids
+                     for k in j:
+                          #If we find a disk with the same uuid as the one identified holding root, tag it
+                          if k = i['uuid']:
+                              try: disks[disks.index(j)].hasRoot = True except ValueError: pass
+                              for l in json_object['ansible_facts']['ansible_device_links']['masters']:
+                                  ##TODO  
         # Get Memory
         memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
 
