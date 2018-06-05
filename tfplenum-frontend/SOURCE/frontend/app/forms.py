@@ -121,6 +121,24 @@ class InventoryForm:
    entries on your separate  DNS Server or the kit will break.")
 
   ###########################
+  # Server and Sensor Forms #
+  ###########################
+
+  use_in_ceph_cluster = GenericButton(
+    form_name = 'use_in_ceph_cluster'
+  , label = "Use drive in ceph cluster?"
+  , description =
+  "Use this field to mark the disks you will use for Ceph. You can choose to select \
+  none. In this case, Ceph will still be installed and active on the machine so that \
+  Kubernetes works properly however, none of its disks will be in the Ceph cluster. \
+  This is common on the sensors. You may choose to use direct attached storage for \
+  your PCAP on one drive and then use the other for your OS. In which case, Moloch \
+  can still write over the network to a clustered drive on another machine for its \
+  metadata which is light weight especially compared to PCAP. You can select multiple \
+  drives if you would like. Make sure you don't select the OS' drive as Ceph will \
+  format and overwrite any drives you select.")
+
+  ###########################
   # Server Settings         #
   ###########################
 
@@ -161,6 +179,21 @@ class InventoryForm:
   , invalid_feedback = 'You must input the server management IP address.'
   , reaction_file = 'button_reaction_gather_device_facts.js')
 
+  # Elasticsearch Settings
+
+  elastic_masters = Field(
+     form_name = 'elastic_masters'
+   , label = 'Elasticsearch Masters'
+   , placeholder = "# of Elasticsearch masters"
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , invalid_feedback = 'Enter the number of elasticsearch master instances you would like'
+   , required = True
+   , description =
+   "This is the number of Elasticsearch masters you would like to run on your kit.\
+   Unless you are going to exceed 5 Elasticsearch nodes, you must run masters instead \
+   of data instances. Unless you are bringing some serious horsepower, this is unlikely. \")
+
   # Sensor form
 
   host_sensor = Button(
@@ -186,22 +219,6 @@ class InventoryForm:
   , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
   , invalid_feedback = 'You must have at least one sensor.'
   , reaction_file = 'button_reaction_number_of_sensors.js')
-
-  # Server and Sensor forms
-
-  use_in_ceph_cluster = GenericButton(
-    form_name = 'use_in_ceph_cluster'
-  , label = "Use drive in ceph cluster?"
-  , description =
-  "Use this field to mark the disks you will use for Ceph. You can choose to select \
-  none. In this case, Ceph will still be installed and active on the machine so that \
-  Kubernetes works properly however, none of its disks will be in the Ceph cluster. \
-  This is common on the sensors. You may choose to use direct attached storage for \
-  your PCAP on one drive and then use the other for your OS. In which case, Moloch \
-  can still write over the network to a clustered drive on another machine for its \
-  metadata which is light weight especially compared to PCAP. You can select multiple \
-  drives if you would like. Make sure you don't select the OS' drive as Ceph will \
-  format and overwrite any drives you select.")
 
   ###########################
   # Sensor Settings         #
@@ -303,5 +320,5 @@ class InventoryForm:
 class HelpPage(InventoryForm):
     def __init__(self):
         self.server_settings = [self.server_is_master_server_checkbox]
-        self.common_settings = [self.dns_ip, self.use_in_ceph_cluster]
-        self.moloch_settings = [self.sensor_storage_type, self.moloch_pcap_folder, self.moloch_bpf, self.moloch_dontSaveBPFs]
+  self.common_settings = [self.dns_ip, self.use_in_ceph_cluster]
+  self.moloch_settings = [self.sensor_storage_type, self.moloch_pcap_folder, self.moloch_bpf, self.moloch_dontSaveBPFs]
