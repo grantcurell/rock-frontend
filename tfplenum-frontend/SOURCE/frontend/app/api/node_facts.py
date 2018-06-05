@@ -155,13 +155,23 @@ def transform(json_object):
         # Get Disk
         ansible_devices = json_object['ansible_facts']['ansible_devices']
         disks = []
+        partitionLinks = {}
         for i, k in ansible_devices.items():
             # We only want logical volume disks
             if k['model'] != None and k['removable'] != "1":
                 disk = Disk(i)
                 disk.set_size(k['size'])
                 disks.append(disk)
+            for j in k['partitions']:
+                partitionLinks[j] = i
+        #Get Disk links
+        disklinks = {}
+        masterlinks = {}
+        for i,k in json_object['ansible_facts']['ansible_device_links']['uuids']:
+            disklinks[k]=i
 
+        for i,k in json_object['ansible_facts'['ansible_device_links']['masters']:
+            masterlinks[k]=i
         # Get Interfaces
         interfaces = []
         for i in json_object['ansible_facts']['ansible_interfaces']:
@@ -180,15 +190,16 @@ def transform(json_object):
         # Determine location of root
         for i in json_object['ansible_facts']['ansible_mounts']:
            if i["mount"] == "/" or i["mount"] == "/boot":
-                #Loop through all ansible device link uuids
-                for j in json_object['ansible_facts']['ansible_device_links']['uuids']:
-                     #enumerate all possible uuids
-                     for k in j:
-                          #If we find a disk with the same uuid as the one identified holding root, tag it
-                          if k = i['uuid']:
-                              try: disks[disks.index(j)].hasRoot = True except ValueError: pass
-                              for l in json_object['ansible_facts']['ansible_device_links']['masters']:
-                                  ##TODO  
+                #Use the established reverse dictionaries to get our partition
+                partVal = disklinks.get(i['uuid'])
+                try: disks[disks.index(partVal)].hasRoot = True except ValueError: pass
+                masterPartVal = masterlinks.get(partVal)
+                topPartVal = partitionLinks.get(partVal)
+                try: disks[disk.index(topPartVal)].hasRoot = True except ValueError: pass
+                try: disks[disk.index(masterPartVal)].hasRoot = True except ValueError: pass
+                topPartVal = partitionLinks.get(masterPartVal)
+                try: disks[disk.index(topPartVal)].hasRoot = True except ValueError: pass
+ 
         # Get Memory
         memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
 
