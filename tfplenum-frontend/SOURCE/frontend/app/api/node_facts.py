@@ -168,10 +168,10 @@ def transform(json_object):
         disklinks = {}
         masterlinks = {}
         for i,k in json_object['ansible_facts']['ansible_device_links']['uuids']:
-            disklinks[k]=i
+            disklinks[k] = i
 
-        for i,k in json_object['ansible_facts'['ansible_device_links']['masters']:
-            masterlinks[k]=i
+        for i,k in json_object['ansible_facts']['ansible_device_links']['masters']:
+            masterlinks[k] = i
         # Get Interfaces
         interfaces = []
         for i in json_object['ansible_facts']['ansible_interfaces']:
@@ -192,13 +192,25 @@ def transform(json_object):
            if i["mount"] == "/" or i["mount"] == "/boot":
                 #Use the established reverse dictionaries to get our partition
                 partVal = disklinks.get(i['uuid'])
-                try: disks[disks.index(partVal)].hasRoot = True except ValueError: pass
+                try:
+                    disks[disks.index(partVal)].hasRoot = True
+                except ValueError:
+                    pass
                 masterPartVal = masterlinks.get(partVal)
                 topPartVal = partitionLinks.get(partVal)
-                try: disks[disk.index(topPartVal)].hasRoot = True except ValueError: pass
-                try: disks[disk.index(masterPartVal)].hasRoot = True except ValueError: pass
+                try:
+                    disks[disk.index(topPartVal)].hasRoot = True
+                except ValueError:
+                    pass
+                try:
+                    disks[disk.index(masterPartVal)].hasRoot = True
+                except ValueError:
+                    pass
                 topPartVal = partitionLinks.get(masterPartVal)
-                try: disks[disk.index(topPartVal)].hasRoot = True except ValueError: pass
+                try:
+                    disks[disk.index(topPartVal)].hasRoot = True
+                except ValueError:
+                    pass
  
         # Get Memory
         memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
