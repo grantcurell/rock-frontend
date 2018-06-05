@@ -194,7 +194,7 @@ def transform(json_object):
 
         # Determine location of root
         for i in json_object['ansible_facts']['ansible_mounts']:
-           if i["mount"] == "/":# or i["mount"] == "/boot":
+           if i["mount"] == "/" or i["mount"] == "/boot":
                 #Use the established reverse dictionaries to get our partition
                 print(i['uuid'])
                 partVal = disklinks.get(i['uuid'])
