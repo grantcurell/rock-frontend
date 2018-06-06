@@ -18,16 +18,23 @@
         event.preventDefault();
       }
     });
+
+  function recalculateRecommendations() {
+    current_total_cpus = data.cpus_available + parseInt($( "#system_cpus_available" ).text());
+    current_total_memory = data.memory_available + parseFloat($( "#system_memory_available" ).text());
+    current_total_clustered_storage = parseFloat($( "#system_clustered_storage_available" ).text());
+    current_total_server_cpus = parseInt($( "#server_cpus_available" ).text());
+  }
 </script>
 <div class="jumbotron">
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
 <h2>Common Settings</h2>
-{% with object = form.dns_ip %}
-  {% include "text_input.html" %}
+{% with form = form.common_settings %}
+  {% include "card.html" %}
 {% endwith %}
-<hr>
+<br>
 <h2>Total System Resources</h2>
 <div class="card">
   <div class="card-header">
@@ -40,42 +47,67 @@
     <p class="card-text">Total Ceph Drives: <span id="system_total_ceph_drives">0</span></p>
   </div>
 </div>
-<hr>
+<br>
 <h2>Server Settings</h2>
-<h3>Elasticsearch Settings</h3>
-<h3>Host Settings</h3>
-{% with object = form.number_of_servers %}
-  {% include "button.html" %}
+{% with form = form.elasticsearch_settings, card_title = "Elasticsearch Settings" %}
+  {% include "card.html" %}
+{% endwith %}
+<br>
+{% with form = form.server_settings, card_title = "Server Host Settings" %}
+  {% include "card.html" %}
 {% endwith %}
 <!-- This is extended by servers.html. It is not actually blank as it might seem.
      Check out foozandfuncs to see how this modification happens. You can search
      for the id server_accordion. -->
 <div class="accordion" id="{{ [form.number_of_servers.form_name, 'accordion'] | join('_') }}"></div>
 <br>
-<hr>
+<br>
 <h2>Sensor Settings</h2>
-<h3>Moloch Settings</h3>
-{% with object = form.sensor_storage_type %}
-  {% include "dropdown.html" %}
+{% with form = form.moloch_settings, card_title = "Moloch Settings" %}
+  {% include "card.html" %}
 {% endwith %}
-{% with object = form.moloch_pcap_folder %}
-  {% include "text_input.html" %}
+<br>
+{% with form = form.moloch_advanced_settings, card_title = "Advanced Moloch Settings" %}
+  {% include "card.html" %}
 {% endwith %}
-<h4>Advanced Moloch Settings</h4>
-<div class="alert alert-danger" role="alert">
-Use these at your own risk!
+<br>
+<div class="card" >
+  <div class="card-body">
+    <h4 class="card-title">Kafka Settings</h4>
+    <p class="card-text text-danger">
+      Unless you really know what you are doing here, you should use the recommended values.
+    </p>
+    {% for option in form.kafka_settings %}
+      {% if option.include_html is defined %}
+        {% with object = option %}
+          {% include option.include_html %}
+        {% endwith %}
+      {% endif %}
+    {% endfor %}
+  </div>
 </div>
-{% with object = form.moloch_bpf %}
-  {% include "text_input.html" %}
-{% endwith %}
-{% with object = form.moloch_dontSaveBPFs %}
-  {% include "text_input.html" %}
-{% endwith %}
+<br>
 <h3>Host Settings</h3>
-{% with object = form.number_of_sensors %}
-  {% include "button.html" %}
+{% with form = form.sensor_settings, card_title = "Sensor Settings" %}
+  {% include "card.html" %}
 {% endwith %}
 <div class="accordion" id="{{ [form.number_of_sensors.form_name, 'accordion'] | join('_') }}"></div>
-<hr>
+<br>
+<h3>Advanced System Settings</h3>
+<div class="card" >
+  <div class="card-body">
+    <p class="card-text text-danger">
+      Unless you really know what you are doing here, you should not change these.
+    </p>
+    {% for option in form.advanced_settings %}
+      {% if option.include_html is defined %}
+        {% with object = option %}
+          {% include option.include_html %}
+        {% endwith %}
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+<br>
 <p><button class="btn btn-primary" type="submit">Generate Inventory</button></p>
 {% endblock %}

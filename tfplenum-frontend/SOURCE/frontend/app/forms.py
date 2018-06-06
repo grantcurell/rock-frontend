@@ -12,8 +12,8 @@ import copy
 # placeholder (str): The placeholder text which will appear inside of the field
 # input_type: See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
 class Field:
-    def __init__(self, form_name, label, html5_constraint=None, valid_feedback=None,
-                 invalid_feedback=None, required=False, description=None, placeholder=None,
+    def __init__(self, form_name, label, html5_constraint=None, valid_feedback='Good to go!',
+                 invalid_feedback='This is not a valid value.', required=False, description=None, placeholder=None,
                  input_type='text'):
       self.form_name = 'form_' + form_name
       self.field_id = form_name + '_field'
@@ -24,6 +24,10 @@ class Field:
       self.html5_constraint = html5_constraint
       self.valid_feedback = valid_feedback
       self.invalid_feedback = invalid_feedback
+
+      # This is the HTML file generally associated with displaying this field.
+      # You don't have to use this, but it is handy for displaying things in a loop.
+      self.include_html = "text_input.html"
 
       if required:
           self.required = 'required'
@@ -40,6 +44,10 @@ class Button(Field, object):
         self.button_id = kwargs.get('form_name') + '_button'
         self.button_text = button_text
         self.reaction_file = reaction_file
+
+        # This is the HTML file generally associated with displaying this field.
+        # You don't have to use this, but it is handy for displaying things in a loop.
+        self.include_html = "button.html"
 
     # This is a mammoth hack because Jinja2 doesn't allow assignment within
     # templates. To get around this, I provide this method which simply modifies
@@ -92,6 +100,10 @@ class DropDown:
         self.options = options
         self.dropdown_text = dropdown_text
 
+        # This is the HTML file generally associated with displaying this field.
+        # You don't have to use this, but it is handy for displaying things in a loop.
+        self.include_html = "dropdown.html"
+
 class InventoryForm:
 
   ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
@@ -100,6 +112,19 @@ class InventoryForm:
     'Kit Configuration': 'kit_configuration'
   , 'Help': 'help'
   }
+
+  what_is_ceph = {"label": "What is Ceph?", "description": "Ceph is what is called a \
+  clustered storage solution. Ceph allows \
+  us to take a hard drive on an individual machine and add it to a Ceph cluster. \
+  Instead of that hard drive only being attached to the machine on which it physically \
+  resides, it is effectively added to a singular \"mega hard drive\" which is spread \
+  across multiple devices. Kubernetes can then create what are called persistent \
+  volumes from the space allocated from this hard drive. A persistent volume acts \
+  like a hard drive attached to a single Docker Container. For example, you might have \
+  a persistent volume of 8 GB attached to an Elasticsearch instance. If that instance \
+  of Elasticsearch dies for whatever reason, Kubernetes creates another identical \
+  instance and reattaches the persistent volume containing the Elasticsearch data. \
+  In this way, containers can die, migrate, or be manipulated without loss of data."}
 
   ###########################
   # Common Settings         #
@@ -110,7 +135,7 @@ class InventoryForm:
   , label = 'DNS IP Address'
   , placeholder = "192.168.1.50"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = 'ip_constraint'
   , invalid_feedback = 'You must enter a valid IP address'
   , required = False
   , description =
@@ -119,6 +144,24 @@ class InventoryForm:
    it to default  unless you have a specific reason to use a different DNS   \
    server. Keep in mind  you will need to manually provide all required DNS  \
    entries on your separate  DNS Server or the kit will break.")
+
+  kubernetes_services_cidr = Field(
+    form_name = 'kubernetes_services_cidr'
+  , label = 'Kubernetes Service CIDR'
+  , placeholder = "192.168.1.16/28"
+  , input_type = 'text'
+  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
+  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
+  , html5_constraint = 'pattern=(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/28'
+  , invalid_feedback = 'You must enter a valid IP address with a CIDR mask of /28.'
+  , required = False
+  , description =
+  "Services_cidr is the range of addresses kubernetes will use for external services \
+   This includes cockpit, Moloch viewer, Kibana, elastichq, kafka-manager, and the \
+   kubernetes dashboard. This range must be at least a /28. Ex: \"192.168.1.16/28\" \
+   Keep in mind, the only thing this does is provide a valid set of IPs for the services \
+   to use. This isn't like a regular netmask that has a broadcast address and a network \
+   address.")
 
   ###########################
   # Server and Sensor Forms #
@@ -190,9 +233,38 @@ class InventoryForm:
    , invalid_feedback = 'Enter the number of elasticsearch master instances you would like'
    , required = True
    , description =
-   "This is the number of Elasticsearch masters you would like to run on your kit.\
-   Unless you are going to exceed 5 Elasticsearch nodes, you must run masters instead \
-   of data instances. Unless you are bringing some serious horsepower, this is unlikely. \")
+   "The number of Elasticsearch masters you would like to run on your kit.\
+   Unless you are going to exceed 5 Elasticsearch nodes, you should run masters instead \
+   of data instances.")
+
+  elastic_memory = Field(
+     form_name = 'elastic_memory'
+   , label = 'Elasticsearch Memory'
+   , placeholder = "Memory in GB per Elasticsearch instance"
+   , input_type = 'number'
+   , html5_constraint = 'min=2'
+   , invalid_feedback = 'Enter a valid integer 2 or greater'
+   , required = True
+   , description =
+   "The amount of memory you would like to assign per Elasticsearch instance. Elasticsearch \
+   will use the memlock feature of the OS to take the memory and immediately commit it for \
+   tself. Good values depend very heavily on the type of traffic that the system runs and developing \
+   good predictive models of what work is one of the more challenging engineering problems\
+   that exists. We generally recommend you stick with the recommended default. If you \
+   know what you are doing, you might try experimenting with this value.")
+
+  elastic_pv_size = Field(
+     form_name = 'elastic_pv_size'
+   , label = 'Elasticsearch Persistent Volume Size'
+   , placeholder = "Storage space in GB per Elasticsearch instance"
+   , input_type = 'number'
+   , html5_constraint = 'min=8'
+   , invalid_feedback = 'Enter a valid integer 8 or greater'
+   , required = True
+   , description =
+   "The amount of space to allocate from the Ceph cluster to the persistent volume \
+   used per Elasticsearch instance. See " + what_is_ceph['label'] + " for a description \
+   of persistent volumes and Ceph.")
 
   # Sensor form
 
@@ -253,8 +325,10 @@ class InventoryForm:
    , label = 'Moloch PCAP Folder'
    , placeholder = "/pcap"
    , input_type = 'text'
-   , html5_constraint = ip_constraint
-   , invalid_feedback = 'You must enter a valid Linux path'
+   #, html5_constraint = 'pattern=(\/[\w^ ]+)+\/?'
+   , html5_constraint = 'pattern=(\\/[\\w]+)+'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'You must enter a valid Linux path. It may not be a hidden folder.'
    , required = True
    , description =
    "This is the folder to which Moloch will write its PCAP data. \
@@ -317,8 +391,74 @@ class InventoryForm:
   :num. For example dontSaveBPFs = port 22:5 will only save 5 packets for port 22 \
   sessions. Currently only the initial packet is matched against the bpfs.")
 
-class HelpPage(InventoryForm):
-    def __init__(self):
-        self.server_settings = [self.server_is_master_server_checkbox]
-  self.common_settings = [self.dns_ip, self.use_in_ceph_cluster]
-  self.moloch_settings = [self.sensor_storage_type, self.moloch_pcap_folder, self.moloch_bpf, self.moloch_dontSaveBPFs]
+  # Kafka settings
+
+  kafka_jvm_memory = Field(
+    form_name = 'kafka_jvm_memory'
+  , label = 'Kafka JVM Memory'
+  , placeholder = "Kafka JVM Memory in GBs"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "This is the amount of memory which will be allocated to Kafka's JVM instance.")
+
+  kafka_pv_size = Field(
+    form_name = 'kafka_pv_size'
+  , label = 'Kafka Persistent Volume Size'
+  , placeholder = "Storage space in GB per Kafka instance"
+  , input_type = 'number'
+  , html5_constraint = 'min=3'
+  , invalid_feedback = 'You must enter a valid value greater than 3'
+  , required = True
+  , description =
+  "The amount of space to allocate from the Ceph cluster to the persistent volume \
+  used per Kafka instance. See " + what_is_ceph['label'] + " for a description \
+  of persistent volumes and Ceph.")
+
+  zookeeper_jvm_memory = Field(
+    form_name = 'zookeeper_jvm_memory'
+  , label = 'Zookeeper JVM Memory'
+  , placeholder = "Zookeeper JVM Memory in GBs"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "This is the amount of memory which will be allocated to Zookeeper's JVM instance.")
+
+  zookeeper_pv_size = Field(
+    form_name = 'zookeeper_pv_size'
+  , label = 'Zookeeper Persistent Volume Size'
+  , placeholder = "Storage space in GB per Zookeeper instance"
+  , input_type = 'number'
+  , html5_constraint = 'min=3'
+  , valid_feedback = 'Good to go!'
+  , invalid_feedback = 'You must enter a valid value greater than 3'
+  , required = True
+  , description =
+  "The amount of space to allocate from the Ceph cluster to the persistent volume \
+  used per Zookeeper instance. See " + what_is_ceph['label'] + " for a description \
+  of persistent volumes and Ceph.")
+
+  zookeeper_replicas = Field(
+    form_name = 'zookeeper_replicas'
+  , label = 'Zookeeper Replicas'
+  , placeholder = "Number of Zookeeper instances"
+  , input_type = 'number'
+  , html5_constraint = 'min=3'
+  , invalid_feedback = 'You must enter a valid value greater than 3'
+  , required = True
+  , description =
+  "This is the number of Zookeeper instances your kit will run. These are used for \
+  redundancy and load balancing. There isn't much reason to run more than three.")
+
+  common_settings = [kubernetes_services_cidr]
+  advanced_settings = [dns_ip]
+  server_settings = [server_is_master_server_checkbox, number_of_servers]
+  sensor_settings = [sensor_storage_type, number_of_sensors]
+  elasticsearch_settings = [elastic_masters, elastic_memory, elastic_pv_size]
+  moloch_settings = [sensor_storage_type, moloch_pcap_folder]
+  moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs]
+  kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]

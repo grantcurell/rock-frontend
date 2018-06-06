@@ -26,7 +26,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   $( "#system_cpus_available" ).replaceWith('<span id="system_cpus_available">' + current_total_cpus + '</span>');
 
   current_total_memory = data.memory_available + parseFloat($( "#system_memory_available" ).text());
-  $( "#system_memory_available" ).replaceWith('<span id="{{ object.args[5] }}_memory_available">' + current_total_memory.toFixed(2) + '</span>');
+  $( "#system_memory_available" ).replaceWith('<span id="system_memory_available">' + current_total_memory.toFixed(2) + '</span>');
 
   // args[0] correlates to server_{{ i + 1}}_cpus_available in server.html
   $( "#{{ object.args[0] }}" ).replaceWith(data.cpus_available);
