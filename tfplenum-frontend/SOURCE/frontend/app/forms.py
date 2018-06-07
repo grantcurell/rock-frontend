@@ -32,6 +32,30 @@ class Field:
       if required:
           self.required = 'required'
 
+    # This is a mammoth hack because Jinja2 doesn't allow assignment within
+    # templates. To get around this, I provide this method which simply modifies
+    # various fields within the object and then returns the copy of the object.
+    # This allows the code to effectively modify the object - without modifying
+    # the object.
+
+    # This function is meant for use when you have something like a for loop
+    # in Jinja and you need to provide different variables to a button on each
+    # iteration of the loop.
+    # form_name (str): The updated form name you would like returned with the copy
+    #                  of your object.
+    # field_id (str): The updated field id you would like returned.
+    # args: See: https://stackoverflow.com/questions/3394835/args-and-kwargs
+    #       for a good explanation of args. This is for providing arbitrary arguments
+    #       to your reaction file. For example, you could provide a new argument
+    #       called 'server_1'. Within the reaction file, you could access this
+    #       by calling object.args[0]
+    def change_values(self, form_name, field_id, *args):
+        copy_of_self = copy.deepcopy(self)
+        copy_of_self.form_name = form_name
+        copy_of_self.field_id = field_id
+        copy_of_self.args = args
+        return copy_of_self
+
 # button_text (str): The text you want displayed on the button itself
 # reaction_file (str): A file containing the javascript you would like executed
 #                      when someone clicks the button. This will be included as
@@ -292,6 +316,52 @@ class InventoryForm:
   , invalid_feedback = 'You must have at least one sensor.'
   , reaction_file = 'button_reaction_number_of_sensors.js')
 
+  bro_workers = Field(
+     form_name = 'bro_workers'
+   , label = 'Number of Bro Workers'
+   , placeholder = "1"
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , invalid_feedback = 'Enter a valid integer 1 or greater'
+   , required = True
+   , description =
+   "The number of bro workers to run on each sensor. The worker is the Bro process \
+    that sniffs network traffic and does protocol analysis on the reassembled traffic \
+    streams. Most of the work of an active cluster takes place on the workers and \
+    as such, the workers typically represent the bulk of the Bro processes that \
+    are running in a cluster. See https://www.bro.org/sphinx/cluster/index.html for \
+    more information.")
+
+  moloch_threads = Field(
+     form_name = 'moloch_threads'
+   , label = 'Number of Moloch Threads'
+   , placeholder = "1"
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , invalid_feedback = 'Enter a valid integer 1 or greater'
+   , required = True
+   , description =
+   "Number of threads to use to process packets AFTER the reader has received \
+   the packets. This also controls how many packet queues there are, since each \
+   thread has its own queue. Basically how much CPU to dedicate to parsing the \
+   packets. Increase this if you get errors about dropping packets or the packetQ \
+   is over flowing.")
+
+  monitor_interface = DropDown(
+    form_name = 'monitor_interface'
+  , label = 'Monitor Interface'
+  #, required = True TODO NEED TO ADD A DEFAULT
+  , description = "The interface on the sensor you would like to use for monitoring.\
+                   This will be the interface that Moloch, Bro, and Suricata use."
+  , options = []
+  , dropdown_text = 'Monitor Interface')
+
+  # This is the form name for the ceph drive list
+  ceph_drive_list = 'sensor_ceph_drive_list_form'
+
+  # This is the form name for the sensor monitor interface list
+  sensor_monitor_interface = 'sensor_monitor_interface_form'
+
   ###########################
   # Sensor Settings         #
   ###########################
@@ -457,7 +527,8 @@ class InventoryForm:
   common_settings = [kubernetes_services_cidr]
   advanced_settings = [dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
-  sensor_settings = [sensor_storage_type, number_of_sensors]
+  sensor_settings = [number_of_sensors]
+  sensor_host_settings= [bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_masters, elastic_memory, elastic_pv_size]
   moloch_settings = [sensor_storage_type, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs]

@@ -44,7 +44,7 @@
 {% endif %}
 {% endfor %}
 <h2>Sensor Settings</h2>
-{% for setting in form.sensor_settings %}
+{% for setting in (form.sensor_settings + form.sensor_host_settings) %}
 {% if setting.description is not none %}
 <dl class="row">
   <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>

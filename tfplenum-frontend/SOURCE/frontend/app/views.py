@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from api.node_facts import *
-from app.forms import InventoryForm
+from app.forms import InventoryForm, DropDown
 import json
 
 @app.route('/_server')
@@ -25,10 +25,37 @@ def _gather_device_facts():
     # This request wil be received from jquery on the client side
     management_ip = request.args.get('management_ip')
     node = get_system_info(management_ip, 'I.am.ghost.47')
+    potential_monitor_interfaces = []
+
+    for interface in node.interfaces:
+        if interface.ip_address != management_ip:
+            potential_monitor_interfaces.append(interface.name)
+
     return jsonify(cpus_available=node.cpu_cores,
                    memory_available=node.memory_gb,
                    disks= json.dumps([disk. __dict__ for disk in node.disks]),
-                   hostname=node.hostname)
+                   hostname=node.hostname,
+                   potential_monitor_interfaces=potential_monitor_interfaces)
+
+@app.route('/_display_monitor_interfaces')
+def _display_monitor_interfaces():
+
+    form = InventoryForm()
+
+    instance_number = request.args.get('instance_number')
+    print "INSTANCE NUMBER " + instance_number
+    print request.args.get('interfaces')
+    interfaces = json.loads(request.args.get('interfaces'))
+
+    object = DropDown(
+    form_name = form.monitor_interface.form_name + "_" + instance_number
+    , label = form.monitor_interface.label
+    #, required = True TODO NEED TO ADD A DEFAULT
+    , description = form.monitor_interface.description
+    , options = interfaces
+    , dropdown_text = form.monitor_interface.dropdown_text)
+
+    return render_template("dropdown.html", object=object, form=form)
 
 @app.route('/_ceph_drives_list')
 def _ceph_drives_list():
@@ -50,10 +77,6 @@ def _ceph_drives_list():
 
     form = InventoryForm()
     return render_template("ceph_disk_list.html", form=form, device_number=device_number, disks=disks, device_type=device_type)
-
-@app.route('/_gather_sensor_facts')
-def _gather_sensor_facts():
-    pass
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index.html', methods=['GET', 'POST'])

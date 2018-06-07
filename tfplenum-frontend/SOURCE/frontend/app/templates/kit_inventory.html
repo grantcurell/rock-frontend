@@ -88,7 +88,7 @@
 </div>
 <br>
 <h3>Host Settings</h3>
-{% with form = form.sensor_settings, card_title = "Sensor Settings" %}
+{% with form = form.sensor_settings, card_title = "Sensor Host Settings" %}
   {% include "card.html" %}
 {% endwith %}
 <div class="accordion" id="{{ [form.number_of_sensors.form_name, 'accordion'] | join('_') }}"></div>

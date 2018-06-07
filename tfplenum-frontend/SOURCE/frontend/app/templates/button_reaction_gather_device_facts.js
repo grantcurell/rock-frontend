@@ -54,7 +54,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
 
   // This causes the gather facts button and the number of servers button to be
   // disabled so that users can't accidentally blow away their own form data
-  if(current_total_cpus > 0) {
+  /*if(current_total_cpus > 0) {
     $( "#{{ object.button_id }}" ).prop( "disabled", true );
     $( "#{{ object.field_id }}" ).prop( "disabled", true );
     {% if object.args[5] == "server" %}
@@ -64,6 +64,15 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     $( "#{{ form.number_of_sensors.button_id }}" ).prop( "disabled", true );
     $( "#{{ form.number_of_sensors.field_id }}" ).prop( "disabled", true );
     {% endif %}
-  }
+  }*/
+
+  // This function call goes up to sensor.html
+  {% if object.args[5] == 'sensor' %}
+    $.get("{{ url_for('_display_monitor_interfaces') }}", { interfaces: JSON.stringify(data.potential_monitor_interfaces), instance_number: {{ object.args[4] }} }, function(data){
+      // The hide method is here because effects only work if the element
+      // begins in a hidden state
+      $( "#{{ form.sensor_monitor_interface }}_{{ object.args[4] }}" ).html(data).hide().slideDown("slow");
+    });
+  {% endif %}
 
 });

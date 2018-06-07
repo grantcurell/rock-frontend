@@ -1,11 +1,4 @@
 
-<script>
-  // Adding this allows this code to be identified in a browser debugger
-  //@ sourceURL=sensor.js
-  $(document).ready(function(){
-
-  });
-</script>
 
 <div class="card">
   <div class="card-header">
@@ -53,10 +46,22 @@
          {% include "button.html" %}
       {% endwith %}
       <br>
-
-      <form id='{{ ['sensor_form', i+1] | join('_') }}' role=form>
+      {% with object = form.bro_workers.change_values(
+        (['bro_workers_form', i+1] | join('_')),
+         (form.bro_workers.field_id + '_' + ((i+1) | string))) %}
+         {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.moloch_threads.change_values(
+        (['moloch_threads_form', i+1] | join('_')),
+         (form.moloch_threads.field_id + '_' + ((i+1) | string))) %}
+         {% include "text_input.html" %}
+      {% endwith %}
+      <br>
+      <form id='{{ [form.ceph_drive_list, i+1] | join('_') }}' role=form>
         <div id="{{ ['sensor_ceph_drive_list', i+1] | join('_') }}"></div>
       </form>
+      <br>
+      <div id="{{ [form.sensor_monitor_interface, i+1] | join('_') }}"></div>
     </div>
   </div>
 </div>
