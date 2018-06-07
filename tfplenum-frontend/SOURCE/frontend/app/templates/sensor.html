@@ -46,6 +46,18 @@
          {% include "button.html" %}
       {% endwith %}
       <br>
+      <form id='{{ [form.is_remote_sensor_checkbox.form_name, i+1] | join('_') }}' role=form>
+      <div class="form-check">
+        <input class="form-check-input {{ form.is_remote_sensor_checkbox.css_class }}" type="checkbox" value="" id="{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}">
+        <label class="form-check-label" for="{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}">
+          {{ form.is_remote_sensor_checkbox.label }}
+        </label>
+      </div>
+      <a href="{{ url_for('help') + '#anchor_' + form.is_remote_sensor_checkbox.label | replace(' ','_') }}" target="_blank">
+        <label>What is this?</label>
+      </a>
+      </form>
+      <br>
       {% with object = form.bro_workers.change_values(
         (['bro_workers_form', i+1] | join('_')),
          (form.bro_workers.field_id + '_' + ((i+1) | string))) %}
@@ -57,7 +69,7 @@
          {% include "text_input.html" %}
       {% endwith %}
       <br>
-      <form id='{{ [form.ceph_drive_list, i+1] | join('_') }}' role=form>
+      <form id='{{ [form.sensor_ceph_drive_list, i+1] | join('_') }}' role=form>
         <div id="{{ ['sensor_ceph_drive_list', i+1] | join('_') }}"></div>
       </form>
       <br>

@@ -75,7 +75,7 @@
          'server') %}
          {% include "button.html" %}
       {% endwith %}
-      <form id='{{ ['server_form', i+1] | join('_') }}' role=form>
+      <form id='{{ [form.server_is_master_server_checkbox.form_name, i+1] | join('_') }}' role=form>
       <div class="form-check">
         <input class="form-check-input {{ form.server_is_master_server_checkbox.css_class }}" type="checkbox" value="" id="{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}">
         <label class="form-check-label" for="{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}">
@@ -89,7 +89,7 @@
 
       <br>
 
-      <form id='{{ ['server_form', i+1] | join('_') }}' role=form>
+      <form id='{{ [form.server_ceph_drive_list, i+1] | join('_') }}' role=form>
         <div id="{{ ['server_ceph_drive_list', i+1] | join('_') }}"></div>
       </form>
     </div>

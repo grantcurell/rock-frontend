@@ -246,6 +246,9 @@ class InventoryForm:
   , invalid_feedback = 'You must input the server management IP address.'
   , reaction_file = 'button_reaction_gather_device_facts.js')
 
+  # This is the form name for the ceph drive list
+  server_ceph_drive_list = 'server_ceph_drive_list_form'
+
   # Elasticsearch Settings
 
   elastic_masters = Field(
@@ -352,12 +355,27 @@ class InventoryForm:
   , label = 'Monitor Interface'
   #, required = True TODO NEED TO ADD A DEFAULT
   , description = "The interface on the sensor you would like to use for monitoring.\
-                   This will be the interface that Moloch, Bro, and Suricata use."
+                   This will be the interface that Moloch, Bro, and Suricata use.\
+                   Note: The management interface will not appear in this list. You \
+                   cannot use an interface for both management and monitoring."
   , options = []
   , dropdown_text = 'Monitor Interface')
 
+  is_remote_sensor_checkbox = CheckBox(
+    form_name = "is_remote_sensor"
+  , label = "Is a remote sensor?"
+  , description =
+  "Checking this box will cause the sensor selected to be built in remote mode. \
+  It is meant for a situation where you have a centralized kit, but have a remote\
+  sensor you would like deployed independent of that kit. Specifically, it is meant \
+  to allow the device to operate over a low bandwidth link. When in remote sensor mode \
+  you cannot add any of the system's drives to the Ceph cluster (as this would require \
+  other devices to read/write over the network), due to the previous you must use \
+  direct attached storage for PCAP, it will not cluster Kafka, and it will run an independent \
+  Zookeeper instance.")
+
   # This is the form name for the ceph drive list
-  ceph_drive_list = 'sensor_ceph_drive_list_form'
+  sensor_ceph_drive_list = 'sensor_ceph_drive_list_form'
 
   # This is the form name for the sensor monitor interface list
   sensor_monitor_interface = 'sensor_monitor_interface_form'
@@ -528,7 +546,7 @@ class InventoryForm:
   advanced_settings = [dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
-  sensor_host_settings= [bro_workers, moloch_threads, monitor_interface]
+  sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_masters, elastic_memory, elastic_pv_size]
   moloch_settings = [sensor_storage_type, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs]

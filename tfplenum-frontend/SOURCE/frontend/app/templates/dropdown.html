@@ -21,7 +21,7 @@
 <form id='{{ object.form_name }}' role=form class="needs-validation" novalidate>
 <div class="input-group mb-3">
   <div class="input-group-prepend">
-    <a href="{{ url_for('help') + '#anchor_' + object.label | replace(' ','_') }}"><span class="input-group-text">{{ object.label }}</span></a>
+    <a href="{{ url_for('help') + '#anchor_' + object.label | replace(' ','_') }}" target="_blank"><span class="input-group-text">{{ object.label }}</span></a>
   </div>
   <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button" id="{{ object.dropdown_id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
