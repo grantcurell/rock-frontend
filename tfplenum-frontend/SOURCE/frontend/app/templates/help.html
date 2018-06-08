@@ -35,7 +35,7 @@
 {% endif %}
 {% endfor %}
 <h3>Elasticsearch Settings</h3>
-{% for setting in form.elasticsearch_settings %}
+{% for setting in (form.elasticsearch_settings + form.elasticsearch_advanced_settings) %}
 {% if setting.description is not none %}
 <dl class="row">
   <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>

@@ -7,14 +7,15 @@ import copy
 # valid_feedback (str): The message to display when the user types something which
 #                       meets the above defined validation constraint
 # invalid_feedback (str): The message tobe displayed when the constraint is not met
+# default_value (str): The default value that you would like to occupy the field
 # required (bool): Whether the field is or is not required
 # description (str): The description which you would like to appear in the help page
 # placeholder (str): The placeholder text which will appear inside of the field
 # input_type: See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
 class Field:
     def __init__(self, form_name, label, html5_constraint=None, valid_feedback='Good to go!',
-                 invalid_feedback='This is not a valid value.', required=False, description=None, placeholder=None,
-                 input_type='text'):
+                 invalid_feedback='This is not a valid value.', default_value=None,
+                 required=False, description=None, placeholder=None, input_type='text'):
       self.form_name = 'form_' + form_name
       self.field_id = form_name + '_field'
       self.label = label
@@ -24,6 +25,7 @@ class Field:
       self.html5_constraint = html5_constraint
       self.valid_feedback = valid_feedback
       self.invalid_feedback = invalid_feedback
+      self.default_value = default_value
 
       # This is the HTML file generally associated with displaying this field.
       # You don't have to use this, but it is handy for displaying things in a loop.
@@ -157,7 +159,7 @@ class InventoryForm:
   dns_ip = Field(
     form_name = 'dns_ip'
   , label = 'DNS IP Address'
-  , placeholder = "192.168.1.50"
+  , placeholder = "Same as Master Server management IP"
   , input_type = 'text'
   , html5_constraint = 'ip_constraint'
   , invalid_feedback = 'You must enter a valid IP address'
@@ -293,6 +295,33 @@ class InventoryForm:
    used per Elasticsearch instance. See " + what_is_ceph['label'] + " for a description \
    of persistent volumes and Ceph.")
 
+  elastic_resource_percentage = Field(
+    form_name = 'elastic_resource_percentage'
+  , label = 'Elasticsearch Resource Percentage'
+  , placeholder = "90"
+  , input_type = 'number'
+  , html5_constraint = 'min=1 max=99'
+  , invalid_feedback = 'Value must be between 1 and 99'
+  , required = True
+  , description =
+  "This is the percentage of server resources which the system will dedicated to \
+  Elasticsearch. "
+  , default_value = '90')
+
+  elastic_curator_threshold = Field(
+    form_name = 'elastic_curator_threshold'
+  , label = 'Elasticsearch Curator Threshold'
+  , placeholder = "90"
+  , input_type = 'number'
+  , html5_constraint = 'min=1 max=99'
+  , invalid_feedback = 'Value must be between 1 and 99'
+  , required = True
+  , description =
+  "The percentage of maximum allocated space for Elasticsearch that can be filled \
+  before Curator begins deleting indices. The oldest moloch indices that exceed \
+  this threshold will be deleted."
+  , default_value = '90')
+
   # Sensor form
 
   host_sensor = Button(
@@ -413,7 +442,6 @@ class InventoryForm:
    , label = 'Moloch PCAP Folder'
    , placeholder = "/pcap"
    , input_type = 'text'
-   #, html5_constraint = 'pattern=(\/[\w^ ]+)+\/?'
    , html5_constraint = 'pattern=(\\/[\\w]+)+'
    , valid_feedback = 'Good to go!'
    , invalid_feedback = 'You must enter a valid Linux path. It may not be a hidden folder.'
@@ -425,7 +453,24 @@ class InventoryForm:
    case this will become a mount point. However this can also be a folder. by itself. \
    If you chose to use a separate disk for PCAP you can define that on a per-host \
    basis in the \"Sensor\" section of \"Host Settings\". This will drastically improve \
-   system performance.")
+   system performance."
+   , default_value = '/pcap')
+
+  moloch_pcap_pv = Field(
+     form_name = 'moloch_pcap_pv_size'
+   , label = 'Moloch PCAP Persistent Volume Size'
+   , placeholder = "Size of Moloch PCAP PV"
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'You must allocate at least 1 GB to Moloch\'s PCAP PV'
+   , required = True
+   , description =
+   "See " + what_is_ceph['label'] + " and " + sensor_storage_type.label + " for a good \
+   explanation of how Ceph works and what this field does. This is the amount of space \
+   you will allocate from the Ceph cluster to Moloch\'s PCAP storage. This is set up on \
+   a per instance basis. For example, if you put 8 here, each Moloch instance will receive \
+   8 GB to write to.")
 
   # Moloch Settings
 
@@ -479,6 +524,122 @@ class InventoryForm:
   :num. For example dontSaveBPFs = port 22:5 will only save 5 packets for port 22 \
   sessions. Currently only the initial packet is matched against the bpfs.")
 
+  moloch_spiDataMaxIndices = Field(
+     form_name = 'moloch_spiDataMaxIndices'
+   , label = 'Moloch SPI Data Max Indices'
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'This must be at least one.'
+   , required = True
+   , description =
+   "Specify the max number of indices we calculate spidata for. Elasticsearch will \
+   blow up if we allow the spiData to search too many indices."
+   , default_value = '5')
+
+  moloch_pcapWriteMethod = Field(
+     form_name = 'moloch_pcapWriteMethod'
+   , label = 'Moloch SPI Data Max Indices'
+   , input_type = 'text'
+   , required = True
+   , description =
+   "Specify how packets are written to disk. \
+   'simple' = what you should probably use. \
+   'simple-nodirect = use this with zfs/nfs. \
+   's3' = write packets into s3. \
+   'null' = don't write to disk at all."
+   , default_value = 'simple')
+
+  moloch_pcapWriteSize = Field(
+     form_name = 'moloch_pcapWriteSize'
+   , label = 'Moloch PACP Write Size'
+   , input_type = 'number'
+   , html5_constraint = 'min=4096'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'This must be at least 4096.'
+   , required = True
+   , description =
+   "Buffer size when writing pcap files. Should be a multiple of the raid 5/xfs \
+   stripe size and multiple of 4096 if using direct/thread-direct pcapWriteMethod"
+   , default_value = '262143')
+
+  moloch_dbBulkSize = Field(
+     form_name = 'moloch_dbBulkSize'
+   , label = 'Moloch DB Bulk Size'
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'This must be at least 1.'
+   , required = True
+   , description =
+   "Size of indexing request to send to Elasticsearch. Increase if monitoring a \
+   high bandwidth network."
+   , default_value = '20000')
+
+  moloch_maxESConns = Field(
+     form_name = 'moloch_maxESConns'
+   , label = 'Moloch Maximum ES Connections'
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'This must be at least 1.'
+   , required = True
+   , description =
+   "Max number of connections to Elasticsearch from capture process"
+   , default_value = '30')
+
+  moloch_maxESRequests = Field(
+     form_name = 'moloch_maxESRequests'
+   , label = 'Moloch Maximum ES Requests'
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'This must be at least 1.'
+   , required = True
+   , description =
+   "Max number of Elasticsearch requests outstanding in queue"
+   , default_value = '500')
+
+  moloch_packetsPerPoll = Field(
+     form_name = 'moloch_packetsPerPoll'
+   , label = 'Moloch Maximum Packets Per Poll'
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'This must be at least 1.'
+   , required = True
+   , description =
+   "Moloch writes a session record after this many packets since the last save. \
+   Moloch is only tested at 10k, anything above is not recommended."
+   , default_value = '10000')
+
+  moloch_magicMode = Field(
+     form_name = 'moloch_magicMode'
+   , label = 'Moloch Magic Mode'
+   , input_type = 'text'
+   , required = True
+   , description =
+   "(since 0.16.1) libfile can be VERY slow. Less accurate \"magicing\" \
+   is available for http/smtp bodies. \
+   'libmagic' = normal libmagic. \
+   'libmagicnotext' = libmagic, but turns off text checks. \
+   'molochmagic' = molochmagic implementation (subset of libmagic input files, and less accurate). \
+   'basic' = 20 of most common headers. \
+   'none' = no libmagic or molochmagic calls."
+   , default_value = 'libmagic')
+
+  moloch_maxPacketsInQueue = Field(
+     form_name = 'moloch_maxPacketsInQueue'
+   , label = 'Moloch Maximum Packets in Queue'
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'This must be at least 1.'
+   , required = True
+   , description =
+   "See: https://github.com/aol/moloch/wiki/FAQ#why-am-i-dropping-packets"
+   , default_value = '200000')
+
   # Kafka settings
 
   kafka_jvm_memory = Field(
@@ -490,7 +651,8 @@ class InventoryForm:
   , invalid_feedback = 'You must enter a valid value greater than 1'
   , required = True
   , description =
-  "This is the amount of memory which will be allocated to Kafka's JVM instance.")
+  "This is the amount of memory which will be allocated to Kafka's JVM instance."
+  , default_value = '1')
 
   kafka_pv_size = Field(
     form_name = 'kafka_pv_size'
@@ -503,7 +665,8 @@ class InventoryForm:
   , description =
   "The amount of space to allocate from the Ceph cluster to the persistent volume \
   used per Kafka instance. See " + what_is_ceph['label'] + " for a description \
-  of persistent volumes and Ceph.")
+  of persistent volumes and Ceph."
+  , default_value = '3')
 
   zookeeper_jvm_memory = Field(
     form_name = 'zookeeper_jvm_memory'
@@ -514,7 +677,8 @@ class InventoryForm:
   , invalid_feedback = 'You must enter a valid value greater than 1'
   , required = True
   , description =
-  "This is the amount of memory which will be allocated to Zookeeper's JVM instance.")
+  "This is the amount of memory which will be allocated to Zookeeper's JVM instance."
+  , default_value = '1')
 
   zookeeper_pv_size = Field(
     form_name = 'zookeeper_pv_size'
@@ -528,7 +692,8 @@ class InventoryForm:
   , description =
   "The amount of space to allocate from the Ceph cluster to the persistent volume \
   used per Zookeeper instance. See " + what_is_ceph['label'] + " for a description \
-  of persistent volumes and Ceph.")
+  of persistent volumes and Ceph."
+  , default_value = '3')
 
   zookeeper_replicas = Field(
     form_name = 'zookeeper_replicas'
@@ -540,7 +705,8 @@ class InventoryForm:
   , required = True
   , description =
   "This is the number of Zookeeper instances your kit will run. These are used for \
-  redundancy and load balancing. There isn't much reason to run more than three.")
+  redundancy and load balancing. There isn't much reason to run more than three."
+  , default_value = '3')
 
   common_settings = [kubernetes_services_cidr]
   advanced_settings = [dns_ip]
@@ -548,6 +714,7 @@ class InventoryForm:
   sensor_settings = [number_of_sensors]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_masters, elastic_memory, elastic_pv_size]
-  moloch_settings = [sensor_storage_type, moloch_pcap_folder]
-  moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs]
+  elasticsearch_advanced_settings = [elastic_resource_percentage]
+  moloch_settings = [sensor_storage_type, moloch_pcap_folder, moloch_pcap_pv]
+  moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]

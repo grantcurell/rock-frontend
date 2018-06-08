@@ -22,11 +22,11 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   current_total_memory = data.memory_available + parseFloat($( "#{{ object.args[5] }}_memory_available" ).text());
   $( "#{{ object.args[5] }}_memory_available" ).replaceWith('<span id="{{ object.args[5] }}_memory_available">' + current_total_memory.toFixed(2) + '</span>');
 
-  current_total_cpus = data.cpus_available + parseInt($( "#system_cpus_available" ).text());
-  $( "#system_cpus_available" ).replaceWith('<span id="system_cpus_available">' + current_total_cpus + '</span>');
+  current_total_system_cpus = data.cpus_available + parseInt($( "#system_cpus_available" ).text());
+  $( "#system_cpus_available" ).replaceWith('<span id="system_cpus_available">' + current_total_system_cpus + '</span>');
 
-  current_total_memory = data.memory_available + parseFloat($( "#system_memory_available" ).text());
-  $( "#system_memory_available" ).replaceWith('<span id="system_memory_available">' + current_total_memory.toFixed(2) + '</span>');
+  current_total_system_memory = data.memory_available + parseFloat($( "#system_memory_available" ).text());
+  $( "#system_memory_available" ).replaceWith('<span id="system_memory_available">' + current_total_system_memory.toFixed(2) + '</span>');
 
   // args[0] correlates to server_{{ i + 1}}_cpus_available in server.html
   $( "#{{ object.args[0] }}" ).replaceWith(data.cpus_available);
@@ -66,13 +66,36 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     {% endif %}
   }*/
 
-  // This function call goes up to sensor.html
+  // This section is for facts specific to only the sensor.
   {% if object.args[5] == 'sensor' %}
     $.get("{{ url_for('_display_monitor_interfaces') }}", { interfaces: JSON.stringify(data.potential_monitor_interfaces), instance_number: {{ object.args[4] }} }, function(data){
       // The hide method is here because effects only work if the element
       // begins in a hidden state
       $( "#{{ form.sensor_monitor_interface }}_{{ object.args[4] }}" ).html(data).hide().slideDown("slow");
     });
+
+    // Configure Sensor Moloch Threads
+    var moloch_threads = Math.round(current_total_cpus * (2/3));
+    if (moloch_threads < 1) {
+      moloch_threads = 1;
+    }
+
+    // Configure Sensor Bro Threads
+    var bro_workers = Math.round(current_total_cpus * (1/3));
+    if (bro_workers < 1) {
+      bro_workers = 1;
+    }
+
+    $( "#{{ form.moloch_threads.field_id + '_' }}{{ object.args[4] }}" ).val(moloch_threads);
+    $( "#{{ form.bro_workers.field_id + '_' }}{{ object.args[4] }}" ).val(bro_workers);
+
+  {% endif %}
+
+  // This section is for facts specific to only the server
+  {% if object.args[5] == 'server' %}
+  elastic_available_cpus = Math.round(current_total_system_cpus * (9/10));
+  elastic_available_memory = Math.round(current_total_system_memory * (9/10));
+
   {% endif %}
 
 });

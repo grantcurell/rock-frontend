@@ -53,6 +53,10 @@
   {% include "card.html" %}
 {% endwith %}
 <br>
+{% with form = form.elasticsearch_advanced_settings, card_title = "Elasticsearch Advanced Settings" %}
+  {% include "card.html" %}
+{% endwith %}
+<br>
 {% with form = form.server_settings, card_title = "Server Host Settings" %}
   {% include "card.html" %}
 {% endwith %}
@@ -97,7 +101,7 @@
 <div class="card" >
   <div class="card-body">
     <p class="card-text text-danger">
-      Unless you really know what you are doing here, you should not change these.
+      Unless you really know what you are doing here, you should not change these. Seriously, there's basically no reason to change this DNS address unless you're an ultra-power user.
     </p>
     {% for option in form.advanced_settings %}
       {% if option.include_html is defined %}
