@@ -1,0 +1,34 @@
+
+x = cpus
+y = memory
+
+x = x * .9
+y = y * .9
+rec = 8
+mem_ratio = 3
+
+if x < (rec*3)
+  WARN PRODUCTION MODE
+  instances = 3
+  if x < 3
+    FAIL
+    DISABLE
+  if memory_per_instance * 3 < y
+    FAIL NOT ENOUGH MEMORY
+    DISABLE
+
+  memory_per_instance = int((x * memratio) / 3)
+  cpus_per_instance = int(x / 3)
+
+else
+  instances = int(x / rec)
+  memory_required = instances * mem_ratio * rec
+  memory_per_instance = memory_required / instances
+  cpus_per_instance = rec
+
+  if memory_required < y
+    FAIL
+
+  if instances > 5
+    es_masters = 5
+    es_datas = instances - 5

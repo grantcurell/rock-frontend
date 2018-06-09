@@ -262,9 +262,25 @@ class InventoryForm:
    , invalid_feedback = 'Enter the number of elasticsearch master instances you would like'
    , required = True
    , description =
-   "The number of Elasticsearch masters you would like to run on your kit.\
-   Unless you are going to exceed 5 Elasticsearch nodes, you should run masters instead \
-   of data instances.")
+   "The number of Elasticsearch masters you would like to run on your kit. Each of \
+   these will run all Elasticsearch node types. Unless you are going to exceed 5 Elasticsearch \
+   nodes, you should run masters instead of data instances. See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html \
+   for a description of the node types.")
+
+  elastic_datas = Field(
+     form_name = 'elastic_datas'
+   , label = 'Elasticsearch Data Nodes'
+   , placeholder = "# of Elasticsearch data nodes"
+   , input_type = 'number'
+   , html5_constraint = 'min=0'
+   , invalid_feedback = 'Enter the number of elasticsearch data instances you would like'
+   , required = True
+   , description =
+   "The number of Elasticsearch data nodes you will run. Each of these run the Elasticsearch \
+   data node type. You should use these if your instance count would exceed 5. \
+   See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html for \
+   a description of the node types."
+   , default_value = '0')
 
   elastic_memory = Field(
      form_name = 'elastic_memory'
@@ -305,7 +321,7 @@ class InventoryForm:
   , required = True
   , description =
   "This is the percentage of server resources which the system will dedicated to \
-  Elasticsearch. "
+  Elasticsearch."
   , default_value = '90')
 
   elastic_curator_threshold = Field(
@@ -321,6 +337,37 @@ class InventoryForm:
   before Curator begins deleting indices. The oldest moloch indices that exceed \
   this threshold will be deleted."
   , default_value = '90')
+
+  elastic_cpus_per_instance_ideal = Field(
+    form_name = 'elastic_cpus_per_instance_ideal'
+  , label = 'Ideal ES CPUs Per Instance'
+  , placeholder = "8"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , invalid_feedback = 'Value must be 1 or greater'
+  , required = True
+  , description =
+  "This is the value that the automatic resource computation algorithm will use to \
+  maximize the number of Elasticsearch instances. We settled on 8 based on testing \
+  and recommendations from Elasticsearch engineers. If you have fewer than this \
+  number the algorithm will still adapt. Unless you really know what you are doing \
+  we do not recommend changing this number."
+  , default_value = '8')
+
+  elastic_cpus_to_mem_ratio = Field(
+    form_name = 'elastic_cpus_to_mem_ratio'
+  , label = 'ES CPU to Memory Ratio'
+  , placeholder = "3"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , invalid_feedback = 'Value must be 1 or greater'
+  , required = True
+  , description =
+  "This is the value that the automatic resource computation algorithm will use to \
+  estimate memory resource requirement. This is the ratio of CPUs to memory. This \
+  can vary greatly dependent on the workload. Unless you really know what you are \
+  doing we do not recommend changing this number."
+  , default_value = '3')
 
   # Sensor form
 
@@ -609,9 +656,9 @@ class InventoryForm:
    , invalid_feedback = 'This must be at least 1.'
    , required = True
    , description =
-   "Moloch writes a session record after this many packets since the last save. \
-   Moloch is only tested at 10k, anything above is not recommended."
-   , default_value = '10000')
+   "Number of packets to ask libnids/libpcap to read per poll/spin. Increasing may \
+    hurt stats and ES performance. Decreasing may cause more dropped packets"
+   , default_value = '50000')
 
   moloch_magicMode = Field(
      form_name = 'moloch_magicMode'
@@ -714,7 +761,7 @@ class InventoryForm:
   sensor_settings = [number_of_sensors]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_masters, elastic_memory, elastic_pv_size]
-  elasticsearch_advanced_settings = [elastic_resource_percentage]
+  elasticsearch_advanced_settings = [elastic_resource_percentage, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
   moloch_settings = [sensor_storage_type, moloch_pcap_folder, moloch_pcap_pv]
   moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]

@@ -50,9 +50,9 @@ class Node(object):
         p_interfaces = '\n'.join([str(x) for x in self.interfaces])
         p_disks = '\n'.join([str(x) for x in self.disks])
         return "Hostname: %s\nInterface List:\n%s\nCPU Cores: %s\nMemory MB: %.2f\nMemory GB: %.2f\nDisk List:\n%s\n" % (self.hostname, p_interfaces, self.cpu_cores, self.memory_mb, self.memory_gb, p_disks)
-   
+
     def marshal(self):
-        node = self        
+        node = self
         setattr(node,'interfaces',json.dumps([interface.__dict__ for interface in node.interfaces]))
         setattr(node,'disks',json.dumps([disk.__dict__ for disk in node.disks]))
         return self.__dict__
@@ -76,8 +76,8 @@ class Interface(object):
 
     def __str__(self):
         return "Interface: %s Ip: %s Mac: %s" % (self.name, self.ip_address, self.mac_address)
-    
-    
+
+
 
 
 class Disk(object):
@@ -133,7 +133,7 @@ def ansible_setup(server_ip, passwd):
     # The following runs ansible setup module on the target node
     # sed magic removes the "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
     p = os.popen("ansible all -m setup -e ansible_ssh_pass=" + passwd + " -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
-    json_object = json.loads(p)    
+    json_object = json.loads(p)
 
     if 'unreachable' in json_object:
         raise Exception("Error: " + json_object['msg'])
@@ -168,15 +168,12 @@ def transform(json_object):
         disklinks = {}
         masterlinks = {}
         for i in json_object['ansible_facts']['ansible_device_links']['uuids']:
-            for k in json_object['ansible_facts']['ansible_device_links']['uuids'][i]: 
+            for k in json_object['ansible_facts']['ansible_device_links']['uuids'][i]:
                 disklinks[k] = i
 
         for i in json_object['ansible_facts']['ansible_device_links']['masters']:
             for k in json_object['ansible_facts']['ansible_device_links']['masters'][i]:
                 masterlinks[k] = i
-        print(partitionLinks)
-        print(disklinks)
-        print(masterlinks)
         # Get Interfaces
         interfaces = []
         for i in json_object['ansible_facts']['ansible_interfaces']:
@@ -196,18 +193,14 @@ def transform(json_object):
         for i in json_object['ansible_facts']['ansible_mounts']:
            if i["mount"] == "/" or i["mount"] == "/boot":
                 #Use the established reverse dictionaries to get our partition
-                print(i['uuid'])
                 partVal = disklinks.get(i['uuid'])
-                print(partVal)
-                
+
                 founddisk = next((x for x in disks if x.name == partVal), None)
                 if founddisk != None:
                     founddisk.hasRoot = True
-                
+
                 masterPartVal = masterlinks.get(partVal)
-                print(masterPartVal)
                 topPartVal = partitionLinks.get(partVal)
-                print(topPartVal)
                 founddisk = next((x for x in disks if x.name == topPartVal), None)
                 if founddisk != None:
                     founddisk.hasRoot = True
@@ -218,7 +211,7 @@ def transform(json_object):
                 founddisk = next((x for x in disks if x.name == topPartVal), None)
                 if founddisk != None:
                     founddisk.hasRoot = True
- 
+
         # Get Memory
         memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
 
@@ -258,4 +251,3 @@ def get_system_info(server_ip, passwd):
 
     # Return node object
     return transform(json_object)
-
