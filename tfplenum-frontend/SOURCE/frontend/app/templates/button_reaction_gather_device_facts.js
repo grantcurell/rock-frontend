@@ -19,7 +19,8 @@
 // server_memory_list (int array): A list of server instances and the memory available
 //                          to each one
 // num_servers (int): The number of servers in server_memory_list
-// instance_size (int): The size of an Elasticsearch instance
+// instance_size (int): The size in GBs of the amount of memory required for an
+//                      Elasticsearch instance
 // num_instances (int): The number of Elasticsearch instances
 // server_cpus_list (int array): A list of server instances and the cpus available
 //                          to each one
@@ -42,7 +43,7 @@ function elastic_fit(server_memory_list[], num_servers, instance_size, num_insta
       var bestIdx = -1;
       for (j=0; j<num_servers; j++)
       {
-          if (server_memory_list[j] >= instance_size && server_cpu_list[j] >= cpus_per_instance)
+          if (server_memory_list[j] >= instance_size && server_cpus_list[j] >= cpus_per_instance)
           {
               if (bestIdx == -1)
                   bestIdx = j;
@@ -76,6 +77,7 @@ function elastic_fit(server_memory_list[], num_servers, instance_size, num_insta
           //return false;
   }
   alert(output);
+  //return true;
 }
 {% endif %}
 
@@ -215,11 +217,25 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
 
     }
 
-    for(i = 0; i < parseInt($( "#{{ form.number_of_servers.field_id }}" ).val()); i++) {
+    var number_of_servers = parseInt($( "#{{ form.number_of_servers.field_id }}" ).val());
 
+    var server_memory_list[number_of_servers];
+    var server_cpus_list[number_of_servers];
+
+    for(i = 0; i < number_of_servers; i++) {
+      server_memory_list[i] = parseInt($( "#" + String(i) + "_memory_available" ).text());
+      server_cpus_list[i] = parseInt($( "#" + String(i) + "_cpus_available" ).text());
     }
 
-    elastic_fit(server_memory_list[], num_servers, instance_size, num_instances, server_cpus_list[], cpus_per_instance)
+    if(elastic_fit(server_memory_list, number_of_servers, elastic_memory_per_instance, elastic_instances, server_cpus_list, elastic_cpus_per_instance)) {
+      if(elastic_instances > 5) {
+        $( "#{ form.elastic_masters.field_id }}" ).val(5);
+        $( "#{ form.elastic_datas.field_id }}" ).val(elastic_instances-5);
+      } else {
+        $( "#{ form.elastic_masters.field_id }}" ).val(elastic_instances);
+      }
+    }
+
 
   }
 
