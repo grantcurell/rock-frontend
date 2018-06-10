@@ -70,4 +70,13 @@
 </dl>
 {% endif %}
 {% endfor %}
+<h3>Advanced System Settings</h3>
+{% for setting in form.advanced_system_settings %}
+{% if setting.description is not none %}
+<dl class="row">
+  <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ setting.description }}</dd>
+</dl>
+{% endif %}
+{% endfor %}
 {% endblock %}

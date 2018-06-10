@@ -14,7 +14,7 @@ import copy
 # input_type: See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
 class Field:
     def __init__(self, form_name, label, html5_constraint=None, valid_feedback='Good to go!',
-                 invalid_feedback='This is not a valid value.', default_value=None,
+                 invalid_feedback='This is not a valid value.', disabled=False, default_value=None,
                  required=False, description=None, placeholder=None, input_type='text'):
       self.form_name = 'form_' + form_name
       self.field_id = form_name + '_field'
@@ -282,6 +282,17 @@ class InventoryForm:
    a description of the node types."
    , default_value = '0')
 
+  elastic_cpus = Field(
+     form_name = 'elastic_cpus'
+   , label = 'Elasticsearch CPUs'
+   , placeholder = "Logical CPUs per Elasticsearch instance"
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , invalid_feedback = 'Enter a valid integer 1 or greater'
+   , required = True
+   , description =
+   "The number of CPUs which will be assigned to each Elasticsearch instance.")
+
   elastic_memory = Field(
      form_name = 'elastic_memory'
    , label = 'Elasticsearch Memory'
@@ -293,7 +304,7 @@ class InventoryForm:
    , description =
    "The amount of memory you would like to assign per Elasticsearch instance. Elasticsearch \
    will use the memlock feature of the OS to take the memory and immediately commit it for \
-   tself. Good values depend very heavily on the type of traffic that the system runs and developing \
+   itself. Good values depend very heavily on the type of traffic that the system runs and developing \
    good predictive models of what work is one of the more challenging engineering problems\
    that exists. We generally recommend you stick with the recommended default. If you \
    know what you are doing, you might try experimenting with this value.")
@@ -756,12 +767,18 @@ class InventoryForm:
   , default_value = '3')
 
   common_settings = [kubernetes_services_cidr]
-  advanced_settings = [dns_ip]
+  advanced_system_settings = [dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
-  elasticsearch_settings = [elastic_masters, elastic_datas, elastic_memory, elastic_pv_size]
-  elasticsearch_advanced_settings = [elastic_resource_percentage, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
+  elasticsearch_settings = [elastic_resource_percentage]
+  elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
   moloch_settings = [sensor_storage_type, moloch_pcap_folder, moloch_pcap_pv]
   moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
+
+  advanced_settings = advanced_system_settings + elasticsearch_advanced_settings + moloch_advanced_settings + kafka_settings
+
+  # By default, disable anything in advanced settings
+  for object in (advanced_settings):
+    object.disabled = True

@@ -12,6 +12,8 @@
 <!-- This disables the enter key. We want this because we don't want the user
      to accidentally hit enter which would reset the entire form. -->
 <script>
+
+$(document).ready(function(){
   $(document).keypress(
     function(event){
       if (event.which == '13') {
@@ -19,12 +21,17 @@
       }
     });
 
-  function recalculateRecommendations() {
-    current_total_cpus = data.cpus_available + parseInt($( "#system_cpus_available" ).text());
-    current_total_memory = data.memory_available + parseFloat($( "#system_memory_available" ).text());
-    current_total_clustered_storage = parseFloat($( "#system_clustered_storage_available" ).text());
-    current_total_server_cpus = parseInt($( "#server_cpus_available" ).text());
-  }
+    $( "#advanced_settings" ).click(function (event) {
+      {% for setting in form.advanced_settings %}
+      if($( "#{{ setting.field_id }}").is(':disabled')){
+        $( "#{{ setting.field_id }}" ).prop( "disabled", false );
+      } else {
+        $( "#{{ setting.field_id }}" ).prop( "disabled", true );
+      }
+      {% endfor %}
+    });
+});
+
 </script>
 <div class="jumbotron">
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
@@ -101,9 +108,9 @@
 <div class="card" >
   <div class="card-body">
     <p class="card-text text-danger">
-      Unless you really know what you are doing here, you should not change these. Seriously, there's basically no reason to change this DNS address unless you're an ultra-power user.
+      Unless you really know what you are doing here, you should not change these. Seriously, there's only an incredibly niche case for changing this and chances are you aren't in it.
     </p>
-    {% for option in form.advanced_settings %}
+    {% for option in form.advanced_system_settings %}
       {% if option.include_html is defined %}
         {% with object = option %}
           {% include option.include_html %}
@@ -113,5 +120,14 @@
   </div>
 </div>
 <br>
-<p><button id="generate_inventory" class="btn btn-primary" type="submit">Generate Inventory</button></p>
+<form>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <p><button id="generate_inventory" class="btn btn-primary" type="submit" disabled>Generate Inventory</button></p>
+    </div>
+    <div class="form-group col-md-6">
+      <p><button id="advanced_settings" class="btn btn-primary" type="button">Unlock/Lock Advanced Settings</button></p>
+    </div>
+  </div>
+</form>
 {% endblock %}
