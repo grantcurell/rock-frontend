@@ -760,7 +760,7 @@ class InventoryForm:
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
-  elasticsearch_settings = [elastic_masters, elastic_memory, elastic_pv_size]
+  elasticsearch_settings = [elastic_masters, elastic_datas, elastic_memory, elastic_pv_size]
   elasticsearch_advanced_settings = [elastic_resource_percentage, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
   moloch_settings = [sensor_storage_type, moloch_pcap_folder, moloch_pcap_pv]
   moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
