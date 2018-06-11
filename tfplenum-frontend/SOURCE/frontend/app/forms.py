@@ -26,6 +26,7 @@ class Field:
       self.valid_feedback = valid_feedback
       self.invalid_feedback = invalid_feedback
       self.default_value = default_value
+      self.disabled = disabled
 
       # This is the HTML file generally associated with displaying this field.
       # You don't have to use this, but it is handy for displaying things in a loop.
@@ -420,7 +421,8 @@ class InventoryForm:
     streams. Most of the work of an active cluster takes place on the workers and \
     as such, the workers typically represent the bulk of the Bro processes that \
     are running in a cluster. See https://www.bro.org/sphinx/cluster/index.html for \
-    more information.")
+    more information."
+    , disabled = True)
 
   moloch_threads = Field(
      form_name = 'moloch_threads'
@@ -435,7 +437,8 @@ class InventoryForm:
    the packets. This also controls how many packet queues there are, since each \
    thread has its own queue. Basically how much CPU to dedicate to parsing the \
    packets. Increase this if you get errors about dropping packets or the packetQ \
-   is over flowing.")
+   is over flowing."
+   , disabled = True)
 
   monitor_interface = DropDown(
     form_name = 'monitor_interface'

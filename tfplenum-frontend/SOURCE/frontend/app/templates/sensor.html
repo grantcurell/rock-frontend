@@ -1,4 +1,34 @@
 
+<script>
+$(document).ready(function(){
+
+  // The condition below is here to take care of the case that a user unlocks
+  // the advanced settings before submitting a sensor count. In which case
+  // we want all of the fields drawn enabled rather than disabled (which is the
+  // default)
+  {% for i in range(sensor_count) %}
+  {% for setting in [form.bro_workers, form.moloch_threads] %}
+  if($( "#{{ form.dns_ip.field_id }}").is(':disabled')){
+    $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
+  } else {
+    $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
+  }
+  {% endfor %}
+  {% endfor %}
+
+  $( "#advanced_settings" ).click(function (event) {
+    {% for i in range(sensor_count) %}
+    {% for setting in [form.bro_workers, form.moloch_threads] %}
+    if($( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}").is(':disabled')){
+      $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
+    } else {
+      $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
+    }
+    {% endfor %}
+    {% endfor %}
+  });
+});
+</script>
 
 <div class="card">
   <div class="card-header">
