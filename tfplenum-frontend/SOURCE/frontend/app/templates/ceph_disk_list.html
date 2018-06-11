@@ -37,7 +37,7 @@
   </div>
   <div class="card-body">
     <p class="card-text">Select which drives on the host, if any, that you would like to add to the Ceph cluster.</p>
-    <p class="card-text text-danger">Make sure you do not select the operating system's drive! Ceph will overwrite it!</p>
+    <p class="card-text text-danger">Note: The operating system's drive will not appear here. If a drive has the root file system mounted to it, it is excluded. This means you may only have one drive listed.</p>
   </div>
   <div class="btn-group-vertical" role="group">
     {% for disk in disks %}

@@ -344,7 +344,12 @@ class InventoryForm:
   , required = True
   , description =
   "This is the percentage of server resources which the system will dedicated to \
-  Elasticsearch."
+  Elasticsearch. This includes RAM and CPUs. CPUs here does not mean dedicated CPUs. \
+  This setting actually controls limits as described here. https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container \
+  What this means is that Elasticsearch pods will have both a limit and a request of \
+  X value for the server's compute power. If Elasticsearch is using less than this, \
+  other devices can use those resources. However, when under load, Elasticsearch is \
+  guarenteed to have access up to X of the server's compute power."
   , default_value = '90')
 
   elastic_curator_threshold = Field(
@@ -526,7 +531,8 @@ class InventoryForm:
    If you chose to use a separate disk for PCAP you can define that on a per-host \
    basis in the \"Sensor\" section of \"Host Settings\". This will drastically improve \
    system performance."
-   , default_value = '/pcap')
+   , default_value = '/pcap'
+   , disabled = True)
 
   moloch_pcap_pv = Field(
      form_name = 'moloch_pcap_pv_size'

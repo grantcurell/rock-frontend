@@ -67,6 +67,10 @@ def _ceph_drives_list():
     # While this looks like a dictionary, it is actually just a  string. json loads
     # makes it a dictionary we can operate on.
     disks = json.loads(request.args.get('disks'))
+    
+    for disk in disks:
+        if disk['hasRoot']:
+            disks.pop(disks.index(disk))
 
     # This is here so you can reuse the code in ceph_disk_list. It will be true
     # if the entity sending the request is a server and false if it is a sensor
