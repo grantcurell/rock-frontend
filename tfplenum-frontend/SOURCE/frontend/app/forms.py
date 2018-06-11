@@ -140,6 +140,16 @@ class InventoryForm:
   , 'Help': 'help'
   }
 
+  advanced_system_settings_text = 'All of the required settings below will autopopulate \
+  based on facts gathered from the servers. It is not necessary to change any of \
+  them in order for the system to function. However, you may want to update some \
+  fields manually based on your specific use cases.'
+
+  advanced_settings_button = GenericButton(
+    form_name = 'advanced_settings'
+    , label = 'Unlock/Lock Advanced Settings'
+  )
+
   what_is_ceph = {"label": "What is Ceph?", "description": "Ceph is what is called a \
   clustered storage solution. Ceph allows \
   us to take a hard drive on an individual machine and add it to a Ceph cluster. \
@@ -222,6 +232,7 @@ class InventoryForm:
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , required = True
+  , valid_feedback = 'Looks good! Now hit \"Submit\" on the right!'
   , invalid_feedback = 'You must have at least one server.'
   , reaction_file = 'button_reaction_number_of_servers.js')
 
@@ -403,7 +414,7 @@ class InventoryForm:
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , required = True
-  , valid_feedback = 'Looks good! Now hit \"Gather Facts\"!'
+  , valid_feedback = 'Looks good! Now hit \"Submit\" on the right!'
   , invalid_feedback = 'You must have at least one sensor.'
   , reaction_file = 'button_reaction_number_of_sensors.js')
 
@@ -776,8 +787,8 @@ class InventoryForm:
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_resource_percentage]
   elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
-  moloch_settings = [sensor_storage_type, moloch_pcap_folder, moloch_pcap_pv]
-  moloch_advanced_settings = [moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
+  moloch_settings = [sensor_storage_type, moloch_pcap_folder]
+  moloch_advanced_settings = [moloch_pcap_pv, moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
 
   advanced_settings = advanced_system_settings + elasticsearch_advanced_settings + moloch_advanced_settings + kafka_settings

@@ -16,7 +16,7 @@ $(document).ready(function(){
   {% endfor %}
   {% endfor %}
 
-  $( "#advanced_settings" ).click(function (event) {
+  $( "#{{ form.advanced_settings_button.generic_button_id }}" ).click(function (event) {
     {% for i in range(sensor_count) %}
     {% for setting in [form.bro_workers, form.moloch_threads] %}
     if($( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}").is(':disabled')){
@@ -88,6 +88,7 @@ $(document).ready(function(){
       </a>
       </form>
       <br>
+      <p class='font-weight-light'>{{ form.bro_workers.label }} and {{ form.moloch_threads.label }} are both advanced settings and will be autopopulated based on the resources available to the devices you input. You can unlock them and enter values manually, by pressing the "{{ form.advanced_settings.label }} button."</p>
       {% with object = form.bro_workers.change_values(
         (['bro_workers_form', i+1] | join('_')),
          (form.bro_workers.field_id + '_' + ((i+1) | string))) %}
