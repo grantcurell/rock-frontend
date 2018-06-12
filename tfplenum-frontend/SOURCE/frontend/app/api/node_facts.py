@@ -213,7 +213,6 @@ def transform(json_object):
         memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
 
         # Get Cores
-        print json_object['ansible_facts']
         cores=json_object['ansible_facts']['ansible_processor_vcpus']
 
         # Get FQDN

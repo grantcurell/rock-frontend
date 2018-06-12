@@ -390,6 +390,7 @@ class InventoryForm:
   , placeholder = "90"
   , input_type = 'number'
   , html5_constraint = 'min=1 max=99'
+  , valid_feedback = 'Input is valid. (This just means you didn\'t type something silly. It doesn\'t necessarily mean you have enough resources.)'
   , invalid_feedback = 'Value must be between 1 and 99'
   , required = True
   , description =
@@ -410,6 +411,7 @@ class InventoryForm:
   , placeholder = "90"
   , input_type = 'number'
   , html5_constraint = 'min=1 max=99'
+  , valid_feedback = 'Input is valid. (This just means you didn\'t type something silly, it could still be insufficient resources.)'
   , invalid_feedback = 'Value must be between 1 and 99'
   , required = True
   , description =
@@ -642,7 +644,7 @@ class InventoryForm:
    , placeholder = "1"
    , input_type = 'number'
    , html5_constraint = 'min=1 max=99'
-   , valid_feedback = 'Good to go!'
+   , valid_feedback = 'Input is valid. (This just means you didn\'t type something silly. It doesn\'t necessarily mean you have enough resources.)'
    , invalid_feedback = 'Moloch can\'t run with nothing! (And it should probably be more than 1% ;-D)'
    , required = True
    , description =

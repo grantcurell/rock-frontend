@@ -9,8 +9,7 @@
 {% endwith %}
 {% endblock %}
 {% block body %}
-<!-- This disables the enter key. We want this because we don't want the user
-     to accidentally hit enter which would reset the entire form. -->
+
 <script>
 
 $(document).ready(function(){
@@ -40,13 +39,6 @@ $(document).ready(function(){
     }
 
   })
-
-  validate_clustered_system_cpus_requested = function() {
-
-    var current_cpus_available = parseFloat($( "#system_clustered_storage_available" ).text());
-    var current_storage_requested = parseFloat($( "#system_clustered_storage_committed" ).text());
-
-  }
 
   // Returns true if there is enough storage available and false otherwise
   validate_clustered_storage_committed = function() {
@@ -113,9 +105,38 @@ $(document).ready(function(){
     validate_clustered_storage_committed();
   }
 
+  validate_ceph_drive_count = function () {
+    number_of_ceph_drives = parseInt($( "#system_total_ceph_drives" ).text());
+
+    if(number_of_ceph_drives < 2) {
+      $( "#system_total_ceph_drives_errors" ).parent().removeClass( "text-success" );
+      $( "#system_total_ceph_drives_errors" ).parent().addClass( "text-danger" );
+      $( "#system_total_ceph_drives_errors" ).replaceWith('<span id="system_total_ceph_drives_errors"> - Error: You need at least two drives in the Ceph cluster!</span>');
+
+      // If for whatever reason the inventory was ready to be generated, disable
+      // the generate inventory button.
+      if( !$( "#generate_inventory" ).is(':disabled') ) {
+        $( "#generate_inventory" ).prop( "disabled", true );
+      }
+
+      return false;
+    } else {
+      $( "#system_total_ceph_drives_errors" ).parent().removeClass( "text-danger text-warning" );
+      $( "#system_total_ceph_drives_errors" ).parent().addClass( "text-success" );
+      $( "#system_total_ceph_drives_errors" ).replaceWith('<span id="system_total_ceph_drives_errors"> - Looks good!</span>');
+    }
+
+  }
+
+  // Define this as a blank function. It will actually be defined when server.html
+  // gets loaded
+  recalculate_elasticsearch_recommendations = function() {};
+
   // This function runs all validations to ensure
   validate_all = function () {
     validate_clustered_storage_committed();
+    recalculate_elasticsearch_recommendations();
+    validate_ceph_drive_count();
   }
 
   // This function validates storage requirements as the user is typing
@@ -127,6 +148,13 @@ $(document).ready(function(){
     }
   });
   {% endfor %}
+
+  $('#{{ form.elastic_resource_percentage.field_id }}').keyup(function (event) {
+    // Only do this if autocalculate is enabled
+    if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
+      recalculate_elasticsearch_recommendations();
+    }
+  });
 
   // The purpose of the below is to disable or enable the Moloch PCAP folder field
   // based on whether local PCAP storage is or is not selected.
@@ -170,6 +198,8 @@ $(document).ready(function(){
     validate_all();
   });
 
+  // This disables the enter key. You don't want the form to accidentally reset
+  // if the user presses enter.
   $(document).keypress(
     function(event){
       // 13 corresponds to the enter key
@@ -225,7 +255,7 @@ $(document).ready(function(){
     <div class="card-body">
       <h4 class="card-title">Global Settings</h4>
       <p class="card-text">
-        Set these two fields next! Unlike the storage settings, you can always come back and adjust them if you change your mind.
+        Dependent on your resources, these are generally sane defaults if you don't know what you are doing and just want to get started. Unlike the storage settings, you can always come back and adjust them if you change your mind. The only field you *have* to fill out is {{ form.kubernetes_services_cidr.label }}.
       </p>
       <hr>
       <br>
@@ -238,7 +268,7 @@ $(document).ready(function(){
         {% include "text_input.html" %}
       {% endwith %}
       <p>Storage Assigned to Elasticsearch (GBs): <span id="elastic_storage_available">0</span></p>
-      <p class="text-info">Note: The value above will update as you discover your hosts below. It will start at 0.</p>
+      <p class="text-info">Note: The amount of storage assigned to Elasticsearch will update as you discover your hosts below. It will start at 0.</p>
       <div id="ceph_for_pcap_selected">
         <br>
         <h5>Moloch PCAP Storage Percentage</h5>
@@ -246,7 +276,7 @@ $(document).ready(function(){
           {% include "text_input.html" %}
         {% endwith %}
         <p>Storage Assigned to Moloch PCAP (GBs): <span id="moloch_pcap_storage_available">0</span></p>
-        <p class="text-info">Note: The value above will update as you discover your hosts below. It will start at 0.</p>
+        <p class="text-info">Note: The amount of storage assigned to Moloch will update as you discover your hosts below. It will start at 0.</p>
       </div>
       <br>
       <h5>Kubernetes Settings</h5>
