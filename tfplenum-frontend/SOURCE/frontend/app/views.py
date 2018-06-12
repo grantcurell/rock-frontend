@@ -31,6 +31,8 @@ def _gather_device_facts():
         if interface.ip_address != management_ip:
             potential_monitor_interfaces.append(interface.name)
 
+    print node.cpu_cores
+
     return jsonify(cpus_available=node.cpu_cores,
                    memory_available=node.memory_gb,
                    disks= json.dumps([disk. __dict__ for disk in node.disks]),

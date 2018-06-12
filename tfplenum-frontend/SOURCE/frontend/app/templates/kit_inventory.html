@@ -41,6 +41,13 @@ $(document).ready(function(){
 
   })
 
+  validate_clustered_system_cpus_requested = function() {
+
+    var current_cpus_available = parseFloat($( "#system_clustered_storage_available" ).text());
+    var current_storage_requested = parseFloat($( "#system_clustered_storage_committed" ).text());
+
+  }
+
   // Returns true if there is enough storage available and false otherwise
   validate_clustered_storage_committed = function() {
 
@@ -260,7 +267,7 @@ $(document).ready(function(){
     <div class="card-body">
       <p class="card-text">Heads Up: These values will autopopulate after you enter you enter your server/sensor information below.</p>
       <hr>
-      <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span>  <span id="system_cpus_available_errors"></span></p>
+      <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span></p>
       <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB  <span id="system_memory_available_errors"></span></p>
       <p class="card-text">Clustered Storage Total: <span id="system_clustered_storage_available">0</span> GB</p>
       <p class="card-text">Clustered Storage Committed: <span id="system_clustered_storage_committed">0</span> GB  <span id="system_clustered_storage_committed_errors"></span></p>

@@ -77,9 +77,6 @@ class Interface(object):
     def __str__(self):
         return "Interface: %s Ip: %s Mac: %s" % (self.name, self.ip_address, self.mac_address)
 
-
-
-
 class Disk(object):
 
     """A disk object which represents a logical disk on a server with the
@@ -216,7 +213,8 @@ def transform(json_object):
         memory=json_object['ansible_facts']['ansible_memory_mb']['real']['total']
 
         # Get Cores
-        cores=json_object['ansible_facts']['ansible_processor_cores']
+        print json_object['ansible_facts']
+        cores=json_object['ansible_facts']['ansible_processor_vcpus']
 
         # Get FQDN
         fqdn=json_object['ansible_facts']['ansible_fqdn']
