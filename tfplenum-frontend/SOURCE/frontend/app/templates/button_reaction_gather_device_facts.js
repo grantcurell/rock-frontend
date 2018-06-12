@@ -61,7 +61,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
 
   // This causes the gather facts button and the number of servers button to be
   // disabled so that users can't accidentally blow away their own form data
-  /*if(current_total_cpus > 0) {
+  if(current_total_cpus > 0) {
     $( "#{{ object.button_id }}" ).prop( "disabled", true );
     $( "#{{ object.field_id }}" ).prop( "disabled", true );
     {% if object.args[5] == "server" %}
@@ -71,7 +71,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     $( "#{{ form.number_of_sensors.button_id }}" ).prop( "disabled", true );
     $( "#{{ form.number_of_sensors.field_id }}" ).prop( "disabled", true );
     {% endif %}
-  }*/
+  }
 
   // This section is for facts specific to only the sensor.
   {% if object.args[5] == 'sensor' %}
