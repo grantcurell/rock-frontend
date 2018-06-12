@@ -18,28 +18,83 @@ $(document).ready(function(){
   // This causes the advanced settings to start as hidden
   $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
 
+  // This starts the Moloch PCAP size setting as hidden
+  $( "#ceph_for_pcap_selected" ).hide();
+
   // This causes the main form before Moloch settings to start as hidden.
   $( "#main_form").hide();
 
+  validate_sufficient_storage_available() = function() {
+    
+  }
+
+  // This is for recomputing the amount of storage used by Elasticsearch, Moloch, Kafka, and Zookeeper
+  recalculate_storage_recommendation = function () {
+
+    var elastic_storage_percentage = parseInt($( "#{{ form.elastic_storage_percentage }}").val()) / 100
+
+    // This basically amounts to total_storage * elastic_storage_percentage / #_instances
+    // to_fixed keeps it from exceeding two decimal places
+    var elastic_storage_size = ( (parseFloat($( "#system_clustered_storage_available" ).text()) * elastic_storage_percentage) / (parseInt( $( "#{{ form.elastic_masters.field_id }}").val() ) + parseInt( $( "#{{ form.elastic_datas.field_id }}").val() )) ).to_fixed(2);
+    $( "#{{ form.elastic_pv_size }}" ).val(elastic_storage_size);
+    $( "#elastic_storage_available" ).replaceWith('<span id="elastic_storage_available">' + elastic_storage_size + '</span>');
+
+    var total_committed = elastic_storage_size;
+
+    // The condition prevents Moloch PCAP storage from being computed if the user
+    // did not select Ceph for PCAP
+    if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
+      var moloch_pcap_storage_percentage = parseInt($( "#{{ form.moloch_pcap_storage_percentage }}").val()) / 100
+
+      var moloch_pcap_storage_size = (parseFloat($( "#system_clustered_storage_available" ).text()) * moloch_pcap_storage_percentage).to_fixed(2);
+      $( "#{{ form.moloch_pcap_pv_size }}" ).val(moloch_pcap_storage_size);
+      $( "#moloch_pcap_storage_available" ).replaceWith('<span id="moloch_pcap_storage_available">' + moloch_pcap_storage_size + '</span>');
+
+      total_committed = moloch_pcap_storage_size + elastic_storage_size;
+    }
+
+    total_committed += parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
+
+    $( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed + '</span>');
+  }
+
   // The purpose of the below is to disable or enable the Moloch PCAP folder field
   // based on whether local PCAP storage is or is not selected.
+  // TODO: This is not currently in use. We need to readd the ability to use
+  // just a folder and not a drive.
+  /*
   $( "#{{ form.sensor_storage_type.options[0] | replace(' ','_') }}" ).click(function(event){
     $( "#{{ form.moloch_pcap_folder.field_id }}" ).prop( "disabled", true );
   });
   $( "#{{ form.sensor_storage_type.options[1] | replace(' ','_') }}" ).click(function(event){
     $( "#{{ form.moloch_pcap_folder.field_id }}" ).prop( "disabled", false );
-  });
+  });*/
 
   // This handles the case when a user clicks continue in the modal dialog box
   // that pops up after selecting your storage type
   $( "#{{ form.submit_sensor_storage_type_modal.button_id_primary }}" ).click(function(event){
     $( "#main_form").slideDown("slow");;
 
+    // This shows the Moloch PCAP storage percentage only if Ceph storage was selected
+    if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
+      $( "#ceph_for_pcap_selected" ).show();
+
+      // We should update the defaults if they select Ceph for PCAP
+      $( "#{{ form.elastic_storage_percentage.field_id }}" ).val('30');
+      $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).val('60');
+    }
+
     // This hides the modal box. If you don't have this, the modal box stays on
     // the screen
     $( "#{{ form.submit_sensor_storage_type_modal.modal_id }}" ).modal('hide');
     $( "#{{ form.sensor_storage_type.dropdown_id }}").prop( "disabled", true );
     $( "#{{ form.submit_sensor_storage_type.generic_button_id }}" ).prop( "disabled", true );
+
+    // This updates the total storage committed field with whatever starts in Zookeeper
+    // and Kafka PVs
+    total_committed = parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
+
+    $( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed + '</span>');
   });
 
   $(document).keypress(
@@ -71,10 +126,10 @@ $(document).ready(function(){
 </div>
 <div class="card" >
   <div class="card-body">
-    <h4 class="card-title">Moloch Settings</h4>
+    <h4 class="card-title">Select Storage Type</h4>
     <p class="card-text text-danger">
     </p>
-    {% for option in form.moloch_settings %}
+    {% for option in form.storage_type_settings %}
       {% if option.include_html is defined %}
         {% with object = option %}
           {% include option.include_html %}
@@ -93,6 +148,45 @@ $(document).ready(function(){
 </div>
 <br>
 <div id="main_form">
+  <div class="card" id="direct_to_disk_selected">
+    <div class="card-body">
+      <h4 class="card-title">Global Settings</h4>
+      <p class="card-text">
+        Set these two fields next! Unlike the storage settings, you can always come back and adjust them if you change your mind.
+      </p>
+      <hr>
+      <br>
+      <h5>Elasticsearch Settings</h5>
+      {% with object = form.elastic_resource_percentage %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      <p class="text-info">Note: Elasticsearch only runs on servers. It will not run on sensors. The percentage above is therefore only applicable to server resources - not sensor.</p>
+      {% with object = form.elastic_storage_percentage %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      <p>Storage Assigned to Elasticsearch (GBs): <span id="elastic_storage_available">0</span></p>
+      <p class="text-info">Note: The value above will update as you discover your hosts below. It will start at 0.</p>
+      <div id="ceph_for_pcap_selected">
+        <br>
+        <h5>Moloch PCAP Storage Percentage</h5>
+        {% with object = form.moloch_pcap_storage_percentage %}
+          {% include "text_input.html" %}
+        {% endwith %}
+        <p>Storage Assigned to Moloch PCAP (GBs): <span id="moloch_pcap_storage_available">0</span></p>
+        <p class="text-info">Note: The value above will update as you discover your hosts below. It will start at 0.</p>
+      </div>
+      <br>
+      <h5>Kubernetes Settings</h5>
+      {% for option in form.common_settings %}
+        {% if option.include_html is defined %}
+          {% with object = option %}
+            {% include option.include_html %}
+          {% endwith %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <br>
   <div class="card">
     <div class="card-header">
       Total System Resources
@@ -102,7 +196,8 @@ $(document).ready(function(){
       <hr>
       <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span></p>
       <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB</p>
-      <p class="card-text">Clustered Storage Available: <span id="system_clustered_storage_available">0</span> GB</p>
+      <p class="card-text">Clustered Storage Total: <span id="system_clustered_storage_available">0</span> GB</p>
+      <p class="card-text">Clustered Storage Committed: <span id="system_clustered_storage_committed">0</span> GB <span class="text-info">Note: This includes requirements from Zookeeper/Kafka</span></p>
       <p class="card-text">Total Ceph Drives: <span id="system_total_ceph_drives">0</span></p>
     </div>
   </div>
@@ -119,14 +214,6 @@ $(document).ready(function(){
     {% include "card.html" %}
   {% endwith %}
   <div class="accordion" id="{{ [form.number_of_sensors.form_name, 'accordion'] | join('_') }}"></div>
-  <br>
-  {% with form = form.elasticsearch_settings, card_title = "Elasticsearch Settings" %}
-    {% include "card.html" %}
-  {% endwith %}
-  <br>
-  {% with form = form.common_settings, card_title = "Kubernetes Settings" %}
-    {% include "card.html" %}
-  {% endwith %}
   <br>
   <form>
     <div class="form-row">
@@ -145,7 +232,7 @@ $(document).ready(function(){
     <div class="card" >
       <div class="card-body">
         <p class="card-text text-danger">
-          Unless you really know what you are doing here, you should not change these. Seriously, there's only an incredibly niche case for changing this and chances are you aren't in it.
+          Unless you really know what you are doing here, you should not change the DNS. Seriously, there's only an incredibly niche case for changing this and chances are you aren't in it.
         </p>
         {% for option in form.advanced_system_settings %}
           {% if option.include_html is defined %}

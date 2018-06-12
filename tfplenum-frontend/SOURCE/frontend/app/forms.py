@@ -241,7 +241,7 @@ class InventoryForm:
    kubernetes dashboard. This range must be at least a /28. Ex: \"192.168.1.16/28\" \
    Keep in mind, the only thing this does is provide a valid set of IPs for the services \
    to use. This isn't like a regular netmask that has a broadcast address and a network \
-   address.")
+   address. You should select a range that everyone can access from a web browser.")
 
   ###########################
   # Server and Sensor Forms #
@@ -385,7 +385,7 @@ class InventoryForm:
 
   elastic_resource_percentage = Field(
     form_name = 'elastic_resource_percentage'
-  , label = 'Elasticsearch Resource Percentage'
+  , label = 'Elasticsearch CPU/RAM Percentage'
   , placeholder = "90"
   , input_type = 'number'
   , html5_constraint = 'min=1 max=99'
@@ -393,12 +393,33 @@ class InventoryForm:
   , required = True
   , description =
   "This is the percentage of server resources which the system will dedicated to \
-  Elasticsearch. This includes RAM and CPUs. CPUs here does not mean dedicated CPUs. \
+  Elasticsearch. ---SKIP IF YOU WANT SIMPLE--- This includes RAM and CPUs. CPUs here does not mean dedicated CPUs. \
   This setting actually controls limits as described here. https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container \
   What this means is that Elasticsearch pods will have both a limit and a request of \
   X value for the server's compute power. If Elasticsearch is using less than this, \
   other devices can use those resources. However, when under load, Elasticsearch is \
-  guarenteed to have access up to X of the server's compute power."
+  guarenteed to have access up to X of the server's compute power. ---STOP SKIPPING HERE--- \
+  Basically, you can think of this as a simple percentage of how much of the server\'s \
+  CPU and RAM you want going to Elasticsearch."
+  , default_value = '90')
+
+  elastic_storage_percentage = Field(
+    form_name = 'elastic_storage_percentage'
+  , label = 'Elasticsearch Storage Space Percentage'
+  , placeholder = "90"
+  , input_type = 'number'
+  , html5_constraint = 'min=1 max=99'
+  , invalid_feedback = 'Value must be between 1 and 99'
+  , required = True
+  , description =
+  "Setting this value correctly can be a bit confusing. It depends primarily if you \
+  are running Ceph for PCAP storage or not. If you are not using Ceph for PCAP storage \
+  then this value can be very high - we recommend around 90%. This is due to the \
+  fact that Elasticsearch accounts for the overwhelming bulk of the resource demand \
+  on the server and there's not much need for storing other things. However, if you \
+  are using Ceph for PCAP then you will have to share server storage with Moloch. \
+  Moloch also takes up a lot of space. If you are running Moloch, in general, we give \
+  Moloch 60% and Elasticsearch 30%, but this depends heavily on the size of your disk storage."
   , default_value = '90')
 
   elastic_curator_threshold = Field(
@@ -577,6 +598,8 @@ class InventoryForm:
   with Ceph. Though, that traffic is only a fraction of what PCAP consumes in most \
   cases."
   , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage']
+  # WARNING: Do not change the order of these options. There are several parts of the code
+  # which depend on them. You can search for them by looking for form.sensor_storage_type.options
   , dropdown_text = 'Storage Type'
   , default_option = 'Use hard drive for PCAP storage')
 
@@ -611,6 +634,22 @@ class InventoryForm:
    system performance."
    , default_value = '/pcap'
    , disabled = True)
+
+  moloch_pcap_storage_percentage = Field(
+     form_name = 'moloch_pcap_storage_percentage'
+   , label = 'Moloch PCAP Storage Percentage'
+   , placeholder = "1"
+   , input_type = 'number'
+   , html5_constraint = 'min=1 max=99'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'Moloch can\'t run with nothing! (And it should probably be more than 1% ;-D)'
+   , required = True
+   , description =
+   "This is the percentage of the clustered storage which will be assigned to Moloch PCAP. \
+   In general, we give this 60% and Elasticsearch 30%, but this depends heavily on \
+   the amount of storage you have available. You can play with the values to see what \
+   works for you."
+   , default_value = '1')
 
   moloch_pcap_pv = Field(
      form_name = 'moloch_pcap_pv_size'
@@ -869,9 +908,10 @@ class InventoryForm:
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
-  elasticsearch_settings = [elastic_resource_percentage]
+  elasticsearch_settings = [elastic_resource_percentage, elastic_storage_percentage]
   elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
-  moloch_settings = [sensor_storage_type] # TODO: We should add this back in at some point, moloch_pcap_folder]
+  storage_type_settings = [sensor_storage_type]
+  moloch_settings = [moloch_pcap_storage_percentage] # TODO: We should add this back in at some point, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_pcap_pv, moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
 

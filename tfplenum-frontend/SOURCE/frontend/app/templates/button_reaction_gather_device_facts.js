@@ -93,21 +93,32 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
       $( "#{{ form.sensor_monitor_interface }}_{{ object.args[4] }}" ).html(data).hide().slideDown("slow");
     });
 
-    // Configure Sensor Moloch Threads
-    var moloch_threads = Math.round(current_total_cpus * (2/3));
-    if (moloch_threads < 1) {
-      moloch_threads = 1;
+    // We only do this calculation if the algorithm is currently enabled
+    if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
+      // Configure Sensor Moloch Threads
+      var moloch_threads = Math.round(current_total_cpus * (2/3));
+      if (moloch_threads < 1) {
+        moloch_threads = 1;
+      }
+
+      // Configure Sensor Bro Threads
+      var bro_workers = Math.round(current_total_cpus * (1/3));
+      if (bro_workers < 1) {
+        bro_workers = 1;
+      }
+
+      $( "#{{ form.moloch_threads.field_id + '_' }}{{ object.args[4] }}" ).val(moloch_threads);
+      $( "#{{ form.bro_workers.field_id + '_' }}{{ object.args[4] }}" ).val(bro_workers);
     }
+  {% endif %}
 
-    // Configure Sensor Bro Threads
-    var bro_workers = Math.round(current_total_cpus * (1/3));
-    if (bro_workers < 1) {
-      bro_workers = 1;
-    }
+  {% if object.args[5] == 'server' %}
+  // We only do this calculation if the algorithm is currently enabled
+  if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
 
-    $( "#{{ form.moloch_threads.field_id + '_' }}{{ object.args[4] }}" ).val(moloch_threads);
-    $( "#{{ form.bro_workers.field_id + '_' }}{{ object.args[4] }}" ).val(bro_workers);
-
+    // This function is defined in server.html
+    recalculate_elasticsearch_recommendations();
+  }
   {% endif %}
 
 });

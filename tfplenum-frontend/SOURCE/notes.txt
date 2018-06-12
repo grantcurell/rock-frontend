@@ -9,3 +9,6 @@ workon my-venv
 pip install Flask
 
 ...
+
+- Need to make sure there is enough storage left over for everything else
+- Need to make sure at least 2 Ceph drives are selected 

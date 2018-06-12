@@ -28,12 +28,8 @@
     })
     {% endfor %}
 
-    window.recalculate_elasticsearch_storage_recommendation = function () {
-      $( "#{{ form.elastic_pv_size }}" ).val((parseFloat($( "#system_clustered_storage_available" ).text()) * elastic_resource_percentage) / elastic_instances);
-    }
+    recalculate_elasticsearch_recommendations = function() {
 
-    // Adding the window. makes this function a global function
-    window.recalculate_elasticsearch_recommendations = function() {
       // server_memory_list (int array): A list of server instances and the memory available
       //                          to each one
       // number_of_servers (int): The number of servers in server_memory_list
@@ -233,7 +229,7 @@
             }
             $( "#{{ form.elastic_memory.field_id }}" ).val(elastic_memory_per_instance);
             $( "#{{ form.elastic_cpus.field_id }}" ).val(elastic_cpus_per_instance);
-
+            recalculate_storage_recommendation();
             console.log("SUCCESS. ALL INSTANCES ALLOCATED.")
           } else {
             console.log("FAIL - COULD NOT ALLOCATE INSTANCES. REDUCING BY 1.")
