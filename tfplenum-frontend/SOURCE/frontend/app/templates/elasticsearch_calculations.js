@@ -64,7 +64,7 @@ recalculate_elasticsearch_recommendations = function() {
       $( "#generate_inventory" ).prop( "disabled", true );
     }
 
-    return false;
+    set_elasticsearch_validation(false);
 
   } else {
 
@@ -134,7 +134,7 @@ recalculate_elasticsearch_recommendations = function() {
           $( "#generate_inventory" ).prop( "disabled", true );
         }
 
-        return false;
+        set_elasticsearch_validation(false);
       }
     }
 
@@ -255,7 +255,8 @@ recalculate_elasticsearch_recommendations = function() {
       $( "#elasticsearch_memory_errors" ).parent().addClass( "text-success" );
       $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_memory_errors"> - Looks good!</span>');
 
-      return true;
+      set_elasticsearch_validation(true);
+      validate_all();
     }
   }
 };

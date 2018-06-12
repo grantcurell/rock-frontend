@@ -26,6 +26,7 @@
         $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
       }
       recalculate_storage_recommendation();
+      validate_ceph_drive_count();
 
     });
     {% endfor %}

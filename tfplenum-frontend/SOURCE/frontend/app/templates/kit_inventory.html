@@ -61,14 +61,15 @@ $(document).ready(function(){
       $( "#system_clustered_storage_committed" ).parent().addClass( "text-danger" );
       $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Error: Insufficient storage space available on system.</span>');
 
-      return false;
+      clustered_storage_validated = false;
     } else {
 
       $( "#system_clustered_storage_committed" ).parent().removeClass( "text-danger" );
       $( "#system_clustered_storage_committed" ).parent().addClass( "text-success" );
       $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Looks good!</span>');
 
-      return true;
+      clustered_storage_validated = true;
+      validate_all();
     }
 
   }
@@ -106,6 +107,7 @@ $(document).ready(function(){
   }
 
   validate_ceph_drive_count = function () {
+
     number_of_ceph_drives = parseInt($( "#system_total_ceph_drives" ).text());
 
     if(number_of_ceph_drives < 2) {
@@ -119,11 +121,14 @@ $(document).ready(function(){
         $( "#generate_inventory" ).prop( "disabled", true );
       }
 
-      return false;
+      ceph_drives_validated = false;
     } else {
       $( "#system_total_ceph_drives_errors" ).parent().removeClass( "text-danger text-warning" );
       $( "#system_total_ceph_drives_errors" ).parent().addClass( "text-success" );
       $( "#system_total_ceph_drives_errors" ).replaceWith('<span id="system_total_ceph_drives_errors"> - Looks good!</span>');
+
+      ceph_drives_validated = true;
+      validate_all();
     }
 
   }
@@ -132,11 +137,30 @@ $(document).ready(function(){
   // gets loaded
   recalculate_elasticsearch_recommendations = function() {};
 
+  var clustered_storage_validated = false;
+  var elasticsearch_validated = false;
+  var ceph_drives_validated = false;
+
+  // This function is just so elements outside this page can set the value of elasticsearch
+  // validation
+  set_elasticsearch_validation = function(value) {
+    elasticsearch_validated = value;
+  }
+
   // This function runs all validations to ensure
   validate_all = function () {
-    validate_clustered_storage_committed();
-    recalculate_elasticsearch_recommendations();
-    validate_ceph_drive_count();
+
+    //console.log(clustered_storage_validated + ' ' + ceph_drives_validated + ' ' + elasticsearch_validated);
+
+    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated ) {
+
+      // If for whatever reason the inventory was ready to be generated, disable
+      // the generate inventory button.
+      if( $( "#generate_inventory" ).is(':disabled') ) {
+        $( "#generate_inventory" ).prop( "disabled", false );
+      }
+
+    }
   }
 
   // This function validates storage requirements as the user is typing
@@ -144,7 +168,7 @@ $(document).ready(function(){
   $('#{{ field }}').keyup(function (event) {
     // Only do this if autocalculate is enabled
     if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
-      recalculate_storage_recommendation();
+      validate_all();
     }
   });
   {% endfor %}
@@ -152,7 +176,7 @@ $(document).ready(function(){
   $('#{{ form.elastic_resource_percentage.field_id }}').keyup(function (event) {
     // Only do this if autocalculate is enabled
     if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
-      recalculate_elasticsearch_recommendations();
+      validate_all();
     }
   });
 
@@ -190,12 +214,12 @@ $(document).ready(function(){
 
     // This updates the total storage committed field with whatever starts in Zookeeper
     // and Kafka PVs
-    total_committed = parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
+    //total_committed = parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
 
-    $( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed + '</span>');
+    //$( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed + '</span>');
 
     recalculate_storage_recommendation();
-    validate_all();
+    validate_ceph_drive_count();
   });
 
   // This disables the enter key. You don't want the form to accidentally reset
