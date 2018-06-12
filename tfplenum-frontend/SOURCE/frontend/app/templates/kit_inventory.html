@@ -38,6 +38,8 @@ $(document).ready(function(){
     // This hides the modal box. If you don't have this, the modal box stays on
     // the screen
     $( "#{{ form.submit_sensor_storage_type_modal.modal_id }}" ).modal('hide');
+    $( "#{{ form.sensor_storage_type.dropdown_id }}").prop( "disabled", true );
+    $( "#{{ form.submit_sensor_storage_type.generic_button_id }}" ).prop( "disabled", true );
   });
 
   $(document).keypress(
