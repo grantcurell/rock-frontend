@@ -15,12 +15,12 @@
 
 $(document).ready(function(){
 
-  // We perform the below replace because this is how the dropdown html forms IDs
-  // from the options listed in the form
-  $("#{{ form.sensor_storage_type.options[0] | replace(' ','_') }}").click(function(event){
+  // The purpose of the below is to disable or enable the Moloch PCAP folder field
+  // based on whether local PCAP storage is or is not selected.
+  $( "#{{ form.sensor_storage_type.options[0] | replace(' ','_') }}" ).click(function(event){
     $( "#{{ form.moloch_pcap_folder.field_id }}" ).prop( "disabled", true );
   });
-  $("#{{ form.sensor_storage_type.options[1] | replace(' ','_') }}").click(function(event){
+  $( "#{{ form.sensor_storage_type.options[1] | replace(' ','_') }}" ).click(function(event){
     $( "#{{ form.moloch_pcap_folder.field_id }}" ).prop( "disabled", false );
   });
 
@@ -44,6 +44,7 @@ $(document).ready(function(){
 });
 
 </script>
+
 <div class="jumbotron">
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>

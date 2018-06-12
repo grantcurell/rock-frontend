@@ -119,13 +119,14 @@ class CheckBox:
         self.description = description
 
 class DropDown:
-    def __init__(self, form_name, label, options, dropdown_text, description=None):
+    def __init__(self, form_name, label, options, dropdown_text, description=None, default_option=None):
         self.form_name = 'form_' + form_name
         self.dropdown_id = form_name + '_dropdown'
         self.label = label
         self.description = description
         self.options = options
         self.dropdown_text = dropdown_text
+        self.default_option = default_option
 
         # This is the HTML file generally associated with displaying this field.
         # You don't have to use this, but it is handy for displaying things in a loop.
@@ -512,7 +513,8 @@ class InventoryForm:
   with Ceph. Though, that traffic is only a fraction of what PCAP consumes in most \
   cases."
   , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage']
-  , dropdown_text = 'Storage Type')
+  , dropdown_text = 'Storage Type'
+  , default_option = 'Use hard drive for PCAP storage')
 
   moloch_pcap_folder = Field(
      form_name = 'moloch_pcap_folder'
@@ -793,7 +795,7 @@ class InventoryForm:
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_resource_percentage]
   elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
-  moloch_settings = [sensor_storage_type, moloch_pcap_folder]
+  moloch_settings = [sensor_storage_type] # TODO: We should add this back in at some point, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_pcap_pv, moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
 
