@@ -22,7 +22,7 @@
     <span class="input-group-text">{{ object.label }}</span>
     </a>
   </div>
-  <input name="{{ object.field_id }}" id="{{ object.field_id }}" type="{{ object.input_type | default("text", true) }}" {{ object.html5_constraint if object.html5_constraint is not none }} class="form-control" placeholder="{{ object.placeholder }}" {{ 'required' if object.required is not none }} {{ 'value=' + object.default_value if object.default_value is not none }} {{ 'disabled' if object.disabled }}>
+  <input name="{{ object.field_id }}" id="{{ object.field_id }}" type="{{ object.input_type | default("text", true) }}" {{ object.html5_constraint if object.html5_constraint is not none }} class="form-control" placeholder="{{ object.placeholder }}" {{ 'required' if object.required is not none }} {{ 'value=' + object.default_value if object.default_value is not none }} {{ 'disabled' if object.disabled }} {{ 'hidden' if object.hidden }}>
   {% if object.valid_feedback is not none %}
     <div class="valid-feedback">
     {{ object.valid_feedback | default("Looks good!", true) }}

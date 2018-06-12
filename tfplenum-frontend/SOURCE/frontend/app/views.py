@@ -67,7 +67,7 @@ def _ceph_drives_list():
     # While this looks like a dictionary, it is actually just a  string. json loads
     # makes it a dictionary we can operate on.
     disks = json.loads(request.args.get('disks'))
-    
+
     for disk in disks:
         if disk['hasRoot']:
             disks.pop(disks.index(disk))
@@ -81,6 +81,24 @@ def _ceph_drives_list():
 
     form = InventoryForm()
     return render_template("ceph_disk_list.html", form=form, device_number=device_number, disks=disks, device_type=device_type)
+
+@app.route('/_pcap_disks_list')
+def _pcap_disks_list():
+
+    # This request wil be received from jquery on the client side
+    device_number = request.args.get('device_number')
+    # json.loads takes the json we received and converts it to a python dict
+    # Ex, the JSON looks like: [{u'size_gb': 20.0, u'name': u'sdb', u'size_tb': 0.01953125}, {u'size_gb': 20.0, u'name': u'sda', u'size_tb': 0.01953125}]
+    # While this looks like a dictionary, it is actually just a  string. json loads
+    # makes it a dictionary we can operate on.
+    disks = json.loads(request.args.get('disks'))
+
+    for disk in disks:
+        if disk['hasRoot']:
+            disks.pop(disks.index(disk))
+
+    form = InventoryForm()
+    return render_template("pcap_disks_list.html", form=form, device_number=device_number, disks=disks)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index.html', methods=['GET', 'POST'])

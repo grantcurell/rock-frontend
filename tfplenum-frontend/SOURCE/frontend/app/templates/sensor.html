@@ -10,6 +10,7 @@ $(document).ready(function(){
   {% for setting in [form.bro_workers, form.moloch_threads] %}
   if($( "#{{ form.dns_ip.field_id }}").is(':disabled')){
     $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
+    $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
   } else {
     $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
   }
@@ -21,8 +22,10 @@ $(document).ready(function(){
     {% for setting in [form.bro_workers, form.moloch_threads] %}
     if($( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}").is(':disabled')){
       $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
+      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").slideDown("slow");
     } else {
       $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
+      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
     }
     {% endfor %}
     {% endfor %}
@@ -88,18 +91,20 @@ $(document).ready(function(){
       </a>
       </form>
       <br>
-      <p class='font-weight-light'>{{ form.bro_workers.label }} and {{ form.moloch_threads.label }} are both advanced settings and will be autopopulated based on the resources available to the devices you input. You can unlock them and enter values manually, by pressing the "{{ form.advanced_settings.label }} button."</p>
-      {% with object = form.bro_workers.change_values(
-        (['bro_workers_form', i+1] | join('_')),
-         (form.bro_workers.field_id + '_' + ((i+1) | string))) %}
-         {% include "text_input.html" %}
-      {% endwith %}
-      {% with object = form.moloch_threads.change_values(
-        (['moloch_threads_form', i+1] | join('_')),
-         (form.moloch_threads.field_id + '_' + ((i+1) | string))) %}
-         {% include "text_input.html" %}
-      {% endwith %}
-      <br>
+      <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' }}">
+        <p class='font-weight-light'>{{ form.bro_workers.label }} and {{ form.moloch_threads.label }} are both advanced settings and will be autopopulated based on the resources available to the devices you input. You do not have to fill in these values."</p>
+        {% with object = form.bro_workers.change_values(
+          (['bro_workers_form', i+1] | join('_')),
+           (form.bro_workers.field_id + '_' + ((i+1) | string))) %}
+           {% include "text_input.html" %}
+        {% endwith %}
+        {% with object = form.moloch_threads.change_values(
+          (['moloch_threads_form', i+1] | join('_')),
+           (form.moloch_threads.field_id + '_' + ((i+1) | string))) %}
+           {% include "text_input.html" %}
+        {% endwith %}
+        <br>
+      </div>
       <form id='{{ [form.sensor_ceph_drive_list, i+1] | join('_') }}' role=form>
         <div id="{{ ['sensor_ceph_drive_list', i+1] | join('_') }}"></div>
       </form>

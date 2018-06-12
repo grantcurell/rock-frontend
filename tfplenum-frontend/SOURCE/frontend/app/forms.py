@@ -14,7 +14,7 @@ import copy
 # input_type: See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
 class Field:
     def __init__(self, form_name, label, html5_constraint=None, valid_feedback='Good to go!',
-                 invalid_feedback='This is not a valid value.', disabled=False, default_value=None,
+                 invalid_feedback='This is not a valid value.', disabled=False, hidden=False, default_value=None,
                  required=False, description=None, placeholder=None, input_type='text'):
       self.form_name = 'form_' + form_name
       self.field_id = form_name + '_field'
@@ -27,6 +27,7 @@ class Field:
       self.invalid_feedback = invalid_feedback
       self.default_value = default_value
       self.disabled = disabled
+      self.hidden = hidden
 
       # This is the HTML file generally associated with displaying this field.
       # You don't have to use this, but it is handy for displaying things in a loop.
@@ -132,6 +133,34 @@ class DropDown:
         # You don't have to use this, but it is handy for displaying things in a loop.
         self.include_html = "dropdown.html"
 
+# name (str): The name of your modal (no spaces)
+# modal_title (str): The title that will appear along with the modal box
+# modal_text (str): The text that will appear in the modal box
+# secondary_button_text (str): The label of the secondary button in the modal
+# primary_button_text (str): The text on the primary button
+
+# The below explain the additional variables that you might have need to reference
+# but are not necessary for calling the modal
+# button_id (str): The id of the button that will trigger this modal popup. You must
+#                  must provide this yourself. You could use GenericButton.
+# modal_id (str): The ID of the modal box itself
+# modal_label_id (str): The ID of the modal label itself
+# button_id_secondary (str): The ID of the secondary button
+# button_id_primary (str): The Id of the primary button
+class ModalPopUp:
+    def __init__(self, name, modal_title, modal_text, secondary_button_text, primary_button_text):
+      self.button_id = name + "_button_id"
+      self.modal_id = name + "_modal_id"
+      self.modal_label_id = name + "_modal_label_id"
+      self.modal_title = modal_title
+      self.modal_text = modal_text
+      self.button_id_secondary = name + "_modal_button_id_secondary"
+      self.secondary_button_text = secondary_button_text
+      self.button_id_primary = name + "_modal_button_id_primary"
+      self.primary_button_text = primary_button_text
+
+
+
 class InventoryForm:
 
   ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
@@ -148,7 +177,7 @@ class InventoryForm:
 
   advanced_settings_button = GenericButton(
     form_name = 'advanced_settings'
-    , label = 'Unlock/Lock Advanced Settings'
+    , label = 'Show/Hide Advanced Settings'
   )
 
   what_is_ceph = {"label": "What is Ceph?", "description": "Ceph is what is called a \
@@ -163,6 +192,15 @@ class InventoryForm:
   of Elasticsearch dies for whatever reason, Kubernetes creates another identical \
   instance and reattaches the persistent volume containing the Elasticsearch data. \
   In this way, containers can die, migrate, or be manipulated without loss of data."}
+
+  help_me_decide = {"label": "Help me decide", "description": "If you plan to have a high volume \
+  of input traffic to the kit, typically more than 1 Gb/s, it's typically better to go with \"Use hard drive for PCAP storage\"\
+  storage, but that assumes a 1Gb/s network backbone. If you have a faster backbone, than it's really \
+  a bit of a judgement call. The bottleneck is typically the network backbone. When \
+  you have all that PCAP coming in, parts must traverse the network if you are using \
+  clustered storage. This can frequently overwhelm a 1Gb/s pipe. If you are on a slower \
+  network, it's better to use Ceph because you get all the benefits of a clustered \
+  storage solution. If you don't know, it's better to stick with \"Use hard drive for PCAP storage\""}
 
   ###########################
   # Common Settings         #
@@ -218,6 +256,12 @@ class InventoryForm:
   metadata which is light weight especially compared to PCAP. You can select multiple \
   drives if you would like. Make sure you don't select the OS' drive as Ceph will \
   format and overwrite any drives you select.")
+
+  use_as_pcap_storage = GenericButton(
+    form_name = 'use_as_pcap_storage'
+  , label = "Use drive for PCAP storage?"
+  , description =
+  "Use this field to mark the disk you would like to use for PCAP storage for Moloch.")
 
   ###########################
   # Server Settings         #
@@ -484,6 +528,9 @@ class InventoryForm:
   # This is the form name for the ceph drive list
   sensor_ceph_drive_list = 'sensor_ceph_drive_list_form'
 
+  # This is the form name for the ceph drive list
+  pcap_disk_list = 'pcap_disk_list_form'
+
   # This is the form name for the sensor monitor interface list
   sensor_monitor_interface = 'sensor_monitor_interface_form'
 
@@ -497,7 +544,8 @@ class InventoryForm:
   #, required = True TODO NEED TO ADD A DEFAULT
   , description =
   "The kit can use two types of storage for PCAP. One is clustered Ceph storage \
-  and the other is a disk on the sensor itself. The advantage to clustered storage \
+  and the other is a disk on the sensor itself. See " + what_is_ceph['label'] + "\
+  for a description of Ceph. The advantage to clustered storage \
   is that all hard drives given to Ceph are treated like one \"mega hard drive\". \
   This means that you may have PCAP come in on sensor 1, but if its disk is filling \
   up, it can just write that data to the disk on sensor 2 because it is also part \
@@ -515,6 +563,18 @@ class InventoryForm:
   , options = ['Use Ceph clustered storage for PCAP', 'Use hard drive for PCAP storage']
   , dropdown_text = 'Storage Type'
   , default_option = 'Use hard drive for PCAP storage')
+
+  submit_sensor_storage_type = GenericButton(
+    form_name = 'submit_sensor_storage_type'
+    , label = "Click me when you've picked your storage type!"
+  )
+
+  submit_sensor_storage_type_modal = ModalPopUp(
+    name = 'submit_sensor_storage_type_modal'
+  , modal_title = 'Are you sure you want to submit?'
+  , modal_text = 'Once you select a storage type you cannot go back without restarting the form.'
+  , secondary_button_text = 'Go back'
+  , primary_button_text = 'Continue')
 
   moloch_pcap_folder = Field(
      form_name = 'moloch_pcap_folder'

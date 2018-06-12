@@ -15,6 +15,12 @@
 
 $(document).ready(function(){
 
+  // This causes the advanced settings to start as hidden
+  $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
+
+  // This causes the main form before Moloch settings to start as hidden.
+  $( "#main_form").hide();
+
   // The purpose of the below is to disable or enable the Moloch PCAP folder field
   // based on whether local PCAP storage is or is not selected.
   $( "#{{ form.sensor_storage_type.options[0] | replace(' ','_') }}" ).click(function(event){
@@ -22,6 +28,16 @@ $(document).ready(function(){
   });
   $( "#{{ form.sensor_storage_type.options[1] | replace(' ','_') }}" ).click(function(event){
     $( "#{{ form.moloch_pcap_folder.field_id }}" ).prop( "disabled", false );
+  });
+
+  // This handles the case when a user clicks continue in the modal dialog box
+  // that pops up after selecting your storage type
+  $( "#{{ form.submit_sensor_storage_type_modal.button_id_primary }}" ).click(function(event){
+    $( "#main_form").slideDown("slow");;
+
+    // This hides the modal box. If you don't have this, the modal box stays on
+    // the screen
+    $( "#{{ form.submit_sensor_storage_type_modal.modal_id }}" ).modal('hide');
   });
 
   $(document).keypress(
@@ -36,8 +52,10 @@ $(document).ready(function(){
       {% for setting in form.advanced_settings %}
       if($( "#{{ setting.field_id }}").is(':disabled')){
         $( "#{{ setting.field_id }}" ).prop( "disabled", false );
+        $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").show()
       } else {
         $( "#{{ setting.field_id }}" ).prop( "disabled", true );
+        $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide()
       }
       {% endfor %}
     });
@@ -49,94 +67,117 @@ $(document).ready(function(){
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
   <p class="lead">We're really trying to make this easier!</p>
 </div>
-<div class="card">
-  <div class="card-header">
-    Total System Resources
-  </div>
-  <div class="card-body">
-    <p class="card-text">Heads Up: These values will autopopulate after you enter you enter your server/sensor information below.</p>
-    <hr>
-    <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span></p>
-    <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB</p>
-    <p class="card-text">Clustered Storage Available: <span id="system_clustered_storage_available">0</span> GB</p>
-    <p class="card-text">Total Ceph Drives: <span id="system_total_ceph_drives">0</span></p>
-  </div>
-</div>
-<br>
-{% with form = form.server_settings, card_title = "Server Host Settings" %}
-  {% include "card.html" %}
-{% endwith %}
-<!-- This is extended by servers.html. It is not actually blank as it might seem.
-     Check out foozandfuncs to see how this modification happens. You can search
-     for the id server_accordion. -->
-<div class="accordion" id="{{ [form.number_of_servers.form_name, 'accordion'] | join('_') }}"></div>
-<br>
-{% with form = form.sensor_settings, card_title = "Sensor Host Settings" %}
-  {% include "card.html" %}
-{% endwith %}
-<div class="accordion" id="{{ [form.number_of_sensors.form_name, 'accordion'] | join('_') }}"></div>
-<br>
-{% with form = form.elasticsearch_settings, card_title = "Elasticsearch Settings" %}
-  {% include "card.html" %}
-{% endwith %}
-<br>
-{% with form = form.moloch_settings, card_title = "Moloch Settings" %}
-  {% include "card.html" %}
-{% endwith %}
-<br>
-{% with form = form.common_settings, card_title = "Kubernetes Settings" %}
-  {% include "card.html" %}
-{% endwith %}
-<br>
-<form>
-  <div class="form-row">
-    <div class="form-group col-md-6">
-      <p><button id="generate_inventory" class="btn btn-primary" type="submit" disabled>Generate Inventory</button></p>
-    </div>
-    <div class="form-group col-md-6">
-      <p><button id="{{ form.advanced_settings_button.generic_button_id }}" class="btn btn-primary" type="button">{{ form.advanced_settings_button.label }}</button></p>
-    </div>
-  </div>
-</form>
-<hr>
-<h3>Advanced System Settings</h3>
-<p class='font-weight-light'>{{ form.advanced_system_settings_text }}</p>
 <div class="card" >
   <div class="card-body">
+    <h4 class="card-title">Moloch Settings</h4>
     <p class="card-text text-danger">
-      Unless you really know what you are doing here, you should not change these. Seriously, there's only an incredibly niche case for changing this and chances are you aren't in it.
     </p>
-    {% for option in form.advanced_system_settings %}
+    {% for option in form.moloch_settings %}
       {% if option.include_html is defined %}
         {% with object = option %}
           {% include option.include_html %}
         {% endwith %}
       {% endif %}
     {% endfor %}
+    <p><button id="{{ form.submit_sensor_storage_type.generic_button_id }}" class="btn btn-primary" type="button" data-toggle="modal" data-target="#{{ form.submit_sensor_storage_type_modal.modal_id }}">{{ form.submit_sensor_storage_type.label }}</button></p>
+    <p>	Click the label {{ form.sensor_storage_type.label }} for a description of what the field does!</p>
+    <a href="{{ url_for('help') + '#anchor_' + form.help_me_decide['label'] | replace(' ','_') }}" target="_blank">
+      <label>{{ form.help_me_decide['label'] }}</label>
+    </a>
+    {% with object = form.submit_sensor_storage_type_modal %}
+      {% include "modal_button.html" %}
+    {% endwith %}
   </div>
 </div>
 <br>
-{% with form = form.elasticsearch_advanced_settings, card_title = "Elasticsearch Advanced Settings" %}
-  {% include "card.html" %}
-{% endwith %}
-<br>
-{% with form = form.moloch_advanced_settings, card_title = "Advanced Moloch Settings" %}
-  {% include "card.html" %}
-{% endwith %}
-<br>
-<div class="card" >
-  <div class="card-body">
-    <h4 class="card-title">Kafka Settings</h4>
-    <p class="card-text text-danger">
-      Unless you really know what you are doing here, you should use the recommended values.
-    </p>
-    {% for option in form.kafka_settings %}
-      {% if option.include_html is defined %}
-        {% with object = option %}
-          {% include option.include_html %}
-        {% endwith %}
-      {% endif %}
-    {% endfor %}
+<div id="main_form">
+  <div class="card">
+    <div class="card-header">
+      Total System Resources
+    </div>
+    <div class="card-body">
+      <p class="card-text">Heads Up: These values will autopopulate after you enter you enter your server/sensor information below.</p>
+      <hr>
+      <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span></p>
+      <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB</p>
+      <p class="card-text">Clustered Storage Available: <span id="system_clustered_storage_available">0</span> GB</p>
+      <p class="card-text">Total Ceph Drives: <span id="system_total_ceph_drives">0</span></p>
+    </div>
+  </div>
+  <br>
+  {% with form = form.server_settings, card_title = "Server Host Settings" %}
+    {% include "card.html" %}
+  {% endwith %}
+  <!-- This is extended by servers.html. It is not actually blank as it might seem.
+       Check out foozandfuncs to see how this modification happens. You can search
+       for the id server_accordion. -->
+  <div class="accordion" id="{{ [form.number_of_servers.form_name, 'accordion'] | join('_') }}"></div>
+  <br>
+  {% with form = form.sensor_settings, card_title = "Sensor Host Settings" %}
+    {% include "card.html" %}
+  {% endwith %}
+  <div class="accordion" id="{{ [form.number_of_sensors.form_name, 'accordion'] | join('_') }}"></div>
+  <br>
+  {% with form = form.elasticsearch_settings, card_title = "Elasticsearch Settings" %}
+    {% include "card.html" %}
+  {% endwith %}
+  <br>
+  {% with form = form.common_settings, card_title = "Kubernetes Settings" %}
+    {% include "card.html" %}
+  {% endwith %}
+  <br>
+  <form>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <p><button id="generate_inventory" class="btn btn-primary" type="submit" disabled>Generate Inventory</button></p>
+      </div>
+      <div class="form-group col-md-6">
+        <p><button id="{{ form.advanced_settings_button.generic_button_id }}" class="btn btn-primary" type="button">{{ form.advanced_settings_button.label }}</button></p>
+      </div>
+    </div>
+  </form>
+  <hr>
+  <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' }}">
+    <h3>Advanced System Settings</h3>
+    <p class='font-weight-light'>{{ form.advanced_system_settings_text }}</p>
+    <div class="card" >
+      <div class="card-body">
+        <p class="card-text text-danger">
+          Unless you really know what you are doing here, you should not change these. Seriously, there's only an incredibly niche case for changing this and chances are you aren't in it.
+        </p>
+        {% for option in form.advanced_system_settings %}
+          {% if option.include_html is defined %}
+            {% with object = option %}
+              {% include option.include_html %}
+            {% endwith %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    <br>
+    {% with form = form.elasticsearch_advanced_settings, card_title = "Elasticsearch Advanced Settings" %}
+      {% include "card.html" %}
+    {% endwith %}
+    <br>
+    {% with form = form.moloch_advanced_settings, card_title = "Advanced Moloch Settings" %}
+      {% include "card.html" %}
+    {% endwith %}
+    <br>
+    <div class="card" >
+      <div class="card-body">
+        <h4 class="card-title">Kafka Settings</h4>
+        <p class="card-text text-danger">
+          Unless you really know what you are doing here, you should use the recommended values.
+        </p>
+        {% for option in form.kafka_settings %}
+          {% if option.include_html is defined %}
+            {% with object = option %}
+              {% include option.include_html %}
+            {% endwith %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

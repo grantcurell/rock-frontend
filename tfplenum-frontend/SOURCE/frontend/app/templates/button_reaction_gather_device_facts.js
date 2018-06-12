@@ -52,6 +52,13 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
   });
 
+  // args[4] correlates to i (the server number) in server.html
+  $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}" }, function(data){
+    // The hide method is here because effects only work if the element
+    // begins in a hidden state
+    $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+  });
+
   // This causes the gather facts button and the number of servers button to be
   // disabled so that users can't accidentally blow away their own form data
   /*if(current_total_cpus > 0) {

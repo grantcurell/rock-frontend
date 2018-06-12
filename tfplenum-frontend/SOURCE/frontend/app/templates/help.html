@@ -16,6 +16,11 @@
 <h2>{{ form.what_is_ceph['label'] }}</h2>
 {{ form.what_is_ceph['description'] }}
 <br><br>
+<a name="{{ 'anchor_' + form.help_me_decide['label'] | replace(' ','_') }} }}">
+<h2>Deciding Between Ceph PCAP Storage and Direct to Disk</h2>
+</a>
+{{ form.help_me_decide['description'] }}
+<br><br>
 <h2>Common Settings</h2>
 {% for setting in form.common_settings %}
 {% if setting.description is not none %}
