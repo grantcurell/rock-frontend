@@ -42,22 +42,34 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   // args[2] correlates to server_{{ i + 1}}_disk_space_available in server.htmlHolde
   $( "#{{ object.args[2] }}" ).replaceWith(total_disk_space.toFixed(2));
 
+
   // args[3] correlates to server_{{ i + 1}}_hostname in server.html
+  // The line below tacks on the hostname next to Server or Sensor #
   $( "#{{ object.args[3] }}" ).replaceWith(" - " + data.hostname);
 
-  // args[4] correlates to i (the server number) in server.html
-  $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}" }, function(data){
-    // The hide method is here because effects only work if the element
-    // begins in a hidden state
-    $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
-  });
+  {# The below condition will only exist for the sensor. For the server it will always be the same #}
+  {% if object.args[5] == 'sensor' %}
+  if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[1] }}") {
 
-  // args[4] correlates to i (the server number) in server.html
-  $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}" }, function(data){
-    // The hide method is here because effects only work if the element
-    // begins in a hidden state
-    $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
-  });
+    // args[4] correlates to i (the server number) in server.html
+    $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }} }, function(data){
+      // The hide method is here because effects only work if the element
+      // begins in a hidden state
+      $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+    });
+
+  } else {
+  {% endif %}
+    // args[4] correlates to i (the server number) in server.html
+    $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}" }, function(data){
+      // The hide method is here because effects only work if the element
+      // begins in a hidden state
+      $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+    });
+  {% if object.args[5] == 'sensor' %}
+  }
+  {% endif %}
+
 
   // This causes the gather facts button and the number of servers button to be
   // disabled so that users can't accidentally blow away their own form data

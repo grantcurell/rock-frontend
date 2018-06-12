@@ -9,20 +9,8 @@
     $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).on('click', function (event) {
 
       if($( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).hasClass( "active" )) {
-        var updated_total_clustered_storage = parseFloat($( "#{{ device_type }}_clustered_storage_available" ).text()) - {{ disk['size_gb'] }};
-        $( "#{{ device_type }}_clustered_storage_available" ).replaceWith('<span id="{{ device_type }}_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
-        var updated_total_clustered_storage = parseFloat($( "#system_clustered_storage_available" ).text()) - {{ disk['size_gb'] }};
-        var system_total_ceph_drives = parseInt($( "#system_total_ceph_drives" ).text()) - 1;
-        $( "#system_total_ceph_drives" ).replaceWith('<span id="system_total_ceph_drives">' + system_total_ceph_drives + '</span>');
-        $( "#system_clustered_storage_available" ).replaceWith('<span id="system_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
       } else {
-        var updated_total_clustered_storage = parseFloat($( "#{{ device_type }}_clustered_storage_available" ).text()) + {{ disk['size_gb'] }};
-        $( "#{{ device_type }}_clustered_storage_available" ).replaceWith('<span id="{{ device_type }}_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
-        var updated_total_clustered_storage = parseFloat($( "#system_clustered_storage_available" ).text()) + {{ disk['size_gb'] }};
-        var system_total_ceph_drives = parseInt($( "#system_total_ceph_drives" ).text()) + 1;
-        $( "#system_total_ceph_drives" ).replaceWith('<span id="system_total_ceph_drives">' + system_total_ceph_drives + '</span>');
-        $( "#system_clustered_storage_available" ).replaceWith('<span id="system_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
       }
     });
@@ -40,9 +28,15 @@
     <p class="card-text text-danger">Note: The operating system's drive will not appear here. If a drive has the root file system mounted to it, it is excluded. This means you may only have one drive listed.</p>
   </div>
   <div class="btn-group-vertical" role="group">
+    {% if (disks | length) > 0 %}
     {% for disk in disks %}
     <button type="button" class="btn btn-primary" id="{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}">{{ disk['name'] }}</button>
     {% endfor %}
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+      No drives found! Are you sure you have a second eligible drive that does not have the root partition mounted?
+    </div>
+    {% endif %}
   </div>
 </div>
 <a href="{{ url_for('help') + '#anchor_' + form.use_as_pcap_storage.label | replace(' ','_') }}" target="_blank">
