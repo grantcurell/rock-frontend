@@ -326,7 +326,8 @@ class InventoryForm:
    "The number of Elasticsearch masters you would like to run on your kit. Each of \
    these will run all Elasticsearch node types. Unless you are going to exceed 5 Elasticsearch \
    nodes, you should run masters instead of data instances. See https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-node.html \
-   for a description of the node types.")
+   for a description of the node types."
+   , default_value = '3')
 
   elastic_datas = Field(
      form_name = 'elastic_datas'

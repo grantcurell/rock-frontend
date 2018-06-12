@@ -24,39 +24,102 @@ $(document).ready(function(){
   // This causes the main form before Moloch settings to start as hidden.
   $( "#main_form").hide();
 
-  validate_sufficient_storage_available() = function() {
-    
+  // This handles disabling fields if autocalculate is disabled. Specifically,
+  // all the percentage fields must be disabled.
+  $("#{{ form.disable_autocalculate.checkbox_id }}").change(event, function() {
+
+    // We only need to check one of the elements since they are all kept in sync
+    if($( "#{{ form.elastic_resource_percentage.field_id }}" ).is(':disabled')){
+      $( "#{{ form.elastic_resource_percentage.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_storage_percentage.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).prop( "disabled", false );
+    } else {
+      $( "#{{ form.elastic_resource_percentage.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_storage_percentage.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).prop( "disabled", true );
+    }
+
+  })
+
+  // Returns true if there is enough storage available and false otherwise
+  validate_clustered_storage_committed = function() {
+
+    var current_storage_total = parseFloat($( "#system_clustered_storage_available" ).text());
+    var current_storage_requested = parseFloat($( "#system_clustered_storage_committed" ).text());
+
+    if( current_storage_requested > current_storage_total ) {
+
+      // If for whatever reason the inventory was ready to be generated, disable
+      // the generate inventory button.
+      if( !$( "#generate_inventory" ).is(':disabled') ) {
+        $( "#generate_inventory" ).prop( "disabled", true );
+      }
+
+      // These repeated three lines redraw the text with either error or success
+      // messages. We use the parent method in this case, otherwise it would just
+      // color the number and the error message
+      $( "#system_clustered_storage_committed" ).parent().removeClass( "text-success" );
+      $( "#system_clustered_storage_committed" ).parent().addClass( "text-danger" );
+      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Error: Insufficient storage space available on system.</span>');
+
+      return false;
+    } else {
+
+      $( "#system_clustered_storage_committed" ).parent().removeClass( "text-danger" );
+      $( "#system_clustered_storage_committed" ).parent().addClass( "text-success" );
+      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Looks good!</span>');
+
+      return true;
+    }
+
   }
 
   // This is for recomputing the amount of storage used by Elasticsearch, Moloch, Kafka, and Zookeeper
   recalculate_storage_recommendation = function () {
 
-    var elastic_storage_percentage = parseInt($( "#{{ form.elastic_storage_percentage }}").val()) / 100
+    var elastic_storage_percentage = parseInt($( "#{{ form.elastic_storage_percentage.field_id }}").val()) / 100
 
     // This basically amounts to total_storage * elastic_storage_percentage / #_instances
-    // to_fixed keeps it from exceeding two decimal places
-    var elastic_storage_size = ( (parseFloat($( "#system_clustered_storage_available" ).text()) * elastic_storage_percentage) / (parseInt( $( "#{{ form.elastic_masters.field_id }}").val() ) + parseInt( $( "#{{ form.elastic_datas.field_id }}").val() )) ).to_fixed(2);
-    $( "#{{ form.elastic_pv_size }}" ).val(elastic_storage_size);
-    $( "#elastic_storage_available" ).replaceWith('<span id="elastic_storage_available">' + elastic_storage_size + '</span>');
+    // toFixed keeps it from exceeding two decimal places
+    var elastic_storage_size = (parseFloat($( "#system_clustered_storage_available" ).text()) * elastic_storage_percentage) / (parseInt( $( "#{{ form.elastic_masters.field_id }}").val() ) + parseInt( $( "#{{ form.elastic_datas.field_id }}").val() ));
+    $( "#{{ form.elastic_pv_size.field_id }}" ).val(elastic_storage_size);
+    $( "#elastic_storage_available" ).replaceWith('<span id="elastic_storage_available">' + elastic_storage_size.toFixed(2) + '</span>');
 
     var total_committed = elastic_storage_size;
 
     // The condition prevents Moloch PCAP storage from being computed if the user
     // did not select Ceph for PCAP
     if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
-      var moloch_pcap_storage_percentage = parseInt($( "#{{ form.moloch_pcap_storage_percentage }}").val()) / 100
+      var moloch_pcap_storage_percentage = parseInt($( "#{{ form.moloch_pcap_storage_percentage.field_id }}").val()) / 100
 
-      var moloch_pcap_storage_size = (parseFloat($( "#system_clustered_storage_available" ).text()) * moloch_pcap_storage_percentage).to_fixed(2);
-      $( "#{{ form.moloch_pcap_pv_size }}" ).val(moloch_pcap_storage_size);
-      $( "#moloch_pcap_storage_available" ).replaceWith('<span id="moloch_pcap_storage_available">' + moloch_pcap_storage_size + '</span>');
+      var moloch_pcap_storage_size = parseFloat($( "#system_clustered_storage_available" ).text()) * moloch_pcap_storage_percentage;
+      $( "#{{ form.moloch_pcap_pv.field_id }}" ).val(moloch_pcap_storage_size);
+      $( "#moloch_pcap_storage_available" ).replaceWith('<span id="moloch_pcap_storage_available">' + moloch_pcap_storage_size.toFixed(2) + '</span>');
 
       total_committed = moloch_pcap_storage_size + elastic_storage_size;
     }
 
     total_committed += parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
 
-    $( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed + '</span>');
+    $( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed.toFixed(2) + '</span>');
+
+    validate_clustered_storage_committed();
   }
+
+  // This function runs all validations to ensure
+  validate_all = function () {
+    validate_clustered_storage_committed();
+  }
+
+  // This function validates storage requirements as the user is typing
+  {% for field in [form.elastic_storage_percentage.field_id, form.moloch_pcap_storage_percentage.field_id] %}
+  $('#{{ field }}').keyup(function (event) {
+    // Only do this if autocalculate is enabled
+    if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
+      recalculate_storage_recommendation();
+    }
+  });
+  {% endfor %}
 
   // The purpose of the below is to disable or enable the Moloch PCAP folder field
   // based on whether local PCAP storage is or is not selected.
@@ -95,6 +158,9 @@ $(document).ready(function(){
     total_committed = parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
 
     $( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed + '</span>');
+
+    recalculate_storage_recommendation();
+    validate_all();
   });
 
   $(document).keypress(
@@ -194,11 +260,12 @@ $(document).ready(function(){
     <div class="card-body">
       <p class="card-text">Heads Up: These values will autopopulate after you enter you enter your server/sensor information below.</p>
       <hr>
-      <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span></p>
-      <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB</p>
+      <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span>  <span id="system_cpus_available_errors"></span></p>
+      <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB  <span id="system_memory_available_errors"></span></p>
       <p class="card-text">Clustered Storage Total: <span id="system_clustered_storage_available">0</span> GB</p>
-      <p class="card-text">Clustered Storage Committed: <span id="system_clustered_storage_committed">0</span> GB <span class="text-info">Note: This includes requirements from Zookeeper/Kafka</span></p>
-      <p class="card-text">Total Ceph Drives: <span id="system_total_ceph_drives">0</span></p>
+      <p class="card-text">Clustered Storage Committed: <span id="system_clustered_storage_committed">0</span> GB  <span id="system_clustered_storage_committed_errors"></span></p>
+      <p class="text-info">Note: Clustered Storage Committed includes requirements from Zookeeper/Kafka</p>
+      <p class="card-text">Total Ceph Drives: <span id="system_total_ceph_drives">0</span>  <span id="system_total_ceph_drives_errors"></span></p>
     </div>
   </div>
   <br>

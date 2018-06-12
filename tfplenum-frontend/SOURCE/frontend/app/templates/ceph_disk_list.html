@@ -25,6 +25,8 @@
         $( "#system_clustered_storage_available" ).replaceWith('<span id="system_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
         $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
       }
+      recalculate_storage_recommendation();
+
     });
     {% endfor %}
 
