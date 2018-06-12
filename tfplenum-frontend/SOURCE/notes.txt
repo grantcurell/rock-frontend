@@ -11,4 +11,7 @@ pip install Flask
 ...
 
 - Need to make sure there is enough storage left over for everything else
-- Need to make sure at least 2 Ceph drives are selected 
+- Need to make sure they have selected a monitor interface
+- Need to add a check to make sure they didn't mean to exclude a drive
+- Need to make sure they have selected a master server
+- Need to add the rolling validation for advanced settings
