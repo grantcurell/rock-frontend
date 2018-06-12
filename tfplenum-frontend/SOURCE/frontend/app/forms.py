@@ -112,12 +112,16 @@ class GenericButton:
         self.description = description
 
 class CheckBox:
-    def __init__(self, form_name, label, description=None):
+    def __init__(self, form_name, label, disabled=False, description=None):
         self.form_name = form_name
         self.checkbox_id = form_name + '_checkbox'
+        self.field_id = form_name + '_checkbox' # This is for niche cases where we
+                                                # a foor loop to loop over fields
+                                                # and checkboxes
         self.css_class = form_name + '_checkbox_class'
         self.label = label
         self.description = description
+        self.disabled = disabled
 
 class DropDown:
     def __init__(self, form_name, label, options, dropdown_text, description=None, default_option=None):
@@ -441,6 +445,18 @@ class InventoryForm:
   can vary greatly dependent on the workload. Unless you really know what you are \
   doing we do not recommend changing this number."
   , default_value = '3')
+
+  disable_autocalculate = CheckBox(
+    form_name = "disable_autocalculate"
+    , label = "Disable Autocalculations for Elasticsearch/Moloch Threads/Bro Workers"
+    , description =
+    "By default, the system will calculate recommended values for the number of Elasticsearch \
+    nodes required, Elasticsearch resource requirements, Bro workers, and Moloch threads. \
+    If you know what you are doing and you have a specific use case, you may not want these \
+    values autocalculated for you. In general, you should use the field " + elastic_resource_percentage.label + " \
+    to control the allocation of resources for Elasticsearch. The algorithm was based \
+    on recommendations from Elasticsearch. However, you may disable these by unchecking \
+    this checkbox.")
 
   # Sensor form
 
@@ -849,7 +865,7 @@ class InventoryForm:
   , default_value = '3')
 
   common_settings = [kubernetes_services_cidr]
-  advanced_system_settings = [dns_ip]
+  advanced_system_settings = [disable_autocalculate, dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]

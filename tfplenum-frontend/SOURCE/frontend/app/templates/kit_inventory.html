@@ -52,12 +52,12 @@ $(document).ready(function(){
 
     $( "#{{ form.advanced_settings_button.generic_button_id }}" ).click(function (event) {
       {% for setting in form.advanced_settings %}
-      if($( "#{{ setting.field_id }}").is(':disabled')){
+      if($( "#{{ setting.field_id }}" ).is(':disabled')){
         $( "#{{ setting.field_id }}" ).prop( "disabled", false );
-        $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").show()
+        $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}" ).show()
       } else {
         $( "#{{ setting.field_id }}" ).prop( "disabled", true );
-        $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide()
+        $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}" ).hide()
       }
       {% endfor %}
     });
@@ -154,6 +154,17 @@ $(document).ready(function(){
             {% endwith %}
           {% endif %}
         {% endfor %}
+        <form id='#{{ form.disable_autocalculate.form_name }}' role=form>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="" id="{{ form.disable_autocalculate.checkbox_id }}" {{ 'disabled' if form.disable_autocalculate.disabled }}>
+          <label class="form-check-label" for="{{ form.disable_autocalculate.checkbox_id }}">
+            {{ form.disable_autocalculate.label }}
+          </label>
+        </div>
+        <a href="{{ url_for('help') + '#anchor_' + form.disable_autocalculate.label | replace(' ','_') }}" target="_blank">
+          <label>What is this?</label>
+        </a>
+        </form>
       </div>
     </div>
     <br>

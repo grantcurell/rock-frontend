@@ -43,8 +43,6 @@ def _display_monitor_interfaces():
     form = InventoryForm()
 
     instance_number = request.args.get('instance_number')
-    print "INSTANCE NUMBER " + instance_number
-    print request.args.get('interfaces')
     interfaces = json.loads(request.args.get('interfaces'))
 
     object = DropDown(
