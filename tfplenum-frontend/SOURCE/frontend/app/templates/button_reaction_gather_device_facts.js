@@ -96,7 +96,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     // We only do this calculation if the algorithm is currently enabled
     if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
       // Configure Sensor Moloch Threads
-      var moloch_threads = Math.round(current_total_cpus * (2/3));
+      var moloch_threads = Math.round(current_total_cpus * (2/3)); // TODO: Need to make these non-static
       if (moloch_threads < 1) {
         moloch_threads = 1;
       }

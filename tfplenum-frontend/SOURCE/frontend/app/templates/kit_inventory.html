@@ -23,10 +23,25 @@ $(document).ready(function(){
   // This causes the main form before Moloch settings to start as hidden.
   $( "#main_form").hide();
 
+  // This field should start disabled regardless of choice
+  $( "#{{ form.moloch_pcap_pv.field_id }}").prop( "disabled", true );
+
   var advanced_settings_enabled = false;
+  var clustered_storage_validated = false;
+  var elasticsearch_validated = false;
+  var ceph_drives_validated = false;
 
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
+  }
+
+  // This runs as the form is loaded because these fields should start disabled
+  if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
+    $( "#{{ form.elastic_cpus.field_id }}" ).prop( "disabled", true );
+    $( "#{{ form.elastic_memory.field_id }}" ).prop( "disabled", true );
+    $( "#{{ form.elastic_pv_size.field_id }}" ).prop( "disabled", true );
+    $( "#{{ form.elastic_masters.field_id }}" ).prop( "disabled", true );
+    $( "#{{ form.elastic_datas.field_id }}" ).prop( "disabled", true );
   }
 
   // This handles disabling fields if autocalculate is disabled. Specifically,
@@ -45,6 +60,15 @@ $(document).ready(function(){
       $( "#{{ form.elastic_pv_size.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.elastic_masters.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.elastic_datas.field_id }}" ).prop( "disabled", true );
+
+      // If they are using clustered storage, this should be included in calculations
+      if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
+        $( "#{{ form.moloch_pcap_pv.field_id }}").prop( "disabled", true );
+      }
+
+      // This causes a recalculation as soon as the algorithm is re-enabled
+      recalculate_storage_recommendation();
+      recalculate_elasticsearch_recommendations();
     } else {
       $( "#{{ form.elastic_resource_percentage.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.elastic_storage_percentage.field_id }}" ).prop( "disabled", true );
@@ -56,22 +80,105 @@ $(document).ready(function(){
       $( "#{{ form.elastic_pv_size.field_id }}" ).prop( "disabled", false );
       $( "#{{ form.elastic_masters.field_id }}" ).prop( "disabled", false );
       $( "#{{ form.elastic_datas.field_id }}" ).prop( "disabled", false );
+
+      // If they are using clustered storage, this should be included in calculations
+      if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
+        $( "#{{ form.moloch_pcap_pv.field_id }}").prop( "disabled", false );
+      }
     }
 
   })
 
   // This function is used when someone disables the autocalculate and enters
   // Elasticsearch information manually instead
-  validate_manual_elasticsearch_entries = function(){
-    number_of_masters = parseInt($( "#{{ form.elastic_masters.field_id }}" ).val());
-    number_of_datas = parseInt($( "#{{ form.elastic_datas.field_id }}" ).val());
+  validate_manual_entries = function(){
 
-    total_instances = number_of_masters + number_of_datas;
+    var number_of_masters = parseInt($( "#{{ form.elastic_masters.field_id }}" ).val());
+    var number_of_datas = parseInt($( "#{{ form.elastic_datas.field_id }}" ).val());
 
-    memory_required = total_instances * parseInt($( "#{{ form.elastic_memory.field_id }}").val());
-    cpus_required = total_instances * parseInt($( "#{{ form.elastic_cpus.field_id }}").val());
-    storage_required = total_instances * parseInt($( "#{{ form.elastic_pv_size.field_id }}").val());
+    var total_instances = number_of_masters + number_of_datas;
 
+    var memory_required = total_instances * parseInt($( "#{{ form.elastic_memory.field_id }}").val());
+    var cpus_required = total_instances * parseInt($( "#{{ form.elastic_cpus.field_id }}").val());
+    var storage_required = total_instances * parseInt($( "#{{ form.elastic_pv_size.field_id }}").val());
+
+    var current_storage_total = parseFloat($( "#system_clustered_storage_available" ).text());
+
+    // Add Moloch if they are using Ceph storage
+    if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
+      storage_required += parseInt($( "#{{ form.moloch_pcap_pv.field_id }}").val());
+    }
+
+    // Validate the storage requirements
+    if( storage_required > current_storage_total ) {
+      $( "#system_clustered_storage_committed" ).parent().removeClass( "text-success" );
+      $( "#system_clustered_storage_committed" ).parent().addClass( "text-danger" );
+      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Error: Insufficient storage space available on system.</span>');
+
+      clustered_storage_validated = false;
+    } else {
+
+      $( "#system_clustered_storage_committed" ).parent().removeClass( "text-danger" );
+      $( "#system_clustered_storage_committed" ).parent().addClass( "text-success" );
+      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Looks good!</span>');
+
+      clustered_storage_validated = true;
+      validate_all();
+    }
+
+    server_cpus_available = parseInt($( "#server_cpus_available" ).text());
+    server_memory_available = parseInt($( "#server_memory_available" ).text());
+
+    parseInt($( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).val());
+
+    if( !isNaN(server_cpus_available) && !isNaN(server_memory_available) ) {
+      $( "#elasticsearch_cpus" ).replaceWith('<span id="elasticsearch_cpus">' + cpus_required + '</span>');
+      $( "#elasticsearch_memory" ).replaceWith('<span id="elasticsearch_memory">' + memory_required + '</span>')
+
+      if(server_cpus_available < cpus_required) {
+        $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-danger" );
+        $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: Insufficient CPUs to support the selected value.</span>');
+        set_elasticsearch_validation(false);
+        validate_all();
+      } else if (server_cpus_available == cpus_required) {
+        $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-danger" );
+        $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: You cannot use all available CPUs for Elasticsearch. Something has to be left for the system.</span>');
+        set_elasticsearch_validation(false);
+        validate_all();
+      } else {
+        $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-danger text-warning" );
+        $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-success" );
+        $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Looks good!</span>');
+        elasticsearch_validated = true;
+        validate_all();
+      }
+
+      if(server_memory_available < memory_required) {
+        $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#elasticsearch_memory_errors" ).parent().addClass( "text-danger" );
+        $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: Insufficient server memory available.</span>');
+        set_elasticsearch_validation(false);
+        validate_all();
+      } else if (server_memory_available == memory_required) {
+        $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#elasticsearch_memory_errors" ).parent().addClass( "text-danger" );
+        $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: You cannot use all memory available for Elasticsearch alone.</span>');
+        set_elasticsearch_validation(false);
+        validate_all();
+      } else {
+        $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-warning" );
+        $( "#elasticsearch_memory_errors" ).parent().addClass( "text-success" );
+        $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_memory_errors"> - Looks good!</span>');
+        elasticsearch_validated = true;
+        validate_all();
+      }
+
+    } else {
+      elasticsearch_validated = false;
+      validate_all();
+    }
 
   }
 
@@ -172,10 +279,6 @@ $(document).ready(function(){
   // gets loaded
   recalculate_elasticsearch_recommendations = function() {};
 
-  var clustered_storage_validated = false;
-  var elasticsearch_validated = false;
-  var ceph_drives_validated = false;
-
   // This function is just so elements outside this page can set the value of elasticsearch
   // validation
   set_elasticsearch_validation = function(value) {
@@ -199,21 +302,33 @@ $(document).ready(function(){
   }
 
   // This function validates storage requirements as the user is typing
-  {% for field in [form.elastic_storage_percentage.field_id, form.moloch_pcap_storage_percentage.field_id] %}
+  {% for field in [form.elastic_storage_percentage.field_id, form.moloch_pcap_storage_percentage.field_id, form.kafka_pv_size.field_id, form.zookeeper_pv_size.field_id] %}
   $('#{{ field }}').keyup(function (event) {
     // Only do this if autocalculate is enabled
     if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
-      validate_all();
+      recalculate_storage_recommendation();
     }
   });
   {% endfor %}
 
-  $('#{{ form.elastic_resource_percentage.field_id }}').keyup(function (event) {
+{% for field in [form.elastic_resource_percentage.field_id, form.elastic_cpus_per_instance_ideal.field_id, form.elastic_cpus_to_mem_ratio.field_id] %}
+  $('#{{ field }}').keyup(function (event) {
     // Only do this if autocalculate is enabled
     if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
-      validate_all();
+      recalculate_elasticsearch_recommendations();
     }
   });
+{% endfor %}
+
+// This causes the manual server resource validation to fire
+{% for field in [form.elastic_masters.field_id, form.elastic_datas.field_id, form.elastic_memory.field_id, form.elastic_pv_size.field_id, form.moloch_pcap_pv.field_id] %}
+  $('#{{ field }}').keyup(function (event) {
+    // Only do this if autocalculate is enabled
+    if ( $( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
+      validate_manual_entries();
+    }
+  });
+{% endfor %}
 
   // The purpose of the below is to disable or enable the Moloch PCAP folder field
   // based on whether local PCAP storage is or is not selected.
@@ -239,6 +354,7 @@ $(document).ready(function(){
       // We should update the defaults if they select Ceph for PCAP
       $( "#{{ form.elastic_storage_percentage.field_id }}" ).val('30');
       $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).val('60');
+
     }
 
     // This hides the modal box. If you don't have this, the modal box stays on
@@ -276,6 +392,7 @@ $(document).ready(function(){
         advanced_settings_enabled = false;
       }
     });
+
 });
 
 </script>

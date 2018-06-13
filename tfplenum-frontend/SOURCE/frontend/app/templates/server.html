@@ -4,6 +4,12 @@
   //@ sourceURL=server.js
   $(document).ready(function(){
 
+    // This performs validation of all entries if someone typed things in before
+    // adding servers
+    if ( $('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
+      validate_manual_entries();
+    }
+
     // The event object generated here represents the input field of the checkbox
     // selected. target is the DOM element that initated the event. See: https://learn.jquery.com/events/event-basics/
     // The object in this case will be an HTMLInputElement. The parent class of this,

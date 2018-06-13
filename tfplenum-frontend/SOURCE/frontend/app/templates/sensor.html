@@ -17,7 +17,6 @@ $(document).ready(function(){
     $( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
     $( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
   } else {
-    alert("HERE");
     $( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
     $( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
   }

@@ -65,6 +65,7 @@ recalculate_elasticsearch_recommendations = function() {
     }
 
     set_elasticsearch_validation(false);
+    validate_all();
 
   } else {
 
@@ -135,6 +136,7 @@ recalculate_elasticsearch_recommendations = function() {
         }
 
         set_elasticsearch_validation(false);
+        validate_all();
       }
     }
 

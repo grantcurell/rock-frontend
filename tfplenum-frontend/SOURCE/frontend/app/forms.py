@@ -353,7 +353,8 @@ class InventoryForm:
    , invalid_feedback = 'Enter a valid integer 1 or greater'
    , required = True
    , description =
-   "The number of CPUs which will be assigned to each Elasticsearch instance.")
+   "The number of CPUs which will be assigned to each Elasticsearch instance."
+   , default_value = '0')
 
   elastic_memory = Field(
      form_name = 'elastic_memory'
@@ -369,7 +370,8 @@ class InventoryForm:
    itself. Good values depend very heavily on the type of traffic that the system runs and developing \
    good predictive models of what work is one of the more challenging engineering problems\
    that exists. We generally recommend you stick with the recommended default. If you \
-   know what you are doing, you might try experimenting with this value.")
+   know what you are doing, you might try experimenting with this value."
+   , default_value = '0')
 
   elastic_pv_size = Field(
      form_name = 'elastic_pv_size'
@@ -382,7 +384,8 @@ class InventoryForm:
    , description =
    "The amount of space to allocate from the Ceph cluster to the persistent volume \
    used per Elasticsearch instance. See " + what_is_ceph['label'] + " for a description \
-   of persistent volumes and Ceph.")
+   of persistent volumes and Ceph."
+   , default_value = '0')
 
   elastic_resource_percentage = Field(
     form_name = 'elastic_resource_percentage'
@@ -669,7 +672,8 @@ class InventoryForm:
    explanation of how Ceph works and what this field does. This is the amount of space \
    you will allocate from the Ceph cluster to Moloch\'s PCAP storage. This is set up on \
    a per instance basis. For example, if you put 8 here, each Moloch instance will receive \
-   8 GB to write to.")
+   8 GB to write to."
+   , default_value = '0')
 
   # Moloch Settings
 
