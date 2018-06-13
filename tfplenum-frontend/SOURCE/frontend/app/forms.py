@@ -457,17 +457,20 @@ class InventoryForm:
 
   elastic_cpus_to_mem_ratio = Field(
     form_name = 'elastic_cpus_to_mem_ratio'
-  , label = 'ES CPU to Memory Ratio'
+  , label = 'ES CPU to Memory Ratio Default'
   , placeholder = "3"
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , invalid_feedback = 'Value must be 1 or greater'
   , required = True
   , description =
-  "This is the value that the automatic resource computation algorithm will use to \
-  estimate memory resource requirement. This is the ratio of CPUs to memory. This \
+  "This is the ratio of CPUs to memory. This is the value that the automatic resource computation algorithm will use to \
+  estimate memory resource requirement by default. This \
   can vary greatly dependent on the workload. Unless you really know what you are \
-  doing we do not recommend changing this number."
+  doing we do not recommend changing this number. Keep in mind that this is the ratio \
+  the algorithm begins with. If there are insufficient memory resources, it will \
+  first try this number and then reduce it until it reaches 1:0 or a working configuration \
+  is found."
   , default_value = '3')
 
   disable_autocalculate = CheckBox(
@@ -522,8 +525,7 @@ class InventoryForm:
     streams. Most of the work of an active cluster takes place on the workers and \
     as such, the workers typically represent the bulk of the Bro processes that \
     are running in a cluster. See https://www.bro.org/sphinx/cluster/index.html for \
-    more information."
-    , disabled = True)
+    more information.")
 
   moloch_threads = Field(
      form_name = 'moloch_threads'
@@ -538,8 +540,7 @@ class InventoryForm:
    the packets. This also controls how many packet queues there are, since each \
    thread has its own queue. Basically how much CPU to dedicate to parsing the \
    packets. Increase this if you get errors about dropping packets or the packetQ \
-   is over flowing."
-   , disabled = True)
+   is over flowing.")
 
   monitor_interface = DropDown(
     form_name = 'monitor_interface'
@@ -919,7 +920,3 @@ class InventoryForm:
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
 
   advanced_settings = advanced_system_settings + elasticsearch_advanced_settings + moloch_advanced_settings + kafka_settings
-
-  # By default, disable anything in advanced settings
-  for object in (advanced_settings):
-    object.disabled = True

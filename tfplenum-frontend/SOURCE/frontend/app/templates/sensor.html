@@ -4,30 +4,46 @@ $(document).ready(function(){
 
   // The condition below is here to take care of the case that a user unlocks
   // the advanced settings before submitting a sensor count. In which case
-  // we want all of the fields drawn enabled rather than disabled (which is the
-  // default)
+  // we want all of the fields drawn. Furthermore, we also have to check if
+  // they have or have not clicked the disable autocalculations button
   {% for i in range(sensor_count) %}
-  {% for setting in [form.bro_workers, form.moloch_threads] %}
-  if($( "#{{ form.dns_ip.field_id }}").is(':disabled')){
-    $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
-    $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
+  if( !get_advanced_settings_status() ) {
+    $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' + '_' + (i | string) }}").hide();
+  }
+
+  // We only need to check one of the elements since they are all kept in sync
+  if ( $('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
+    alert("HEER2");
+    $( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
+    $( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
   } else {
-    $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
+    alert("HERE");
+    $( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
+    $( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
   }
   {% endfor %}
+
+  {% for i in range(sensor_count) %}
+  $( "#{{ form.advanced_settings_button.generic_button_id }}" ).click(function (event) {
+    if( get_advanced_settings_status()) {
+      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' + '_' + (i | string) }}").slideDown("slow");
+    } else {
+      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' + '_' + (i | string) }}").hide();
+    }
+  });
   {% endfor %}
 
-  $( "#{{ form.advanced_settings_button.generic_button_id }}" ).click(function (event) {
+  $("#{{ form.disable_autocalculate.checkbox_id }}").change(event, function() {
+
     {% for i in range(sensor_count) %}
-    {% for setting in [form.bro_workers, form.moloch_threads] %}
-    if($( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}").is(':disabled')){
-      $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
-      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").slideDown("slow");
+    // We only need to check one of the elements since they are all kept in sync
+    if ( $('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
+      $( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
+      $( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
     } else {
-      $( "#{{ (setting.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
-      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
+      $( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
+      $( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", true );
     }
-    {% endfor %}
     {% endfor %}
   });
 });
@@ -91,7 +107,7 @@ $(document).ready(function(){
       </a>
       </form>
       <br>
-      <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' }}">
+      <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' + '_' + (i | string) }}">
         <p class='font-weight-light'>{{ form.bro_workers.label }} and {{ form.moloch_threads.label }} are both advanced settings and will be autopopulated based on the resources available to the devices you input. You do not have to fill in these values.</p>
         {% with object = form.bro_workers.change_values(
           (['bro_workers_form', i+1] | join('_')),

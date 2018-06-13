@@ -23,22 +23,57 @@ $(document).ready(function(){
   // This causes the main form before Moloch settings to start as hidden.
   $( "#main_form").hide();
 
+  var advanced_settings_enabled = false;
+
+  get_advanced_settings_status = function() {
+    return advanced_settings_enabled;
+  }
+
   // This handles disabling fields if autocalculate is disabled. Specifically,
   // all the percentage fields must be disabled.
   $("#{{ form.disable_autocalculate.checkbox_id }}").change(event, function() {
 
     // We only need to check one of the elements since they are all kept in sync
-    if($( "#{{ form.elastic_resource_percentage.field_id }}" ).is(':disabled')){
+    if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
       $( "#{{ form.elastic_resource_percentage.field_id }}" ).prop( "disabled", false );
       $( "#{{ form.elastic_storage_percentage.field_id }}" ).prop( "disabled", false );
       $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_cpus_to_mem_ratio.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_cpus.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_memory.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_pv_size.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_masters.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_datas.field_id }}" ).prop( "disabled", true );
     } else {
       $( "#{{ form.elastic_resource_percentage.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.elastic_storage_percentage.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_cpus_to_mem_ratio.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_cpus.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_memory.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_pv_size.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_masters.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_datas.field_id }}" ).prop( "disabled", false );
     }
 
   })
+
+  // This function is used when someone disables the autocalculate and enters
+  // Elasticsearch information manually instead
+  validate_manual_elasticsearch_entries = function(){
+    number_of_masters = parseInt($( "#{{ form.elastic_masters.field_id }}" ).val());
+    number_of_datas = parseInt($( "#{{ form.elastic_datas.field_id }}" ).val());
+
+    total_instances = number_of_masters + number_of_datas;
+
+    memory_required = total_instances * parseInt($( "#{{ form.elastic_memory.field_id }}").val());
+    cpus_required = total_instances * parseInt($( "#{{ form.elastic_cpus.field_id }}").val());
+    storage_required = total_instances * parseInt($( "#{{ form.elastic_pv_size.field_id }}").val());
+
+
+  }
 
   // Returns true if there is enough storage available and false otherwise
   validate_clustered_storage_committed = function() {
@@ -233,15 +268,13 @@ $(document).ready(function(){
     });
 
     $( "#{{ form.advanced_settings_button.generic_button_id }}" ).click(function (event) {
-      {% for setting in form.advanced_settings %}
-      if($( "#{{ setting.field_id }}" ).is(':disabled')){
-        $( "#{{ setting.field_id }}" ).prop( "disabled", false );
+      if( !advanced_settings_enabled ){
         $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}" ).show()
+        advanced_settings_enabled = true;
       } else {
-        $( "#{{ setting.field_id }}" ).prop( "disabled", true );
         $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}" ).hide()
+        advanced_settings_enabled = false;
       }
-      {% endfor %}
     });
 });
 
