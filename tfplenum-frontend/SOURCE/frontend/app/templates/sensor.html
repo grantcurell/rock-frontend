@@ -45,6 +45,10 @@ $(document).ready(function(){
     }
     {% endfor %}
   });
+
+  {{ form.monitor_interface_callback }} = function(event) {
+    alert("HERE");
+  }
 });
 </script>
 

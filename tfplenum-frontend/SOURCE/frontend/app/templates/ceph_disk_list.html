@@ -16,6 +16,7 @@
         $( "#system_total_ceph_drives" ).replaceWith('<span id="system_total_ceph_drives">' + system_total_ceph_drives + '</span>');
         $( "#system_clustered_storage_available" ).replaceWith('<span id="system_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
         $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
+        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] }}");
       } else {
         var updated_total_clustered_storage = parseFloat($( "#{{ device_type }}_clustered_storage_available" ).text()) + {{ disk['size_gb'] }};
         $( "#{{ device_type }}_clustered_storage_available" ).replaceWith('<span id="{{ device_type }}_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
@@ -23,6 +24,7 @@
         var system_total_ceph_drives = parseInt($( "#system_total_ceph_drives" ).text()) + 1;
         $( "#system_total_ceph_drives" ).replaceWith('<span id="system_total_ceph_drives">' + system_total_ceph_drives + '</span>');
         $( "#system_clustered_storage_available" ).replaceWith('<span id="system_clustered_storage_available">' + updated_total_clustered_storage.toFixed(2) + '</span>');
+        $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] + ' - selected'}}");
         $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
       }
       recalculate_storage_recommendation();
@@ -49,5 +51,5 @@
   </div>
 </div>
 <a href="{{ url_for('help') + '#anchor_' + form.use_in_ceph_cluster.label | replace(' ','_') }}" target="_blank">
-  <label>What is this?</label>
+  <label>What is Ceph?</label>
 </a>

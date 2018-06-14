@@ -124,7 +124,7 @@ class CheckBox:
         self.disabled = disabled
 
 class DropDown:
-    def __init__(self, form_name, label, options, dropdown_text, description=None, default_option=None):
+    def __init__(self, form_name, label, options, dropdown_text, callback=None, description=None, default_option=None):
         self.form_name = 'form_' + form_name
         self.dropdown_id = form_name + '_dropdown'
         self.label = label
@@ -132,6 +132,7 @@ class DropDown:
         self.options = options
         self.dropdown_text = dropdown_text
         self.default_option = default_option
+        self.callback = callback
 
         # This is the HTML file generally associated with displaying this field.
         # You don't have to use this, but it is handy for displaying things in a loop.
@@ -554,7 +555,8 @@ class InventoryForm:
                    Note: The management interface will not appear in this list. You \
                    cannot use an interface for both management and monitoring."
   , options = []
-  , dropdown_text = 'Monitor Interface')
+  , dropdown_text = 'Monitor Interface'
+  , callback = 'monitor_interface_callback')
 
   is_remote_sensor_checkbox = CheckBox(
     form_name = "is_remote_sensor"
@@ -564,8 +566,8 @@ class InventoryForm:
   It is meant for a situation where you have a centralized kit, but have a remote\
   sensor you would like deployed independent of that kit. Specifically, it is meant \
   to allow the device to operate over a low bandwidth link. When in remote sensor mode \
-  you cannot add any of the system's drives to the Ceph cluster (as this would require \
-  other devices to read/write over the network), due to the previous you must use \
+  you cannot add any of the system's drives to the Ceph cluster as this would require \
+  other devices to read/write over the network. Due to the previous, you must use \
   direct attached storage for PCAP, it will not cluster Kafka, and it will run an independent \
   Zookeeper instance.")
 

@@ -1,6 +1,7 @@
 <script type="text/javascript">
   $(document).ready(function(){
 
+    // The purpose of the below is to set the default option
     {% if object.default_option is not none %}
     $( "#{{ object.default_option | replace(' ','_') | replace(' ','_') }}" ).click(function(event){
       $("#{{ object.dropdown_id }}:first-child").text($(this).text());
@@ -24,6 +25,10 @@
       // DOM object who holds the ID {{ object.dropdown_id }}
       $("#{{ object.dropdown_id }}:first-child").text($(this).text());
       $("#{{ object.dropdown_id }}").val($(this).text());
+
+      {% if callback is not none %}
+        {{ object.callback }}();
+      {% endif %}
     });
     {% endfor %}
   });

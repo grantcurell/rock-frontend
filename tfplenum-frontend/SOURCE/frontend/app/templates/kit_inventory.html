@@ -30,6 +30,7 @@ $(document).ready(function(){
   var clustered_storage_validated = false;
   var elasticsearch_validated = false;
   var ceph_drives_validated = false;
+  var monitor_interfaces_validated = false;
 
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
@@ -285,12 +286,16 @@ $(document).ready(function(){
     elasticsearch_validated = value;
   }
 
+  set_monitor_interface_validation = function(value) {
+    monitor_interfaces_validated = value;
+  }
+
   // This function runs all validations to ensure
   validate_all = function () {
 
     //console.log(clustered_storage_validated + ' ' + ceph_drives_validated + ' ' + elasticsearch_validated);
 
-    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated ) {
+    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated) {
 
       // If for whatever reason the inventory was ready to be generated, disable
       // the generate inventory button.
@@ -469,7 +474,7 @@ $(document).ready(function(){
       Total System Resources
     </div>
     <div class="card-body">
-      <p class="card-text">Heads Up: These values will autopopulate after you enter you enter your server/sensor information below.</p>
+      <p class="card-text">Heads Up: These values will autopopulate after you enter your server/sensor information below.</p>
       <hr>
       <p class="card-text">CPU Cores Available: <span id="system_cpus_available">0</span></p>
       <p class="card-text">Memory Available: <span id="system_memory_available">0</span> GB  <span id="system_memory_available_errors"></span></p>
@@ -507,7 +512,7 @@ $(document).ready(function(){
   <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' }}">
     <h3>Advanced System Settings</h3>
     <p class='font-weight-light'>{{ form.advanced_system_settings_text }}</p>
-    <div class="card" >
+    <div class="card">
       <div class="card-body">
         <p class="card-text text-danger">
           Unless you really know what you are doing here, you should not change the DNS. Seriously, there's only an incredibly niche case for changing this and chances are you aren't in it.
