@@ -26,7 +26,7 @@
       $("#{{ object.dropdown_id }}:first-child").text($(this).text());
       $("#{{ object.dropdown_id }}").val($(this).text());
 
-      {% if callback is not none %}
+      {% if object.callback is not none %}
         {{ object.callback }}();
       {% endif %}
     });

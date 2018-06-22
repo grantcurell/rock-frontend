@@ -12,7 +12,6 @@
       // item. checkValidity is an HTML5 built in function we are calling against
       // the element.
       if ($( "#{{ object.form_name }}" )[0].checkValidity() === false) {
-        alert("WHAT")
         event.preventDefault();
         event.stopPropagation();
       } else {

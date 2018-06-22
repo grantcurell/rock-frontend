@@ -13,7 +13,6 @@ $(document).ready(function(){
 
   // We only need to check one of the elements since they are all kept in sync
   if ( $('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
-    alert("HEER2");
     $( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
     $( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).prop( "disabled", false );
   } else {
@@ -46,9 +45,22 @@ $(document).ready(function(){
     {% endfor %}
   });
 
-  {{ form.monitor_interface_callback }} = function(event) {
-    alert("HERE");
+  validate_interfaces = function() {
+    if({% for i in range(sensor_count) %}{{ "monitor_interface_" + ((i+1) | string) + "_valid" }} &&{% endfor %} true) {
+      set_monitor_interface_validation(true);
+      validate_all();
+    }
   }
+
+  {% for i in range(sensor_count) %}
+
+  {{ "monitor_interface_" + ((i+1) | string) + "_valid" }} = false;
+
+  {{ form.monitor_interface.callback + "_" + ((i+1) | string) }} = function(event) {
+    {{ "monitor_interface_" + ((i+1) | string) + "_valid" }} = true;
+    validate_interfaces();
+  }
+  {% endfor %}
 });
 </script>
 

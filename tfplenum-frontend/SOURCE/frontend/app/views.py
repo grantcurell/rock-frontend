@@ -53,7 +53,8 @@ def _display_monitor_interfaces():
     #, required = True TODO NEED TO ADD A DEFAULT
     , description = form.monitor_interface.description
     , options = interfaces
-    , dropdown_text = form.monitor_interface.dropdown_text)
+    , dropdown_text = form.monitor_interface.dropdown_text
+    , callback = form.monitor_interface.callback + "_" + instance_number)
 
     return render_template("dropdown.html", object=object, form=form)
 
