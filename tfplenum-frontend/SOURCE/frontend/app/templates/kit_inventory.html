@@ -101,7 +101,7 @@ $(document).ready(function(){
 
     var memory_required = total_instances * parseInt($( "#{{ form.elastic_memory.field_id }}").val());
     var cpus_required = total_instances * parseInt($( "#{{ form.elastic_cpus.field_id }}").val());
-    var storage_required = total_instances * parseInt($( "#{{ form.elastic_pv_size.field_id }}").val());
+    var storage_required = total_instances * parseInt($( "#{{ form.elastic_pv_size.field_id }}").val()) + parseInt($( "#{{ form.elastic_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
 
     var current_storage_total = parseFloat($( "#system_clustered_storage_available" ).text());
 

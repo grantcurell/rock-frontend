@@ -10,9 +10,8 @@ pip install Flask
 
 ...
 
-- Need to make sure they have selected a monitor interface
+
 - Need to add a check to make sure they didn't mean to exclude a drive
 - Need to make sure they have selected a master server
-- Need to add the rolling validation for advanced settings
 - Need to give Elasticsearch a data minimum
 - Need to add a CPU / Memory check for sensor
