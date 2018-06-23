@@ -847,6 +847,18 @@ class InventoryForm:
 
   # Kafka settings
 
+  kafka_cpus = Field(
+    form_name = 'kafka_cpus'
+  , label = 'Kafka CPUs'
+  , placeholder = "Kafka CPUs"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "This is the number of CPUs which will be assigned to each Kafka instance."
+  , default_value = '5')
+
   kafka_jvm_memory = Field(
     form_name = 'kafka_jvm_memory'
   , label = 'Kafka JVM Memory'
@@ -923,6 +935,6 @@ class InventoryForm:
   storage_type_settings = [sensor_storage_type]
   moloch_settings = [moloch_pcap_storage_percentage] # TODO: We should add this back in at some point, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_pcap_pv, moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
-  kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
+  kafka_settings = [kafka_cpus, kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
 
   advanced_settings = advanced_system_settings + elasticsearch_advanced_settings + moloch_advanced_settings + kafka_settings

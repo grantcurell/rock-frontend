@@ -42,7 +42,6 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   // args[2] correlates to server_{{ i + 1}}_disk_space_available in server.htmlHolde
   $( "#{{ object.args[2] }}" ).replaceWith(total_disk_space.toFixed(2));
 
-
   // args[3] correlates to server_{{ i + 1}}_hostname in server.html
   // The line below tacks on the hostname next to Server or Sensor #
   $( "#{{ object.args[3] }}" ).replaceWith(" - " + data.hostname);
@@ -70,7 +69,6 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   }
   {% endif %}
 
-
   // This causes the gather facts button and the number of servers button to be
   // disabled so that users can't accidentally blow away their own form data
   if(current_total_cpus > 0) {
@@ -96,13 +94,13 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     // We only do this calculation if the algorithm is currently enabled
     if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
       // Configure Sensor Moloch Threads
-      var moloch_threads = Math.round(current_total_cpus * (2/3)); // TODO: Need to make these non-static
+      var moloch_threads = Math.round(current_total_cpus * (1/3)); // TODO: Need to make these non-static
       if (moloch_threads < 1) {
         moloch_threads = 1;
       }
 
       // Configure Sensor Bro Threads
-      var bro_workers = Math.round(current_total_cpus * (1/3));
+      var bro_workers = Math.round(current_total_cpus * (2/3));
       if (bro_workers < 1) {
         bro_workers = 1;
       }

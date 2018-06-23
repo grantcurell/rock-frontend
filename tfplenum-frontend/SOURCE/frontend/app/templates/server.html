@@ -31,6 +31,9 @@
           $( "#" + this.id ).prop( "disabled", true );
         }
       });
+
+      set_master_server_validated(true);
+      validate_all();
     })
     {% endfor %}
 

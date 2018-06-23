@@ -31,6 +31,7 @@ $(document).ready(function(){
   var elasticsearch_validated = false;
   var ceph_drives_validated = false;
   var monitor_interfaces_validated = false;
+  var master_server_validated = false;
 
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
@@ -290,12 +291,19 @@ $(document).ready(function(){
     monitor_interfaces_validated = value;
   }
 
+  set_master_server_validated = function(value) {
+    master_server_validated = value;
+  }
+
   // This function runs all validations to ensure
   validate_all = function () {
 
     //console.log(clustered_storage_validated + ' ' + ceph_drives_validated + ' ' + elasticsearch_validated);
 
-    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated) {
+    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated) {
+
+      // This line is for debugging
+      //alert(clustered_storage_validated + "\n" + ceph_drives_validated + "\n" + monitor_interfaces_validated + "\n" + master_server_validated + "\n");
 
       // If for whatever reason the inventory was ready to be generated, disable
       // the generate inventory button.
@@ -303,6 +311,9 @@ $(document).ready(function(){
         $( "#generate_inventory" ).prop( "disabled", false );
       }
 
+    // If all variables are not valid, make sure we disable the generate inventory button
+    } else {
+      $( "#generate_inventory" ).prop( "disabled", true );
     }
   }
 
