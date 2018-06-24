@@ -14,6 +14,21 @@
 
 $(document).ready(function(){
 
+  get_entries = function(){
+  }
+
+
+  var data = {};
+  var array = $("input");//.serializeArray().map(function(x){data[x.id] = x.value;});
+
+  $.each(array, function( key, value) {
+    console.log($(value).attr('id'));
+  });
+
+  $.get("{{ url_for('_generate_inventory') }}", function(data){
+
+  });
+
   // This causes the advanced settings to start as hidden
   $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
 
@@ -409,6 +424,13 @@ $(document).ready(function(){
       }
     });
 
+    // This handles the case when someone clicks the generate inventory button
+    $( "#generate_inventory" ).click(function(event){
+      var data = {};
+      var array = $("form").serializeArray().map(function(x){data[x.id] = x.value;});
+      console.log(array);
+    });
+
 });
 
 </script>
@@ -512,7 +534,7 @@ $(document).ready(function(){
   <form>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <p><button id="generate_inventory" class="btn btn-primary" type="submit" disabled>Generate Inventory</button></p>
+        <p><button id="generate_inventory" class="btn btn-primary" type="button" disabled>Generate Inventory</button></p>
       </div>
       <div class="form-group col-md-6">
         <p><button id="{{ form.advanced_settings_button.generic_button_id }}" class="btn btn-primary" type="button">{{ form.advanced_settings_button.label }}</button></p>
