@@ -289,9 +289,10 @@ all:
               # none on a machine. On the system in total there must be at least
               # two.
               ceph_drive_list:
-              # - <DISK 1>
-              # - <DISK 2>
-              
+              {% for drive in sensor.ceph_drive_list %}
+                - {{ drive }}
+              {% endfor %}
+
           {% endfor %}
 
         # If you have a deployment where the majority of the kit is in one location,
@@ -302,16 +303,19 @@ all:
         #everything after the group name empty. Ex: you could have an inventory
         #with just "remote-sensors:", but no hosts defined.
         remote-sensors:
-          #hosts:
-          #  tfplenumsensor2.lan:
-          #    ansible_user: root
-          #    bro_workers: 2
-          #    moloch_threads: 8
-          #    ceph_drive_list:
-          #    - /dev/sdb <raw disk name>
-          #    management_ipv4: # IP Address of node
-          #    sensor_monitor_interface:
-          #    - eth0 <Interface Name>
+        {% if remote-sensors is not none %}
+        {% for sensor in remote-sensors %}
+          hosts:
+            {{ sensor.hostname }}:
+              ansible_user: root
+              bro_workers: {{ sensor.bro_workers }}
+              moloch_threads: {{ sensor.moloch_threads }}
+              ceph_drive_list:
+              management_ipv4: {{ sensor.management_ipv4 }}
+              sensor_monitor_interface:
+              - {{ sensor.monitor_interface }}
+        {% endfor %}
+        {% endif %}
 
     #############################
     # Server Settings           #
@@ -325,14 +329,16 @@ all:
         servers:
 
           hosts:
-
-            tfplenumserver2.lan:
+            {% for server in servers %}
+            {{ host }}:
               ansible_user: root
               ansible_connection: ssh
-              management_ipv4: # !!!DEFINE ME!!!
+              management_ipv4: {{ server.management_ipv4 }}
               ceph_drive_list:
-              # - <DISK 1>
-              # - <DISK 2>
+              {% for drive in server.ceph_drive_list %}
+                - {{ drive }}
+              {% endfor %}
+            {% endfor %}
 
         master-server:
 
@@ -347,21 +353,15 @@ all:
     # feel free to dig through the code.
 
           hosts:
-            tfplenumserver1.lan:
+            {{ master_server.hostname }}:
               ansible_user: root
               ansible_connection: ssh
-              management_ipv4: # !!!DEFINE ME!!!
+              management_ipv4: {{ master_server.management_ipv4 }}
               ceph_drive_list:
-              # - <DISK 1>
-              # - <DISK 2>
+              {% for drive in master_server.ceph_drive_list %}
+                - {{ drive }}
+              {% endfor %}
 
-    # This is used when you add -e reinstall=true to your ansible-playbook command. This has the effect
-    # of resetting kubernetes on all nodes defined below
     nodes_to_remove:
-      # Example: (you need to define your own hosts)
-      #hosts:
-      #  tfplenumsensor1.lan:
-      #  tfplenumserver2.lan:
-      #  tfplenumserver1.lan:
 
 ...

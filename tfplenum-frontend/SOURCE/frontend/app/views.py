@@ -104,12 +104,15 @@ def _pcap_disks_list():
 
 @app.route('/_generate_inventory')
 def _generate_inventory():
+    """
     with open("/root/tfplenum/playbooks/inventory/sample/inventory.yml", 'r') as yaml_stream, file("/root/tfplenum/playbooks/inventory/output.yml", 'w') as output:
         try:
             data = yaml.load(yaml_stream)
             yaml.dump(data, output, default_flow_style=False)
         except yaml.YAMLError as error:
             print error
+    """
+    #render_template('inventory_template.yml')
     return "bullshit"
 
 @app.route('/', methods=['GET', 'POST'])
