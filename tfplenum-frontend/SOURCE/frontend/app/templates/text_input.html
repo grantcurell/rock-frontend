@@ -1,5 +1,8 @@
 <script type="text/javascript">
   $(document).ready(function(){
+
+    get_ids();
+
     // See: https://api.jquery.com/keyup/
     $('#{{ object.field_id }}').keyup(function (event) {
       // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
@@ -9,6 +12,8 @@
       if ($( "#{{ object.form_name }}" )[0].checkValidity() === false) {
         event.preventDefault();
         event.stopPropagation();
+      } else {
+        set_id_value("{{ object.field_id }}", $( "#{{ object.field_id }}").val());
       }
       $( "#{{ object.form_name }}" ).addClass('was-validated');
     });

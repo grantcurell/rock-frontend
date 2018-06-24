@@ -55,7 +55,7 @@ def _display_monitor_interfaces():
     , description = form.monitor_interface.description
     , options = interfaces
     , dropdown_text = form.monitor_interface.dropdown_text
-    , callback = form.monitor_interface.callback + "_" + i)
+    , callback = form.monitor_interface.callback + "_" + instance_number)
 
     return render_template("dropdown.html", object=object, form=form)
 

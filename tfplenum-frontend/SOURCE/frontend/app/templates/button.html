@@ -3,6 +3,9 @@
 
 <script type="text/javascript">
   $(document).ready(function(){
+
+    get_ids();
+
     // Server events: this function handles when a user presses submit on the
     // number of servers button.
     // See: https://api.jquery.com/click/
@@ -36,6 +39,8 @@
       if ($( "#{{ object.form_name }}" )[0].checkValidity() === false) {
         event.preventDefault();
         event.stopPropagation();
+      } else {
+        set_id_value("{{ object.field_id }}", $( "#{{ object.field_id }}").val());
       }
       $( "#{{ object.form_name }}" ).addClass('was-validated');
     });

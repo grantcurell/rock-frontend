@@ -1,5 +1,8 @@
 
 <script>
+
+  get_ids();
+
   // Adding this allows this code to be identified in a browser debugger
   //@ sourceURL=server.js
   $(document).ready(function(){
@@ -27,8 +30,10 @@
         // See: https://stackoverflow.com/questions/14913845/jquery-checking-for-disabled-attribute-and-adding-removing-it
         if($(this).is(':disabled')){
           $( "#" + this.id ).prop( "disabled", false );
+          set_id_value("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}", true);
         } else {
           $( "#" + this.id ).prop( "disabled", true );
+          set_id_value("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}", false);
         }
       });
 

@@ -14,21 +14,6 @@
 
 $(document).ready(function(){
 
-  get_entries = function(){
-  }
-
-
-  var data = {};
-  var array = $("input");//.serializeArray().map(function(x){data[x.id] = x.value;});
-
-  $.each(array, function( key, value) {
-    console.log($(value).attr('id'));
-  });
-
-  $.get("{{ url_for('_generate_inventory') }}", function(data){
-
-  });
-
   // This causes the advanced settings to start as hidden
   $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
 
@@ -47,6 +32,32 @@ $(document).ready(function(){
   var ceph_drives_validated = false;
   var monitor_interfaces_validated = false;
   var master_server_validated = false;
+
+  // This exists so that there is a way to get all the IDs from all the nested DOM
+  // elements. It is specifically used for the generate_inventory button which needs
+  // to get all the inputs from everyone, but there's really no way for it to do that.
+  var input_data = {};
+
+  get_ids = function(){
+    var data = $("input");//.serializeArray().map(function(x){data[x.id] = x.value;});
+
+    // This loop goes through the id of all input elements on the page. If that element
+    // is not already in the list it adds it, otherwise, it ignores it.
+    $.each(data, function( key, value ) {
+      id = $(value).attr('id');
+      if( !(id in input_data) ) {
+        input_data[id] = $( "#" + id ).val();
+        //console.log("ID: " + id + " Value: " + input_data[id]);
+      }
+    });
+  }
+
+  set_id_value = function(id, value) {
+    input_data[id] = value;
+    console.log("ID: " + id + " Value: " + input_data[id]);
+  }
+
+  get_ids();
 
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
@@ -426,9 +437,18 @@ $(document).ready(function(){
 
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
+      //var data = {};
+      //var array = $("form").serializeArray().map(function(x){data[x.id] = x.value;});
+      //console.log(array);
+
+
+
       var data = {};
-      var array = $("form").serializeArray().map(function(x){data[x.id] = x.value;});
-      console.log(array);
+
+
+      $.get("{{ url_for('_generate_inventory') }}", function(data){
+
+      });
     });
 
 });
