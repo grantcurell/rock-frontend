@@ -18,7 +18,7 @@ all:
     # unless you have a specific reason to use a different DNS server. Keep in mind
     # you will need to manually provide all required DNS entries on your separate
     # DNS Server or the kit will break.
-    dns_ip: {{ dns_ip }}
+    dns_ip: {{ input_data.dns_ip }}
 
     #############################
     # CPU Allocations           #
@@ -55,7 +55,7 @@ all:
     # Explanations taken from: https://github.com/aol/moloch/wiki/Settings
 
     # The bpf filter used to reduce traffic. Used both on live and file traffic.
-    moloch_bpf: "{{ moloch_bpf }}"
+    moloch_bpf: "{{ input_data.moloch_bpf }}"
 
     # Semicolon ';' separated list of bpf filters which when matched for a
     # session causes the remaining pcap from being saved for the session. It is
@@ -63,7 +63,7 @@ all:
     # with a :num. For example dontSaveBPFs = port 22:5 will only save 5 packets
     # for port 22 sessions. Currently only the initial packet is matched against
     # the bpfs.
-    moloch_dontSaveBPFs: "{{ moloch_dontSaveBPFs }}"
+    moloch_dontSaveBPFs: "{{ input_data.moloch_dontSaveBPFs }}"
 
     # There are two storage types available on the system. One is clustered storage
     # and the other is Direct Attached Storage (DAS). Using clustered storage
@@ -71,7 +71,7 @@ all:
     # one giant storage device across the entire kit. This is ideal for many types
     # of storage, but causes latency. This is not acceptable for high speed PCAP
     # capture.
-    use_ceph_for_pcap: "{{ use_ceph_for_pcap }}"
+    use_ceph_for_pcap: "{{ input_data.use_ceph_for_pcap }}"
 
     # This should be defined if you are going to use Moloch in direct disk
     # access mode which is the default. If this is defined it is assumed you are
@@ -81,25 +81,25 @@ all:
     # be formatted and wiped and then /pcap used as a mount point to it. WARNING:
     # THIS WILL BE APPLIED TO ALL SENSORS. YOU CANNOT MIX AND MATCH BETWEEN CLUSTERED
     # AND NON-CLUSTERED STORAGE.
-    moloch_pcap_folder: "{{ moloch_pcap_folder | default("/pcap", true) }}"
+    moloch_pcap_folder: "{{ input_data.moloch_pcap_folder | default("/pcap", true) }}"
 
     # If you want to use clustered storage as described above for PCAP, you will
     # need to set this value. This is the amount of space in GBs total that you
     # will assign to PCAP. It should be zero if use_ceph_for_pcap is false.
     # Remember, this will be spread out across every drive in the ceph cluster
     # as defined in the variable "ceph_drive_list".
-    moloch_pcap_pv_size: "{{ moloch_pcap_pv_size }}"
+    moloch_pcap_pv_size: "{{ input_data.moloch_pcap_pv_size }}"
 
     # Advanced Moloch settings, do not touch unless you know what you're doing
-    moloch_spiDataMaxIndices: "{{ moloch_spiDataMaxIndices }}"
-    moloch_pcapWriteMethod: "{{ moloch_pcapWriteMethod }}"
-    moloch_pcapWriteSize: "{{ moloch_pcapWriteSize }}"
-    moloch_dbBulkSize: "{{ moloch_dbBulkSize }}"
-    moloch_maxESConns: "{{ moloch_maxESConns }}"
-    moloch_maxESRequests: "{{ moloch_maxESRequests }}"
-    moloch_packetsPerPoll: "{{ moloch_packetsPerPoll }}"
-    moloch_magicMode: "{{ moloch_magicMode }}"
-    moloch_maxPacketsInQueue: "{{ moloch_maxPacketsInQueue }}"
+    moloch_spiDataMaxIndices: "{{ input_data.moloch_spiDataMaxIndices }}"
+    moloch_pcapWriteMethod: "{{ input_data.moloch_pcapWriteMethod }}"
+    moloch_pcapWriteSize: "{{ input_data.moloch_pcapWriteSize }}"
+    moloch_dbBulkSize: "{{ input_data.moloch_dbBulkSize }}"
+    moloch_maxESConns: "{{ input_data.moloch_maxESConns }}"
+    moloch_maxESRequests: "{{ input_data.moloch_maxESRequests }}"
+    moloch_packetsPerPoll: "{{ input_data.moloch_packetsPerPoll }}"
+    moloch_magicMode: "{{ input_data.moloch_magicMode }}"
+    moloch_maxPacketsInQueue: "{{ input_data.moloch_maxPacketsInQueue }}"
 
     #############################
     # Elasticsearch Settings    #
@@ -109,21 +109,21 @@ all:
     # different from elastic_masters in that they do not run the master role
     # Unless your kit will exceed 5 nodes, you should probably leave this at 0
     # unless you know what you are doing.
-    elastic_datas: "{{ elastic_datas }}"
+    elastic_datas: "{{ input_data.elastic_datas }}"
 
     # The number of Elasticsearch masters you will run
-    elastic_masters: "{{ elastic_masters }}"
+    elastic_masters: "{{ input_data.elastic_masters }}"
 
     # The amount of memory you want to assign to each Elasticsearch instance
-    elastic_memory: "{{ elastic_memory }}"
+    elastic_memory: "{{ input_data.elastic_memory }}"
 
     # The amount of space allocated in GB to each persistent volume for Elasticsearch
-    elastic_pv_size: "{{ elastic_pv_size }}"
+    elastic_pv_size: "{{ input_data.elastic_pv_size }}"
 
     # The percentage of maximum allocated space for Elasticsearch that can be filled
     # before Curator begins deleting indices. The oldest moloch indices that exceed
     # this threshold will be deleted.
-    elastic_curator_threshold: "{{ elastic_curator_threshold }}"
+    elastic_curator_threshold: "{{ input_data.elastic_curator_threshold }}"
 
     #############################
     # Bro/Suricata Settings     #
@@ -141,23 +141,23 @@ all:
 
     # The amount of memory provided to the Kafka JVM. You probably don't need
     # to change this
-    kafka_jvm_memory: "{{ kafka_jvm_memory }}"
+    kafka_jvm_memory: "{{ input_data.kafka_jvm_memory }}"
 
     # The amount of space allocated in GB to each persistent volume for Kafka
     # You probably don't need to change this
-    kafka_pv_size: "{{ kafka_pv_size }}"
+    kafka_pv_size: "{{ input_data.kafka_pv_size }}"
 
     # The amount of memory provided to the Zookeeper JVM. You probably don't need
     # to change this
-    zookeeper_mem: "{{ zookeeper_mem }}"
+    zookeeper_mem: "{{ input_data.zookeeper_mem }}"
 
     # The amount of space allocated in GB to each persistent volume for Zookeeper
     # You probably don't need to change this
-    zookeeper_pv_size: "{{ zookeeper_pv_size }}"
+    zookeeper_pv_size: "{{ input_data.zookeeper_pv_size }}"
 
     # Number of zookeeper replicas to be created. Three should be sufficient for
     # any setup. These are only used for replication backup
-    zookeeper_replicas: "{{ zookeeper_replicas }}"
+    zookeeper_replicas: "{{ input_data.zookeeper_replicas }}"
 
     #############################
     # Kubernetes Settings       #
@@ -166,7 +166,7 @@ all:
     # kubernetes_services_cidr is the range of addresses kubernetes will use for external services
     # This includes cockpit, Moloch viewer, Kibana, elastichq, kafka-manager, and
     # the kubernetes dashboard. This range must be at least a /28. Ex: "192.168.1.16/28"
-    kubernetes_services_cidr: {{ kubernetes_services_cidr }}
+    kubernetes_services_cidr: {{ input_data.kubernetes_services_cidr }}
 
     #############################
     # Software Locations        #
@@ -250,7 +250,7 @@ all:
         sensors:
           hosts:
 
-          {% for sensor in sensors %}
+          {% for sensor in input_data.sensors %}
 
             # This is the hostname of the sensor. Whatever you put here will be
             # used to overwrite the current hostname.
@@ -265,24 +265,24 @@ all:
 
               # This is the management IP address of the node. Ex: 192.168.1.198
               # This is the address Ansible will use to communicate with.
-              management_ipv4: {{ sensor.management_ipv4 }}
+              management_ipv4: {{ input_data.sensor.management_ipv4 }}
 
               # This is the number of bro workers which will spawn on the sensor
-              bro_workers: {{ sensor.bro_workers }}
+              bro_workers: {{ input_data.sensor.bro_workers }}
 
               # This is the number of threads which will be dedicated to Moloch
-              moloch_threads: {{ sensor.moloch_threads }}
+              moloch_threads: {{ input_data.sensor.moloch_threads }}
 
               # This is the interface the sensor will use for monitoring on Moloch,
               # bro, and Suricata. Ex: ens4
               sensor_monitor_interface:
-                - {{ sensor.monitor_interface }}
+                - {{ input_data.sensor.monitor_interface }}
 
               # Instead of using ceph you can use an entire drive for PCAP storage.
               # This is the drive you will use. Ex: /dev/sdb. This is only used
               # if use_ceph_for_pcap is set to false. moloch_pcap_folder must be defined
               # for this to work. moloch_pcap_folder will be the mount point.
-              pcap_disk: {{ sensor.pcap_disk }}
+              pcap_disk: {{ input_data.sensor.pcap_disk }}
 
               # These are the disks you will use for Ceph. These must be devices.
               # This cannot be a folder or partition. Ex: /dev/vdb. You may have
@@ -304,7 +304,7 @@ all:
         #with just "remote-sensors:", but no hosts defined.
         remote-sensors:
         {% if remote-sensors is not none %}
-        {% for sensor in remote-sensors %}
+        {% for sensor in input_data.remote-sensors %}
           hosts:
             {{ sensor.hostname }}:
               ansible_user: root
@@ -329,8 +329,8 @@ all:
         servers:
 
           hosts:
-            {% for server in servers %}
-            {{ host }}:
+            {% for server in input_data.servers %}
+            {{ server.hostname }}:
               ansible_user: root
               ansible_connection: ssh
               management_ipv4: {{ server.management_ipv4 }}
@@ -353,10 +353,10 @@ all:
     # feel free to dig through the code.
 
           hosts:
-            {{ master_server.hostname }}:
+            {{ input_data.master_server.hostname }}:
               ansible_user: root
               ansible_connection: ssh
-              management_ipv4: {{ master_server.management_ipv4 }}
+              management_ipv4: {{ input_data.master_server.management_ipv4 }}
               ceph_drive_list:
               {% for drive in master_server.ceph_drive_list %}
                 - {{ drive }}

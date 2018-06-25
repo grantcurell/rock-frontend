@@ -20,6 +20,8 @@
     {% for i in range(server_count) %}
     $("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}").change(event, function() {
 
+      set_id_value("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}", true);
+
       // This loops over each checkbox this ISN'T the checkbox that was clicked
       // and flips its disabled status to be the opposite of what it currently is.
       // This has the effect of only allowing one of the master server checkboxes
@@ -30,11 +32,11 @@
         // See: https://stackoverflow.com/questions/14913845/jquery-checking-for-disabled-attribute-and-adding-removing-it
         if($(this).is(':disabled')){
           $( "#" + this.id ).prop( "disabled", false );
-          set_id_value("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}", true);
         } else {
           $( "#" + this.id ).prop( "disabled", true );
-          set_id_value("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}", false);
         }
+
+        set_id_value("#" + this.id, false);
       });
 
       set_master_server_validated(true);

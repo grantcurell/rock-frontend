@@ -5,7 +5,6 @@ from app import app
 from api.node_facts import *
 from app.forms import InventoryForm, DropDown
 import json
-import yaml
 
 @app.route('/_server')
 def _server():
@@ -104,15 +103,16 @@ def _pcap_disks_list():
 
 @app.route('/_generate_inventory')
 def _generate_inventory():
-    """
-    with open("/root/tfplenum/playbooks/inventory/sample/inventory.yml", 'r') as yaml_stream, file("/root/tfplenum/playbooks/inventory/output.yml", 'w') as output:
-        try:
-            data = yaml.load(yaml_stream)
-            yaml.dump(data, output, default_flow_style=False)
-        except yaml.YAMLError as error:
-            print error
-    """
-    #render_template('inventory_template.yml')
+
+    input_data = json.loads(request.args.get('input_data'))
+
+    inventory_template = render_template('inventory_template.yml', input_data=input_data)
+    print output_from_parsed_template
+
+    # to save the results
+    with open("my_new_file.html", "wb") as fh:
+        fh.write(output_from_parsed_template)
+
     return "bullshit"
 
 @app.route('/', methods=['GET', 'POST'])

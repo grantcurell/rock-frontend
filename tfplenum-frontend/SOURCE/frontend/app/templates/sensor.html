@@ -63,6 +63,18 @@ $(document).ready(function(){
     validate_interfaces();
   }
   {% endfor %}
+
+  {% for i in range(sensor_count) %}
+  $("#{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}").change(event, function() {
+
+      if($( "#{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}" ).is(":checked")){
+        set_id_value("{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}", true);
+      } else {
+        set_id_value("{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}", false);
+      }
+
+  })
+  {% endfor %}
 });
 </script>
 

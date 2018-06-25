@@ -39,7 +39,7 @@ $(document).ready(function(){
   var input_data = {};
 
   get_ids = function(){
-    var data = $("input");//.serializeArray().map(function(x){data[x.id] = x.value;});
+    var data = $("input");
 
     // This loop goes through the id of all input elements on the page. If that element
     // is not already in the list it adds it, otherwise, it ignores it.
@@ -58,6 +58,10 @@ $(document).ready(function(){
   }
 
   get_ids();
+  console.log(input_data);
+  $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data)}, function(data){
+
+  });
 
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
@@ -437,16 +441,8 @@ $(document).ready(function(){
 
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
-      //var data = {};
-      //var array = $("form").serializeArray().map(function(x){data[x.id] = x.value;});
-      //console.log(array);
 
-
-
-      var data = {};
-
-
-      $.get("{{ url_for('_generate_inventory') }}", function(data){
+      $.get("{{ url_for('_generate_inventory') }}", input_data, function(data){
 
       });
     });
