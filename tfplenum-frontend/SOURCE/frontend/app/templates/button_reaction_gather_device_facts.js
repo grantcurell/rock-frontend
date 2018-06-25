@@ -42,9 +42,9 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   // args[2] correlates to server_{{ i + 1}}_disk_space_available in server.htmlHolde
   $( "#{{ object.args[2] }}" ).replaceWith(total_disk_space.toFixed(2));
 
-  // args[3] correlates to server_{{ i + 1}}_hostname in server.html
+  // args[3] correlates to server_{{ i + 1}}_hostname (or sensor in the case of sensor) in server.html
   // The line below tacks on the hostname next to Server or Sensor #
-  $( "#{{ object.args[3] }}" ).replaceWith(" - " + data.hostname);
+  $( "#{{ object.args[3] }}" ).replaceWith(" - " + '<span id="{{ object.args[3] }}">' + data.hostname + "</span>");
 
   {# The below condition will only exist for the sensor. For the server it will always be the same #}
   {% if object.args[5] == 'sensor' %}

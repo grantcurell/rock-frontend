@@ -4,6 +4,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from api.node_facts import *
 from app.forms import InventoryForm, DropDown
+from app.inventory_classes import Sensor, Server
 import json
 
 @app.route('/_server')
@@ -104,6 +105,8 @@ def _pcap_disks_list():
 @app.route('/_generate_inventory')
 def _generate_inventory():
 
+    form = InventoryForm();
+
     input_data = json.loads(request.args.get('input_data'))
 
     print "\n\n\n"
@@ -116,12 +119,20 @@ def _generate_inventory():
         if "_field" in key:
             input_data[key.replace("_field", "")] = input_data.pop(key)
 
-    inventory_template = render_template('inventory_template.yml', input_data=input_data)
-    print inventory_template
+    for key, value in input_data.iteritems():
+
+        # Check to see if we have located a Remote Sensor
+        if form.is_remote_sensor_checkbox.checkbox_id in key and input_data[key]:
+            print "\n\n\nHERE"
+
+    #inventory_template = render_template('inventory_template.yml', input_data=input_data)
+    #print inventory_template
+
+
 
     # to save the results
-    with open("my_new_file.html", "wb") as fh:
-        fh.write(output_from_parsed_template)
+    #with open("my_new_file.html", "wb") as fh:
+    #    fh.write(output_from_parsed_template)
 
     return "bullshit"
 
