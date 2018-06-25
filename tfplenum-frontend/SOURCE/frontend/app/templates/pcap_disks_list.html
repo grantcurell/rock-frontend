@@ -5,17 +5,19 @@
 
   $(document).ready(function(){
 
-    //get_ids();
+    get_ids();
 
     {% for disk in disks %}
     $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).on('click', function (event) {
 
       if($( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).hasClass( "active" )) {
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
-        //$( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] }}");
+        $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] }}");
+        set_id_value("{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}", false);
       } else {
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
-        //$( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] + ' - selected'}}");
+        $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] + ' - selected'}}");
+        set_id_value("{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}", true);
       }
     });
     {% endfor %}

@@ -150,8 +150,8 @@ $(document).ready(function(){
         {% endwith %}
         <br>
       </div>
-      <form id='{{ [form.ceph_drive_list, i+1] | join('_') }}' role=form>
-        <div id="{{ ['ceph_drive_list', i+1] | join('_') }}"></div>
+      <form id='{{ [form.sensor_ceph_drive_list, i+1] | join('_') }}' role=form>
+        <div id="{{ ['sensor_ceph_drive_list', i+1] | join('_') }}"></div>
       </form>
       <br>
       <div id="{{ [form.sensor_monitor_interface, i+1] | join('_') }}"></div>

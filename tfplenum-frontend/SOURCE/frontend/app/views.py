@@ -106,8 +106,18 @@ def _generate_inventory():
 
     input_data = json.loads(request.args.get('input_data'))
 
+    print "\n\n\n"
+    print input_data
+    print "\n\n\n"
+
+    for key, value in input_data.iteritems():
+
+        # This exists to clean up the word field which we added to a lot of the IDs
+        if "_field" in key:
+            input_data[key.replace("_field", "")] = input_data.pop(key)
+
     inventory_template = render_template('inventory_template.yml', input_data=input_data)
-    print output_from_parsed_template
+    print inventory_template
 
     # to save the results
     with open("my_new_file.html", "wb") as fh:

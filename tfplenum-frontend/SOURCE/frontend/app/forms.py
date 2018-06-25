@@ -572,7 +572,7 @@ class InventoryForm:
   Zookeeper instance.")
 
   # This is the form name for the ceph drive list
-  ceph_drive_list = 'ceph_drive_list_form'
+  sensor_ceph_drive_list = 'sensor_ceph_drive_list_form'
 
   # This is the form name for the ceph drive list
   pcap_disk_list = 'pcap_disk_list_form'

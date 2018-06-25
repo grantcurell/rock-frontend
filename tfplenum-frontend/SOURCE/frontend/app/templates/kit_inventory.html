@@ -59,6 +59,8 @@ $(document).ready(function(){
 
   get_ids();
 
+  //$.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data)}, function(data){});
+
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
   }
@@ -437,7 +439,6 @@ $(document).ready(function(){
 
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
-      console.log(input_data);
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data)}, function(data){});
     });
 
