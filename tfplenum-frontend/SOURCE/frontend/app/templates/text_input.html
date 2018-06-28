@@ -1,7 +1,10 @@
 <script type="text/javascript">
   $(document).ready(function(){
 
-    get_ids();
+    text_input_get_ids = function(){
+      get_ids();
+    }
+    callbacks.add( text_input_get_ids );
 
     // See: https://api.jquery.com/keyup/
     $('#{{ object.field_id }}').keyup(function (event) {

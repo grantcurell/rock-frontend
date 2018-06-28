@@ -7,6 +7,11 @@
   //@ sourceURL=server.js
   $(document).ready(function(){
 
+    server_get_ids = function(){
+      get_ids();
+    }
+    callbacks.add( server_get_ids );
+
     // This performs validation of all entries if someone typed things in before
     // adding servers
     if ( $('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {

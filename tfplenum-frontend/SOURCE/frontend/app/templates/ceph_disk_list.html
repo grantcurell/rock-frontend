@@ -5,7 +5,10 @@
 
   $(document).ready(function(){
 
-    get_ids();
+    ceph_disk_get_ids = function(){
+      get_ids();
+    }
+    callbacks.add( ceph_disk_get_ids );
 
     {% for disk in disks %}
     $( "#{{ [form.use_in_ceph_cluster.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).on('click', function (event) {

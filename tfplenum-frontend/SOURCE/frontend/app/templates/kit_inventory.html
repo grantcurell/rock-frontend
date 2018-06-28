@@ -12,6 +12,10 @@
 
 <script>
 
+// This is used to register callbacks in various forms that when fired will
+// collect all the ID values everywhere on the system.
+var callbacks = $.Callbacks();
+
 $(document).ready(function(){
 
   // This causes the advanced settings to start as hidden
@@ -439,6 +443,7 @@ $(document).ready(function(){
 
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
+      callbacks.fire();
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data)}, function(data){});
     });
 

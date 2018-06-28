@@ -113,6 +113,8 @@ def _generate_inventory():
     print input_data
     print "\n\n\n"
 
+    print input_data["sensor_1_hostname"]
+
     for key, value in input_data.iteritems():
 
         # This exists to clean up the word field which we added to a lot of the IDs
@@ -121,9 +123,9 @@ def _generate_inventory():
 
     for key, value in input_data.iteritems():
 
-        # Check to see if we have located a Remote Sensor
+        # Check to see if we have located a Remote Sensor and it is a remote sensor
         if form.is_remote_sensor_checkbox.checkbox_id in key and input_data[key]:
-            print "\n\n\nHERE"
+            print "\n\n\n" + key
 
     #inventory_template = render_template('inventory_template.yml', input_data=input_data)
     #print inventory_template

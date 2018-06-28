@@ -2,7 +2,10 @@
 <script>
 $(document).ready(function(){
 
-  get_ids();
+  sensor_get_ids = function(){
+    get_ids();
+  }
+  callbacks.add( sensor_get_ids );
 
   // The condition below is here to take care of the case that a user unlocks
   // the advanced settings before submitting a sensor count. In which case
@@ -69,8 +72,10 @@ $(document).ready(function(){
 
       if($( "#{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}" ).is(":checked")){
         set_id_value("{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}", true);
+        set_id_value("{{ ('sensor_' + ((i+1) | string) + '_hostname' }}", attributes["is_remote"] = true)
       } else {
         set_id_value("{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}", false);
+        set_id_value("{{ ('sensor_' + ((i+1) | string) + '_hostname' }}", attributes["is_remote"] = false)
       }
 
   })

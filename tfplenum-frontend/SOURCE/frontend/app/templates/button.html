@@ -4,7 +4,10 @@
 <script type="text/javascript">
   $(document).ready(function(){
 
-    get_ids();
+    button_get_ids = function(){
+      get_ids();
+    }
+    callbacks.add( button_get_ids );
 
     // Server events: this function handles when a user presses submit on the
     // number of servers button.
