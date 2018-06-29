@@ -74,6 +74,17 @@ $(document).ready(function(){
     hosts[hostname]["monitor_interfaces"] = {};
   }
 
+  // This function is used internally for converting a hostname from one of the
+  // generic numbered hosts in sensor or server.html to their real hostname (if
+  // it exists)
+  function _resolve_hostname(hostname) {
+    if(hostname in input_data) {
+      return input_data[hostname];
+    } else {
+      return hostname;
+    }
+  }
+
   // We use this to add data for a specific hosts. The if condition checks to see
   // if a host already exists in the list of hosts and if it doesn't it creates
   // a new dictionary for that host
@@ -496,7 +507,21 @@ $(document).ready(function(){
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
       callbacks.fire();
-      alert(hosts);
+
+      // This section of code updates the hostnames to be the correct hostnames
+      // rather than the numerical hostnames used within sensors and servers
+      _resolve_hostname();
+      console.log(hosts);
+      $.each(hosts, function( key, value ) {
+        proper_hostname = _resolve_hostname(key);
+        console.log(proper_hostname);
+        console.log(key);
+        if (proper_hostname !== key) {
+          hosts[proper_hostname] = hosts[key];
+          delete hosts[key];
+        }
+      });
+
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){});
     });
 

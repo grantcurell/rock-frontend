@@ -16,20 +16,20 @@
     var interface_count = 0;
 
     {% for interface in interfaces %}
-    $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).on('click', function (event) {
+    $( "#{{ [form.monitor_interface.generic_button_id, interface, device_number, device_type] | join('_') }}" ).on('click', function (event) {
 
-      if($( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).hasClass( "active" )) {
-        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
-        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).html("{{ interface['name'] }}");
-        set_monitor_interface("{{ hostname }}", "{{ interface['name'] }}", false)
+      if($( "#{{ [form.monitor_interface.generic_button_id, interface, device_number, device_type] | join('_') }}" ).hasClass( "active" )) {
+        $( "#{{ [form.monitor_interface.generic_button_id, interface, device_number, device_type] | join('_') }}" ).removeClass( "active" );
+        $( "#{{ [form.monitor_interface.generic_button_id, interface, device_number, device_type] | join('_') }}" ).html("{{ interface }}");
+        set_monitor_interface("{{ hostname }}", "{{ interface }}", false)
         interface_count -= 1;
       } else {
-        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
-        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).html("{{ interface['name'] + ' - selected'}}");
-        set_monitor_interface("{{ hostname }}", "{{ interface['name'] }}", true)
+        $( "#{{ [form.monitor_interface.generic_button_id, interface, device_number, device_type] | join('_') }}" ).addClass( "active" );
+        $( "#{{ [form.monitor_interface.generic_button_id, interface, device_number, device_type] | join('_') }}" ).html("{{ interface + ' - selected'}}");
+        set_monitor_interface("{{ hostname }}", "{{ interface }}", true)
         interface_count += 1;
       }
-      {{ form.monitor_interface.callback + "_" + ((device_number+1) | string) }}(interface_count);
+      {{ form.monitor_interface.callback + "_" + device_number }}(interface_count);
     });
     {% endfor %}
 
@@ -39,7 +39,7 @@
 
 <div class="card" style="width: 20rem;">
   <div class="card-header">
-    Select PCAP Drive
+    Select Monitor Interfaces
   </div>
   <div class="card-body">
     <p class="card-text">Select which interfaces you would like to use as monitor interfaces.</p>
@@ -48,7 +48,7 @@
   <div class="btn-group-vertical" role="group">
     {% if (interfaces | length) > 0 %}
     {% for interface in interfaces %}
-    <button type="button" class="btn btn-primary" id="{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}">{{ interface['name'] }}</button>
+    <button type="button" class="btn btn-primary" id="{{ [form.monitor_interface.generic_button_id, interface, device_number, device_type] | join('_') }}">{{ interface }}</button>
     {% endfor %}
     {% else %}
     <div class="alert alert-danger" role="alert">

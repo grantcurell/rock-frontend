@@ -120,7 +120,7 @@ def _generate_inventory():
 
 
     for host in hosts:
-        print "HERE"
+        print host
     """
     for key, value in input_data.iteritems():
 

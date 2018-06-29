@@ -54,6 +54,9 @@ $(document).ready(function(){
     if({% for i in range(sensor_count) %}{{ "monitor_interface_" + ((i+1) | string) + "_valid" }} &&{% endfor %} true) {
       set_monitor_interface_validation(true);
       validate_all();
+    } else {
+      set_monitor_interface_validation(false);
+      validate_all();
     }
   }
 

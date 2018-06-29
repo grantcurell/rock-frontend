@@ -918,8 +918,8 @@ class InventoryForm:
     form_name = 'monitor_interface'
   , label = 'Monitor Interface'
   #, required = True TODO NEED TO ADD A DEFAULT
-  , description = "The interface on the sensor you would like to use for monitoring.\
-                   This will be the interface that Moloch, Bro, and Suricata use.\
+  , description = "The interfaces on the sensor you would like to use for monitoring.\
+                   These will be the interfaces that Moloch, Bro, and Suricata use.\
                    Note: The management interface will not appear in this list. You \
                    cannot use an interface for both management and monitoring."
   , callback = 'monitor_interface_callback')
