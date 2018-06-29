@@ -109,21 +109,21 @@ all:
     # different from elastic_masters in that they do not run the master role
     # Unless your kit will exceed 5 nodes, you should probably leave this at 0
     # unless you know what you are doing.
-    elastic_datas: "{{ input_data[form.elastic_datas.field_id] }}"
+    elastic_datas: {{ input_data[form.elastic_datas.field_id] }}
 
     # The number of Elasticsearch masters you will run
-    elastic_masters: "{{ input_data[form.elastic_masters.field_id] }}"
+    elastic_masters: {{ input_data[form.elastic_masters.field_id] }}
 
     # The amount of memory you want to assign to each Elasticsearch instance
-    elastic_memory: "{{ input_data[form.elastic_memory.field_id] }}"
+    elastic_memory: {{ input_data[form.elastic_memory.field_id] }}
 
     # The amount of space allocated in GB to each persistent volume for Elasticsearch
-    elastic_pv_size: "{{ input_data[form.elastic_pv_size.field_id] }}"
+    elastic_pv_size: {{ input_data[form.elastic_pv_size.field_id] }}
 
     # The percentage of maximum allocated space for Elasticsearch that can be filled
     # before Curator begins deleting indices. The oldest moloch indices that exceed
     # this threshold will be deleted.
-    elastic_curator_threshold: "{{ input_data[form.elastic_curator_threshold.field_id] }}"
+    elastic_curator_threshold: {{ input_data[form.elastic_curator_threshold.field_id] }}
 
     #############################
     # Bro/Suricata Settings     #
@@ -141,23 +141,23 @@ all:
 
     # The amount of memory provided to the Kafka JVM. You probably don't need
     # to change this
-    kafka_jvm_memory: "{{ input_data[form.kafka_jvm_memory.field_id] }}"
+    kafka_jvm_memory: {{ input_data[form.kafka_jvm_memory.field_id] }}
 
     # The amount of space allocated in GB to each persistent volume for Kafka
     # You probably don't need to change this
-    kafka_pv_size: "{{ input_data[form.kafka_pv_size.field_id] }}"
+    kafka_pv_size: {{ input_data[form.kafka_pv_size.field_id] }}
 
     # The amount of memory provided to the Zookeeper JVM. You probably don't need
     # to change this
-    zookeeper_mem: "{{ input_data[form.zookeeper_mem.field_id] }}"
+    zookeeper_mem: {{ input_data[form.zookeeper_jvm_memory.field_id] }}
 
     # The amount of space allocated in GB to each persistent volume for Zookeeper
     # You probably don't need to change this
-    zookeeper_pv_size: "{{ input_data[form.zookeeper_pv_size.field_id] }}"
+    zookeeper_pv_size: {{ input_data[form.zookeeper_pv_size.field_id] }}
 
     # Number of zookeeper replicas to be created. Three should be sufficient for
     # any setup. These are only used for replication backup
-    zookeeper_replicas: "{{ input_data[form.zookeeper_replicas.field_id] }}"
+    zookeeper_replicas: {{ input_data[form.zookeeper_replicas.field_id] }}
 
     #############################
     # Kubernetes Settings       #
@@ -166,7 +166,7 @@ all:
     # kubernetes_services_cidr is the range of addresses kubernetes will use for external services
     # This includes cockpit, Moloch viewer, Kibana, elastichq, kafka-manager, and
     # the kubernetes dashboard. This range must be at least a /28. Ex: "192.168.1.16/28"
-    kubernetes_services_cidr: {{ input_data[form.kubernetes_services_cidr.field_id] }}
+    kubernetes_services_cidr: "{{ input_data[form.kubernetes_services_cidr.field_id] }}"
 
     #############################
     # Software Locations        #
@@ -266,7 +266,7 @@ all:
 
               # This is the management IP address of the node. Ex: 192.168.1.198
               # This is the address Ansible will use to communicate with.
-              management_ipv4: {{ attributes.management_ipv4 }}
+              management_ipv4: "{{ attributes.management_ipv4 }}"
 
               # This is the number of bro workers which will spawn on the sensor
               bro_workers: {{ attributes.bro_workers }}
@@ -293,7 +293,7 @@ all:
               # two.
               ceph_drive_list:
               {% for drive in attributes.ceph_drive_list %}
-                - {{ drive }}
+                - {{ "/dev/" + drive }}
               {% endfor %}
 
           {% endfor %}
@@ -315,7 +315,8 @@ all:
               bro_workers: {{ attributes.bro_workers }}
               moloch_threads: {{ attributes.moloch_threads }}
               ceph_drive_list:
-              management_ipv4: {{ attributes.management_ipv4 }}
+              pcap_disk: {{ attributes.pcap_disk }}
+              management_ipv4: "{{ attributes.management_ipv4 }}"
               sensor_monitor_interface:
                 {% for interface in attributes.sensor_monitor_interfaces %}
                 - {{ interface }}
@@ -342,7 +343,7 @@ all:
               management_ipv4: {{ attributes.management_ipv4 }}
               ceph_drive_list:
               {% for drive in attributes.ceph_drive_list %}
-                - {{ drive }}
+                - {{ "/dev/" + drive }}
               {% endfor %}
             {% endfor %}
 
@@ -365,7 +366,7 @@ all:
               management_ipv4: {{ master_server.management_ipv4 }}
               ceph_drive_list:
               {% for drive in master_server.ceph_drive_list %}
-                - {{ drive }}
+                - {{ "/dev/" + drive }}
               {% endfor %}
 
     nodes_to_remove:

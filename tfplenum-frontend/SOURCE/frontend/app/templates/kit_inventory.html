@@ -53,13 +53,13 @@ $(document).ready(function(){
     // is not already in the list it adds it, otherwise, it ignores it.
     $.each(data, function( key, value ) {
       id = $(value).attr('id');
-      if( !(id in input_data) ) {
+      //if( !(id in input_data) ) {
         input_data[id] = $( "#" + id ).val();
-      }
+      //}
     });
   }
 
-  get_ids();
+  callbacks.add( get_ids );
 
   set_id_value = function(id, value) {
     input_data[id] = value;
@@ -500,12 +500,6 @@ $(document).ready(function(){
 
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
-      $.each(hosts, function( key, value ) {
-        console.log("key: " + key);
-        $.each(value, function( key2, value2 ) {
-          console.log("key: " + key2 + " value: " + value2);
-        });
-      });
 
       // This section of code updates the hostnames to be the correct hostnames
       // rather than the numerical hostnames used within sensors and servers
@@ -518,8 +512,6 @@ $(document).ready(function(){
           set_host_value(key, "is_server", true);
         }
         proper_hostname = _resolve_hostname(key);
-        console.log(proper_hostname);
-        console.log(key);
         if (proper_hostname != key) {
           hosts[proper_hostname] = hosts[key];
           delete hosts[key];
@@ -527,16 +519,6 @@ $(document).ready(function(){
         yes = true;
       });
       }
-      console.log("2 FUCK ME FUCK ME FUCK ME FUCK ME");
-
-      $.each(hosts, function( key, value ) {
-        console.log("key: " + key);
-        $.each(value, function( key2, value2 ) {
-          console.log("key: " + key2 + " value: " + value2);
-        });
-      });
-
-      console.log("3 FUCK ME FUCK ME FUCK ME FUCK ME");
 
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){});
     });

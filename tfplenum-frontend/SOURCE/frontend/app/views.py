@@ -110,27 +110,29 @@ def _generate_inventory():
     remote_sensors = {}
     master_server = None
     use_ceph_for_pcap = False
+    form = InventoryForm
 
     for host, attributes in hosts.iteritems():
         # This is purely a convienience function. Master server and servers
         # are identical aside from their type and this just makes it so you
         # don't have unnecessary code duplication
         if attributes["is_server"]:
-            def _assign_server(type_of_server):
-                type_of_server[host] = Server()
-                type_of_server[host].hostname = host
-                type_of_server[host].management_ipv4 = attributes["management_ip"]
+            if not form.server_is_master_server_checkbox.field_id in attributes:
+                attributes[form.server_is_master_server_checkbox.field_id] = False
+            if attributes[form.server_is_master_server_checkbox.field_id]:
+                master_server = Server()
+                master_server.hostname = host
+                master_server.management_ipv4 = attributes["management_ip"]
                 for drive_name, value in attributes["ceph_drives"].iteritems():
-                    if value:
-                        type_of_server[host].ceph_drive_list.append(drive_name)
-
-            if not "server_is_master_server_checkbox" in attributes:
-                attributes["server_is_master_server_checkbox"] = False
-            if attributes["server_is_master_server_checkbox"]:
-                _assign_server(master_server)
+                    if value and not drive_name in master_server.ceph_drive_list:
+                        master_server.ceph_drive_list.append(drive_name)
             else:
-                _assign_server(servers)
-
+                servers[host] = Server()
+                servers[host].hostname = host
+                servers[host].management_ipv4 = attributes["management_ip"]
+                for drive_name, value in attributes["ceph_drives"].iteritems():
+                    if value and not drive_name in servers[host].ceph_drive_list:
+                        servers[host].ceph_drive_list.append(drive_name)
         else:
             # This is purely a convienience function. Remote sensors and sensors
             # are identical aside from their type and this just makes it so you
@@ -142,16 +144,15 @@ def _generate_inventory():
                 type_of_sensor[host].bro_workers = attributes["bro_workers"]
                 type_of_sensor[host].moloch_threads = attributes["moloch_threads"]
                 for drive_name, value in attributes["ceph_drives"].iteritems():
-                    if value:
+                    if value and not drive_name in type_of_sensor[host].ceph_drive_list:
                         type_of_sensor[host].ceph_drive_list.append(drive_name)
                 for interface, value in attributes["monitor_interfaces"].iteritems():
-                    if value:
+                    if value and not interface in type_of_sensor[host].sensor_monitor_interfaces:
                         type_of_sensor[host].sensor_monitor_interfaces.append(interface)
                 for drive_name, value in attributes["pcap_drives"].iteritems():
                     if value:
                         type_of_sensor[host].pcap_disk = drive_name
                         # TODO - these lines will probably need to be updated
-                        print "HERE"
                         use_ceph_for_pcap = False
                     else:
                         use_ceph_for_pcap = True
@@ -162,15 +163,14 @@ def _generate_inventory():
             else:
                 _assign_sensor(sensors)
 
-    form = InventoryForm
     inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
     print inventory_template
 
     # to save the results
-    #with open("my_new_file.html", "wb") as fh:
-    #    fh.write(output_from_parsed_template)
+    with open("/root/inventory.yml", "w") as inventory_file:
+        inventory_file.write(inventory_template)
 
-    return "bullshit"
+    return "Finished"
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index.html', methods=['GET', 'POST'])
