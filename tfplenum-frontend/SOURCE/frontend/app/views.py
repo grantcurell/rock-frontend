@@ -32,8 +32,6 @@ def _gather_device_facts():
         if interface.ip_address != management_ip:
             potential_monitor_interfaces.append(interface.name)
 
-    print node.cpu_cores
-
     return jsonify(cpus_available=node.cpu_cores,
                    memory_available=node.memory_gb,
                    disks= json.dumps([disk. __dict__ for disk in node.disks]),
@@ -103,23 +101,15 @@ def _pcap_disks_list():
 def _generate_inventory():
 
     form = InventoryForm();
-    print "\n\n\n"
-    print request.args
-    print "\n\n\n"
 
     input_data = json.loads(request.args.get('input_data'))
     hosts = json.loads(request.args.get('hosts'))
-
-    for key, value in input_data.iteritems():
-
-        # This exists to clean up the word field which we added to a lot of the IDs
-        if "_field" in key:
-            input_data[key.replace("_field", "")] = input_data.pop(key)
 
     servers = {}
     sensors = {}
     remote_sensors = {}
     master_server = None
+    use_ceph_for_pcap = False
 
     for host, attributes in hosts.iteritems():
         # This is purely a convienience function. Master server and servers
@@ -156,10 +146,15 @@ def _generate_inventory():
                         type_of_sensor[host].ceph_drive_list.append(drive_name)
                 for interface, value in attributes["monitor_interfaces"].iteritems():
                     if value:
-                        type_of_sensor[host].sensor_monitor_interfaces.append(drive_name)
+                        type_of_sensor[host].sensor_monitor_interfaces.append(interface)
                 for drive_name, value in attributes["pcap_drives"].iteritems():
                     if value:
                         type_of_sensor[host].pcap_disk = drive_name
+                        # TODO - these lines will probably need to be updated
+                        print "HERE"
+                        use_ceph_for_pcap = False
+                    else:
+                        use_ceph_for_pcap = True
             if not "is_remote_sensor_checkbox" in attributes:
                 attributes["is_remote_sensor_checkbox"] = False
             if attributes["is_remote_sensor_checkbox"]:
@@ -167,7 +162,8 @@ def _generate_inventory():
             else:
                 _assign_sensor(sensors)
 
-    inventory_template = render_template('inventory_template.yml', input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers)
+    form = InventoryForm
+    inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
     print inventory_template
 
     # to save the results

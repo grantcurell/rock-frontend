@@ -21,6 +21,9 @@ var callbacks = $.Callbacks();
 // to get all the inputs from everyone, but there's really no way for it to do that.
 var input_data = {};
 
+// This is used to store host specific data
+var hosts = {};
+
 
 $(document).ready(function(){
 
@@ -43,9 +46,6 @@ $(document).ready(function(){
   var monitor_interfaces_validated = false;
   var master_server_validated = false;
 
-  // This is used to store host specific data
-  var hosts = {};
-
   get_ids = function(){
     var data = $("input");
 
@@ -55,7 +55,6 @@ $(document).ready(function(){
       id = $(value).attr('id');
       if( !(id in input_data) ) {
         input_data[id] = $( "#" + id ).val();
-        //console.log("ID: " + id + " Value: " + input_data[id]);
       }
     });
   }
@@ -64,7 +63,6 @@ $(document).ready(function(){
 
   set_id_value = function(id, value) {
     input_data[id] = value;
-    console.log("ID: " + id + " Value: " + input_data[id]);
   }
 
   function _initialize_host(hostname) {
@@ -95,7 +93,6 @@ $(document).ready(function(){
       _initialize_host(hostname);
       hosts[hostname][key] = value;
     }
-    console.log("Host: " + hostname + " ID: " + key + " Value: " + value);
   }
 
   set_ceph_drive = function(hostname, drive, value) {
@@ -105,7 +102,6 @@ $(document).ready(function(){
       _initialize_host(hostname);
       hosts[hostname]["ceph_drives"][drive] = value;
     }
-    console.log("Host: " + hostname + " ID: " + drive + " Value: " + value);
   }
 
   set_pcap_drive = function(hostname, drive, value) {
@@ -115,7 +111,6 @@ $(document).ready(function(){
       _initialize_host(hostname);
       hosts[hostname]["pcap_drives"][drive] = value;
     }
-    console.log("Host: " + hostname + " ID: " + drive + " Value: " + value);
   }
 
   set_monitor_interface = function(hostname, monitor_interface, value) {
@@ -125,7 +120,6 @@ $(document).ready(function(){
       _initialize_host(hostname);
       hosts[hostname]["monitor_interfaces"][monitor_interface] = value;
     }
-    console.log("Host: " + hostname + " ID: " + monitor_interface + " Value: " + value);
   }
 
   get_advanced_settings_status = function() {
@@ -393,8 +387,6 @@ $(document).ready(function(){
   // This function runs all validations to ensure
   validate_all = function () {
 
-    //console.log(clustered_storage_validated + ' ' + ceph_drives_validated + ' ' + elasticsearch_validated);
-
     if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated) {
 
       // This line is for debugging
@@ -504,12 +496,21 @@ $(document).ready(function(){
       }
     });
 
+    var yes = false;
+
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
-      callbacks.fire();
+      $.each(hosts, function( key, value ) {
+        console.log("key: " + key);
+        $.each(value, function( key2, value2 ) {
+          console.log("key: " + key2 + " value: " + value2);
+        });
+      });
 
       // This section of code updates the hostnames to be the correct hostnames
       // rather than the numerical hostnames used within sensors and servers
+      if(!yes) {
+      callbacks.fire();
       $.each(hosts, function( key, value ) {
         if(key.includes("sensor")) {
           set_host_value(key, "is_server", false);
@@ -517,11 +518,25 @@ $(document).ready(function(){
           set_host_value(key, "is_server", true);
         }
         proper_hostname = _resolve_hostname(key);
-        if (proper_hostname !== key) {
+        console.log(proper_hostname);
+        console.log(key);
+        if (proper_hostname != key) {
           hosts[proper_hostname] = hosts[key];
           delete hosts[key];
         }
+        yes = true;
       });
+      }
+      console.log("2 FUCK ME FUCK ME FUCK ME FUCK ME");
+
+      $.each(hosts, function( key, value ) {
+        console.log("key: " + key);
+        $.each(value, function( key2, value2 ) {
+          console.log("key: " + key2 + " value: " + value2);
+        });
+      });
+
+      console.log("3 FUCK ME FUCK ME FUCK ME FUCK ME");
 
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){});
     });
