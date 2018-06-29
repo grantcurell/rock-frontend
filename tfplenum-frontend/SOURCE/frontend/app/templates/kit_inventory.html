@@ -510,12 +510,13 @@ $(document).ready(function(){
 
       // This section of code updates the hostnames to be the correct hostnames
       // rather than the numerical hostnames used within sensors and servers
-      _resolve_hostname();
-      console.log(hosts);
       $.each(hosts, function( key, value ) {
+        if(key.includes("sensor")) {
+          set_host_value(key, "is_server", false);
+        } else {
+          set_host_value(key, "is_server", true);
+        }
         proper_hostname = _resolve_hostname(key);
-        console.log(proper_hostname);
-        console.log(key);
         if (proper_hostname !== key) {
           hosts[proper_hostname] = hosts[key];
           delete hosts[key];

@@ -110,17 +110,33 @@ def _generate_inventory():
     input_data = json.loads(request.args.get('input_data'))
     hosts = json.loads(request.args.get('hosts'))
 
-    #print input_data["sensor_1_hostname"]
-
     for key, value in input_data.iteritems():
 
         # This exists to clean up the word field which we added to a lot of the IDs
         if "_field" in key:
             input_data[key.replace("_field", "")] = input_data.pop(key)
 
+    servers = {}
+    sensors = {}
 
-    for host in hosts:
-        print host
+    for host, attributes in hosts.iteritems():
+        if attributes["is_server"]:
+            servers[host] = Server()
+            servers[host].hostname = host
+            servers[host].management_ipv4 = attributes["management_ip"]
+            for drive_name, value in attributes["ceph_drives"]:
+                if value:
+                    servers[host].ceph_disk_list.append(drive_name)
+        else
+            sensors[host] = Sensor()
+            sensors[host].hostname = host
+            sensors[host].management_ipv4 = attributes["management_ip"]
+            sensors[host].bro_workers
+            for drive_name, value in attributes["ceph_drives"]:
+                if value:
+                    sensors[host].ceph_disk_list.append(drive_name)
+
+
     """
     for key, value in input_data.iteritems():
 
