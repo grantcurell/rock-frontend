@@ -118,37 +118,57 @@ def _generate_inventory():
 
     servers = {}
     sensors = {}
+    remote_sensors = {}
+    master_server = None
 
     for host, attributes in hosts.iteritems():
+        # This is purely a convienience function. Master server and servers
+        # are identical aside from their type and this just makes it so you
+        # don't have unnecessary code duplication
         if attributes["is_server"]:
-            servers[host] = Server()
-            servers[host].hostname = host
-            servers[host].management_ipv4 = attributes["management_ip"]
-            for drive_name, value in attributes["ceph_drives"]:
-                if value:
-                    servers[host].ceph_disk_list.append(drive_name)
-        else
-            sensors[host] = Sensor()
-            sensors[host].hostname = host
-            sensors[host].management_ipv4 = attributes["management_ip"]
-            sensors[host].bro_workers
-            for drive_name, value in attributes["ceph_drives"]:
-                if value:
-                    sensors[host].ceph_disk_list.append(drive_name)
+            def _assign_server(type_of_server):
+                type_of_server[host] = Server()
+                type_of_server[host].hostname = host
+                type_of_server[host].management_ipv4 = attributes["management_ip"]
+                for drive_name, value in attributes["ceph_drives"].iteritems():
+                    if value:
+                        type_of_server[host].ceph_drive_list.append(drive_name)
 
+            if not "server_is_master_server_checkbox" in attributes:
+                attributes["server_is_master_server_checkbox"] = False
+            if attributes["server_is_master_server_checkbox"]:
+                _assign_server(master_server)
+            else:
+                _assign_server(servers)
 
-    """
-    for key, value in input_data.iteritems():
+        else:
+            # This is purely a convienience function. Remote sensors and sensors
+            # are identical aside from their type and this just makes it so you
+            # don't have unnecessary code duplication
+            def _assign_sensor(type_of_sensor):
+                type_of_sensor[host] = Sensor()
+                type_of_sensor[host].hostname = host
+                type_of_sensor[host].management_ipv4 = attributes["management_ip"]
+                type_of_sensor[host].bro_workers = attributes["bro_workers"]
+                type_of_sensor[host].moloch_threads = attributes["moloch_threads"]
+                for drive_name, value in attributes["ceph_drives"].iteritems():
+                    if value:
+                        type_of_sensor[host].ceph_drive_list.append(drive_name)
+                for interface, value in attributes["monitor_interfaces"].iteritems():
+                    if value:
+                        type_of_sensor[host].sensor_monitor_interfaces.append(drive_name)
+                for drive_name, value in attributes["pcap_drives"].iteritems():
+                    if value:
+                        type_of_sensor[host].pcap_disk = drive_name
+            if not "is_remote_sensor_checkbox" in attributes:
+                attributes["is_remote_sensor_checkbox"] = False
+            if attributes["is_remote_sensor_checkbox"]:
+                _assign_sensor(remote_sensors)
+            else:
+                _assign_sensor(sensors)
 
-        # Check to see if we have located a Remote Sensor and it is a remote sensor
-        if form.is_remote_sensor_checkbox.checkbox_id in key and input_data[key]:
-            print "\n\n\n" + key
-    """
-
-    #inventory_template = render_template('inventory_template.yml', input_data=input_data)
-    #print inventory_template
-
-
+    inventory_template = render_template('inventory_template.yml', input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers)
+    print inventory_template
 
     # to save the results
     #with open("my_new_file.html", "wb") as fh:

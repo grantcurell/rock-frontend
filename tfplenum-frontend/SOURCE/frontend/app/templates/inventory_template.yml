@@ -178,7 +178,7 @@ all:
   children:
 
     # Any host in this group will be used in the ceph cluster. By default this is
-    # all hosts except remote-sensors
+    # all hosts except remote_sensors
     ceph:
       children:
         master-server:
@@ -250,7 +250,7 @@ all:
         sensors:
           hosts:
 
-          {% for sensor in input_data["sensors"] %}
+          {% for sensor in sensors %}
 
             # This is the hostname of the sensor. Whatever you put here will be
             # used to overwrite the current hostname.
@@ -265,24 +265,26 @@ all:
 
               # This is the management IP address of the node. Ex: 192.168.1.198
               # This is the address Ansible will use to communicate with.
-              management_ipv4: {{ input_data["sensor.management_ipv4"] }}
+              management_ipv4: {{ sensor.management_ipv4 }}
 
               # This is the number of bro workers which will spawn on the sensor
-              bro_workers: {{ input_data["sensor.bro_workers"] }}
+              bro_workers: {{ sensor.bro_workers }}
 
               # This is the number of threads which will be dedicated to Moloch
-              moloch_threads: {{ input_data["sensor.moloch_threads"] }}
+              moloch_threads: {{ sensor.moloch_threads }}
 
               # This is the interface the sensor will use for monitoring on Moloch,
               # bro, and Suricata. Ex: ens4
               sensor_monitor_interface:
-                - {{ input_data["sensor.monitor_interface"] }}
+                {% for interface in sensor.sensor_monitor_interfaces %}
+                - {{ interface }}
+                {% endfor %}
 
               # Instead of using ceph you can use an entire drive for PCAP storage.
               # This is the drive you will use. Ex: /dev/sdb. This is only used
               # if use_ceph_for_pcap is set to false. moloch_pcap_folder must be defined
               # for this to work. moloch_pcap_folder will be the mount point.
-              pcap_disk: {{ input_data["sensor.pcap_disk"] }}
+              pcap_disk: {{ sensor.pcap_disk }}
 
               # These are the disks you will use for Ceph. These must be devices.
               # This cannot be a folder or partition. Ex: /dev/vdb. You may have
@@ -303,8 +305,8 @@ all:
         #everything after the group name empty. Ex: you could have an inventory
         #with just "remote-sensors:", but no hosts defined.
         remote-sensors:
-        {% if remote-sensors is not none %}
-        {% for sensor in input_data["remote-sensors"] %}
+        {% if remote_sensors is not none %}
+        {% for sensor in remote_sensors %}
           hosts:
             {{ sensor.hostname }}:
               ansible_user: root
@@ -313,7 +315,9 @@ all:
               ceph_drive_list:
               management_ipv4: {{ sensor.management_ipv4 }}
               sensor_monitor_interface:
-              - {{ sensor.monitor_interface }}
+                {% for interface in sensor.sensor_monitor_interfaces %}
+                - {{ interface }}
+                {% endfor %}
         {% endfor %}
         {% endif %}
 
@@ -329,7 +333,7 @@ all:
         servers:
 
           hosts:
-            {% for server in input_data["servers"] %}
+            {% for server in servers %}
             {{ server.hostname }}:
               ansible_user: root
               ansible_connection: ssh
@@ -353,10 +357,10 @@ all:
     # feel free to dig through the code.
 
           hosts:
-            {{ input_data["master_server.hostname"] }}:
+            {{ master_server.hostname }}:
               ansible_user: root
               ansible_connection: ssh
-              management_ipv4: {{ input_data["master_server.management_ipv4"] }}
+              management_ipv4: {{ master_server.management_ipv4 }}
               ceph_drive_list:
               {% for drive in master_server.ceph_drive_list %}
                 - {{ drive }}

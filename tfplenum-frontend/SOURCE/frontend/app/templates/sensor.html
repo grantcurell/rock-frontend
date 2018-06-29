@@ -4,6 +4,14 @@ $(document).ready(function(){
 
   sensor_get_ids = function(){
     get_ids();
+
+    // This fires when generate_interface in kit_inventory is called (it's part of
+    // the callbacks). It is used for retrieving the bro workers and moloch thread
+    // counts from each of the sensors
+    {% for i in range(sensor_count) %}
+    set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "bro_workers", parseInt($( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).val()));
+    set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "moloch_threads", parseInt($( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).val()));
+    {% endfor %}
   }
   callbacks.add( sensor_get_ids );
 
