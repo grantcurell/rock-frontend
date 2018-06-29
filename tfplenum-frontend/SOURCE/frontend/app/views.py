@@ -45,19 +45,12 @@ def _display_monitor_interfaces():
 
     form = InventoryForm()
 
-    instance_number = request.args.get('instance_number')
+    device_number = request.args.get('instance_number')
     interfaces = json.loads(request.args.get('interfaces'))
+    hostname = request.args.get('hostname')
 
-    object = DropDown(
-    form_name = form.monitor_interface.form_name + "_" + instance_number
-    , label = form.monitor_interface.label
-    #, required = True TODO NEED TO ADD A DEFAULT
-    , description = form.monitor_interface.description
-    , options = interfaces
-    , dropdown_text = form.monitor_interface.dropdown_text
-    , callback = form.monitor_interface.callback + "_" + instance_number)
-
-    return render_template("dropdown.html", object=object, form=form)
+    form = InventoryForm()
+    return render_template("monitor_interfaces.html", form=form, device_number=device_number, interfaces=interfaces, device_type="sensor", hostname=hostname)
 
 @app.route('/_ceph_drives_list')
 def _ceph_drives_list():

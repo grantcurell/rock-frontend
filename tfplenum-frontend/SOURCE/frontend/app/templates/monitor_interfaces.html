@@ -1,0 +1,62 @@
+
+<script>
+// Adding this allows this code to be identified in a browser debugger
+//@ sourceURL=ceph_interface_list
+
+  $(document).ready(function(){
+
+    monitor_interface_get_ids = function(){
+      get_ids();
+    }
+    callbacks.add( monitor_interface_get_ids );
+
+    // This is used to track how many interfaces are selected. For the system
+    // to validate and allow you to continue you must have at least one interface
+    // selected
+    var interface_count = 0;
+
+    {% for interface in interfaces %}
+    $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).on('click', function (event) {
+
+      if($( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).hasClass( "active" )) {
+        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
+        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).html("{{ interface['name'] }}");
+        set_monitor_interface("{{ hostname }}", "{{ interface['name'] }}", false)
+        interface_count -= 1;
+      } else {
+        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
+        $( "#{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).html("{{ interface['name'] + ' - selected'}}");
+        set_monitor_interface("{{ hostname }}", "{{ interface['name'] }}", true)
+        interface_count += 1;
+      }
+      {{ form.monitor_interface.callback + "_" + ((device_number+1) | string) }}(interface_count);
+    });
+    {% endfor %}
+
+
+  });
+</script>
+
+<div class="card" style="width: 20rem;">
+  <div class="card-header">
+    Select PCAP Drive
+  </div>
+  <div class="card-body">
+    <p class="card-text">Select which interfaces you would like to use as monitor interfaces.</p>
+    <p class="card-text text-danger">Note: The management interface will not be listed below. It is not eligble for use as a monitor interface.</p>
+  </div>
+  <div class="btn-group-vertical" role="group">
+    {% if (interfaces | length) > 0 %}
+    {% for interface in interfaces %}
+    <button type="button" class="btn btn-primary" id="{{ [form.monitor_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}">{{ interface['name'] }}</button>
+    {% endfor %}
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+      No interfaces found! Are you sure you have a second eligible interface that is not the management interface?
+    </div>
+    {% endif %}
+  </div>
+</div>
+<a href="{{ url_for('help') + '#anchor_' + form.monitor_interface.label | replace(' ','_') }}" target="_blank">
+  <label>What is this?</label>
+</a>

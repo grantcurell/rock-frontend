@@ -86,7 +86,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
 
   // This section is for facts specific to only the sensor.
   {% if object.args[5] == 'sensor' %}
-    $.get("{{ url_for('_display_monitor_interfaces') }}", { interfaces: JSON.stringify(data.potential_monitor_interfaces), instance_number: {{ object.args[4] }} }, function(data){
+    $.get("{{ url_for('_display_monitor_interfaces') }}", { interfaces: JSON.stringify(data.potential_monitor_interfaces), instance_number: {{ object.args[4] }}, hostname: "{{ object.args[3] }}"}, function(data){
       // The hide method is here because effects only work if the element
       // begins in a hidden state
       $( "#{{ form.sensor_monitor_interface }}_{{ object.args[4] }}" ).html(data).hide().slideDown("slow");

@@ -104,12 +104,13 @@ class Button(Field, object):
         return copy_of_self
 
 class GenericButton:
-    def __init__(self, form_name, label, description=None):
+    def __init__(self, form_name, label, description=None, callback=None):
         self.form_name = form_name
         self.generic_button_id = form_name + '_generic_button'
         self.css_class = form_name + '_generic_button_class'
         self.label = label
         self.description = description
+        self.callback = callback
 
 class CheckBox:
     def __init__(self, form_name, label, disabled=False, description=None):
@@ -261,12 +262,6 @@ class InventoryForm:
   metadata which is light weight especially compared to PCAP. You can select multiple \
   drives if you would like. Make sure you don't select the OS' drive as Ceph will \
   format and overwrite any drives you select.")
-
-  use_as_pcap_storage = GenericButton(
-    form_name = 'use_as_pcap_storage'
-  , label = "Use drive for PCAP storage?"
-  , description =
-  "Use this field to mark the disk you would like to use for PCAP storage for Moloch.")
 
   ###########################
   # Server Settings         #
@@ -545,18 +540,6 @@ class InventoryForm:
    thread has its own queue. Basically how much CPU to dedicate to parsing the \
    packets. Increase this if you get errors about dropping packets or the packetQ \
    is over flowing.")
-
-  monitor_interface = DropDown(
-    form_name = 'monitor_interface'
-  , label = 'Monitor Interface'
-  #, required = True TODO NEED TO ADD A DEFAULT
-  , description = "The interface on the sensor you would like to use for monitoring.\
-                   This will be the interface that Moloch, Bro, and Suricata use.\
-                   Note: The management interface will not appear in this list. You \
-                   cannot use an interface for both management and monitoring."
-  , options = []
-  , dropdown_text = 'Monitor Interface'
-  , callback = 'monitor_interface_callback')
 
   is_remote_sensor_checkbox = CheckBox(
     form_name = "is_remote_sensor"
@@ -924,6 +907,22 @@ class InventoryForm:
   "This is the number of Zookeeper instances your kit will run. These are used for \
   redundancy and load balancing. There isn't much reason to run more than three."
   , default_value = '3')
+
+  use_as_pcap_storage = GenericButton(
+    form_name = 'use_as_pcap_storage'
+  , label = "Use drive for PCAP storage?"
+  , description =
+  "Use this field to mark the disk you would like to use for PCAP storage for Moloch.")
+
+  monitor_interface = GenericButton(
+    form_name = 'monitor_interface'
+  , label = 'Monitor Interface'
+  #, required = True TODO NEED TO ADD A DEFAULT
+  , description = "The interface on the sensor you would like to use for monitoring.\
+                   This will be the interface that Moloch, Bro, and Suricata use.\
+                   Note: The management interface will not appear in this list. You \
+                   cannot use an interface for both management and monitoring."
+  , callback = 'monitor_interface_callback')
 
   common_settings = [kubernetes_services_cidr]
   advanced_system_settings = [disable_autocalculate, dns_ip]
