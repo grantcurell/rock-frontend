@@ -74,6 +74,8 @@ def _ceph_drives_list():
         if disk['hasRoot']:
             disks.pop(disks.index(disk))
 
+    hostname = request.args.get('hostname')
+
     # This is here so you can reuse the code in ceph_disk_list. It will be true
     # if the entity sending the request is a server and false if it is a sensor
     if request.args.get('isServer') == "True":
@@ -82,7 +84,7 @@ def _ceph_drives_list():
         device_type = 'sensor'
 
     form = InventoryForm()
-    return render_template("ceph_disk_list.html", form=form, device_number=device_number, disks=disks, device_type=device_type)
+    return render_template("ceph_disk_list.html", form=form, device_number=device_number, disks=disks, device_type=device_type, hostname=hostname)
 
 @app.route('/_pcap_disks_list')
 def _pcap_disks_list():
@@ -99,21 +101,23 @@ def _pcap_disks_list():
         if disk['hasRoot']:
             disks.pop(disks.index(disk))
 
+    hostname = request.args.get('hostname')
+
     form = InventoryForm()
-    return render_template("pcap_disks_list.html", form=form, device_number=device_number, disks=disks)
+    return render_template("pcap_disks_list.html", form=form, device_number=device_number, disks=disks, hostname=hostname)
 
 @app.route('/_generate_inventory')
 def _generate_inventory():
 
     form = InventoryForm();
+    print "\n\n\n"
+    print request.args
+    print "\n\n\n"
 
     input_data = json.loads(request.args.get('input_data'))
+    hosts = json.loads(request.args.get('hosts'))
 
-    print "\n\n\n"
-    print input_data
-    print "\n\n\n"
-
-    print input_data["sensor_1_hostname"]
+    #print input_data["sensor_1_hostname"]
 
     for key, value in input_data.iteritems():
 
@@ -121,11 +125,16 @@ def _generate_inventory():
         if "_field" in key:
             input_data[key.replace("_field", "")] = input_data.pop(key)
 
+
+    for host in hosts:
+        print "HERE"
+    """
     for key, value in input_data.iteritems():
 
         # Check to see if we have located a Remote Sensor and it is a remote sensor
         if form.is_remote_sensor_checkbox.checkbox_id in key and input_data[key]:
             print "\n\n\n" + key
+    """
 
     #inventory_template = render_template('inventory_template.yml', input_data=input_data)
     #print inventory_template

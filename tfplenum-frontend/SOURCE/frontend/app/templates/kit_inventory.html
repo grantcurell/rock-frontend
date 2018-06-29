@@ -16,6 +16,7 @@
 // collect all the ID values everywhere on the system.
 var callbacks = $.Callbacks();
 
+
 $(document).ready(function(){
 
   // This causes the advanced settings to start as hidden
@@ -42,6 +43,9 @@ $(document).ready(function(){
   // to get all the inputs from everyone, but there's really no way for it to do that.
   var input_data = {};
 
+  // This is used to store host specific data
+  var hosts = {};
+
   get_ids = function(){
     var data = $("input");
 
@@ -56,14 +60,51 @@ $(document).ready(function(){
     });
   }
 
+  get_ids();
+
   set_id_value = function(id, value) {
     input_data[id] = value;
     console.log("ID: " + id + " Value: " + input_data[id]);
   }
 
-  get_ids();
+  function _initialize_host(hostname) {
+    hosts[hostname] = {};
+    hosts[hostname]["ceph_drives"] = {};
+    hosts[hostname]["pcap_drives"] = {};
+  }
 
-  //$.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data)}, function(data){});
+  // We use this to add data for a specific hosts. The if condition checks to see
+  // if a host already exists in the list of hosts and if it doesn't it creates
+  // a new dictionary for that host
+  set_host_value = function(hostname, key, value) {
+    if(hostname in hosts) {
+      hosts[hostname][key] = value;
+    } else {
+      _initialize_host(hostname);
+      hosts[hostname][key] = value;
+    }
+    console.log("Host: " + hostname + " ID: " + key + " Value: " + value);
+  }
+
+  set_ceph_drive = function(hostname, drive, value) {
+    if(hostname in hosts) {
+      hosts[hostname]["ceph_drives"][drive] = value;
+    } else {
+      _initialize_host(hostname);
+      hosts[hostname]["ceph_drives"][drive] = value;
+    }
+    console.log("Host: " + hostname + " ID: " + drive + " Value: " + value);
+  }
+
+  set_pcap_drive = function(hostname, drive, value) {
+    if(hostname in hosts) {
+      hosts[hostname]["pcap_drives"][drive] = value;
+    } else {
+      _initialize_host(hostname);
+      hosts[hostname]["pcap_drives"][drive] = value;
+    }
+    console.log("Host: " + hostname + " ID: " + drive + " Value: " + value);
+  }
 
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
@@ -444,7 +485,8 @@ $(document).ready(function(){
     // This handles the case when someone clicks the generate inventory button
     $( "#generate_inventory" ).click(function(event){
       callbacks.fire();
-      $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data)}, function(data){});
+      alert(hosts);
+      $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){});
     });
 
 });

@@ -25,6 +25,14 @@
     {% for i in range(server_count) %}
     $("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}").change(event, function() {
 
+      // This is used for generate inventory to actually track if a specific host
+      // is or is not a master server
+      if($( "#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}" ).is(":checked")){
+        set_host_value("{{ 'server_' + ((i+1) | string) + '_hostname' }}", "{{ form.server_is_master_server_checkbox.checkbox_id }}", true);
+      } else {
+        set_host_value("{{ 'server_' + ((i+1) | string) + '_hostname' }}", "{{ form.server_is_master_server_checkbox.checkbox_id }}", false);
+      }
+
       set_id_value("#{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}", true);
 
       // This loops over each checkbox this ISN'T the checkbox that was clicked

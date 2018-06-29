@@ -52,7 +52,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[1] }}") {
 
     // args[4] correlates to i (the server number) in server.html
-    $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }} }, function(data){
+    $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, hostname: "{{ object.args[3] }}" }, function(data){
       // The hide method is here because effects only work if the element
       // begins in a hidden state
       $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
@@ -61,7 +61,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   } else {
   {% endif %}
     // args[4] correlates to i (the server number) in server.html
-    $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}" }, function(data){
+    $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}", hostname: "{{ object.args[3] }}" }, function(data){
       // The hide method is here because effects only work if the element
       // begins in a hidden state
       $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
@@ -109,6 +109,8 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
       $( "#{{ form.moloch_threads.field_id + '_' }}{{ object.args[4] }}" ).val(moloch_threads);
       $( "#{{ form.bro_workers.field_id + '_' }}{{ object.args[4] }}" ).val(bro_workers);
     }
+
+
   {% endif %}
 
   {% if object.args[5] == 'server' %}
@@ -119,5 +121,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     recalculate_elasticsearch_recommendations();
   }
   {% endif %}
+
+  set_host_value("{{ object.args[3] }}", "management_ip", $( 'input[name={{ object.field_id }}]' ).val());
 
 });

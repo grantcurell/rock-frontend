@@ -70,12 +70,12 @@ $(document).ready(function(){
   {% for i in range(sensor_count) %}
   $("#{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}").change(event, function() {
 
+      // This is used for generate inventory to actually track if a specific host
+      // is or is not a remote sensor
       if($( "#{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}" ).is(":checked")){
-        set_id_value("{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}", true);
-        set_id_value("{{ ('sensor_' + ((i+1) | string) + '_hostname' }}", attributes["is_remote"] = true)
+        set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "{{ form.is_remote_sensor_checkbox.checkbox_id }}", true);
       } else {
-        set_id_value("{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}", false);
-        set_id_value("{{ ('sensor_' + ((i+1) | string) + '_hostname' }}", attributes["is_remote"] = false)
+        set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "{{ form.is_remote_sensor_checkbox.checkbox_id }}", false);
       }
 
   })
