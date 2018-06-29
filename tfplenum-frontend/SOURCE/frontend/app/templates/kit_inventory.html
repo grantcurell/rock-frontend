@@ -16,6 +16,11 @@
 // collect all the ID values everywhere on the system.
 var callbacks = $.Callbacks();
 
+// This exists so that there is a way to get all the IDs from all the nested DOM
+// elements. It is specifically used for the generate_inventory button which needs
+// to get all the inputs from everyone, but there's really no way for it to do that.
+var input_data = {};
+
 
 $(document).ready(function(){
 
@@ -37,11 +42,6 @@ $(document).ready(function(){
   var ceph_drives_validated = false;
   var monitor_interfaces_validated = false;
   var master_server_validated = false;
-
-  // This exists so that there is a way to get all the IDs from all the nested DOM
-  // elements. It is specifically used for the generate_inventory button which needs
-  // to get all the inputs from everyone, but there's really no way for it to do that.
-  var input_data = {};
 
   // This is used to store host specific data
   var hosts = {};
@@ -71,6 +71,7 @@ $(document).ready(function(){
     hosts[hostname] = {};
     hosts[hostname]["ceph_drives"] = {};
     hosts[hostname]["pcap_drives"] = {};
+    hosts[hostname]["monitor_interfaces"] = {};
   }
 
   // We use this to add data for a specific hosts. The if condition checks to see
@@ -104,6 +105,16 @@ $(document).ready(function(){
       hosts[hostname]["pcap_drives"][drive] = value;
     }
     console.log("Host: " + hostname + " ID: " + drive + " Value: " + value);
+  }
+
+  set_monitor_interface = function(hostname, monitor_interface, value) {
+    if(hostname in hosts) {
+      hosts[hostname]["monitor_interfaces"][monitor_interface] = value;
+    } else {
+      _initialize_host(hostname);
+      hosts[hostname]["monitor_interfaces"][monitor_interface] = value;
+    }
+    console.log("Host: " + hostname + " ID: " + monitor_interface + " Value: " + value);
   }
 
   get_advanced_settings_status = function() {

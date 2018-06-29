@@ -64,6 +64,7 @@ $(document).ready(function(){
   {{ form.monitor_interface.callback + "_" + ((i+1) | string) }} = function(event) {
     {{ "monitor_interface_" + ((i+1) | string) + "_valid" }} = true;
     validate_interfaces();
+    set_monitor_interface("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", input_data["{{ [form.monitor_interface.form_name, i+1, '_dropdown'] | join('_') }}"], true)
   }
   {% endfor %}
 
