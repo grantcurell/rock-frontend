@@ -92,27 +92,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
       $( "#{{ form.sensor_monitor_interface }}_{{ object.args[4] }}" ).html(data).hide().slideDown("slow");
     });
 
-    // We only do this calculation if the algorithm is currently enabled
-    if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
-      // Configure Sensor Moloch Threads
-      var moloch_threads = Math.round(current_total_cpus * (1/3)); // TODO: Need to make these non-static
-      if (moloch_threads < 1) {
-        moloch_threads = 1;
-      }
-
-      // Configure Sensor Bro Threads
-      var bro_workers = Math.round(current_total_cpus * (2/3));
-      if (bro_workers < 1) {
-        bro_workers = 1;
-      }
-
-      $( "#{{ form.moloch_threads.field_id + '_' }}{{ object.args[4] }}" ).val(moloch_threads);
-      $( "#{{ form.bro_workers.field_id + '_' }}{{ object.args[4] }}" ).val(bro_workers);
-
-      recalculate_sensor_resource_percentages();
-    }
-
-
+    recalculate_sensor_resource_percentages();
   {% endif %}
 
   {% if object.args[5] == 'server' %}

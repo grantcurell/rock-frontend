@@ -388,9 +388,9 @@ class InventoryForm:
   , label = 'Elasticsearch CPU/RAM Percentage'
   , placeholder = "90"
   , input_type = 'number'
-  , html5_constraint = 'min=1 max=99'
+  , html5_constraint = 'min=1 max=90'
   , valid_feedback = 'Input is valid. (This just means you didn\'t type something silly. It doesn\'t necessarily mean you have enough resources.)'
-  , invalid_feedback = 'Value must be between 1 and 99'
+  , invalid_feedback = 'Value must be between 1 and 90. At least 10% is required for other programs.'
   , required = True
   , description =
   "This is the percentage of server resources which the system will dedicated to \
@@ -472,16 +472,16 @@ class InventoryForm:
   is found."
   , default_value = '3')
 
-  logstash_cpus = Field(
-    form_name = 'logstash_cpus'
-  , label = 'Logstash CPUs'
-  , placeholder = "Logical CPUs per Logstash instance"
+  logstash_cpu_percentage = Field(
+    form_name = 'logstash_cpu_percentage'
+  , label = 'Logstash CPU Percentage'
+  , placeholder = "Percentage of server resources dedicated to Logstash"
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , invalid_feedback = 'Enter a valid integer 1 or greater'
   , required = True
   , description =
-  "The number of CPUs which will be assigned to each Logstash instance. By default there is only one (this is all is needed in the default kit)"
+  "The Percentage of the server CPU resources which will be dedicated to logstash"
   , default_value = '5')
 
   disable_autocalculate = CheckBox(
@@ -842,18 +842,6 @@ class InventoryForm:
 
   # Kafka settings
 
-  kafka_cpus = Field(
-    form_name = 'kafka_cpus'
-  , label = 'Kafka CPUs'
-  , placeholder = "Kafka CPUs"
-  , input_type = 'number'
-  , html5_constraint = 'min=1'
-  , invalid_feedback = 'You must enter a valid value greater than 1'
-  , required = True
-  , description =
-  "This is the number of CPUs which will be assigned to each Kafka instance."
-  , default_value = '5')
-
   kafka_jvm_memory = Field(
     form_name = 'kafka_jvm_memory'
   , label = 'Kafka JVM Memory'
@@ -986,7 +974,7 @@ class InventoryForm:
   , required = True
   , description =
   "The percentage of the sensor cores which will be allocated to Bro." + explanation
-  , default_value = '62')
+  , default_value = '59')
 
   suricata_cpu_percentage = Field(
     form_name = 'suricata_cpu_percentage'
@@ -999,19 +987,32 @@ class InventoryForm:
   , required = True
   , description =
   "The percentage of the sensor cores which will be allocated to Suricata." + explanation
+  , default_value = '6')
+
+  zookeeper_cpu_percentage = Field(
+    form_name = 'zookeeper_cpu_percentage'
+  , label = 'Zookeeper CPU Percentage'
+  , placeholder = "% of CPUs for Zookeeper"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , valid_feedback = 'Valid'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "The percentage of the sensor cores which will be allocated to Zookeeper." + explanation
   , default_value = '3')
 
   common_settings = [kubernetes_services_cidr]
   advanced_system_settings = [disable_autocalculate, dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
-  sensor_resource_percentages = [kafka_cpu_percentage, moloch_cpu_percentage, bro_cpu_percentage, suricata_cpu_percentage]
+  sensor_resource_percentages = [kafka_cpu_percentage, moloch_cpu_percentage, bro_cpu_percentage, suricata_cpu_percentage, zookeeper_cpu_percentage]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
-  elasticsearch_settings = [elastic_resource_percentage, elastic_storage_percentage]
+  elasticsearch_settings = [elastic_resource_percentage, elastic_storage_percentage, logstash_cpu_percentage]
   elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
   storage_type_settings = [sensor_storage_type]
   moloch_settings = [moloch_pcap_storage_percentage] # TODO: We should add this back in at some point, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_pcap_pv, moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
-  kafka_settings = [kafka_cpus, kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
+  kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
 
   advanced_settings = advanced_system_settings + elasticsearch_advanced_settings + moloch_advanced_settings + kafka_settings

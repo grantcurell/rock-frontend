@@ -29,6 +29,7 @@ recalculate_elasticsearch_recommendations = function() {
 
   // The total number of CPUs Elasticsearch could potentially use
   var elastic_available_cpus = Math.floor(parseInt($( "#server_cpus_available" ).text()) * (elastic_resource_percentage/100));
+
   $( "#elasticsearch_cpus" ).replaceWith('<span id="elasticsearch_cpus">' + elastic_available_cpus + '</span>');
 
   // The total amount of memory Elasticsearch could potentially use
@@ -173,9 +174,6 @@ recalculate_elasticsearch_recommendations = function() {
     do {
 
       successful_allocation = true
-
-      server_memory_list = [57, 57]
-      server_cpus_list = [28, 28]
 
       // Stores block id of the block allocated to a
       // process
