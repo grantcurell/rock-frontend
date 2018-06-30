@@ -39,13 +39,6 @@ $(document).ready(function(){
   // This field should start disabled regardless of choice
   $( "#{{ form.moloch_pcap_pv.field_id }}").prop( "disabled", true );
 
-  var advanced_settings_enabled = false;
-  var clustered_storage_validated = false;
-  var elasticsearch_validated = false;
-  var ceph_drives_validated = false;
-  var monitor_interfaces_validated = false;
-  var master_server_validated = false;
-
   get_ids = function(){
     var data = $("input");
 
@@ -366,6 +359,14 @@ $(document).ready(function(){
 
   }
 
+  var advanced_settings_enabled = false;
+  var clustered_storage_validated = false;
+  var elasticsearch_validated = false;
+  var ceph_drives_validated = false;
+  var monitor_interfaces_validated = false;
+  var master_server_validated = false;
+  var sensor_resources_validated = false;
+
   // Define this as a blank function. It will actually be defined when server.html
   // gets loaded
   recalculate_elasticsearch_recommendations = function() {};
@@ -384,13 +385,14 @@ $(document).ready(function(){
     master_server_validated = value;
   }
 
+  set_sensor_resources_validated = function(value) {
+    sensor_resources_validated = value;
+  }
+
   // This function runs all validations to ensure
   validate_all = function () {
 
-    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated) {
-
-      // This line is for debugging
-      //alert(clustered_storage_validated + "\n" + ceph_drives_validated + "\n" + monitor_interfaces_validated + "\n" + master_server_validated + "\n");
+    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated && sensor_resources_validated) {
 
       // If for whatever reason the inventory was ready to be generated, disable
       // the generate inventory button.

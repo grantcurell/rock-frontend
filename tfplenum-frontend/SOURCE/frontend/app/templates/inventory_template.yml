@@ -24,28 +24,13 @@ all:
     # CPU Allocations           #
     #############################
 
-    bro_cpu_limit: 1000m
     bro_cpu_request: 100m
-
-    moloch_cpu_limit: 1000m
     moloch_cpu_request: 100m
-
-    suricata_cpu_limit: 1000m
     suricata_cpu_request: 100m
-
-    kafka_cpu_limit: 1000m
     kafka_cpu_request: 100m
-
-    zookeeper_cpu_limit: 1000m
     zookeeper_cpu_request: 100m
-
-    logstash_cpu_limit: 1000m
     logstash_cpu_request: 100m
-
-    elasticsearch_cpu_limit: 1000m
     elasticsearch_cpu_request: 100m
-
-    kibana_cpu_limit: 1000m
     kibana_cpu_request: 100m
 
     #############################
@@ -285,7 +270,7 @@ all:
               # This is the drive you will use. Ex: /dev/sdb. This is only used
               # if use_ceph_for_pcap is set to false. moloch_pcap_folder must be defined
               # for this to work. moloch_pcap_folder will be the mount point.
-              pcap_disk: {{ attributes.pcap_disk }}
+              pcap_disk: {{ "/dev/" + attributes.pcap_disk }}
 
               # These are the disks you will use for Ceph. These must be devices.
               # This cannot be a folder or partition. Ex: /dev/vdb. You may have
@@ -315,7 +300,7 @@ all:
               bro_workers: {{ attributes.bro_workers }}
               moloch_threads: {{ attributes.moloch_threads }}
               ceph_drive_list:
-              pcap_disk: {{ attributes.pcap_disk }}
+              pcap_disk: {{ "/dev/" + attributes.pcap_disk }}
               management_ipv4: "{{ attributes.management_ipv4 }}"
               sensor_monitor_interface:
                 {% for interface in attributes.sensor_monitor_interfaces %}

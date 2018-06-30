@@ -472,6 +472,18 @@ class InventoryForm:
   is found."
   , default_value = '3')
 
+  logstash_cpus = Field(
+    form_name = 'logstash_cpus'
+  , label = 'Logstash CPUs'
+  , placeholder = "Logical CPUs per Logstash instance"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , invalid_feedback = 'Enter a valid integer 1 or greater'
+  , required = True
+  , description =
+  "The number of CPUs which will be assigned to each Logstash instance. By default there is only one (this is all is needed in the default kit)"
+  , default_value = '5')
+
   disable_autocalculate = CheckBox(
     form_name = "disable_autocalculate"
     , label = "Disable Autocalculations for Elasticsearch/Moloch Threads/Bro Workers"
@@ -924,10 +936,76 @@ class InventoryForm:
                    cannot use an interface for both management and monitoring."
   , callback = 'monitor_interface_callback')
 
+  explanation = " Kubernetes will \
+   not cap the performance of the resource at the specified number of cores - it will \
+   guarentee that amount of compute resource is available if the application needs it. For example, \
+   if Bro were set to 60%, it is guarenteed to have at least 60% of the server available \
+   to it. However, if it were only using 30% and something else needed 60%, the other \
+   thing would be allowed to infringe on Bro's guarenteed resources. If Bro's needs suddenly grew and it \
+   required the compute resources given out to the other thing, Kubernetes would \
+   throttle the other thing and Bro would be allowed to burst up to 60% while the other thing \
+   would be throttled to whatever its resource request is. Basically, this allows everything \
+   to take whatever it needs at any given time if the sensor is not resource constrained. \
+   If the sensor becomes resource constrained, each thing will be limited to what it \
+   requested. See resource requests: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/."
+
+  kafka_cpu_percentage = Field(
+    form_name = 'kafka_cpu_percentage'
+  , label = 'Kafka CPU Percentage'
+  , placeholder = "% of CPUs for Kafka"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , valid_feedback = 'Valid'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "The percentage of the sensor cores which will be allocated to Kafka." + explanation
+  , default_value = '13')
+
+  moloch_cpu_percentage = Field(
+    form_name = 'moloch_cpu_percentage'
+  , label = 'Moloch CPU Percentage'
+  , placeholder = "% of CPUs for Moloch"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , valid_feedback = 'Valid'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "The percentage of the sensor cores which will be allocated to moloch." + explanation
+  , default_value = '19')
+
+  bro_cpu_percentage = Field(
+    form_name = 'bro_cpu_percentage'
+  , label = 'Bro CPU Percentage'
+  , placeholder = "% of CPUs for Bro"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , valid_feedback = 'Valid'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "The percentage of the sensor cores which will be allocated to Bro." + explanation
+  , default_value = '62')
+
+  suricata_cpu_percentage = Field(
+    form_name = 'suricata_cpu_percentage'
+  , label = 'Suricata CPU Percentage'
+  , placeholder = "% of CPUs for Suricata"
+  , input_type = 'number'
+  , html5_constraint = 'min=1'
+  , valid_feedback = 'Valid'
+  , invalid_feedback = 'You must enter a valid value greater than 1'
+  , required = True
+  , description =
+  "The percentage of the sensor cores which will be allocated to Suricata." + explanation
+  , default_value = '3')
+
   common_settings = [kubernetes_services_cidr]
   advanced_system_settings = [disable_autocalculate, dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
+  sensor_resource_percentages = [kafka_cpu_percentage, moloch_cpu_percentage, bro_cpu_percentage, suricata_cpu_percentage]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_resource_percentage, elastic_storage_percentage]
   elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]

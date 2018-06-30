@@ -95,6 +95,9 @@ $(document).ready(function(){
 
   })
   {% endfor %}
+
+  recalculate_sensor_resource_percentages = function() {
+  }
 });
 </script>
 
@@ -106,6 +109,21 @@ $(document).ready(function(){
     <p class="card-text">CPU Cores Available: <span id="sensor_cpus_available">0</span></p>
     <p class="card-text">Memory Available: <span id="sensor_memory_available">0</span> GB</p>
     <p class="card-text">Clustered Storage Available: <span id="sensor_clustered_storage_available">0</span> GB</p>
+    <hr>
+    <h6 class="card-subtitle mb-2 text-muted">Sensor Resource Allocations</h6>
+    <hr>
+    <p class="card-text">Kafka CPUs: <span id="{{ form.kafka_cpu_percentage.field_id + "_span" }}">0</span></p>
+    <p class="card-text">Moloch CPUs: <span id="{{ form.moloch_cpu_percentage.field_id + "_span" }}">0</span></p>
+    <p class="card-text">Bro CPUs: <span id="{{ form.bro_cpu_percentage.field_id + "_span" }}">0</span></p>
+    <p class="card-text">Bro CPUs: <span id="{{ form.suricata_cpu_percentage.field_id + "_span" }}">0</span></p>
+    {% for option in form.sensor_resource_percentages %}
+      {% if option.include_html is defined %}
+        {% with object = option %}
+          {% include option.include_html %}
+        {% endwith %}
+      {% endif %}
+    {% endfor %}
+    <p class="card-text">The default values above were derived from testing with SuperMicro ThinkMates based on 1Gb/s of AFNET representative traffic ingest.</p>
   </div>
 </div>
 {# This loop goes from 0 to sensor_count #}
