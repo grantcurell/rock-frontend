@@ -1,5 +1,8 @@
 
 <script>
+
+//@ sourceURL=sensor.js
+
 $(document).ready(function(){
 
   sensor_get_ids = function(){
@@ -96,8 +99,56 @@ $(document).ready(function(){
   })
   {% endfor %}
 
+  // This function calculates the total of all the sensor resource percentage fields.
   recalculate_sensor_resource_percentages = function() {
+    {% for field in form.sensor_resource_percentages %}
+      var {{ field.field_id + "_var" }} = parseInt($( "#{{ field.field_id }}" ).val());
+    {% endfor %}
+    var total = 0;
+    {% for field in form.sensor_resource_percentages %}
+      total += {{ field.field_id + "_var" }};
+    {% endfor %}
+
+    if(total <= 100 && total > 0) {
+
+      // We need to calculate which sensor has the lowest resource count. This
+      // is the sensor we will use for our calculations
+      var lowest_cpus = parseInt($( "#sensor_1_cpus_available" ).text());
+
+      {% for i in range(sensor_count) %}
+      cpus = parseInt($( "#{{ 'sensor_' + ((i + 1) | string) + '_cpus_available' }}" ).text());
+      if(cpus < lowest_cpus) {
+        lowest_cpus = cpus;
+      }
+      {% endfor %}
+
+      // Now we need to calculate what percentage of the cores each resource will
+      // receive. Remember 1000m = 1 core in Kubernetes.
+      total_cpu_power_avaliable = lowest_cpus * 1000;
+
+      {% for field in form.sensor_resource_percentages %}
+      var {{ field.field_id + "_cpus" }} = Math.floor(total_cpu_power_avaliable * ({{ field.field_id + "_var" }}/100));
+
+      // We need the below so that these values can be retrieved when we go to generate
+      // the inventory file
+      set_id_value("{{ field.field_id + '_cpus' }}", {{ field.field_id + "_cpus" }});
+      $( "#{{ field.field_id + '_span' }}" ).replaceWith('<span id={{ field.field_id + "_span" }}>' + ({{ field.field_id + "_cpus" }}/1000).toFixed(2) + '</span>');
+      {% endfor %}
+
+      set_sensor_resources_validated(true);
+      $( "#sensor_resource_percentage_warnings" ).replaceWith('<span id="sensor_resource_percentage_warnings"></span>');
+    } else {
+      set_sensor_resources_validated(false);
+      $( "#sensor_resource_percentage_warnings" ).replaceWith('<span id="sensor_resource_percentage_warnings">The sensor\'s total resources cannot exceeed 100!</span>');
+    }
   }
+
+  {% for field in form.sensor_resource_percentages %}
+  $('#{{ field.field_id }}').keyup(function (event) {
+    recalculate_sensor_resource_percentages();
+    validate_all();
+  });
+  {% endfor %}
 });
 </script>
 
@@ -115,7 +166,7 @@ $(document).ready(function(){
     <p class="card-text">Kafka CPUs: <span id="{{ form.kafka_cpu_percentage.field_id + "_span" }}">0</span></p>
     <p class="card-text">Moloch CPUs: <span id="{{ form.moloch_cpu_percentage.field_id + "_span" }}">0</span></p>
     <p class="card-text">Bro CPUs: <span id="{{ form.bro_cpu_percentage.field_id + "_span" }}">0</span></p>
-    <p class="card-text">Bro CPUs: <span id="{{ form.suricata_cpu_percentage.field_id + "_span" }}">0</span></p>
+    <p class="card-text">Suricata CPUs: <span id="{{ form.suricata_cpu_percentage.field_id + "_span" }}">0</span></p>
     {% for option in form.sensor_resource_percentages %}
       {% if option.include_html is defined %}
         {% with object = option %}
@@ -123,7 +174,8 @@ $(document).ready(function(){
         {% endwith %}
       {% endif %}
     {% endfor %}
-    <p class="card-text">The default values above were derived from testing with SuperMicro ThinkMates based on 1Gb/s of AFNET representative traffic ingest.</p>
+    <p class="card-text">The default values above were derived from testing with SuperMicro ThinkMates based on 1.25 Gb/s of HTTP/SMB/FTP/YouTube. We used TCPReplay on each sensor with PCAP to avoid the interfaces throttling how much we could play.The system must use the slowest sensor's CPU count.</p>
+    <p class="card-text text-danger"><span id="sensor_resource_percentage_warnings"></span></p>
   </div>
 </div>
 {# This loop goes from 0 to sensor_count #}

@@ -17,22 +17,22 @@
 $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val() }, function(data){
 
   var current_total_cpus = data.cpus_available + parseInt($( "#{{ object.args[5] }}_cpus_available" ).text());
-  $( "#{{ object.args[5] }}_cpus_available" ).replaceWith('<span id="{{ object.args[5] }}_cpus_available">' + current_total_cpus + '</span>');
+  $( "#{{ object.args[5] }}_cpus_available" ).text(current_total_cpus);
 
   var current_total_memory = data.memory_available + parseFloat($( "#{{ object.args[5] }}_memory_available" ).text());
-  $( "#{{ object.args[5] }}_memory_available" ).replaceWith('<span id="{{ object.args[5] }}_memory_available">' + current_total_memory.toFixed(2) + '</span>');
+  $( "#{{ object.args[5] }}_memory_available" ).text(current_total_memory.toFixed(2));
 
   current_total_system_cpus = data.cpus_available + parseInt($( "#system_cpus_available" ).text());
-  $( "#system_cpus_available" ).replaceWith('<span id="system_cpus_available">' + current_total_system_cpus + '</span>');
+  $( "#system_cpus_available" ).text(current_total_system_cpus);
 
   current_total_system_memory = data.memory_available + parseFloat($( "#system_memory_available" ).text());
-  $( "#system_memory_available" ).replaceWith('<span id="system_memory_available">' + current_total_system_memory.toFixed(2) + '</span>');
+  $( "#system_memory_available" ).text(current_total_system_memory.toFixed(2));
 
   // args[0] correlates to server_{{ i + 1}}_cpus_available in server.html
-  $( "#{{ object.args[0] }}" ).replaceWith(data.cpus_available);
+  $( "#{{ object.args[0] }}" ).text(data.cpus_available);
 
   // args[1] correlates to server_{{ i + 1}}_memory_available in server.html
-  $( "#{{ object.args[1] }}" ).replaceWith(data.memory_available.toFixed(2));
+  $( "#{{ object.args[1] }}" ).text(data.memory_available.toFixed(2));
 
   var total_disk_space = 0;
   $.each( JSON.parse(data.disks), function( index, value ) {
@@ -40,7 +40,7 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
   });
 
   // args[2] correlates to server_{{ i + 1}}_disk_space_available in server.htmlHolde
-  $( "#{{ object.args[2] }}" ).replaceWith(total_disk_space.toFixed(2));
+  $( "#{{ object.args[2] }}" ).text(total_disk_space.toFixed(2));
 
   // args[3] correlates to server_{{ i + 1}}_hostname (or sensor in the case of sensor) in server.html
   // The line below tacks on the hostname next to Server or Sensor #
@@ -108,6 +108,8 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
 
       $( "#{{ form.moloch_threads.field_id + '_' }}{{ object.args[4] }}" ).val(moloch_threads);
       $( "#{{ form.bro_workers.field_id + '_' }}{{ object.args[4] }}" ).val(bro_workers);
+
+      recalculate_sensor_resource_percentages();
     }
 
 
