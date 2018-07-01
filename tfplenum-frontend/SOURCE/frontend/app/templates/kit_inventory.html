@@ -12,6 +12,8 @@
 
 <script>
 
+//@ sourceURL=kit_inventory.js
+
 // This is used to register callbacks in various forms that when fired will
 // collect all the ID values everywhere on the system.
 var callbacks = $.Callbacks();
@@ -188,6 +190,13 @@ $(document).ready(function(){
 
     var current_storage_total = parseFloat($( "#system_clustered_storage_available" ).text());
 
+    var logstash_replicas = parseInt($( "#{{ form.logstash_replicas.field_id }}" ).val());
+    var logstash_cpu_percentage = parseInt($( "#{{ form.logstash_cpu_percentage.field_id }}" ).val());
+
+    var logstash_required_cpu = parseInt($( "#server_cpus_available" ).text()) * (logstash_cpu_percentage/100);
+    var logstash_cpus_required = logstash_required_cpu * logstash_replicas;
+    $( "#logstash_cpus" ).text((logstash_required_cpu * logstash_replicas).toFixed(2));
+
     // Add Moloch if they are using Ceph storage
     if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
       storage_required += parseInt($( "#{{ form.moloch_pcap_pv.field_id }}").val());
@@ -197,14 +206,14 @@ $(document).ready(function(){
     if( storage_required > current_storage_total ) {
       $( "#system_clustered_storage_committed" ).parent().removeClass( "text-success" );
       $( "#system_clustered_storage_committed" ).parent().addClass( "text-danger" );
-      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Error: Insufficient storage space available on system.</span>');
+      $( "#system_clustered_storage_committed_errors" ).text(' - Error: Insufficient storage space available on system.');
 
       clustered_storage_validated = false;
     } else {
 
       $( "#system_clustered_storage_committed" ).parent().removeClass( "text-danger" );
       $( "#system_clustered_storage_committed" ).parent().addClass( "text-success" );
-      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Looks good!</span>');
+      $( "#system_clustered_storage_committed_errors" ).text(' - Looks good!');
 
       clustered_storage_validated = true;
       validate_all();
@@ -216,51 +225,74 @@ $(document).ready(function(){
     parseInt($( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).val());
 
     if( !isNaN(server_cpus_available) && !isNaN(server_memory_available) ) {
-      $( "#elasticsearch_cpus" ).replaceWith('<span id="elasticsearch_cpus">' + cpus_required + '</span>');
-      $( "#elasticsearch_memory" ).replaceWith('<span id="elasticsearch_memory">' + memory_required + '</span>')
+      $( "#elasticsearch_cpus" ).text(cpus_required);
+      $( "#elasticsearch_memory" ).text(memory_required);
 
       if(server_cpus_available < cpus_required) {
         $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-warning" );
         $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-danger" );
-        $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: Insufficient CPUs to support the selected value.</span>');
+        $( "#elasticsearch_cpus_errors" ).text(' - Error: Insufficient CPUs to support the selected value.');
+        $( "#logstash_cpus_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#logstash_cpus_errors" ).parent().addClass( "text-danger" );
+        $( "#logstash_cpus_errors" ).text(' - Error: Insufficient CPUs to support the selected value for Logstash and Elasticsearch.');
         set_elasticsearch_validation(false);
         validate_all();
       } else if (server_cpus_available == cpus_required) {
         $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-warning" );
         $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-danger" );
-        $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: You cannot use all available CPUs for Elasticsearch. Something has to be left for the system.</span>');
+        $( "#elasticsearch_cpus_errors" ).text(' - Error: You cannot use all available CPUs for Elasticsearch/Logstash. Something has to be left for the system.');
+        $( "#logstash_cpus_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#logstash_cpus_errors" ).parent().addClass( "text-danger" );
+        $( "#logstash_cpus_errors" ).text(' - Error: You cannot use all available CPUs for Elasticsearch/Logstash. Something has to be left for the system.');
         set_elasticsearch_validation(false);
         validate_all();
       } else {
         $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-danger text-warning" );
         $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-success" );
-        $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Looks good!</span>');
-        elasticsearch_validated = true;
+        $( "#elasticsearch_cpus_errors" ).text(' - Looks good!');
+        $( "#logstash_cpus_errors" ).parent().removeClass( "text-danger text-warning" );
+        $( "#logstash_cpus_errors" ).parent().addClass( "text-success" );
+        $( "#logstash_cpus_errors" ).text(' - Looks good!');
+        set_elasticsearch_validation(true);
         validate_all();
       }
 
-      if(server_memory_available < memory_required) {
+      if(parseInt($( "#{{ form.elastic_cpus.field_id }}").val()) == 0) {
+        $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-danger" );
+        $( "#elasticsearch_cpus_errors" ).text(' - Error: Elasticsearch CPUs must be non-zero!');
+        set_elasticsearch_validation(false);
+        validate_all();
+      }
+
+      if(parseInt($( "#{{ form.elastic_memory.field_id }}").val()) == 0) {
         $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
         $( "#elasticsearch_memory_errors" ).parent().addClass( "text-danger" );
-        $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: Insufficient server memory available.</span>');
+        $( "#elasticsearch_memory_errors" ).text(' - Error: Elasticsearch memory must be non-zero!');
+        set_elasticsearch_validation(false);
+        validate_all();
+      } else if (server_memory_available < memory_required) {
+        $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
+        $( "#elasticsearch_memory_errors" ).parent().addClass( "text-danger" );
+        $( "#elasticsearch_memory_errors" ).text(' - Error: Insufficient server memory available.');
         set_elasticsearch_validation(false);
         validate_all();
       } else if (server_memory_available == memory_required) {
         $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
         $( "#elasticsearch_memory_errors" ).parent().addClass( "text-danger" );
-        $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: You cannot use all memory available for Elasticsearch alone.</span>');
+        $( "#elasticsearch_memory_errors" ).text(' - Error: You cannot use all memory available for Elasticsearch alone.');
         set_elasticsearch_validation(false);
         validate_all();
       } else {
         $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-warning" );
         $( "#elasticsearch_memory_errors" ).parent().addClass( "text-success" );
-        $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_memory_errors"> - Looks good!</span>');
-        elasticsearch_validated = true;
+        $( "#elasticsearch_memory_errors" ).text(' - Looks good!');
+        set_elasticsearch_validation(true);
         validate_all();
       }
 
     } else {
-      elasticsearch_validated = false;
+      set_elasticsearch_validation(false);
       validate_all();
     }
 
@@ -416,7 +448,7 @@ $(document).ready(function(){
   });
   {% endfor %}
 
-{% for field in [form.elastic_resource_percentage.field_id, form.elastic_cpus_per_instance_ideal.field_id, form.elastic_cpus_to_mem_ratio.field_id] %}
+{% for field in [form.elastic_resource_percentage.field_id, form.elastic_cpus_per_instance_ideal.field_id, form.elastic_cpus_to_mem_ratio.field_id, form.logstash_replicas.field_id, form.logstash_cpu_percentage.field_id] %}
   $('#{{ field }}').keyup(function (event) {
     // Only do this if autocalculate is enabled
     if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
@@ -426,9 +458,9 @@ $(document).ready(function(){
 {% endfor %}
 
 // This causes the manual server resource validation to fire
-{% for field in [form.elastic_masters.field_id, form.elastic_datas.field_id, form.elastic_memory.field_id, form.elastic_pv_size.field_id, form.moloch_pcap_pv.field_id] %}
+{% for field in [form.elastic_masters.field_id, form.elastic_datas.field_id, form.elastic_cpus.field_id, form.elastic_memory.field_id, form.elastic_pv_size.field_id, form.moloch_pcap_pv.field_id, form.logstash_cpu_percentage.field_id, form.logstash_replicas.field_id] %}
   $('#{{ field }}').keyup(function (event) {
-    // Only do this if autocalculate is enabled
+    // Only do this if autocalculate is disabled
     if ( $( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
       validate_manual_entries();
     }

@@ -28,7 +28,7 @@ recalculate_elasticsearch_recommendations = function() {
   var logstash_cpu_percentage = parseInt($( "#{{ form.logstash_cpu_percentage.field_id }}" ).val());
 
   var logstash_required_cpu = parseInt($( "#server_cpus_available" ).text()) * (logstash_cpu_percentage/100);
-  $( "#logstash_cpus" ).text(logstash_required_cpu.toFixed(2));
+  $( "#logstash_cpus" ).text((logstash_required_cpu * logstash_replicas).toFixed(2));
 
   if(elastic_resource_percentage < 1 || elastic_resource_percentage > 99) {
     $( "#{{ form.elastic_resource_percentage.field_id }}" ).val({{ form.elastic_resource_percentage.default_value }});
@@ -320,14 +320,14 @@ recalculate_elasticsearch_recommendations = function() {
 
       for (i = 0; i < logstash_replicas; i++) {
           if (logstash_allocation[i] != -1) {
-              console.log('Elasticsearch Instance ' + i + ' successfully allocated.');
+              console.log('Logstash Instance ' + i + ' successfully allocated.');
           } else {
-              console.log('Elasticsearch Instance ' + i + ' failed to allocate.');
+              console.log('Logstash Instance ' + i + ' failed to allocate.');
               logstash_successful_allocation = false;
           }
       }
 
-      if(elasticsearch_successful_allocation_cpu && elasticsearch_successful_allocation_ram) {
+      if(elasticsearch_successful_allocation_cpu && elasticsearch_successful_allocation_ram && logstash_successful_allocation) {
         if(elastic_instances > 5) {
           $( "#{{ form.elastic_masters.field_id }}" ).val(5);
           $( "#{{ form.elastic_datas.field_id }}" ).val(elastic_instances-5);
@@ -342,7 +342,6 @@ recalculate_elasticsearch_recommendations = function() {
       } else {
         console.log("FAIL - COULD NOT ALLOCATE INSTANCES. REDUCING ELASTICSEARCH INSTANCES BY 1.");
         elastic_instances -= 1;
-
       }
     } while((!elasticsearch_successful_allocation_ram || !elasticsearch_successful_allocation_cpu || !logstash_successful_allocation) && elastic_instances >= elastic_minimum_instances);
 
@@ -364,8 +363,6 @@ recalculate_elasticsearch_recommendations = function() {
         $( "#elasticsearch_cpus_errors" ).text(' - Looks good!');
       }
 
-      set_elasticsearch_validation(true);
-      validate_all();
     } else {
       $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-danger text-warning" );
       $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-danger" );
@@ -380,6 +377,14 @@ recalculate_elasticsearch_recommendations = function() {
       $( "#logstash_cpus_errors" ).parent().removeClass( "text-danger text-warning" );
       $( "#logstash_cpus_errors" ).parent().addClass( "text-success" );
       $( "#logstash_cpus_errors" ).text(' - Looks good!');
+    }
+
+    if(logstash_successful_allocation && elasticsearch_successful_allocation_cpu && elasticsearch_successful_allocation_ram) {
+      set_elasticsearch_validation(true);
+      validate_all();
+    } else {
+      set_elasticsearch_validation(false);
+      validate_all();
     }
   }
 };

@@ -477,8 +477,8 @@ class InventoryForm:
   , label = 'Logstash Servers CPU Percentage'
   , placeholder = "Percentage of server resources dedicated to Logstash"
   , input_type = 'number'
-  , html5_constraint = 'min=1'
-  , invalid_feedback = 'Enter a valid integer 1 or greater'
+  , html5_constraint = 'min=1 max=99'
+  , invalid_feedback = 'Enter a valid integer 1 or greater and 99 or less'
   , required = True
   , description =
   "The Percentage of the server CPU resources which will be dedicated to logstash. \
