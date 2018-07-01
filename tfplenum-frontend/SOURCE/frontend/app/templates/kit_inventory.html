@@ -177,6 +177,14 @@ $(document).ready(function(){
 
   })
 
+  $("#{{ form.is_offline_build.checkbox_id }}").change(event, function() {
+    if ( $('#{{ form.is_offline_build.checkbox_id }}').is(":checked") ) {
+      set_id_value("{{ form.is_offline_build.checkbox_id }}", true);
+    } else {
+      set_id_value("{{ form.is_offline_build.checkbox_id }}", false);
+    }
+  });
+
   // This function is used when someone disables the autocalculate and enters
   // Elasticsearch information manually instead
   validate_manual_entries = function(){
@@ -612,6 +620,18 @@ $(document).ready(function(){
       </p>
       <hr>
       <br>
+      <h5>Offline Build</h5>
+      <form id='#{{ form.is_offline_build.form_name }}' role=form>
+      <div class="form-check">
+        <input class="form-check-input {{ form.is_offline_build.css_class }}" type="checkbox" value="" id="{{ form.is_offline_build.checkbox_id }}">
+        <label class="form-check-label" for="{{ form.is_offline_build.checkbox_id }}">
+          {{ form.is_offline_build.label }}
+        </label>
+      </div>
+      <a href="{{ url_for('help') + '#anchor_' + form.is_offline_build.label | replace(' ','_') }}" target="_blank">
+        <label>What is this?</label>
+      </a>
+      </form>
       <h5>Elasticsearch Settings</h5>
       {% with object = form.elastic_cpu_percentage %}
         {% include "text_input.html" %}

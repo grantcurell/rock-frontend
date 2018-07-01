@@ -245,6 +245,12 @@ class InventoryForm:
    to use. This isn't like a regular netmask that has a broadcast address and a network \
    address. You should select a range that everyone can access from a web browser.")
 
+  is_offline_build = CheckBox(
+    form_name = "is_offline_build"
+  , label = "Is offline build?"
+  , description =
+  "Check this if you are setting up your build using the prebuilt offline installer.")
+
   ###########################
   # Server and Sensor Forms #
   ###########################
@@ -1037,7 +1043,7 @@ class InventoryForm:
   "The percentage of the sensor cores which will be allocated to Zookeeper." + explanation
   , default_value = '3')
 
-  common_settings = [kubernetes_services_cidr]
+  common_settings = [is_offline_build, kubernetes_services_cidr]
   advanced_system_settings = [disable_autocalculate, dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]

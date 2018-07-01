@@ -7,7 +7,7 @@
 
 all:
   vars:
-    offline: true # Offline install repos and dependencies are hosted on ansible controller
+    offline: {{ input_data[form.is_offline_build.checkbox_id] | default(false, true) }} # Offline install repos and dependencies are hosted on ansible controller
 
     #############################
     # General System Settings   #

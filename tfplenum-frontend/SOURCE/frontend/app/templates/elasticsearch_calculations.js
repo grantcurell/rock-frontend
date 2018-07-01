@@ -418,7 +418,6 @@ recalculate_elasticsearch_recommendations = function() {
       set_elasticsearch_validation(true);
       validate_all();
       set_id_value("{{ form.elastic_cpus.field_id }}", elastic_cpus_per_instance);
-      alert(elastic_cpus_per_instance);
       set_id_value("logstash_cpus", logstash_required_cpu);
     } else {
       set_elasticsearch_validation(false);
