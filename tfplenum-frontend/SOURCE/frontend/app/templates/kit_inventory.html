@@ -397,6 +397,7 @@ $(document).ready(function(){
   var clustered_storage_validated = false;
   var elasticsearch_validated = false;
   var ceph_drives_validated = false;
+  var pcap_drives_validated = false;
   var monitor_interfaces_validated = false;
   var master_server_validated = false;
   var sensor_resources_validated = false;
@@ -423,13 +424,18 @@ $(document).ready(function(){
     sensor_resources_validated = value;
   }
 
+  set_pcap_drives_validated = function(value) {
+    pcap_drives_validated = value;
+    validate_all();
+  }
+
   // This function runs all validations to ensure
   validate_all = function () {
 
     // See https://www.w3schools.com/js/js_validation_api.asp
     if(document.getElementById("{{ form.kubernetes_services_cidr.field_id }}").checkValidity() == true ) {
 
-      if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated && sensor_resources_validated) {
+      if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated && sensor_resources_validated && pcap_drives_validated) {
 
         // If for whatever reason the inventory was ready to be generated, disable
         // the generate inventory button.
@@ -504,6 +510,9 @@ $(document).ready(function(){
       $( "#{{ form.elastic_storage_percentage.field_id }}" ).val('30');
       $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).val('60');
 
+      // If they select Ceph for PCAP we want to automatically validate PCAP
+      pcap_drives_validated = true;
+
     }
 
     // This hides the modal box. If you don't have this, the modal box stays on
@@ -511,12 +520,6 @@ $(document).ready(function(){
     $( "#{{ form.submit_sensor_storage_type_modal.modal_id }}" ).modal('hide');
     $( "#{{ form.sensor_storage_type.dropdown_id }}").prop( "disabled", true );
     $( "#{{ form.submit_sensor_storage_type.generic_button_id }}" ).prop( "disabled", true );
-
-    // This updates the total storage committed field with whatever starts in Zookeeper
-    // and Kafka PVs
-    //total_committed = parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
-
-    //$( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed + '</span>');
 
     recalculate_storage_recommendation();
     validate_ceph_drive_count();

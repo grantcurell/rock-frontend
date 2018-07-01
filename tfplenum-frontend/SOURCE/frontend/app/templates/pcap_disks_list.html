@@ -1,7 +1,7 @@
 
 <script>
 // Adding this allows this code to be identified in a browser debugger
-//@ sourceURL=ceph_disk_list
+//@ sourceURL=pcap_disk_list
 
   $(document).ready(function(){
 
@@ -17,11 +17,29 @@
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] }}");
         set_pcap_drive("{{ hostname }}", "{{ disk['name'] }}", false);
+        set_pcap_drives_validated(false);
       } else {
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
         $( "#{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}" ).html("{{ disk['name'] + ' - selected'}}");
         set_pcap_drive("{{ hostname }}", "{{ disk['name'] }}", true);
+        set_pcap_drives_validated(true);
       }
+
+      // This loops over each button this ISN'T the PCAP drive that was clicked
+      // and flips its disabled status to be the opposite of what it currently is.
+      // This has the effect of only allowing one of the PCAP drives to be selected
+      // at any given time.
+      $( ".pcap_disk" ).not( "#" + event.target.id ).each(function() {
+        if($(this).hasClass( "active" )){
+          $( this ).removeClass( "active" );
+          // The two lines below gets the current button text and modifies it. For example,
+          // it may say something like 'sdb - selected'. The below would get that line
+          // and delete the '- selected' portion
+          var drive_name = $( this ).html().split(' ')[0];
+          $( this ).html(drive_name);
+          set_pcap_drive("{{ hostname }}", drive_name, false);
+        }
+      });
     });
     {% endfor %}
 
@@ -39,7 +57,7 @@
   <div class="btn-group-vertical" role="group">
     {% if (disks | length) > 0 %}
     {% for disk in disks %}
-    <button type="button" class="btn btn-primary" id="{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}">{{ disk['name'] }}</button>
+    <button type="button" class="btn btn-primary pcap_disk" id="{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}">{{ disk['name'] }}</button>
     {% endfor %}
     {% else %}
     <div class="alert alert-danger" role="alert">

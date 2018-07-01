@@ -164,7 +164,7 @@ def _generate_inventory():
                 _assign_sensor(sensors)
 
     inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
-    print inventory_template
+    #print inventory_template
 
     # to save the results
     with open("/root/inventory.yml", "w") as inventory_file:

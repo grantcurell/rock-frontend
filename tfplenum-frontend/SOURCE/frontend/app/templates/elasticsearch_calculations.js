@@ -417,6 +417,9 @@ recalculate_elasticsearch_recommendations = function() {
     if(logstash_successful_allocation && elasticsearch_successful_allocation_cpu && elasticsearch_successful_allocation_ram) {
       set_elasticsearch_validation(true);
       validate_all();
+      set_id_value("{{ form.elastic_cpus.field_id }}", elastic_cpus_per_instance);
+      alert(elastic_cpus_per_instance);
+      set_id_value("logstash_cpus", logstash_required_cpu);
     } else {
       set_elasticsearch_validation(false);
       validate_all();
