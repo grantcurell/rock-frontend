@@ -21,27 +21,33 @@ recalculate_elasticsearch_recommendations = function() {
   // This variable denotes a build that will work, but does not reach recommended minimums
   var warning_reached = false;
 
-  var elastic_resource_percentage = parseInt($( "#{{ form.elastic_resource_percentage.field_id }}" ).val());
+  var elastic_cpu_percentage = parseInt($( "#{{ form.elastic_cpu_percentage.field_id }}" ).val());
+  var elastic_memory_percentage = parseInt($( "#{{ form.elastic_memory_percentage.field_id }}" ).val());
   var elastic_recommended_cpus = parseInt($( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).val());
   var elastic_cpu_to_mem_ratio = parseInt($( "#{{ form.elastic_cpus_to_mem_ratio.field_id }}" ).val());
+  var ideal_cpu_to_mem = elastic_cpu_to_mem_ratio;
   var logstash_replicas = parseInt($( "#{{ form.logstash_replicas.field_id }}" ).val());
   var logstash_cpu_percentage = parseInt($( "#{{ form.logstash_cpu_percentage.field_id }}" ).val());
 
-  var logstash_required_cpu = parseInt($( "#server_cpus_available" ).text()) * (logstash_cpu_percentage/100);
-  $( "#logstash_cpus" ).text((logstash_required_cpu * logstash_replicas).toFixed(2));
+  var logstash_required_cpu = parseInt($( "#server_cpus_available" ).text()) * (logstash_cpu_percentage/100) / logstash_replicas;
+  $( "#logstash_cpus" ).text((logstash_required_cpu / logstash_replicas).toFixed(2));
 
-  if(elastic_resource_percentage < 1 || elastic_resource_percentage > 99) {
-    $( "#{{ form.elastic_resource_percentage.field_id }}" ).val({{ form.elastic_resource_percentage.default_value }});
+  if(elastic_cpu_percentage < 1 || elastic_cpu_percentage > 99) {
+    $( "#{{ form.elastic_cpu_percentage.field_id }}" ).val({{ form.elastic_cpu_percentage.default_value }});
+  }
+
+  if(elastic_memory_percentage < 1 || elastic_memory_percentage > 99) {
+    $( "#{{ form.elastic_memory_percentage.field_id }}" ).val({{ form.elastic_memory_percentage.default_value }});
   }
 
   // The total number of CPUs Elasticsearch could potentially use
-  var elastic_available_cpus = Math.floor(parseInt($( "#server_cpus_available" ).text()) * (elastic_resource_percentage/100));
+  var elastic_available_cpus = Math.floor(parseInt($( "#server_cpus_available" ).text()) * (elastic_cpu_percentage/100));
 
   $( "#elasticsearch_cpus" ).text(elastic_available_cpus);
 
   // The total amount of memory Elasticsearch could potentially use
-  var elastic_available_memory = Math.floor(parseInt($( "#server_memory_available" ).text()) * (elastic_resource_percentage/100));
-  $( "#elasticsearch_memory" ).text(elastic_available_memory);
+  var elastic_available_memory = parseFloat($( "#server_memory_available" ).text()) * (elastic_memory_percentage/100);
+  $( "#elasticsearch_memory" ).text(elastic_available_memory.toFixed(2));
 
   var elastic_memory_per_instance = 0; // The required memory per Elasticsearch instance
   var elastic_cpus_per_instance = 0; // The required CPUs per Elasticsearch instance
@@ -115,7 +121,7 @@ recalculate_elasticsearch_recommendations = function() {
     // multiplied by the number of instances of Elasticsearch, further multiplied
     // by however many CPUs belong to each instance.
     elastic_memory_required = elastic_instances * elastic_cpu_to_mem_ratio * elastic_cpus_per_instance;
-    elastic_memory_per_instance = Math.floor(elastic_memory_required / elastic_instances);
+    elastic_memory_per_instance = elastic_memory_required / elastic_instances;
 
     // Check to make sure we have enough memory to run the designated number of instances
     if(elastic_memory_required > elastic_available_memory) {
@@ -128,11 +134,11 @@ recalculate_elasticsearch_recommendations = function() {
       while(elastic_memory_required > elastic_available_memory && elastic_cpu_to_mem_ratio > 1) {
           elastic_cpu_to_mem_ratio -= 1;
           elastic_memory_required = elastic_instances * elastic_cpu_to_mem_ratio * elastic_cpus_per_instance;
-          elastic_memory_per_instance = Math.floor(elastic_memory_required / elastic_instances);
+          elastic_memory_per_instance = elastic_memory_required / elastic_instances;
       }
 
       if( elastic_available_memory > elastic_memory_required) {
-        console.log('SUCCESS - REDUCED MEMORY RATIO TO ' + elastic_cpu_to_mem_ratio)
+        console.log('SUCCESS - REDUCED MEMORY RATIO TO ' + elastic_cpu_to_mem_ratio);
       } else {
         console.log('FAIL 2 - NOT ENOUGH MEMORY');
         $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
@@ -177,8 +183,7 @@ recalculate_elasticsearch_recommendations = function() {
     do {
 
       for(i = 0; i < number_of_servers; i++) {
-        server_memory_list[i] = Math.floor(parseInt($( "#server_" + String(i+1) + "_memory_available" ).text()) * (elastic_resource_percentage/100));
-        server_cpus_list[i] = Math.floor(parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) * (elastic_resource_percentage/100));
+        server_cpus_list[i] = Math.floor(parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) * (elastic_cpu_percentage/100));
       }
 
       elasticsearch_successful_allocation_cpu = true;
@@ -187,6 +192,7 @@ recalculate_elasticsearch_recommendations = function() {
 
       // Stores block id of the block allocated to a
       // process
+      console.log(elastic_instances);
       var elasticsearch_cpu_allocation = new Array(elastic_instances);
       var elasticsearch_memory_allocation = new Array(elastic_instances);
 
@@ -222,31 +228,43 @@ recalculate_elasticsearch_recommendations = function() {
           }
       }
 
-      // This loop handles allocating memory
-      for (i=0; i<elastic_instances; i++) {
-          // Find the best fit block for current process
-          var bestIdx = -1;
-          for (j=0; j<number_of_servers; j++)
-          {
-              if (server_memory_list[j] >= elastic_memory_per_instance)
-              {
-                  if (bestIdx == -1)
-                      bestIdx = j;
-                  else if (server_memory_list[bestIdx] > server_memory_list[j])
-                      bestIdx = j;
-              }
-          }
+      do {
 
-          // If we could find a block for current process
-          if (bestIdx != -1)
-          {
-              // allocate block j to p[i] process
-              elasticsearch_memory_allocation[i] = bestIdx;
+        for(i = 0; i < number_of_servers; i++) {
+          server_memory_list[i] = parseFloat($( "#server_" + String(i+1) + "_memory_available" ).text()) * (elastic_memory_percentage/100);
+        }
 
-              // Reduce available memory on this server
-              server_memory_list[bestIdx] -= elastic_memory_per_instance;
-          }
-      }
+        // This loop handles allocating memory
+        for (i=0; i<elastic_instances; i++) {
+            // Find the best fit block for current process
+            var bestIdx = -1;
+            for (j=0; j<number_of_servers; j++)
+            {
+                if (server_memory_list[j] >= elastic_memory_per_instance)
+                {
+                    if (bestIdx == -1)
+                        bestIdx = j;
+                    else if (server_memory_list[bestIdx] > server_memory_list[j])
+                        bestIdx = j;
+                }
+            }
+
+            // If we could find a block for current process
+            if (bestIdx != -1)
+            {
+                // allocate block j to p[i] process
+                elasticsearch_memory_allocation[i] = bestIdx;
+
+                // Reduce available memory on this server
+                server_memory_list[bestIdx] -= elastic_memory_per_instance;
+            }
+        }
+
+        if(elasticsearch_memory_allocation.includes(-1)) {
+          elastic_memory_per_instance -= 1;
+        }
+
+      } while(elasticsearch_memory_allocation.includes(-1) && elastic_memory_per_instance > 0);
 
       // The above section allocated all the Elasticsearch instances, now we have
       // to see if we can allocate Logstash
@@ -262,7 +280,7 @@ recalculate_elasticsearch_recommendations = function() {
         if(server_cpus_list[i] == -1) {
           server_cpus_list[i] = 0;
         }
-        server_cpus_list[i] = parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) - Math.floor(parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) * (elastic_resource_percentage/100)) + server_cpus_list[i];
+        server_cpus_list[i] = parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) - Math.floor(parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) * (elastic_cpu_percentage/100)) + server_cpus_list[i];
       }
 
       // Stores block id of the block allocated to a
@@ -301,30 +319,30 @@ recalculate_elasticsearch_recommendations = function() {
       }
 
       for (i = 0; i < elastic_instances; i++) {
-          if (elasticsearch_cpu_allocation[i] != -1) {
-              console.log('Elasticsearch Instance ' + i + ' CPU successfully allocated.');
-          } else {
-              console.log('Elasticsearch Instance ' + i + ' CPU failed to allocate.');
-              elasticsearch_successful_allocation_cpu = false;
-          }
+        if (elasticsearch_cpu_allocation[i] != -1) {
+            console.log('Elasticsearch Instance ' + i + ' CPU successfully allocated.');
+        } else {
+            console.log('Elasticsearch Instance ' + i + ' CPU failed to allocate.');
+            elasticsearch_successful_allocation_cpu = false;
+        }
       }
 
       for (i = 0; i < elastic_instances; i++) {
-          if (elasticsearch_memory_allocation[i] != -1) {
-              console.log('Elasticsearch Instance ' + i + ' RAM successfully allocated.');
-          } else {
-              console.log('Elasticsearch Instance ' + i + ' RAM failed to allocate.');
-              elasticsearch_successful_allocation_ram = false;
-          }
+        if (elasticsearch_memory_allocation[i] != -1) {
+            console.log('Elasticsearch Instance ' + i + ' RAM successfully allocated.');
+        } else {
+            console.log('Elasticsearch Instance ' + i + ' RAM failed to allocate.');
+            elasticsearch_successful_allocation_ram = false;
+        }
       }
 
       for (i = 0; i < logstash_replicas; i++) {
-          if (logstash_allocation[i] != -1) {
-              console.log('Logstash Instance ' + i + ' successfully allocated.');
-          } else {
-              console.log('Logstash Instance ' + i + ' failed to allocate.');
-              logstash_successful_allocation = false;
-          }
+        if (logstash_allocation[i] != -1) {
+            console.log('Logstash Instance ' + i + ' successfully allocated.');
+        } else {
+            console.log('Logstash Instance ' + i + ' failed to allocate.');
+            logstash_successful_allocation = false;
+        }
       }
 
       if(elasticsearch_successful_allocation_cpu && elasticsearch_successful_allocation_ram && logstash_successful_allocation) {
@@ -346,9 +364,26 @@ recalculate_elasticsearch_recommendations = function() {
     } while((!elasticsearch_successful_allocation_ram || !elasticsearch_successful_allocation_cpu || !logstash_successful_allocation) && elastic_instances >= elastic_minimum_instances);
 
     if(elasticsearch_successful_allocation_ram) {
-      $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-warning" );
-      $( "#elasticsearch_memory_errors" ).parent().addClass( "text-success" );
-      $( "#elasticsearch_memory_errors" ).text(' - Looks good!');
+      if((elastic_available_memory - parseFloat($( "#server_memory_available" ).text())) < 4) {
+        console.log('WARN - Server memory dangerously low!');
+        $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-success" );
+        $( "#elasticsearch_memory_errors" ).parent().addClass( "text-warning" );
+        if(elastic_memory_per_instance < ideal_cpu_to_mem) {
+          $( "#elasticsearch_memory_errors" ).text(' - Server memory dangerously low! You have less than 4GB remaining. We won\'t stop you from building, but this might not work and is a bad idea! On top of that, we had to reduce the memory per instance to ' + elastic_memory_per_instance + " to get it to work!");
+        } else {
+          $( "#elasticsearch_memory_errors" ).text(' - Server memory dangerously low! You have less than 4GB remaining. We won\'t stop you from building, but this might not work and is a bad idea!');
+        }
+      } else {
+        if(elastic_memory_per_instance < ideal_cpu_to_mem) {
+          $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-success" );
+          $( "#elasticsearch_memory_errors" ).parent().addClass( "text-warning" );
+          $( "#elasticsearch_memory_errors" ).text(' - We got it to work, but we had to drop the memory per instance to ' + elastic_memory_per_instance + ".");
+        } else {
+          $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-warning" );
+          $( "#elasticsearch_memory_errors" ).parent().addClass( "text-success" );
+          $( "#elasticsearch_memory_errors" ).text(' - Looks good!');
+        }
+      }
     } else {
       $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
       $( "#elasticsearch_memory_errors" ).parent().addClass( "text-danger" );

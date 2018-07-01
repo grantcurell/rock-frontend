@@ -136,7 +136,8 @@ $(document).ready(function(){
 
     // We only need to check one of the elements since they are all kept in sync
     if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
-      $( "#{{ form.elastic_resource_percentage.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_cpu_percentage.field_id }}" ).prop( "disabled", false );
+      $( "#{{ form.elastic_memory_percentage.field_id }}" ).prop( "disabled", false );
       $( "#{{ form.elastic_storage_percentage.field_id }}" ).prop( "disabled", false );
       $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).prop( "disabled", false );
       $( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).prop( "disabled", false );
@@ -156,7 +157,8 @@ $(document).ready(function(){
       recalculate_storage_recommendation();
       recalculate_elasticsearch_recommendations();
     } else {
-      $( "#{{ form.elastic_resource_percentage.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_cpu_percentage.field_id }}" ).prop( "disabled", true );
+      $( "#{{ form.elastic_memory_percentage.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.elastic_storage_percentage.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.moloch_pcap_storage_percentage.field_id }}" ).prop( "disabled", true );
       $( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).prop( "disabled", true );
@@ -448,7 +450,7 @@ $(document).ready(function(){
   });
   {% endfor %}
 
-{% for field in [form.elastic_resource_percentage.field_id, form.elastic_cpus_per_instance_ideal.field_id, form.elastic_cpus_to_mem_ratio.field_id, form.logstash_replicas.field_id, form.logstash_cpu_percentage.field_id] %}
+{% for field in [form.elastic_cpu_percentage.field_id, form.elastic_memory_percentage.field_id, form.elastic_cpus_per_instance_ideal.field_id, form.elastic_cpus_to_mem_ratio.field_id, form.logstash_replicas.field_id, form.logstash_cpu_percentage.field_id] %}
   $('#{{ field }}').keyup(function (event) {
     // Only do this if autocalculate is enabled
     if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
@@ -598,10 +600,20 @@ $(document).ready(function(){
       <hr>
       <br>
       <h5>Elasticsearch Settings</h5>
-      {% with object = form.elastic_resource_percentage %}
+      {% with object = form.elastic_cpu_percentage %}
         {% include "text_input.html" %}
       {% endwith %}
-      <p class="text-info">Note: Elasticsearch only runs on servers. It will not run on sensors. The percentage above is therefore only applicable to server resources - not sensor.</p>
+      {% with object = form.elastic_memory_percentage %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.logstash_cpu_percentage %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      <p class="text-info">We found that on the typical DIP kit 1 instance with 5 CPU cores was enough. You may need to adjust based on your traffic profile.</p>
+      {% with object = form.logstash_replicas %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      <p class="text-info">Note: Elasticsearch only runs on servers. It will not run on sensors. The percentages above are only applicable to server resources - not sensor.</p>
       {% with object = form.elastic_storage_percentage %}
         {% include "text_input.html" %}
       {% endwith %}

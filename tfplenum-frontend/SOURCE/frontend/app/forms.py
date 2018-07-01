@@ -383,9 +383,9 @@ class InventoryForm:
    of persistent volumes and Ceph."
    , default_value = '0')
 
-  elastic_resource_percentage = Field(
-    form_name = 'elastic_resource_percentage'
-  , label = 'Elasticsearch CPU/RAM Percentage'
+  elastic_cpu_percentage = Field(
+    form_name = 'elastic_cpu_percentage'
+  , label = 'Elasticsearch CPU Percentage'
   , placeholder = "90"
   , input_type = 'number'
   , html5_constraint = 'min=1 max=90'
@@ -393,15 +393,36 @@ class InventoryForm:
   , invalid_feedback = 'Value must be between 1 and 90. At least 10% is required for other programs.'
   , required = True
   , description =
-  "This is the percentage of server resources which the system will dedicated to \
-  Elasticsearch. ---SKIP IF YOU WANT SIMPLE--- This includes RAM and CPUs. CPUs here does not mean dedicated CPUs. \
+  "This is the percentage of server CPUs which the system will dedicated to \
+  Elasticsearch. ---SKIP IF YOU WANT SIMPLE--- CPUs here does not mean dedicated CPUs. \
   This setting actually controls limits as described here. https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container \
-  What this means is that Elasticsearch pods will have both a limit and a request of \
+  What this means is that Elasticsearch pods will have a request of \
   X value for the server's compute power. If Elasticsearch is using less than this, \
   other devices can use those resources. However, when under load, Elasticsearch is \
   guarenteed to have access up to X of the server's compute power. ---STOP SKIPPING HERE--- \
   Basically, you can think of this as a simple percentage of how much of the server\'s \
-  CPU and RAM you want going to Elasticsearch."
+  CPU you want going to Elasticsearch."
+  , default_value = '90')
+
+  elastic_memory_percentage = Field(
+    form_name = 'elastic_memory_percentage'
+  , label = 'Elasticsearch RAM Percentage'
+  , placeholder = "90"
+  , input_type = 'number'
+  , html5_constraint = 'min=1 max=90'
+  , valid_feedback = 'Input is valid. (This just means you didn\'t type something silly. It doesn\'t necessarily mean you have enough resources.)'
+  , invalid_feedback = 'Value must be between 1 and 90. At least 10% is required for other programs.'
+  , required = True
+  , description =
+  "This is the percentage of server RAM which the system will dedicated to \
+  Elasticsearch. ---SKIP IF YOU WANT SIMPLE--- \
+  This setting actually controls limits as described here. https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container \
+  What this means is that Elasticsearch pods will have a request of \
+  X value for the server's compute power. If Elasticsearch is using less than this, \
+  other devices can use those resources. However, when under load, Elasticsearch is \
+  guarenteed to have access up to X of the server's compute power. ---STOP SKIPPING HERE--- \
+  Basically, you can think of this as a simple percentage of how much of the server\'s \
+  RAM you want going to Elasticsearch."
   , default_value = '90')
 
   elastic_storage_percentage = Field(
@@ -505,7 +526,7 @@ class InventoryForm:
     "By default, the system will calculate recommended values for the number of Elasticsearch \
     nodes required, Elasticsearch resource requirements, Logstash, Bro workers, and Moloch threads. \
     If you know what you are doing and you have a specific use case, you may not want these \
-    values autocalculated for you. In general, you should use the field " + elastic_resource_percentage.label + " \
+    values autocalculated for you. In general, you should use the field " + elastic_cpu_percentage.label + " and " + elastic_memory_percentage.label + " \
     to control the allocation of resources for Elasticsearch. The algorithm was based \
     on recommendations from Elasticsearch. However, you may disable these by unchecking \
     this checkbox.")
@@ -1022,8 +1043,8 @@ class InventoryForm:
   sensor_settings = [number_of_sensors]
   sensor_resource_percentages = [kafka_cpu_percentage, moloch_cpu_percentage, bro_cpu_percentage, suricata_cpu_percentage, zookeeper_cpu_percentage]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
-  elasticsearch_settings = [elastic_resource_percentage, elastic_storage_percentage, logstash_cpu_percentage]
-  elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio, logstash_cpu_percentage, logstash_replicas]
+  elasticsearch_settings = [elastic_cpu_percentage, elastic_memory_percentage, elastic_storage_percentage, logstash_cpu_percentage, logstash_replicas]
+  elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
   storage_type_settings = [sensor_storage_type]
   moloch_settings = [moloch_pcap_storage_percentage] # TODO: We should add this back in at some point, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_pcap_pv, moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
