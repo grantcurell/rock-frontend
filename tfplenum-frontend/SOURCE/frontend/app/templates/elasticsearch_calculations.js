@@ -1,5 +1,7 @@
 recalculate_elasticsearch_recommendations = function() {
 
+  //@ sourceURL=elasticsearch_calculations.js
+
   // server_memory_list (int array): A list of server instances and the memory available
   //                          to each one
   // number_of_servers (int): The number of servers in server_memory_list
@@ -22,6 +24,12 @@ recalculate_elasticsearch_recommendations = function() {
   var elastic_resource_percentage = parseInt($( "#{{ form.elastic_resource_percentage.field_id }}" ).val());
   var elastic_recommended_cpus = parseInt($( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).val());
   var elastic_cpu_to_mem_ratio = parseInt($( "#{{ form.elastic_cpus_to_mem_ratio.field_id }}" ).val());
+  var logstash_replicas = parseInt($( "#{{ form.logstash_replicas.field_id }}" ).val());
+  var logstash_cpu_percentage = parseInt($( "#{{ form.logstash_cpu_percentage.field_id }}" ).val());
+
+  var logstash_required_cpu = parseInt($( "#server_cpus_available" ).text()) * (logstash_cpu_percentage/100);
+  console.log(logstash_replicas);
+  console.log(logstash_required_cpu);
 
   if(elastic_resource_percentage < 1 || elastic_resource_percentage > 99) {
     $( "#{{ form.elastic_resource_percentage.field_id }}" ).val({{ form.elastic_resource_percentage.default_value }});
@@ -30,11 +38,11 @@ recalculate_elasticsearch_recommendations = function() {
   // The total number of CPUs Elasticsearch could potentially use
   var elastic_available_cpus = Math.floor(parseInt($( "#server_cpus_available" ).text()) * (elastic_resource_percentage/100));
 
-  $( "#elasticsearch_cpus" ).replaceWith('<span id="elasticsearch_cpus">' + elastic_available_cpus + '</span>');
+  $( "#elasticsearch_cpus" ).text(elastic_available_cpus);
 
   // The total amount of memory Elasticsearch could potentially use
   var elastic_available_memory = Math.floor(parseInt($( "#server_memory_available" ).text()) * (elastic_resource_percentage/100));
-  $( "#elasticsearch_memory" ).replaceWith('<span id="elasticsearch_memory">' + elastic_available_memory + '</span>');
+  $( "#elasticsearch_memory" ).text(elastic_available_memory);
 
   var elastic_memory_per_instance = 0; // The required memory per Elasticsearch instance
   var elastic_cpus_per_instance = 0; // The required CPUs per Elasticsearch instance
@@ -59,7 +67,7 @@ recalculate_elasticsearch_recommendations = function() {
     // color the number and the error message
     $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-warning" );
     $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-danger" );
-    $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Error: Insufficient CPUs. You do not even have enough to assign 1 core per instance. Minimum number of instances is ' + elastic_minimum_instances + '</span>');
+    $( "#elasticsearch_cpus_errors" ).text(' - Error: Insufficient CPUs. You do not even have enough to assign 1 core per instance. Minimum number of instances is ' + elastic_minimum_instances);
 
     if( !$( "#generate_inventory" ).is(':disabled') ) {
       $( "#generate_inventory" ).prop( "disabled", true );
@@ -79,7 +87,7 @@ recalculate_elasticsearch_recommendations = function() {
       console.log('WARN NOT PRODUCTION READY');
       $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-success text-danger" );
       $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-warning" );
-      $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Warning: You have enough CPU power to at least create a build, but you do not meet the recommended minimum of ' + recommended_cpus + '</span>');
+      $( "#elasticsearch_cpus_errors" ).text(' - Warning: You have enough CPU power to at least create a build, but you do not meet the recommended minimum of ' + recommended_cpus);
 
       warning_reached = true;
 
@@ -130,7 +138,7 @@ recalculate_elasticsearch_recommendations = function() {
         console.log('FAIL 2 - NOT ENOUGH MEMORY');
         $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-success text-warning" );
         $( "#elasticsearch_memory_errors" ).parent().addClass( "text-danger" );
-        $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_memory_errors"> - Error: Insufficient memory. You need at least ' + elastic_memory_required + ' GBs to start a build.</span>');
+        $( "#elasticsearch_memory_errors" ).text(' - Error: Insufficient memory. You need at least ' + elastic_memory_required + ' GBs to start a build.');
 
         if( !$( "#generate_inventory" ).is(':disabled') ) {
           $( "#generate_inventory" ).prop( "disabled", true );
@@ -148,8 +156,12 @@ recalculate_elasticsearch_recommendations = function() {
 
 
     for(i = 0; i < number_of_servers; i++) {
-      server_memory_list[i] = Math.floor(parseInt($( "#" + String(i) + "_memory_available" ).text()) * elastic_resource_percentage);
-      server_cpus_list[i] = Math.floor(parseInt($( "#" + String(i) + "_cpus_available" ).text()) * elastic_resource_percentage);
+      server_memory_list[i] = Math.floor(parseInt($( "#server_" + String(i+1) + "_memory_available" ).text()) * (elastic_resource_percentage/100));
+      server_cpus_list[i] = Math.floor(parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) * (elastic_resource_percentage/100));
+    }
+
+    for(i = 0; i < number_of_servers; i++) {
+    console.log("Server " + String(i) + " " + server_cpus_list[i]);
     }
 
     // This is modeled from https://www.geeksforgeeks.org/program-best-fit-algorithm-memory-management/
@@ -177,15 +189,14 @@ recalculate_elasticsearch_recommendations = function() {
 
       // Stores block id of the block allocated to a
       // process
-      var allocation = new Array(elastic_instances);
+      var allocation = new Array(elastic_instances+logstash_replicas);
 
       // Initialize the allocation array
-      for(i=0; i < elastic_instances; i++) {
+      for(i=0; i < (elastic_instances+logstash_replicas); i++) {
         allocation[i] = -1
       }
 
-      for (i=0; i<elastic_instances; i++)
-      {
+      for (i=0; i<elastic_instances; i++) {
           // Find the best fit block for current process
           var bestIdx = -1;
           for (j=0; j<number_of_servers; j++)
@@ -213,9 +224,45 @@ recalculate_elasticsearch_recommendations = function() {
           }
       }
 
+      // This part of the equation attempts to match the logstash instance to a
+      // server
+      for (i=elastic_instances; i<(elastic_instances+logstash_replicas); i++) {
+          // Find the best fit block for current process
+          var bestIdx = -1;
+          for (j=0; j<number_of_servers; j++)
+          {
+              if (server_cpus_list[j] >= logstash_required_cpu)
+              {
+                  if (bestIdx == -1)
+                      bestIdx = j;
+                  else if (server_cpus_list[bestIdx] > server_cpus_list[j])
+                      bestIdx = j;
+              }
+          }
+
+          // If we could find a block for current process
+          if (bestIdx != -1)
+          {
+              // allocate block j to p[i] process
+              allocation[i] = bestIdx;
+
+              // Reduce processors available on this server
+              server_cpus_list[bestIdx] -= logstash_required_cpu;
+
+          }
+      }
+
+      for(i = 0; i < number_of_servers; i++) {
+      console.log("Server " + String(i) + " " + server_cpus_list[i]);
+      }
+
+      for(i = 0; i < elastic_instances+logstash_replicas; i++) {
+      console.log(allocation[i]);
+      }
+
       successful_allocation = true;
 
-      for (i = 0; i < elastic_instances; i++)
+      for (i = 0; i < (elastic_instances+logstash_replicas); i++)
       {
           if (allocation[i] != -1) {
               console.log('Instance ' + i + ' successfully allocated.');
@@ -235,6 +282,7 @@ recalculate_elasticsearch_recommendations = function() {
         $( "#{{ form.elastic_memory.field_id }}" ).val(elastic_memory_per_instance);
         $( "#{{ form.elastic_cpus.field_id }}" ).val(elastic_cpus_per_instance);
         recalculate_storage_recommendation();
+        alert("HERE");
 
         console.log("SUCCESS. ALL INSTANCES ALLOCATED.")
       } else {
@@ -248,12 +296,12 @@ recalculate_elasticsearch_recommendations = function() {
       if(!warning_reached) {
         $( "#elasticsearch_cpus_errors" ).parent().removeClass( "text-danger text-warning" );
         $( "#elasticsearch_cpus_errors" ).parent().addClass( "text-success" );
-        $( "#elasticsearch_cpus_errors" ).replaceWith('<span id="elasticsearch_cpus_errors"> - Looks good!</span>');
+        $( "#elasticsearch_cpus_errors" ).text(' - Looks good!');
       }
 
       $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-warning" );
       $( "#elasticsearch_memory_errors" ).parent().addClass( "text-success" );
-      $( "#elasticsearch_memory_errors" ).replaceWith('<span id="elasticsearch_memory_errors"> - Looks good!</span>');
+      $( "#elasticsearch_memory_errors" ).text(' - Looks good!');
 
       set_elasticsearch_validation(true);
       validate_all();

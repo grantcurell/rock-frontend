@@ -110,6 +110,9 @@ all:
     # this threshold will be deleted.
     elastic_curator_threshold: {{ input_data[form.elastic_curator_threshold.field_id] }}
 
+    # logstash_replicas is the number of logstash instances you would like to run
+    logstash_replicas: {{ input_data[form.logstash_replicas.field_id] }}
+
     #############################
     # Bro/Suricata Settings     #
     #############################
@@ -355,5 +358,10 @@ all:
               {% endfor %}
 
     nodes_to_remove:
+      # Example: (you need to define your own hosts)
+      #hosts:
+      #  tfplenumsensor1.lan:
+      #  tfplenumserver2.lan:
+      #  tfplenumserver1.lan:
 
 ...

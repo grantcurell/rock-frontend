@@ -474,22 +474,36 @@ class InventoryForm:
 
   logstash_cpu_percentage = Field(
     form_name = 'logstash_cpu_percentage'
-  , label = 'Logstash CPU Percentage'
+  , label = 'Logstash Servers CPU Percentage'
   , placeholder = "Percentage of server resources dedicated to Logstash"
   , input_type = 'number'
   , html5_constraint = 'min=1'
   , invalid_feedback = 'Enter a valid integer 1 or greater'
   , required = True
   , description =
-  "The Percentage of the server CPU resources which will be dedicated to logstash"
+  "The Percentage of the server CPU resources which will be dedicated to logstash. \
+  Unlike some of the other calculations, this is a percentage of the total server \
+  resources."
   , default_value = '5')
+
+  logstash_replicas = Field(
+     form_name = 'logstash_replicas'
+   , label = 'Logstash Replicas'
+   , placeholder = "The number of logstash instances you would like to run"
+   , input_type = 'number'
+   , html5_constraint = 'min=1'
+   , invalid_feedback = 'Enter the number of elasticsearch master instances you would like'
+   , required = True
+   , description =
+   "This is the number of instances of Logstash you would like to run."
+   , default_value = '1')
 
   disable_autocalculate = CheckBox(
     form_name = "disable_autocalculate"
-    , label = "Disable Autocalculations for Elasticsearch/Moloch Threads/Bro Workers"
+    , label = "Disable Autocalculations for Elasticsearch/Logstash/Moloch Threads/Bro Workers"
     , description =
     "By default, the system will calculate recommended values for the number of Elasticsearch \
-    nodes required, Elasticsearch resource requirements, Bro workers, and Moloch threads. \
+    nodes required, Elasticsearch resource requirements, Logstash, Bro workers, and Moloch threads. \
     If you know what you are doing and you have a specific use case, you may not want these \
     values autocalculated for you. In general, you should use the field " + elastic_resource_percentage.label + " \
     to control the allocation of resources for Elasticsearch. The algorithm was based \
@@ -974,7 +988,7 @@ class InventoryForm:
   , required = True
   , description =
   "The percentage of the sensor cores which will be allocated to Bro." + explanation
-  , default_value = '59')
+  , default_value = '58')
 
   suricata_cpu_percentage = Field(
     form_name = 'suricata_cpu_percentage'
@@ -1009,7 +1023,7 @@ class InventoryForm:
   sensor_resource_percentages = [kafka_cpu_percentage, moloch_cpu_percentage, bro_cpu_percentage, suricata_cpu_percentage, zookeeper_cpu_percentage]
   sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_resource_percentage, elastic_storage_percentage, logstash_cpu_percentage]
-  elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
+  elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio, logstash_cpu_percentage, logstash_replicas]
   storage_type_settings = [sensor_storage_type]
   moloch_settings = [moloch_pcap_storage_percentage] # TODO: We should add this back in at some point, moloch_pcap_folder]
   moloch_advanced_settings = [moloch_pcap_pv, moloch_bpf, moloch_dontSaveBPFs, moloch_spiDataMaxIndices, moloch_pcapWriteMethod, moloch_pcapWriteSize, moloch_dbBulkSize, moloch_maxESConns, moloch_maxESRequests, moloch_packetsPerPoll, moloch_magicMode, moloch_maxPacketsInQueue]
