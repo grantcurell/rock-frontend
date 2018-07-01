@@ -426,15 +426,21 @@ $(document).ready(function(){
   // This function runs all validations to ensure
   validate_all = function () {
 
-    if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated && sensor_resources_validated) {
+    // See https://www.w3schools.com/js/js_validation_api.asp
+    if(document.getElementById("{{ form.kubernetes_services_cidr.field_id }}").checkValidity() == true ) {
 
-      // If for whatever reason the inventory was ready to be generated, disable
-      // the generate inventory button.
-      if( $( "#generate_inventory" ).is(':disabled') ) {
-        $( "#generate_inventory" ).prop( "disabled", false );
+      if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated && sensor_resources_validated) {
+
+        // If for whatever reason the inventory was ready to be generated, disable
+        // the generate inventory button.
+        if( $( "#generate_inventory" ).is(':disabled') ) {
+          $( "#generate_inventory" ).prop( "disabled", false );
+        }
+
+      // If all variables are not valid, make sure we disable the generate inventory button
+      } else {
+        $( "#generate_inventory" ).prop( "disabled", true );
       }
-
-    // If all variables are not valid, make sure we disable the generate inventory button
     } else {
       $( "#generate_inventory" ).prop( "disabled", true );
     }
@@ -468,6 +474,10 @@ $(document).ready(function(){
     }
   });
 {% endfor %}
+
+  $('#{{ form.kubernetes_services_cidr.field_id }}').keyup(function (event) {
+    validate_all();
+  });
 
   // The purpose of the below is to disable or enable the Moloch PCAP folder field
   // based on whether local PCAP storage is or is not selected.

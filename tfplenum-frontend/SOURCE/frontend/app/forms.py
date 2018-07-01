@@ -970,7 +970,7 @@ class InventoryForm:
    would be throttled to whatever its resource request is. Basically, this allows everything \
    to take whatever it needs at any given time if the sensor is not resource constrained. \
    If the sensor becomes resource constrained, each thing will be limited to what it \
-   requested. See resource requests: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/."
+   requested. See resource requests: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/ and https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/."
 
   kafka_cpu_percentage = Field(
     form_name = 'kafka_cpu_percentage'
