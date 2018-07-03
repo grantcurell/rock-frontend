@@ -631,6 +631,13 @@ $(document).ready(function(){
       <a href="{{ url_for('help') + '#anchor_' + form.is_offline_build.label | replace(' ','_') }}" target="_blank">
         <label>What is this?</label>
       </a>
+      <br>
+      <br>
+      <h5>Credentials</h5>
+      {% with object = form.password %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      <br>
       </form>
       <h5>Elasticsearch Settings</h5>
       {% with object = form.elastic_cpu_percentage %}

@@ -17,3 +17,12 @@ flask run --host=0.0.0.0
 - Need to make sure they have selected a master server
 - Need to give Elasticsearch a data minimum
 - Need to add a CPU / Memory check for sensor
+
+----------------------------
+
+pip install flask virtualenv virtualenvwrapper
+pip install --upgrade pip
+export WORKON_HOME=~/Envs
+source /usr/bin/virtualenvwrapper.sh
+mkvirtualenv my-venv
+workon my-venv

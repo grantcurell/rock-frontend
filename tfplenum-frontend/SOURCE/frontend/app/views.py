@@ -25,7 +25,8 @@ def _sensor():
 def _gather_device_facts():
     # This request wil be received from jquery on the client side
     management_ip = request.args.get('management_ip')
-    node = get_system_info(management_ip, 'I.am.ghost.47')
+    password = request.args.get('password')
+    node = get_system_info(management_ip, password)
     potential_monitor_interfaces = []
 
     for interface in node.interfaces:
@@ -167,7 +168,7 @@ def _generate_inventory():
     #print inventory_template
 
     # to save the results
-    with open("/root/inventory.yml", "w") as inventory_file:
+    with open("/opt/tfplenum/playbooks/inventory.yml", "w") as inventory_file:
         inventory_file.write(inventory_template)
 
     return "Finished"

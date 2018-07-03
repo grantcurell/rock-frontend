@@ -227,6 +227,16 @@ class InventoryForm:
    server. Keep in mind  you will need to manually provide all required DNS  \
    entries on your separate  DNS Server or the kit will break.")
 
+  password = Field(
+    form_name = 'password'
+  , label = 'Root Password'
+  , placeholder = "Root password for all devices"
+  , input_type = 'text'
+  , required = True
+  , description =
+  "This is the root password set on all the system devices. For initial setup it must \
+  be the same for everything.")
+
   kubernetes_services_cidr = Field(
     form_name = 'kubernetes_services_cidr'
   , label = 'Kubernetes Service CIDR'
@@ -1043,7 +1053,7 @@ class InventoryForm:
   "The percentage of the sensor cores which will be allocated to Zookeeper." + explanation
   , default_value = '3')
 
-  common_settings = [is_offline_build, kubernetes_services_cidr]
+  common_settings = [is_offline_build, password, kubernetes_services_cidr]
   advanced_system_settings = [disable_autocalculate, dns_ip]
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]

@@ -179,6 +179,27 @@ $(document).ready(function(){
   {% endfor %}
 
   recalculate_sensor_resource_percentages();
+
+  // The gather facts button should start disabled until someone types in a
+  // password
+  {% for i in range(sensor_count) %}
+  $( "#{{ form.host_sensor.button_id + '_' + ((i+1) | string) }}" ).prop( "disabled", true );
+  {% endfor %}
+
+  // Need to make sure they type something in the password field before we allow
+  // them to continue
+  $('#{{ form.password.field_id }}').keyup(function (event) {
+    // Only do this if autocalculate is enabled
+    if ( $( '#{{ form.password.field_id }}' ).val() != "" ) {
+      {% for i in range(sensor_count) %}
+      $( "#{{ form.host_sensor.button_id + '_' + ((i+1) | string) }}" ).prop( "disabled", false );
+      {% endfor %}
+    } else {
+      {% for i in range(sensor_count) %}
+      $( "#{{ form.host_sensor.button_id + '_' + ((i+1) | string) }}" ).prop( "disabled", true );
+      {% endfor %}
+    }
+  });
 });
 </script>
 
