@@ -113,6 +113,15 @@ def _generate_inventory():
     master_server = None
     use_ceph_for_pcap = False
     form = InventoryForm
+    input_data[form.kubernetes_services_cidr.field_id] = input_data[form.kubernetes_services_cidr.field_id] + "/28"
+
+    if form.sensor_storage_type.dropdown_id in input_data:
+        if input_data[form.sensor_storage_type.dropdown_id] == form.sensor_storage_type.options[0].replace(" ", "_"):
+            use_ceph_for_pcap = True
+        else:
+            use_ceph_for_pcap = False
+    else:
+        use_ceph_for_pcap = False
 
     for host, attributes in hosts.iteritems():
         # This is purely a convienience function. Master server and servers
@@ -154,10 +163,6 @@ def _generate_inventory():
                 for drive_name, value in attributes["pcap_drives"].iteritems():
                     if value:
                         type_of_sensor[host].pcap_disk = drive_name
-                        # TODO - these lines will probably need to be updated
-                        use_ceph_for_pcap = False
-                    else:
-                        use_ceph_for_pcap = True
             if not "is_remote_sensor_checkbox" in attributes:
                 attributes["is_remote_sensor_checkbox"] = False
             if attributes["is_remote_sensor_checkbox"]:

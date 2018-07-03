@@ -177,11 +177,15 @@ $(document).ready(function(){
 
   })
 
+  // This is the default option. Most builds will be performed offline.
+  $( "#{{ form.is_offline_build.checkbox_id }}" ).prop('checked', true);
+  set_id_value("is_offline", "True");
+
   $("#{{ form.is_offline_build.checkbox_id }}").change(event, function() {
-    if ( $('#{{ form.is_offline_build.checkbox_id }}').is(":checked") ) {
-      set_id_value("{{ form.is_offline_build.checkbox_id }}", true);
+    if ( $( "#{{ form.is_offline_build.checkbox_id }}" ).is(":checked") ) {
+      set_id_value("is_offline", "True");
     } else {
-      set_id_value("{{ form.is_offline_build.checkbox_id }}", false);
+      set_id_value("is_offline", "False");
     }
   });
 
@@ -489,7 +493,7 @@ $(document).ready(function(){
   });
 {% endfor %}
 
-  $('#{{ form.kubernetes_services_cidr.field_id }}').keyup(function (event) {
+  $( '#{{ form.kubernetes_services_cidr.field_id }}' ).keyup(function (event) {
     validate_all();
   });
 
@@ -578,6 +582,7 @@ $(document).ready(function(){
       }
 
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){});
+
     });
 
 });

@@ -154,7 +154,7 @@ class DropDown:
 # button_id_secondary (str): The ID of the secondary button
 # button_id_primary (str): The Id of the primary button
 class ModalPopUp:
-    def __init__(self, name, modal_title, modal_text, secondary_button_text, primary_button_text):
+    def __init__(self, name, modal_title, modal_text, primary_button_text, secondary_button_text=None):
       self.button_id = name + "_button_id"
       self.modal_id = name + "_modal_id"
       self.modal_label_id = name + "_modal_label_id"
@@ -168,6 +168,8 @@ class ModalPopUp:
 
 
 class InventoryForm:
+
+  inventory_path = '/opt/tfplenum/playbooks/inventory.yml'
 
   ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
 
@@ -212,6 +214,12 @@ class InventoryForm:
   # Common Settings         #
   ###########################
 
+  submit_sensor_storage_type_modal = ModalPopUp(
+    name = 'submit_sensor_storage_type_modal'
+  , modal_title = 'Success'
+  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path
+  , primary_button_text = 'Close')
+
   dns_ip = Field(
     form_name = 'dns_ip'
   , label = 'DNS IP Address'
@@ -240,28 +248,31 @@ class InventoryForm:
   kubernetes_services_cidr = Field(
     form_name = 'kubernetes_services_cidr'
   , label = 'Kubernetes Service CIDR'
-  , placeholder = "192.168.1.16/28"
+  , placeholder = "Put your Kubernetes Services CIDR here."
   , input_type = 'text'
   # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
   # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
-  , html5_constraint = 'pattern=(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/28'
-  , invalid_feedback = 'You must enter a valid IP address with a CIDR mask of /28.'
+  , html5_constraint = 'pattern=(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
+  , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
   , description =
   "Services_cidr is the range of addresses kubernetes will use for external services \
    This includes cockpit, Moloch viewer, Kibana, elastichq, kafka-manager, and the \
-   kubernetes dashboard. This range must be at least a /28. Ex: \"192.168.1.16/28\" \
-   Keep in mind, the only thing this does is provide a valid set of IPs for the services \
-   to use. This isn't like a regular netmask that has a broadcast address and a network \
-   address. You should select a range that everyone can access from a web browser.")
+   kubernetes dashboard. This will use a /28 under the hood. This means it will take \
+   whatever IP address you enter and create a range addresses from that IP +16. For example, \
+   192.168.1.16 would become a range from 192.168.1.16-31.")
 
   is_offline_build = CheckBox(
     form_name = "is_offline_build"
   , label = "Is offline build?"
   , description =
-  "Check this if you are setting up your build using the prebuilt offline installer.")
+  "Check this if you are setting up your build using the prebuilt offline installer. \
+  This is the installer on the control server shipped to you from the PMO. If you \
+  uncheck this, it is expected that all boxes have access to commercial internet. \
+  The online build will pull everything required from the Internet instead of the \
+  controller. Use this if you are building the system at home.")
 
-  ###########################
+  ######################## ###
   # Server and Sensor Forms #
   ###########################
 
