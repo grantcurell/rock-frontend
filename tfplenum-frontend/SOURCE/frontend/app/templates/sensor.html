@@ -183,7 +183,9 @@ $(document).ready(function(){
   // The gather facts button should start disabled until someone types in a
   // password
   {% for i in range(sensor_count) %}
-  $( "#{{ form.host_sensor.button_id + '_' + ((i+1) | string) }}" ).prop( "disabled", true );
+  if ( $( '#{{ form.password.field_id }}' ).val() == "" ) {
+    $( "#{{ form.host_sensor.button_id + '_' + ((i+1) | string) }}" ).prop( "disabled", true );
+  }
   {% endfor %}
 
   // Need to make sure they type something in the password field before we allow

@@ -12,12 +12,16 @@
       // selection set. To access the DOM properties you have to select the first
       // item. checkValidity is an HTML5 built in function we are calling against
       // the element.
+      {% if object.html5_constraint is not none %}
       if ($( "#{{ object.form_name }}" )[0].checkValidity() === false) {
         event.preventDefault();
         event.stopPropagation();
       } else {
+      {% endif %}
         set_id_value("{{ object.field_id }}", $( "#{{ object.field_id }}").val());
+      {% if object.html5_constraint is not none %}
       }
+      {% endif %}
       $( "#{{ object.form_name }}" ).addClass('was-validated');
     });
 });
