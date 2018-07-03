@@ -670,13 +670,9 @@ $(document).ready(function(){
       </div>
       <br>
       <h5>Kubernetes Settings</h5>
-      {% for option in form.common_settings %}
-        {% if option.include_html is defined %}
-          {% with object = option %}
-            {% include option.include_html %}
-          {% endwith %}
-        {% endif %}
-      {% endfor %}
+      {% with object = form.kubernetes_services_cidr %}
+        {% include "text_input.html" %}
+      {% endwith %}
     </div>
   </div>
   <br>
