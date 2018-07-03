@@ -14,8 +14,7 @@
 // args[4] correlates to i (the server number) in server.html
 // args[5] correlates to the word server or sensor in server.html or sensor.html respectively
 
-$.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val(), password: $( "{{ form.password.field_id }}").val() }, function(data){
-
+$.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val(), password: $( "#{{ form.password.field_id }}").val() }, function(data){
   var current_total_cpus = data.cpus_available + parseInt($( "#{{ object.args[5] }}_cpus_available" ).text());
   $( "#{{ object.args[5] }}_cpus_available" ).text(current_total_cpus);
 

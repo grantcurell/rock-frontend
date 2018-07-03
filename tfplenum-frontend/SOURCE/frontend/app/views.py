@@ -6,6 +6,7 @@ from api.node_facts import *
 from app.forms import InventoryForm, DropDown
 from app.inventory_classes import Sensor, Server
 import json
+import os
 
 @app.route('/_server')
 def _server():
@@ -166,6 +167,9 @@ def _generate_inventory():
 
     inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
     #print inventory_template
+
+    if not os.path.exists("/opt/tfplenum/playbooks/"):
+        os.makedirs("/opt/tfplenum/playbooks/")
 
     # to save the results
     with open("/opt/tfplenum/playbooks/inventory.yml", "w") as inventory_file:
