@@ -155,6 +155,10 @@ def _generate_inventory():
                 type_of_sensor[host].bro_workers = attributes["bro_workers"]
                 type_of_sensor[host].moloch_threads = attributes["moloch_threads"]
                 for drive_name, value in attributes["ceph_drives"].iteritems():
+
+                    # This condition may seem a bit unintuitive - it's just there
+                    # to make sure duplicates don't make it in. It's the same for
+                    # the other conditions with the same structure.
                     if value and not drive_name in type_of_sensor[host].ceph_drive_list:
                         type_of_sensor[host].ceph_drive_list.append(drive_name)
                 for interface, value in attributes["monitor_interfaces"].iteritems():
@@ -163,9 +167,7 @@ def _generate_inventory():
                 for drive_name, value in attributes["pcap_drives"].iteritems():
                     if value:
                         type_of_sensor[host].pcap_disk = drive_name
-            if not "is_remote_sensor_checkbox" in attributes:
-                attributes["is_remote_sensor_checkbox"] = False
-            if attributes["is_remote_sensor_checkbox"]:
+            if attributes["is_remote_sensor"]:
                 _assign_sensor(remote_sensors)
             else:
                 _assign_sensor(sensors)

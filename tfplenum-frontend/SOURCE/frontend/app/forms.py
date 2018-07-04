@@ -258,7 +258,7 @@ class InventoryForm:
   , required = False
   , description =
   "Services_cidr is the range of addresses kubernetes will use for external services \
-   This includes cockpit, Moloch viewer, Kibana, elastichq, kafka-manager, and the \
+   This includes cockpit (a front end for Kubernetes), Moloch viewer, Kibana, elastichq, kafka-manager, and the \
    kubernetes dashboard. This will use a /28 under the hood. This means it will take \
    whatever IP address you enter and create a range addresses from that IP +16. For example, \
    192.168.1.16 would become a range from 192.168.1.16-31.")
@@ -616,19 +616,6 @@ class InventoryForm:
    packets. Increase this if you get errors about dropping packets or the packetQ \
    is over flowing.")
 
-  is_remote_sensor_checkbox = CheckBox(
-    form_name = "is_remote_sensor"
-  , label = "Is a remote sensor?"
-  , description =
-  "Checking this box will cause the sensor selected to be built in remote mode. \
-  It is meant for a situation where you have a centralized kit, but have a remote\
-  sensor you would like deployed independent of that kit. Specifically, it is meant \
-  to allow the device to operate over a low bandwidth link. When in remote sensor mode \
-  you cannot add any of the system's drives to the Ceph cluster as this would require \
-  other devices to read/write over the network. Due to the previous, you must use \
-  direct attached storage for PCAP, it will not cluster Kafka, and it will run an independent \
-  Zookeeper instance.")
-
   sensor_gather_facts_modal = ModalPopUp(
     name = 'sensor_gather_facts_modal'
   , modal_title = 'Is this a remote sensor?'
@@ -637,10 +624,13 @@ class InventoryForm:
     deployed geographically separate from the rest of your gear. Usually, sensors \
     and servers perform a number of clustering operations to optimize resource usage. \
     However, if the sensor is geographically separate, specifically over a low-bandwidth \
-    link, you do not want this to happen. By making a sensor a remote sensor, Ceph \
+    link, you do not want this to happen. By making a sensor a remote sensor Ceph \
     will be disabled, Kafka will not cluster, and the sensor will get its own Zookeeper \
     instance. This generally has negative performance implications, but it's what \
-    you want if the sensor is going to be standalone."
+    you want if the sensor is going to be standalone. \n\nREMINDER: If you are using Ceph \
+    you'll probably want to adjust the amount of storage you allocate to Moloch based on \
+    the number of remote sensors you have. You won't need as much if some of your sensors \
+    are writing directly to their disks!"
   , secondary_button_text = 'Is a remote sensor'
   , primary_button_text = 'Is NOT a remote sensor'
   , secondary_button_close = False)
@@ -1086,7 +1076,7 @@ class InventoryForm:
   server_settings = [server_is_master_server_checkbox, number_of_servers]
   sensor_settings = [number_of_sensors]
   sensor_resource_percentages = [kafka_cpu_percentage, moloch_cpu_percentage, bro_cpu_percentage, suricata_cpu_percentage, zookeeper_cpu_percentage]
-  sensor_host_settings= [is_remote_sensor_checkbox, bro_workers, moloch_threads, monitor_interface]
+  sensor_host_settings= [bro_workers, moloch_threads, monitor_interface]
   elasticsearch_settings = [elastic_cpu_percentage, elastic_memory_percentage, elastic_storage_percentage, logstash_cpu_percentage, logstash_replicas]
   elasticsearch_advanced_settings = [elastic_masters, elastic_datas, elastic_cpus, elastic_memory, elastic_pv_size, elastic_curator_threshold, elastic_cpus_per_instance_ideal, elastic_cpus_to_mem_ratio]
   storage_type_settings = [sensor_storage_type]

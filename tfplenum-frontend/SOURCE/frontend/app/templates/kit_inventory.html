@@ -397,7 +397,7 @@ $(document).ready(function(){
     } else {
       $( "#system_total_ceph_drives_errors" ).parent().removeClass( "text-danger text-warning" );
       $( "#system_total_ceph_drives_errors" ).parent().addClass( "text-success" );
-      $( "#system_total_ceph_drives_errors" ).text(' - Looks good!</span>');
+      $( "#system_total_ceph_drives_errors" ).text(' - Looks good!');
 
       ceph_drives_validated = true;
       validate_all();
@@ -512,7 +512,7 @@ $(document).ready(function(){
   // This handles the case when a user clicks continue in the modal dialog box
   // that pops up after selecting your storage type
   $( "#{{ form.submit_sensor_storage_type_modal.button_id_primary }}" ).click(function(event){
-    $( "#main_form").slideDown("slow");;
+    $( "#main_form").slideDown("slow");
 
     // This shows the Moloch PCAP storage percentage only if Ceph storage was selected
     if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {

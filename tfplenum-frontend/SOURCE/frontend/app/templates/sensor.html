@@ -85,20 +85,6 @@ $(document).ready(function(){
   }
   {% endfor %}
 
-  {% for i in range(sensor_count) %}
-  $("#{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}").change(event, function() {
-
-      // This is used for generate inventory to actually track if a specific host
-      // is or is not a remote sensor
-      if($( "#{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}" ).is(":checked")){
-        set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "{{ form.is_remote_sensor_checkbox.checkbox_id }}", true);
-      } else {
-        set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "{{ form.is_remote_sensor_checkbox.checkbox_id }}", false);
-      }
-
-  })
-  {% endfor %}
-
   // This function calculates the total of all the sensor resource percentage fields.
   recalculate_sensor_resource_percentages = function() {
     {% for field in form.sensor_resource_percentages %}
@@ -272,18 +258,6 @@ $(document).ready(function(){
          'sensor') %}
          {% include "button.html" %}
       {% endwith %}
-      <br>
-      <form id='{{ [form.is_remote_sensor_checkbox.form_name, i+1] | join('_') }}' role=form>
-      <div class="form-check">
-        <input class="form-check-input {{ form.is_remote_sensor_checkbox.css_class }}" type="checkbox" value="" id="{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}">
-        <label class="form-check-label" for="{{ [form.is_remote_sensor_checkbox.checkbox_id, i+1] | join('_') }}">
-          {{ form.is_remote_sensor_checkbox.label }}
-        </label>
-      </div>
-      <a href="{{ url_for('help') + '#anchor_' + form.is_remote_sensor_checkbox.label | replace(' ','_') }}" target="_blank">
-        <label>What is this?</label>
-      </a>
-      </form>
       <br>
       <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' + '_' + (i | string) }}">
         <p class='font-weight-light'>{{ form.bro_workers.label }} and {{ form.moloch_threads.label }} are both advanced settings and will be autopopulated based on the resources available to the devices you input. You do not have to fill in these values.</p>
