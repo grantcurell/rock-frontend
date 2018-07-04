@@ -226,7 +226,7 @@ $(document).ready(function(){
         {% endwith %}
       {% endif %}
     {% endfor %}
-    <p class="card-text">The default values above were derived from testing with SuperMicro ThinkMates based on 1.25 Gb/s of HTTP/SMB/FTP/YouTube. We used TCPReplay on each sensor with PCAP to avoid the interfaces throttling how much we could play.The system must use the slowest sensor's CPU count.</p>
+    <p class="card-text">The default values above were derived from testing with SuperMicro ThinkMates based on 1.25 Gb/s of HTTP/SMB/FTP/YouTube. We used TCPReplay on each sensor with PCAP to avoid the interfaces throttling how much we could play. The system will use the sensor with the lowest CPU count for calculations. Keep in mind, this does not mean faster systems won't use that speed, the above are effectively ratios. See field descriptions for more information.</p>
     <p class="card-text">Percentage Allocated: <span id="sensor_resource_percentage_allocated">0</span></p>
     <p class="card-text text-danger"><span id="sensor_resource_percentage_warnings"></span></p>
   </div>
@@ -254,6 +254,12 @@ $(document).ready(function(){
         </ul>
       </div>
       <br>
+      <!-- This is the modal button for confirming whether or not this is a remote
+      sensor -->
+      {% with object = form.sensor_gather_facts_modal %}
+        {% include "modal_button.html" %}
+      {% endwith %}
+      <!-- For a description of what these arguments are see button_reaction_gather_device_facts -->
       {% with object = form.host_sensor.change_values(
         (['sensor_form', i+1] | join('_')),
          (form.host_sensor.field_id + '_' + ((i+1) | string)),

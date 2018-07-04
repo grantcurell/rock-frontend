@@ -331,14 +331,14 @@ $(document).ready(function(){
       // color the number and the error message
       $( "#system_clustered_storage_committed" ).parent().removeClass( "text-success" );
       $( "#system_clustered_storage_committed" ).parent().addClass( "text-danger" );
-      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Error: Insufficient storage space available on system.</span>');
+      $( "#system_clustered_storage_committed_errors" ).text(' - Error: Insufficient storage space available on system.');
 
       clustered_storage_validated = false;
     } else {
 
       $( "#system_clustered_storage_committed" ).parent().removeClass( "text-danger" );
       $( "#system_clustered_storage_committed" ).parent().addClass( "text-success" );
-      $( "#system_clustered_storage_committed_errors" ).replaceWith('<span id="system_clustered_storage_committed_errors"> - Looks good!</span>');
+      $( "#system_clustered_storage_committed_errors" ).text(' - Looks good!');
 
       clustered_storage_validated = true;
       validate_all();
@@ -354,8 +354,8 @@ $(document).ready(function(){
     // This basically amounts to total_storage * elastic_storage_percentage / #_instances
     // toFixed keeps it from exceeding two decimal places
     var elastic_storage_size = (parseFloat($( "#system_clustered_storage_available" ).text()) * elastic_storage_percentage) / (parseInt( $( "#{{ form.elastic_masters.field_id }}").val() ) + parseInt( $( "#{{ form.elastic_datas.field_id }}").val() ));
-    $( "#{{ form.elastic_pv_size.field_id }}" ).val(elastic_storage_size);
-    $( "#elastic_storage_available" ).replaceWith('<span id="elastic_storage_available">' + elastic_storage_size.toFixed(2) + '</span>');
+    $( "#{{ form.elastic_pv_size.field_id }}" ).val(Math.floor(elastic_storage_size));
+    $( "#elastic_storage_available" ).text(elastic_storage_size.toFixed(2));
 
     var total_committed = elastic_storage_size;
 
@@ -366,14 +366,14 @@ $(document).ready(function(){
 
       var moloch_pcap_storage_size = parseFloat($( "#system_clustered_storage_available" ).text()) * moloch_pcap_storage_percentage;
       $( "#{{ form.moloch_pcap_pv.field_id }}" ).val(moloch_pcap_storage_size);
-      $( "#moloch_pcap_storage_available" ).replaceWith('<span id="moloch_pcap_storage_available">' + moloch_pcap_storage_size.toFixed(2) + '</span>');
+      $( "#moloch_pcap_storage_available" ).text(moloch_pcap_storage_size.toFixed(2));
 
       total_committed = moloch_pcap_storage_size + elastic_storage_size;
     }
 
     total_committed += parseInt($( "#{{ form.kafka_pv_size.field_id }}").val()) + (parseInt($( "#{{ form.zookeeper_pv_size.field_id }}").val()) * parseInt($( "#{{ form.zookeeper_replicas.field_id }}").val()));
 
-    $( "#system_clustered_storage_committed" ).replaceWith('<span id="system_clustered_storage_committed">' + total_committed.toFixed(2) + '</span>');
+    $( "#system_clustered_storage_committed" ).text(total_committed.toFixed(2));
 
     validate_clustered_storage_committed();
   }
@@ -385,7 +385,7 @@ $(document).ready(function(){
     if(number_of_ceph_drives < 2) {
       $( "#system_total_ceph_drives_errors" ).parent().removeClass( "text-success" );
       $( "#system_total_ceph_drives_errors" ).parent().addClass( "text-danger" );
-      $( "#system_total_ceph_drives_errors" ).replaceWith('<span id="system_total_ceph_drives_errors"> - Error: You need at least two drives in the Ceph cluster!</span>');
+      $( "#system_total_ceph_drives_errors" ).text(' - Error: You need at least two drives in the Ceph cluster!');
 
       // If for whatever reason the inventory was ready to be generated, disable
       // the generate inventory button.
@@ -397,7 +397,7 @@ $(document).ready(function(){
     } else {
       $( "#system_total_ceph_drives_errors" ).parent().removeClass( "text-danger text-warning" );
       $( "#system_total_ceph_drives_errors" ).parent().addClass( "text-success" );
-      $( "#system_total_ceph_drives_errors" ).replaceWith('<span id="system_total_ceph_drives_errors"> - Looks good!</span>');
+      $( "#system_total_ceph_drives_errors" ).text(' - Looks good!</span>');
 
       ceph_drives_validated = true;
       validate_all();

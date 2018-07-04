@@ -14,6 +14,9 @@
 // args[4] correlates to i (the server number) in server.html
 // args[5] correlates to the word server or sensor in server.html or sensor.html respectively
 
+{% if object.args[5] == 'sensor' %}
+$( '#{{ form.sensor_gather_facts_modal.modal_id }}' ).modal('show');
+{% endif %}
 $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val(), password: $( "#{{ form.password.field_id }}").val() }, function(data){
   var current_total_cpus = data.cpus_available + parseInt($( "#{{ object.args[5] }}_cpus_available" ).text());
   $( "#{{ object.args[5] }}_cpus_available" ).text(current_total_cpus);
@@ -58,14 +61,26 @@ $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[na
     });
 
   } else {
+    alert($( '#{{ [form.is_remote_sensor_checkbox.checkbox_id, object.args[4]] | join('_') }}' ).is(":checked"));
+    // This handles the scenario in which someone has checked the remote sensor
+    // checkbox, in which case it should display a PCAP selection instead of Ceph
+    if ( $( '#{{ [form.is_remote_sensor_checkbox.checkbox_id, object.args[4]] | join('_') }}' ).is(":checked") ) {
+      // args[4] correlates to i (the server number) in server.html
+      $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, hostname: "{{ object.args[3] }}" }, function(data){
+        // The hide method is here because effects only work if the element
+        // begins in a hidden state
+        $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+      });
+    } else {
   {% endif %}
-    // args[4] correlates to i (the server number) in server.html
-    $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}", hostname: "{{ object.args[3] }}" }, function(data){
-      // The hide method is here because effects only work if the element
-      // begins in a hidden state
-      $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
-    });
+      // args[4] correlates to i (the server number) in server.html
+      $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}", hostname: "{{ object.args[3] }}" }, function(data){
+        // The hide method is here because effects only work if the element
+        // begins in a hidden state
+        $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+      });
   {% if object.args[5] == 'sensor' %}
+    }
   }
   {% endif %}
 

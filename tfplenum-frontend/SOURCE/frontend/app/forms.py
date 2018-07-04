@@ -153,8 +153,10 @@ class DropDown:
 # modal_label_id (str): The ID of the modal label itself
 # button_id_secondary (str): The ID of the secondary button
 # button_id_primary (str): The Id of the primary button
+# secondary_button_close: True if you want the secondary button to close the modal
+#                         and false if you don't
 class ModalPopUp:
-    def __init__(self, name, modal_title, modal_text, primary_button_text, secondary_button_text=None):
+    def __init__(self, name, modal_title, modal_text, primary_button_text, secondary_button_text=None, secondary_button_close=True):
       self.button_id = name + "_button_id"
       self.modal_id = name + "_modal_id"
       self.modal_label_id = name + "_modal_label_id"
@@ -164,8 +166,7 @@ class ModalPopUp:
       self.secondary_button_text = secondary_button_text
       self.button_id_primary = name + "_modal_button_id_primary"
       self.primary_button_text = primary_button_text
-
-
+      self.secondary_button_close = secondary_button_close
 
 class InventoryForm:
 
@@ -214,8 +215,8 @@ class InventoryForm:
   # Common Settings         #
   ###########################
 
-  submit_sensor_storage_type_modal = ModalPopUp(
-    name = 'submit_sensor_storage_type_modal'
+  inventory_generated_modal = ModalPopUp(
+    name = 'inventory_generated_modal'
   , modal_title = 'Success'
   , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path
   , primary_button_text = 'Close')
@@ -627,6 +628,22 @@ class InventoryForm:
   other devices to read/write over the network. Due to the previous, you must use \
   direct attached storage for PCAP, it will not cluster Kafka, and it will run an independent \
   Zookeeper instance.")
+
+  sensor_gather_facts_modal = ModalPopUp(
+    name = 'sensor_gather_facts_modal'
+  , modal_title = 'Is this a remote sensor?'
+  , modal_text =   "Is this sensor going to be geographically separate from the servers \
+    for your kit? If so, then you probably want to click yes here. A remote sensor is a sensor \
+    deployed geographically separate from the rest of your gear. Usually, sensors \
+    and servers perform a number of clustering operations to optimize resource usage. \
+    However, if the sensor is geographically separate, specifically over a low-bandwidth \
+    link, you do not want this to happen. By making a sensor a remote sensor, Ceph \
+    will be disabled, Kafka will not cluster, and the sensor will get its own Zookeeper \
+    instance. This generally has negative performance implications, but it's what \
+    you want if the sensor is going to be standalone."
+  , secondary_button_text = 'Is a remote sensor'
+  , primary_button_text = 'Is NOT a remote sensor'
+  , secondary_button_close = False)
 
   # This is the form name for the ceph drive list
   sensor_ceph_drive_list = 'sensor_ceph_drive_list_form'
