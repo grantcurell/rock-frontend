@@ -416,9 +416,9 @@ class InventoryForm:
   , label = 'Elasticsearch CPU Percentage'
   , placeholder = "90"
   , input_type = 'number'
-  , html5_constraint = 'min=1 max=90'
+  , html5_constraint = 'min=1 max=99'
   , valid_feedback = 'Input is valid. (This just means you didn\'t type something silly. It doesn\'t necessarily mean you have enough resources.)'
-  , invalid_feedback = 'Value must be between 1 and 90. At least 10% is required for other programs.'
+  , invalid_feedback = 'Value must be between 1 and 99. At least 10% is required for other programs.'
   , required = True
   , description =
   "This is the percentage of server CPUs which the system will dedicated to \
@@ -435,11 +435,11 @@ class InventoryForm:
   elastic_memory_percentage = Field(
     form_name = 'elastic_memory_percentage'
   , label = 'Elasticsearch RAM Percentage'
-  , placeholder = "90"
+  , placeholder = "99"
   , input_type = 'number'
-  , html5_constraint = 'min=1 max=90'
+  , html5_constraint = 'min=1 max=99'
   , valid_feedback = 'Input is valid. (This just means you didn\'t type something silly. It doesn\'t necessarily mean you have enough resources.)'
-  , invalid_feedback = 'Value must be between 1 and 90. At least 10% is required for other programs.'
+  , invalid_feedback = 'Value must be between 1 and 99. At least 10% is required for other programs.'
   , required = True
   , description =
   "This is the percentage of server RAM which the system will dedicated to \

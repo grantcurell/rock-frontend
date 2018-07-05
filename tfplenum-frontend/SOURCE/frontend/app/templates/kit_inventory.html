@@ -362,11 +362,12 @@ $(document).ready(function(){
     // The condition prevents Moloch PCAP storage from being computed if the user
     // did not select Ceph for PCAP
     if( $("#{{ form.sensor_storage_type.dropdown_id }}:first-child").text() == "{{ form.sensor_storage_type.options[0] }}") {
+
       var moloch_pcap_storage_percentage = parseInt($( "#{{ form.moloch_pcap_storage_percentage.field_id }}").val()) / 100
 
       var moloch_pcap_storage_size = parseFloat($( "#system_clustered_storage_available" ).text()) * moloch_pcap_storage_percentage;
-      $( "#{{ form.moloch_pcap_pv.field_id }}" ).val(moloch_pcap_storage_size);
-      $( "#moloch_pcap_storage_available" ).text(moloch_pcap_storage_size.toFixed(2));
+      $( "#{{ form.moloch_pcap_pv.field_id }}" ).val(Math.floor(moloch_pcap_storage_size));
+      $( "#moloch_pcap_storage_available" ).text(Math.floor(moloch_pcap_storage_size));
 
       total_committed = moloch_pcap_storage_size + elastic_storage_size;
     }
