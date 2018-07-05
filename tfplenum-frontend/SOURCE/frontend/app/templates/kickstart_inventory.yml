@@ -11,7 +11,7 @@ all:
     # After all the repos and dependencies are available on the ansible controller this option can be set to true.
     # Tasks requiring an internet connection will not execute such as repo syncs or downloading additional dependencies from the internet.
     # Default: true   
-    offline: {{ system_settings["offline"] }}
+    offline: {{ system_settings["offline"]|lower() }}
 
     # dnsmasq: By default the ansible controller is used as the dns server during setup.
     # If this is set to false then the proper options such must be configured on the external dns server.
@@ -56,13 +56,13 @@ all:
     pull_all_repos: false
     # pull_centos_repos: This pull down centos base, updates and extras repos.
     # Default: false
-    pull_centos_repos: {{ system_settings["repo_sync_centos"] }}
+    pull_centos_repos: {{ system_settings["repo_sync_centos"]|lower() }}
     # pull_rhel_repos: This pull down centos base, updates and extras yum repos.
     # Default: false
-    pull_rhel_repos: {{ system_settings["repo_sync_rhel"] }}
+    pull_rhel_repos: {{ system_settings["repo_sync_rhel"]|lower() }}
     # pull_additional_repos: This pull down epel, rocknsm, and ceph yum repos.
     # Default: false
-    pull_additional_repos: {{ system_settings["repo_sync_additional"] }}   
+    pull_additional_repos: {{ system_settings["repo_sync_additional"]|lower() }}   
 
   
     # The following variables are used to setup the kickstart operating system:
