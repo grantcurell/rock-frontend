@@ -215,6 +215,13 @@ $(document).ready(function(){
     <p class="card-text">The default values above were derived from testing with SuperMicro ThinkMates based on 1.25 Gb/s of HTTP/SMB/FTP/YouTube. We used TCPReplay on each sensor with PCAP to avoid the interfaces throttling how much we could play. The system will use the sensor with the lowest CPU count for calculations. Keep in mind, this does not mean faster systems won't use that speed, the above are effectively ratios. See field descriptions for more information.</p>
     <p class="card-text">Percentage Allocated: <span id="sensor_resource_percentage_allocated">0</span></p>
     <p class="card-text text-danger"><span id="sensor_resource_percentage_warnings"></span></p>
+    <hr>
+    <h6 class="card-subtitle mb-2 text-muted">Home NET Settings</h6>
+    <br>
+    {% with object = form.home_net %}
+      {% include "button.html" %}
+    {% endwith %}
+    <hr>
   </div>
 </div>
 {# This loop goes from 0 to sensor_count #}

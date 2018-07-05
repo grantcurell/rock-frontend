@@ -648,6 +648,21 @@ class InventoryForm:
   # Sensor Settings         #
   ###########################
 
+  home_net = Button(
+     form_name = 'home_net'
+   , label = 'Home Net CIDR IP'
+   , button_text = 'Add another'
+   , placeholder = ""
+   , input_type = 'text'
+   , html5_constraint = 'pattern=(\\/[\\w]+)+'
+   , valid_feedback = 'Good to go!'
+   , invalid_feedback = 'You must enter a CIDR IP'
+   , required = True
+   , description =
+   "These are the values Bro and Suricata will use for their home nets. Home Nets \
+   are the networks you are trying to protect."
+   , reaction_file = 'home_net.js')
+
   sensor_storage_type = DropDown(
     form_name = 'sensor_storage_type'
   , label = 'Sensor Storage Type'
