@@ -254,7 +254,7 @@ class InventoryForm:
     form_name = 'password'
   , label = 'Root Password'
   , placeholder = "Root password for all devices"
-  , input_type = 'text'
+  , input_type = 'password'
   , required = True
   , description =
   "This is the root password set on all the system devices. For initial setup it must \
