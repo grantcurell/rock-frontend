@@ -214,12 +214,7 @@ $(document).ready(function(){
 </div>
 <div id="main_form">
   <div class="card" id="direct_to_disk_selected">
-    <div class="card-body">
-      <h4 class="card-title">Global Settings</h4>
-      <p class="card-text">
-        blah blah blah here
-      </p>
-      <hr>
+    <div class="card-body">           
       <h5>DHCP Settings</h5>
       {% with object = form.dhcp_start %}
         {% include "text_input.html" %}
@@ -227,7 +222,7 @@ $(document).ready(function(){
       {% with object = form.dhcp_end %}
         {% include "text_input.html" %}
       {% endwith %}
-      <br />
+      <hr>
       <h5>Static Interface Settings</h5>      
       {% with object = form.dns %}
         {% include "text_input.html" %}
@@ -238,6 +233,7 @@ $(document).ready(function(){
       {% with object = form.netmask %}
         {% include "text_input.html" %}
       {% endwith %} 
+      <hr>
       <h5>System Settings</h5>
       {% with object = form.root_password %}
         {% include "text_input.html" %}

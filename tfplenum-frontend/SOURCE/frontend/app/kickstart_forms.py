@@ -217,7 +217,8 @@ class KickstartInventoryForm:
     form_name = "is_offline_build"
   , label = "Is offline build?"
   , description =
-  "Check this if you are setting up your build using the prebuilt offline installer.")
+  "Check this if you are setting up your build using the prebuilt offline installer.\
+  By default, this should be checked.  If unchecked, this option requires an internet connection.")
 
   enable_dhcp_server = CheckBox(
     form_name = "enable_dhcp"
@@ -239,7 +240,9 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
-  , description = "")
+  , description = "This field is used to identify the starting ip address of the dhcp range.  The dhcp range is only used during the network boot process.\
+  The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time. \
+  Be sure not to use a range will be cause conflicts with existing network devices.")
 
   dhcp_end = Field(
     form_name = 'dhcp_end'
@@ -249,7 +252,8 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
-  , description = "")
+  , description = "This field is used to identify the ending ip address of the dhcp range.  \
+  The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time.")
 
   dns = Field(
     form_name = 'dns'
@@ -259,7 +263,9 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
-  , description = "")
+  , description = "The dns field or Domain Name Resolution is the address used to resolve ip addresses to domain names. \
+  During the system installation the dns address should be the ansible controllers ip address unless you are using an external dns server. \
+  This field is specifically used as a part of the static interface assignment during the operating system installation.")
 
   gateway = Field(
     form_name = 'gateway'
@@ -269,7 +275,8 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
-  , description = "")
+  , description = "The gateway address or default gateway is usually a routable address to the local network.  \
+  This field is specifically used as a part of the static interface assignment during the operating system installation.")
 
   netmask = Field(
     form_name = 'netmask'
@@ -279,7 +286,8 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
-  , description = "")
+  , description = "The netmask is the network address used for subnetting.  \
+  This field is specifically used as a part of the static interface assignment during the operating system installation.")
 
   root_password = Field(
     form_name = 'root_password'
@@ -289,7 +297,8 @@ class KickstartInventoryForm:
   , html5_constraint = ""
   , invalid_feedback = 'You must enter a root password.'
   , required = True
-  , description = "")
+  , description = "The root password will be how to log into each node after the kickstart process completes.\
+  Do not forget this password or you will not be able to complete the system installation.")
 
 
   ###########################
@@ -308,19 +317,7 @@ class KickstartInventoryForm:
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Submit\" on the right!'
   , invalid_feedback = 'You must have at least two server.'
-  , reaction_file = 'button_reaction_number_of_nodes.js')  
-
-  host_server = Button(
-    form_name = 'host_server'
-  , label = 'Management IP Address'
-  , button_text = 'Gather Facts'
-  , placeholder = "Server's management IP address"
-  , input_type = 'text'
-  , html5_constraint = ip_constraint
-  , required = True
-  , valid_feedback = 'Looks good! Now hit \"Gather Facts\"! Heads up, once you add a server successfully, you can\'t remove it!'
-  , invalid_feedback = 'You must input the server management IP address.'
-  , reaction_file = 'button_reaction_gather_device_facts.js')
+  , reaction_file = 'button_reaction_number_of_nodes.js') 
   
   ip_address = Field(
     form_name = 'ip_address'
@@ -332,7 +329,7 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
-  , description = "")
+  , description = "The node ip address is used during the kickstart process to statically assign the node's interface.")
 
   mac_address = Field(
     form_name = 'mac_address'
@@ -344,7 +341,9 @@ class KickstartInventoryForm:
   , html5_constraint = 'pattern=(^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$)'
   , invalid_feedback = 'You must enter a valid mac address'
   , required = True
-  , description = "")
+  , description = "The mac address is the network interface's physical  address.  \
+  This address is used by the dhcp server to provide the node a specific pxe file used for network booting.\
+  If the mac address is incorrect the node will be able to network boot.")
 
   boot_drive = Field(
     form_name = 'boot_drive'
@@ -356,7 +355,8 @@ class KickstartInventoryForm:
   , html5_constraint = ""
   , invalid_feedback = ''
   , required = True
-  , description = "")
+  , description = "The boot drive is the disk name that will have the operating system installed during the kickstart process.  \
+  By default, the Supermicro will use sda and the HP DL160 will use sdb.")
 
   hostname = Field(
     form_name = 'hostname'
@@ -368,13 +368,15 @@ class KickstartInventoryForm:
   , html5_constraint = ""
   , invalid_feedback = 'You must enter a valid hostname.'
   , required = True
-  , description = "")
+  , description = "The hostname is the nodes name that will be assigned during the installation of the operating system.  This should match the hostname used by the DNS server.")
 
   pxe_type = DropDown(
       form_name = 'pxe_type'
     , label = 'PXE Type'
     #, required = True TODO NEED TO ADD A DEFAULT
-    , description = ""
+    , description = "The PXE Type referes to the motherboards method of network booting.  \
+    By default, the Supermicro uses BIOS and the HP DL160s use UEFI.\
+    BIOS is sometimes called Legacy in the bios settings."
     , options = ['BIOS', 'UEFI']
     # WARNING: Do not change the order of these options. There are several parts of the code
     # which depend on them. You can search for them by looking for form.sensor_storage_type.options
@@ -385,7 +387,7 @@ class KickstartInventoryForm:
       form_name = 'timezone'
     , label = 'Timezone'
     #, required = True TODO NEED TO ADD A DEFAULT
-    , description = ""
+    , description = "This option is sets each node's timezone during the kickstart provisioning process (Automated Operating System installation)."
     , options = ['Chicago', 'Los_Angeles', 'New_York', 'UTC']
     # WARNING: Do not change the order of these options. There are several parts of the code
     # which depend on them. You can search for them by looking for form.sensor_storage_type.options
@@ -396,21 +398,28 @@ class KickstartInventoryForm:
     form_name = "repo_sync_centos"
   , label = "CentOS"
   , description =
-  "Check this if you are setting up your build using the prebuilt offline installer.")
+  "This options is used to download the public centos yum repositories to the ansible controller.  \
+  This option requires an internet connection.")
 
   repo_sync_rhel = CheckBox(
     form_name = "repo_sync_rhel"
   , label = "RHEL"
   , description =
-  "Check this if you are setting up your build using the prebuilt offline installer.")
+  "This options is used to download the required Red Hat Enterprise Linux(RHEL) 7 yum repositories to the ansible controller.\
+  This option requires an internet connection and a RHEL subscription.")
 
   repo_sync_additional = CheckBox(
     form_name = "repo_sync_additional"
   , label = "Additional (EPEL, RockNSM, Ceph, Kubernetes)"
   , description =
-  "Check this if you are setting up your build using the prebuilt offline installer.")
+  "This options is used to download the public EPEL, kubernetes, RockNSM, and Ceph yum repositories to the ansible controller.\
+  This option requires an internet connection.")
  
-  common_settings = [is_offline_build]
-  node_settings = [number_of_nodes]
+  dhcp_settings = [dhcp_start, dhcp_end]
+  interface_settings = [dns,gateway,netmask]
+  system_settings = [root_password]
   pxe_type_settings = [pxe_type]
+  node_settings = [number_of_nodes]
+  node_options = [hostname,ip_address,mac_address,boot_drive,pxe_type_settings]
   timezone_settings = [timezone]
+  advanced_system_settings = [is_offline_build,repo_sync_centos,repo_sync_rhel,repo_sync_additional]
