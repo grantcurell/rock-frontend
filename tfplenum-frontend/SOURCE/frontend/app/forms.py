@@ -174,6 +174,12 @@ class InventoryForm:
 
   ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
 
+  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
+  # ^ I left the line above because it was helpful, but I didn't end up using it
+  # in the final version
+  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
+  cidr_constraint = "pattern=(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/(3[0-2]|[1-2]?[0-9])";
+
   navbar_elements = {
     'Kit Configuration': 'kit_configuration'
   , 'Help': 'help'
@@ -251,9 +257,7 @@ class InventoryForm:
   , label = 'Kubernetes Service CIDR'
   , placeholder = "Put your Kubernetes Services CIDR here."
   , input_type = 'text'
-  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
-  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
-  , html5_constraint = 'pattern=(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)'
+  , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
   , description =
@@ -652,9 +656,9 @@ class InventoryForm:
      form_name = 'home_net'
    , label = 'Home Net CIDR IP'
    , button_text = 'Add another'
-   , placeholder = ""
+   , placeholder = "Enter your home net CIDR IP here (or leave it blank)"
    , input_type = 'text'
-   , html5_constraint = 'pattern=(\\/[\\w]+)+'
+   , html5_constraint = cidr_constraint
    , valid_feedback = 'Good to go!'
    , invalid_feedback = 'You must enter a CIDR IP'
    , required = False

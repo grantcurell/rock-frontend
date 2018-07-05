@@ -17,7 +17,10 @@ $(document).ready(function(){
     {% endfor %}
 
     for(i=1; i <= home_net_count; i++) {
-      set_home_net(i, $( "#{{ form.home_net.field_id }}" + String(home_net_count) ).val());
+      // We need to make sure the element is valid before putting it in the dictionary
+      if(document.getElementById("{{ form.home_net.field_id }}_" + String(i)).checkValidity() == true ) {
+        set_home_net(i, $( "#{{ form.home_net.field_id }}_" + String(i) ).val());
+      }
     }
   }
   callbacks.add( sensor_get_ids );

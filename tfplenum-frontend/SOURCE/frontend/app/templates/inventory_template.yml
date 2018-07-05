@@ -118,9 +118,9 @@ all:
 
     # This is used to define the homenet for bro/suricata
     home_net:
-      - "192.168.0.0/16"
-      - "10.0.0.0/8"
-      - "172.16.0.0/12"
+      {% for key, home_net in input_data["home_nets"].iteritems() %}
+      - "{{ home_net }}"
+      {% endfor %}
 
     #############################
     # Kafka Settings            #
