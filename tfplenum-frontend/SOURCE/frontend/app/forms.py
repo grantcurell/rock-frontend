@@ -138,6 +138,12 @@ class DropDown:
         # This is the HTML file generally associated with displaying this field.
         # You don't have to use this, but it is handy for displaying things in a loop.
         self.include_html = "dropdown.html"
+    def change_values(self, form_name, dropdown_id, *args):
+        copy_of_self = copy.deepcopy(self)
+        copy_of_self.form_name = form_name
+        copy_of_self.dropdown_id = dropdown_id    
+        copy_of_self.args = args
+        return copy_of_self
 
 # name (str): The name of your modal (no spaces)
 # modal_title (str): The title that will appear along with the modal box
@@ -1106,3 +1112,253 @@ class InventoryForm:
   kafka_settings = [kafka_jvm_memory, kafka_pv_size, zookeeper_jvm_memory, zookeeper_pv_size, zookeeper_replicas]
 
   advanced_settings = advanced_system_settings + elasticsearch_advanced_settings + moloch_advanced_settings + kafka_settings
+
+class KickstartInventoryForm:
+
+  ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
+
+  navbar_elements = {
+    'Kit Configuration': 'kit_configuration'
+  , 'Kickstart Configuration': 'kickstart'
+  , 'Help': 'help'
+  }
+
+  advanced_system_settings_text = 'All of the required settings below will autopopulate \
+  based on facts gathered from the servers. It is not necessary to change any of \
+  them in order for the system to function. However, you may want to update some \
+  fields manually based on your specific use cases.'
+
+  advanced_settings_button = GenericButton(
+    form_name = 'advanced_settings'
+    , label = 'Show/Hide Advanced Settings'
+  )
+
+  ###########################
+  # Common Settings         #
+  ###########################
+
+  dns_ip = Field(
+    form_name = 'dns_ip'
+  , label = 'DNS IP Address'
+  , placeholder = "Same as Master Server management IP"
+  , input_type = 'text'
+  , html5_constraint = 'ip_constraint'
+  , invalid_feedback = 'You must enter a valid IP address'
+  , required = False
+  , description =
+  "The IP address of the system DNS server. You may define this or it will   \
+   default  to using the master server's management IP. We suggest you leave \
+   it to default  unless you have a specific reason to use a different DNS   \
+   server. Keep in mind  you will need to manually provide all required DNS  \
+   entries on your separate  DNS Server or the kit will break.")
+
+  is_offline_build = CheckBox(
+    form_name = "is_offline_build"
+  , label = "Is offline build?"
+  , description =
+  "Check this if you are setting up your build using the prebuilt offline installer.\
+  By default, this should be checked.  If unchecked, this option requires an internet connection.")
+
+  enable_dhcp_server = CheckBox(
+    form_name = "enable_dhcp"
+  , label = "Enable DHCP Server?"
+  , description =
+  "Check this if you are not using an external dhcp server.  A dhcp server is required for kickstart.")
+
+  enable_dns_server = CheckBox(
+    form_name = "enable_dns_server"
+  , label = "Enable DNS Server?"
+  , description =
+  "Check this if you are not using an external dns server.")
+
+  dhcp_start = Field(
+    form_name = 'dhcp_start'
+  , label = 'DHCP Starting Ip Address'
+  , placeholder = "192.168.1.50"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address.'
+  , required = False
+  , description = "This field is used to identify the starting ip address of the dhcp range.  The dhcp range is only used during the network boot process.\
+  The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time. \
+  Be sure not to use a range will be cause conflicts with existing network devices.")
+
+  dhcp_end = Field(
+    form_name = 'dhcp_end'
+  , label = 'DHCP Ending Ip Address'
+  , placeholder = "192.168.1.60"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address.'
+  , required = False
+  , description = "This field is used to identify the ending ip address of the dhcp range.  \
+  The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time.")
+
+  dns = Field(
+    form_name = 'dns'
+  , label = 'DNS'
+  , placeholder = "192.168.1.1"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address.'
+  , required = True
+  , description = "The dns field or Domain Name Resolution is the address used to resolve ip addresses to domain names. \
+  During the system installation the dns address should be the ansible controllers ip address unless you are using an external dns server. \
+  This field is specifically used as a part of the static interface assignment during the operating system installation.")
+
+  gateway = Field(
+    form_name = 'gateway'
+  , label = 'Gateway'
+  , placeholder = "192.168.1.1"
+  , input_type = 'text'
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address.'
+  , required = True
+  , description = "The gateway address or default gateway is usually a routable address to the local network.  \
+  This field is specifically used as a part of the static interface assignment during the operating system installation.")
+
+  netmask = Field(
+    form_name = 'netmask'
+  , label = 'Netmask'
+  , placeholder = "255.255.255.0"
+  , input_type = 'text'  
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address.'
+  , required = True
+  , description = "The netmask is the network address used for subnetting.  \
+  This field is specifically used as a part of the static interface assignment during the operating system installation.")
+
+  root_password = Field(
+    form_name = 'root_password'
+  , label = 'Root Password'
+  , placeholder = ""
+  , input_type = 'password'
+  , html5_constraint = ""
+  , invalid_feedback = 'You must enter a root password.'
+  , required = True
+  , description = "The root password will be how to log into each node after the kickstart process completes.\
+  Do not forget this password or you will not be able to complete the system installation.")
+
+
+  ###########################
+  # Node Settings         #
+  ###########################
+
+  # Node form
+
+  number_of_nodes = Button(
+    form_name = 'number_of_nodes'
+  , label = 'Number of Nodes'
+  , button_text = 'Submit'
+  , placeholder = "Enter the number of nodes you have"
+  , input_type = 'number'
+  , html5_constraint = 'min=2'
+  , required = True
+  , valid_feedback = 'Looks good! Now hit \"Submit\" on the right!'
+  , invalid_feedback = 'You must have at least two server.'
+  , reaction_file = 'button_reaction_number_of_nodes.js') 
+  
+  ip_address = Field(
+    form_name = 'ip_address'
+  , label = 'IP Address'
+  , placeholder = "192.168.1.20"
+  , input_type = 'text'
+  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
+  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
+  , html5_constraint = ip_constraint
+  , invalid_feedback = 'You must enter a valid IP address.'
+  , required = True
+  , description = "The node ip address is used during the kickstart process to statically assign the node's interface.")
+
+  mac_address = Field(
+    form_name = 'mac_address'
+  , label = 'MAC Address'
+  , placeholder = "01:23:45:67:89:ab"
+  , input_type = 'text'
+  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
+  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
+  , html5_constraint = 'pattern=(^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$)'
+  , invalid_feedback = 'You must enter a valid mac address'
+  , required = True
+  , description = "The mac address is the network interface's physical  address.  \
+  This address is used by the dhcp server to provide the node a specific pxe file used for network booting.\
+  If the mac address is incorrect the node will be able to network boot.")
+
+  boot_drive = Field(
+    form_name = 'boot_drive'
+  , label = 'Boot Drive'
+  , placeholder = "sda"
+  , input_type = 'text'
+  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
+  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
+  , html5_constraint = ""
+  , invalid_feedback = ''
+  , required = True
+  , description = "The boot drive is the disk name that will have the operating system installed during the kickstart process.  \
+  By default, the Supermicro will use sda and the HP DL160 will use sdb.")
+
+  hostname = Field(
+    form_name = 'hostname'
+  , label = 'Hostname'
+  , placeholder = "rockserver1.lan"
+  , input_type = 'text'
+  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
+  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
+  , html5_constraint = ""
+  , invalid_feedback = 'You must enter a valid hostname.'
+  , required = True
+  , description = "The hostname is the nodes name that will be assigned during the installation of the operating system.  This should match the hostname used by the DNS server.")
+
+  pxe_type = DropDown(
+      form_name = 'pxe_type'
+    , label = 'PXE Type'
+    #, required = True TODO NEED TO ADD A DEFAULT
+    , description = "The PXE Type referes to the motherboards method of network booting.  \
+    By default, the Supermicro uses BIOS and the HP DL160s use UEFI.\
+    BIOS is sometimes called Legacy in the bios settings."
+    , options = ['BIOS', 'UEFI']
+    # WARNING: Do not change the order of these options. There are several parts of the code
+    # which depend on them. You can search for them by looking for form.sensor_storage_type.options
+    , dropdown_text = 'PXE Type'
+    , default_option = 'BIOS')
+
+  timezone = DropDown(
+      form_name = 'timezone'
+    , label = 'Timezone'
+    #, required = True TODO NEED TO ADD A DEFAULT
+    , description = "This option is sets each node's timezone during the kickstart provisioning process (Automated Operating System installation)."
+    , options = ['Chicago', 'Los_Angeles', 'New_York', 'UTC']
+    # WARNING: Do not change the order of these options. There are several parts of the code
+    # which depend on them. You can search for them by looking for form.sensor_storage_type.options
+    , dropdown_text = 'Timezone'
+    , default_option = 'Chicago')
+
+  repo_sync_centos = CheckBox(
+    form_name = "repo_sync_centos"
+  , label = "CentOS"
+  , description =
+  "This options is used to download the public centos yum repositories to the ansible controller.  \
+  This option requires an internet connection.")
+
+  repo_sync_rhel = CheckBox(
+    form_name = "repo_sync_rhel"
+  , label = "RHEL"
+  , description =
+  "This options is used to download the required Red Hat Enterprise Linux(RHEL) 7 yum repositories to the ansible controller.\
+  This option requires an internet connection and a RHEL subscription.")
+
+  repo_sync_additional = CheckBox(
+    form_name = "repo_sync_additional"
+  , label = "Additional (EPEL, RockNSM, Ceph, Kubernetes)"
+  , description =
+  "This options is used to download the public EPEL, kubernetes, RockNSM, and Ceph yum repositories to the ansible controller.\
+  This option requires an internet connection.")
+ 
+  dhcp_settings = [dhcp_start, dhcp_end]
+  interface_settings = [dns,gateway,netmask]
+  system_settings = [root_password]
+  pxe_type_settings = [pxe_type]
+  node_settings = [number_of_nodes]
+  node_options = [hostname,ip_address,mac_address,boot_drive,pxe_type_settings]
+  timezone_settings = [timezone]
+  advanced_system_settings = [is_offline_build,repo_sync_centos,repo_sync_rhel,repo_sync_additional]
