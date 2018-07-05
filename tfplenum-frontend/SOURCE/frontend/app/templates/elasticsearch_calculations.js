@@ -21,14 +21,32 @@ recalculate_elasticsearch_recommendations = function() {
   // This variable denotes a build that will work, but does not reach recommended minimums
   var warning_reached = false;
 
+  // Used to determine if one of the servers is short on memory.
+  var mem_warning_reached = false;
+
+  // The percentage of CPU the user input that Elasticsearch will use
   var elastic_cpu_percentage = parseInt($( "#{{ form.elastic_cpu_percentage.field_id }}" ).val());
+
+  // The percentage of RAM the user input that Elasticsearch will use
   var elastic_memory_percentage = parseInt($( "#{{ form.elastic_memory_percentage.field_id }}" ).val());
+
+  // See the forms explanation for elastic_cpus_per_instance_ideal
   var elastic_recommended_cpus = parseInt($( "#{{ form.elastic_cpus_per_instance_ideal.field_id }}" ).val());
+
+  // The amonut of RAM Elasticsearch should use per CPU core
   var elastic_cpu_to_mem_ratio = parseInt($( "#{{ form.elastic_cpus_to_mem_ratio.field_id }}" ).val());
+
+  // Same as the above, but this will not be modified. elastic_cpu_to_mem_ratio will change
+  // if the proper amount of resources aren't available.
   var ideal_cpu_to_mem = elastic_cpu_to_mem_ratio;
+
+  // The number of Logstash replicas for the system
   var logstash_replicas = parseInt($( "#{{ form.logstash_replicas.field_id }}" ).val());
+
+  // The percentage of the CPU power Logstash should consume
   var logstash_cpu_percentage = parseInt($( "#{{ form.logstash_cpu_percentage.field_id }}" ).val());
 
+  // The number of CPU cores Logstash will need
   var logstash_required_cpu = parseInt($( "#server_cpus_available" ).text()) * (logstash_cpu_percentage/100) / logstash_replicas;
   $( "#logstash_cpus" ).text((logstash_required_cpu / logstash_replicas).toFixed(2));
 
@@ -187,8 +205,9 @@ recalculate_elasticsearch_recommendations = function() {
       }
 
       elasticsearch_successful_allocation_cpu = true;
-      var elasticsearch_successful_allocation_ram = true;
+      elasticsearch_successful_allocation_ram = true;
       logstash_successful_allocation = true;
+      mem_warning_reached = false;
 
       // Stores block id of the block allocated to a
       // process
@@ -238,8 +257,7 @@ recalculate_elasticsearch_recommendations = function() {
         for (i=0; i<elastic_instances; i++) {
             // Find the best fit block for current process
             var bestIdx = -1;
-            for (j=0; j<number_of_servers; j++)
-            {
+            for (j=0; j<number_of_servers; j++) {
                 if (server_memory_list[j] >= elastic_memory_per_instance)
                 {
                     if (bestIdx == -1)
@@ -258,6 +276,29 @@ recalculate_elasticsearch_recommendations = function() {
                 // Reduce available memory on this server
                 server_memory_list[bestIdx] -= elastic_memory_per_instance;
             }
+        }
+
+        var total_server_memory_available = [];
+        var total_memory_used = [];
+
+        // This checks to see if any server would have less than 4 GB remaining.
+        // You could still run the build it just might be a problem.
+        for(i = 0; i < number_of_servers; i++) {
+          total_server_memory_available[i] = parseFloat($( "#server_" + String(i+1) + "_memory_available" ).text());
+        }
+
+        // The total amount used is whatever we started with minus any memory
+        // leftover from the above loop (which is what would be in server_memory_list
+        // still).
+        for(i = 0; i < number_of_servers; i++) {
+          total_memory_used[i] = total_server_memory_available[i] - server_memory_list[i];
+        }
+
+        // Check to see if any of that is under 4GB
+        for (i=0; i<number_of_servers; i++) {
+          if((total_server_memory_available[i] - total_memory_used[i]) < 4) {
+            mem_warning_reached = true;
+          }
         }
 
         if(elasticsearch_memory_allocation.includes(-1)) {
@@ -364,14 +405,14 @@ recalculate_elasticsearch_recommendations = function() {
     } while((!elasticsearch_successful_allocation_ram || !elasticsearch_successful_allocation_cpu || !logstash_successful_allocation) && elastic_instances >= elastic_minimum_instances);
 
     if(elasticsearch_successful_allocation_ram) {
-      if((elastic_available_memory - parseFloat($( "#server_memory_available" ).text())) < 4) {
+      if(mem_warning_reached) {
         console.log('WARN - Server memory dangerously low!');
         $( "#elasticsearch_memory_errors" ).parent().removeClass( "text-danger text-success" );
         $( "#elasticsearch_memory_errors" ).parent().addClass( "text-warning" );
         if(elastic_memory_per_instance < ideal_cpu_to_mem) {
-          $( "#elasticsearch_memory_errors" ).text(' - Server memory dangerously low! You have less than 4GB remaining. We won\'t stop you from building, but this might not work and is a bad idea! On top of that, we had to reduce the memory per instance to ' + elastic_memory_per_instance + " to get it to work!");
+          $( "#elasticsearch_memory_errors" ).text(' - Heads up, the system could potentially allocate pods in a way in which a server has less than 4GB remaining. This may never happen and it won\'t stop you from building, but it *could* cause problems! On top of that, we had to reduce the memory per instance to ' + elastic_memory_per_instance + " to get Elasticsearch to fit on the system!");
         } else {
-          $( "#elasticsearch_memory_errors" ).text(' - Server memory dangerously low! You have less than 4GB remaining. We won\'t stop you from building, but this might not work and is a bad idea!');
+          $( "#elasticsearch_memory_errors" ).text(' - Heads up, the system could potentially allocate pods in a way in which a server has less than 4GB remaining. This may never happen and it won\'t stop you from building, but it *could* cause problems!');
         }
       } else {
         if(elastic_memory_per_instance < ideal_cpu_to_mem) {
