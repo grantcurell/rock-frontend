@@ -46,6 +46,9 @@ recalculate_elasticsearch_recommendations = function() {
   // The percentage of the CPU power Logstash should consume
   var logstash_cpu_percentage = parseInt($( "#{{ form.logstash_cpu_percentage.field_id }}" ).val());
 
+  // The number of servers available in the system
+  var number_of_servers = parseInt($( "#{{ form.number_of_servers.field_id }}" ).val());
+
   // The number of CPU cores Logstash will need
   var logstash_required_cpu = parseInt($( "#server_cpus_available" ).text()) * (logstash_cpu_percentage/100) / logstash_replicas;
   $( "#logstash_cpus" ).text((logstash_required_cpu / logstash_replicas).toFixed(2));
@@ -58,8 +61,10 @@ recalculate_elasticsearch_recommendations = function() {
     $( "#{{ form.elastic_memory_percentage.field_id }}" ).val({{ form.elastic_memory_percentage.default_value }});
   }
 
-  // The total number of CPUs Elasticsearch could potentially use
-  var elastic_available_cpus = Math.floor(parseInt($( "#server_cpus_available" ).text()) * (elastic_cpu_percentage/100));
+  // The total number of CPUs Elasticsearch could potentially use. We subtract
+  // the number of servers because each server must have one core set aside for
+  // other functions
+  var elastic_available_cpus = Math.floor((parseInt($( "#server_cpus_available" ).text()) * (elastic_cpu_percentage/100)) - number_of_servers);
 
   $( "#elasticsearch_cpus" ).text(elastic_available_cpus);
 
@@ -172,8 +177,6 @@ recalculate_elasticsearch_recommendations = function() {
       }
     }
 
-    var number_of_servers = parseInt($( "#{{ form.number_of_servers.field_id }}" ).val());
-
     var server_memory_list = new Array(number_of_servers);
     var server_cpus_list = new Array(number_of_servers);
 
@@ -201,7 +204,7 @@ recalculate_elasticsearch_recommendations = function() {
     do {
 
       for(i = 0; i < number_of_servers; i++) {
-        server_cpus_list[i] = Math.floor(parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) * (elastic_cpu_percentage/100));
+        server_cpus_list[i] = Math.floor((parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) - 1) * (elastic_cpu_percentage/100));
       }
 
       elasticsearch_successful_allocation_cpu = true;

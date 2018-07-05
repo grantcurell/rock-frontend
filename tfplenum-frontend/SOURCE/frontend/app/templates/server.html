@@ -91,7 +91,8 @@
   </div>
   <div class="card-body">
     <p class="card-text">CPU Cores Available: <span id="server_cpus_available">0</span></p>
-    <p class="card-text">CPUs Assigned to Elasticsearch: <span id="elasticsearch_cpus">0</span>  <span id="elasticsearch_cpus_errors"></span></p>
+    <p class="card-text">CPUs Assigned to Elasticsearch: <span id="elasticsearch_cpus"></span>  <span id="elasticsearch_cpus_errors"></span></p>
+    <p class="text-info">Keep in mind that each server will have one core set aside for all the things non-Elasticsearch. This may lead to the system telling you that you have insufficient cores though it seems like you have enough.</p>
     <p class="card-text">CPUs Assigned to Logstash: <span id="logstash_cpus">0</span>  <span id="logstash_cpus_errors"></span></p>
     <p class="card-text">Memory Available: <span id="server_memory_available">0</span> GB</p>
     <p class="card-text">Memory Assigned to Elasticsearch: <span id="elasticsearch_memory">0</span> GBs  <span id="elasticsearch_memory_errors"></span></p>
