@@ -199,7 +199,6 @@ def _generate_inventory():
                 _assign_sensor(sensors)
 
     inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
-    #print inventory_template
 
     if not os.path.exists("/opt/tfplenum/playbooks/"):
         os.makedirs("/opt/tfplenum/playbooks/")
@@ -211,19 +210,19 @@ def _generate_inventory():
     return "Finished"
 
 @app.route('/_generate_kickstart_inventory')
-def _generate_kickstart_inventory():    
+def _generate_kickstart_inventory():
     system_settings = json.loads(request.args.get('system_settings'))
     hosts = json.loads(request.args.get('hosts'))
     nodes = {}
     for host, value in hosts.iteritems():
-        nodes[host] = Node()        
+        nodes[host] = Node()
         nodes[host].hostname = host
         nodes[host].ip_address = value["ip"]
         nodes[host].mac_address = value["mac"]
-        nodes[host].boot_drive = value["boot_drive"]       
+        nodes[host].boot_drive = value["boot_drive"]
         nodes[host].pxe_type = value["pxe_type"]
 
-    inventory_template = render_template('kickstart_inventory.yml', system_settings=system_settings, nodes=nodes)    
+    inventory_template = render_template('kickstart_inventory.yml', system_settings=system_settings, nodes=nodes)
 
     if not os.path.exists("/opt/tfplenum-deployer/playbooks/"):
         os.makedirs("/opt/tfplenum-deployer/playbooks/")
