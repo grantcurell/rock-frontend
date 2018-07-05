@@ -120,6 +120,9 @@ def _generate_inventory():
             use_ceph_for_pcap = True
         else:
             use_ceph_for_pcap = False
+
+            # If we are not using Ceph for PCAP the PCAP PV size should be 0
+            input_data[form.moloch_pcap_pv] = 0
     else:
         use_ceph_for_pcap = False
 
