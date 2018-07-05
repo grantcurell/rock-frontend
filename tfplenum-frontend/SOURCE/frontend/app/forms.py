@@ -156,7 +156,7 @@ class DropDown:
 # secondary_button_close: True if you want the secondary button to close the modal
 #                         and false if you don't
 class ModalPopUp:
-    def __init__(self, name, modal_title, modal_text, primary_button_text, secondary_button_text=None, secondary_button_close=True):
+    def __init__(self, name, modal_title, modal_text, primary_button_text=None, secondary_button_text=None, secondary_button_close=True):
       self.button_id = name + "_button_id"
       self.modal_id = name + "_modal_id"
       self.modal_label_id = name + "_modal_label_id"
@@ -180,6 +180,7 @@ class InventoryForm:
   # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
   cidr_constraint = "pattern=(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/(3[0-2]|[1-2]?[0-9])";
 
+  # If you need to add elements to the navbar you can do it here
   navbar_elements = {
     'Kit Configuration': 'kit_configuration'
   , 'Kickstart Configuration': 'kickstart'
@@ -218,15 +219,15 @@ class InventoryForm:
   network, it's better to use Ceph because you get all the benefits of a clustered \
   storage solution. If you don't know, it's better to stick with \"Use hard drive for PCAP storage\""}
 
-  ###########################
-  # Common Settings         #
-  ###########################
-
   inventory_generated_modal = ModalPopUp(
     name = 'inventory_generated_modal'
   , modal_title = 'Success'
-  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path
+  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page.'
   , primary_button_text = 'Close')
+
+  ###########################
+  # Common Settings         #
+  ###########################
 
   dns_ip = Field(
     form_name = 'dns_ip'

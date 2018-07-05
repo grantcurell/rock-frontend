@@ -14,7 +14,7 @@
       </div>
       <div class="modal-footer">
         {% if secondary_button_text is not none %}<button type="button" class="btn btn-secondary" {% if object.secondary_button_close %}data-dismiss="modal"{% endif %} id="{{ object.button_id_secondary }}">{{ object.secondary_button_text }}</button>{% endif %}
-        <button type="button" class="btn btn-primary" id="{{ object.button_id_primary }}">{{ object.primary_button_text }}</button>
+        {% if primary_button_text is not none %}<button type="button" class="btn btn-primary" id="{{ object.button_id_primary }}">{{ object.primary_button_text }}</button>{% endif %}
       </div>
     </div>
   </div>

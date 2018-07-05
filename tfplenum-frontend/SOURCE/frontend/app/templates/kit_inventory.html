@@ -591,13 +591,26 @@ $(document).ready(function(){
       });
       }
 
-      $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){});
+      $( "#{{ form.inventory_generated_modal.button_id_primary }}" ).click(function(event){
+
+        // This hides the modal box. If you don't have this, the modal box stays on
+        // the screen
+        $( "#{{ form.inventory_generated_modal.modal_id }}" ).modal('hide');
+      });
+
+      $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){
+        $( '#{{ form.inventory_generated_modal.modal_id }}' ).modal('show');
+      });
 
     });
 
 });
 
 </script>
+
+{% with object = form.inventory_generated_modal %}
+  {% include "modal_button.html" %}
+{% endwith %}
 
 <div class="jumbotron">
   <h1 class="display-4">TFPlenum Kit Configuration</h1>
