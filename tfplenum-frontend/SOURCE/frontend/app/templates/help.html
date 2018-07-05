@@ -84,4 +84,13 @@
 </dl>
 {% endif %}
 {% endfor %}
+<h2>Kickstart Installation Settings</h2>
+{% for setting in kickstart_form.kickstart_form_settings %}
+{% if setting.description is not none %}
+<dl class="row">
+  <dt class="col-sm-3">{{ setting.label }}<a name="{{ 'anchor_' + setting.label | replace(' ','_') }}"></a></dt>
+  <dd class="col-sm-9">{{ setting.description }}</dd>
+</dl>
+{% endif %}
+{% endfor %}
 {% endblock %}

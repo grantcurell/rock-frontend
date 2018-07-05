@@ -243,7 +243,9 @@ def kit_configuration():
 def kickstart():
     form = KickstartInventoryForm()
     return render_template('kickstart.html', title='Configure Inventory', form=form)
+
 @app.route('/help')
 def help():
     form = InventoryForm()
-    return render_template("help.html", form=form)
+    kickstart_form = KickstartInventoryForm()
+    return render_template("help.html", form=form, kickstart_form=kickstart_form)

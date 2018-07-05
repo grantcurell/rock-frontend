@@ -63,7 +63,7 @@ $(document).ready(function(){
     hosts[hostname]["ip"] = {};
     hosts[hostname]["mac"] = {};
     hosts[hostname]["boot_drive"] = {};
-    hosts[hostname]["pxe_type"] = {};    
+    hosts[hostname]["pxe_type"] = {};
   }
 
   // This function is used internally for converting a hostname from one of the
@@ -80,8 +80,8 @@ $(document).ready(function(){
   // We use this to add data for a specific hosts. The if condition checks to see
   // if a host already exists in the list of hosts and if it doesn't it creates
   // a new dictionary for that host
-  set_host_value = function(hostname, key, value) {    
-      hosts[hostname][key] = value;    
+  set_host_value = function(hostname, key, value) {
+      hosts[hostname][key] = value;
   }
 
   $("#{{ form.is_offline_build.checkbox_id }}").change(event, function() {
@@ -89,8 +89,8 @@ $(document).ready(function(){
       $("#{{ form.is_offline_build.checkbox_id }}").prop('checked', true);
       $("#{{ form.repo_sync_centos.checkbox_id }}").prop('checked', false);
       $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('checked', false);
-      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('checked', false);  
-      
+      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('checked', false);
+
       $("#{{ form.repo_sync_centos.checkbox_id }}").prop('disabled', true);
       $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('disabled', true);
       $("#{{ form.repo_sync_additional.checkbox_id }}").prop('disabled', true);
@@ -103,11 +103,11 @@ $(document).ready(function(){
   });
 
   {% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.dns.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %}
-  $('#{{ field }}').keyup(function (event) {     
+  $('#{{ field }}').keyup(function (event) {
     validate_all();
   });
   {% endfor %}
-  
+
   validate_all = function() {
     if (system_settings_validate()) {
       console.log("system is valid moving on")
@@ -122,14 +122,14 @@ $(document).ready(function(){
     }
     else{
         $( "#generate_inventory" ).prop( "disabled", true );
-    }    
+    }
   }
 
-  system_settings_validate = function () {    
+  system_settings_validate = function () {
     if({% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.dns.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %} true) {
       return true;
     }
-    return false;   
+    return false;
   }
 
   // This disables the enter key. You don't want the form to accidentally reset
@@ -153,13 +153,13 @@ $(document).ready(function(){
   });
 
     // This handles the case when someone clicks the generate inventory button
-    $( "#generate_inventory" ).click(function(event){    
-      
-      // Clear hosts each time so its fresh
-      hosts = {}      
+    $( "#generate_inventory" ).click(function(event){
 
-      for(var i = 0; i < $('#number_of_nodes_field').val(); i++) {           
-       tmp = i+1;      
+      // Clear hosts each time so its fresh
+      hosts = {}
+
+      for(var i = 0; i < $('#number_of_nodes_field').val(); i++) {
+       tmp = i+1;
        hostname=$("#hostname_field_" + tmp).val();
        ip=$("#ip_address_field_" + tmp).val();
        mac=$("#mac_address_field_" + tmp).val();
@@ -175,20 +175,20 @@ $(document).ready(function(){
       system_settings = {};
 
       // Global Settings
-      dhcp_start =$("#dhcp_start_field").val(); 
+      dhcp_start =$("#dhcp_start_field").val();
       dhcp_end =$("#dhcp_end_field").val();
       dns =$("#dns_field").val();
       gateway =$("#gateway_field").val();
       netmask = $("#netmask_field").val();
-      root_password=$("#root_password_field").val(); 
+      root_password=$("#root_password_field").val();
 
       // Advanced Settings
       offline=$("#is_offline_build_checkbox").prop("checked");
       repo_sync_centos=$("#repo_sync_centos_checkbox").prop("checked");
       repo_sync_rhel=$("#repo_sync_rhel_checkbox").prop("checked");
-      repo_sync_additional=$("#repo_sync_additional_checkbox").prop("checked");       
-      timezone=$("#timezone_dropdown").val();     
-      
+      repo_sync_additional=$("#repo_sync_additional_checkbox").prop("checked");
+      timezone=$("#timezone_dropdown").val();
+
       system_settings["dhcp_start"] = dhcp_start;
       system_settings["dhcp_end"] = dhcp_end;
       system_settings["dns"] = dns;
@@ -214,7 +214,7 @@ $(document).ready(function(){
 </div>
 <div id="main_form">
   <div class="card" id="direct_to_disk_selected">
-    <div class="card-body">           
+    <div class="card-body">
       <h5>DHCP Settings</h5>
       {% with object = form.dhcp_start %}
         {% include "text_input.html" %}
@@ -223,7 +223,7 @@ $(document).ready(function(){
         {% include "text_input.html" %}
       {% endwith %}
       <hr>
-      <h5>Static Interface Settings</h5>      
+      <h5>Static Interface Settings</h5>
       {% with object = form.dns %}
         {% include "text_input.html" %}
       {% endwith %}
@@ -232,12 +232,12 @@ $(document).ready(function(){
       {% endwith %}
       {% with object = form.netmask %}
         {% include "text_input.html" %}
-      {% endwith %} 
+      {% endwith %}
       <hr>
       <h5>System Settings</h5>
       {% with object = form.root_password %}
         {% include "text_input.html" %}
-      {% endwith %} 
+      {% endwith %}
     </div>
   </div>
   <br />
@@ -273,8 +273,8 @@ $(document).ready(function(){
                 {% include option.include_html %}
               {% endwith %}
             {% endif %}
-          {% endfor %}  
-          <br />
+          {% endfor %}
+          <br/>
           <h5>Offline Build</h5>
           <form id='#{{ form.is_offline_build.form_name }}' role=form>
           <div class="form-check">
@@ -282,33 +282,33 @@ $(document).ready(function(){
             <label class="form-check-label" for="{{ form.is_offline_build.checkbox_id }}">
               {{ form.is_offline_build.label }}
             </label>
-          </div>  
-          </form> 
-          <br />      
-          <h5>Repo Sync Settings</h5> 
+          </div>
+          </form>
+          <br />
+          <h5>Repo Sync Settings</h5>
           <form id='#{{ form.repo_sync_centos.form_name }}' role=form>
             <div class="form-check">
               <input class="form-check-input {{ form.repo_sync_centos.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_centos.checkbox_id }}">
               <label class="form-check-label" for="{{ form.repo_sync_centos.checkbox_id }}">
                 {{ form.repo_sync_centos.label }}
               </label>
-            </div>            
+            </div>
             <div class="form-check">
                 <input class="form-check-input {{ form.repo_sync_rhel.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_rhel.checkbox_id }}">
                 <label class="form-check-label" for="{{ form.repo_sync_rhel.checkbox_id }}">
                   {{ form.repo_sync_rhel.label }}
                 </label>
-              </div>             
+              </div>
             <div class="form-check">
                 <input class="form-check-input {{ form.repo_sync_additional.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_additional.checkbox_id }}">
                 <label class="form-check-label" for="{{ form.repo_sync_additional.checkbox_id }}">
                   {{ form.repo_sync_additional.label }}
                 </label>
-              </div>           
+            </div>
           </form>
       </div>
     </div>
   </div>
-        
+
 </div>
 {% endblock %}

@@ -141,7 +141,7 @@ class DropDown:
     def change_values(self, form_name, dropdown_id, *args):
         copy_of_self = copy.deepcopy(self)
         copy_of_self.form_name = form_name
-        copy_of_self.dropdown_id = dropdown_id    
+        copy_of_self.dropdown_id = dropdown_id
         copy_of_self.args = args
         return copy_of_self
 
@@ -1221,7 +1221,7 @@ class KickstartInventoryForm:
     form_name = 'netmask'
   , label = 'Netmask'
   , placeholder = "255.255.255.0"
-  , input_type = 'text'  
+  , input_type = 'text'
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
@@ -1256,8 +1256,8 @@ class KickstartInventoryForm:
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Submit\" on the right!'
   , invalid_feedback = 'You must have at least two server.'
-  , reaction_file = 'button_reaction_number_of_nodes.js') 
-  
+  , reaction_file = 'button_reaction_number_of_nodes.js')
+
   ip_address = Field(
     form_name = 'ip_address'
   , label = 'IP Address'
@@ -1353,12 +1353,8 @@ class KickstartInventoryForm:
   , description =
   "This options is used to download the public EPEL, kubernetes, RockNSM, and Ceph yum repositories to the ansible controller.\
   This option requires an internet connection.")
- 
-  dhcp_settings = [dhcp_start, dhcp_end]
-  interface_settings = [dns,gateway,netmask]
-  system_settings = [root_password]
-  pxe_type_settings = [pxe_type]
-  node_settings = [number_of_nodes]
-  node_options = [hostname,ip_address,mac_address,boot_drive,pxe_type_settings]
-  timezone_settings = [timezone]
-  advanced_system_settings = [is_offline_build,repo_sync_centos,repo_sync_rhel,repo_sync_additional]
+
+  kickstart_form_settings = [dhcp_start, dhcp_end, dns, gateway, netmask, root_password,
+  pxe_type, number_of_nodes, hostname, ip_address, mac_address, boot_drive,
+  pxe_type, timezone, is_offline_build, repo_sync_centos, repo_sync_rhel,
+  repo_sync_additional]
