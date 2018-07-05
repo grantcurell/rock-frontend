@@ -4,7 +4,8 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from api.node_facts import *
 from app.forms import InventoryForm, DropDown
-from app.inventory_classes import Sensor, Server
+from app.kickstart_forms import KickstartInventoryForm, DropDown
+from app.inventory_classes import Sensor, Server, Node
 import json
 import os
 
@@ -21,6 +22,13 @@ def _sensor():
     sensor_count = request.args.get('sensor_count', 0, type=int)
     form = InventoryForm()
     return render_template("sensor.html", form=form, sensor_count=sensor_count)
+
+@app.route('/_node')
+def _node():
+    # This request wil be received from jquery on the client side
+    node_count = request.args.get('node_count', 0, type=int)
+    form = KickstartInventoryForm()
+    return render_template("node.html", form=form, node_count=node_count)
 
 @app.route('/_gather_device_facts')
 def _gather_device_facts():
@@ -202,6 +210,30 @@ def _generate_inventory():
 
     return "Finished"
 
+@app.route('/_generate_kickstart_inventory')
+def _generate_kickstart_inventory():    
+    system_settings = json.loads(request.args.get('system_settings'))
+    hosts = json.loads(request.args.get('hosts'))
+    nodes = {}
+    for host, value in hosts.iteritems():
+        nodes[host] = Node()        
+        nodes[host].hostname = host
+        nodes[host].ip_address = value["ip"]
+        nodes[host].mac_address = value["mac"]
+        nodes[host].boot_drive = value["boot_drive"]       
+        nodes[host].pxe_type = value["pxe_type"]
+
+    inventory_template = render_template('kickstart_inventory.yml', system_settings=system_settings, nodes=nodes)    
+
+    if not os.path.exists("/opt/tfplenum-deployer/playbooks/"):
+        os.makedirs("/opt/tfplenum-deployer/playbooks/")
+
+    # # to save the results
+    with open("/opt/tfplenum-deployer/playbooks/inventory.yml", "w") as inventory_file:
+        inventory_file.write(inventory_template)
+
+    return "Finished"
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index.html', methods=['GET', 'POST'])
 @app.route('/kit_configuration', methods=['GET', 'POST'])
@@ -209,6 +241,10 @@ def kit_configuration():
     form = InventoryForm()
     return render_template('kit_inventory.html', title='Configure Inventory', form=form)
 
+@app.route('/kickstart', methods=['GET', 'POST'])
+def kickstart():
+    form = KickstartInventoryForm()
+    return render_template('kickstart.html', title='Configure Inventory', form=form)
 @app.route('/help')
 def help():
     form = InventoryForm()

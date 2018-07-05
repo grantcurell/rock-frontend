@@ -1,0 +1,315 @@
+<!-- index.html-->
+
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block navbar %}
+{% with navbar_elements = form.navbar_elements
+      , current_page = 'kickstart' %}
+{% include "navbar.html" %}
+{% endwith %}
+{% endblock %}
+{% block body %}
+
+<script>
+
+//@ sourceURL=kit_inventory.js
+
+// This is used to register callbacks in various forms that when fired will
+// collect all the ID values everywhere on the system.
+var callbacks = $.Callbacks();
+
+// This exists so that there is a way to get all the IDs from all the nested DOM
+// elements. It is specifically used for the generate_inventory button which needs
+// to get all the inputs from everyone, but there's really no way for it to do that.
+var input_data = {};
+
+// This is used to store host specific data
+var hosts = {};
+
+
+$(document).ready(function(){
+
+  $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
+
+  var advanced_settings_enabled = false;
+
+  // By default set offline build true and disable repo sync checkboxes
+  $("#{{ form.is_offline_build.checkbox_id }}").prop('checked', true);
+  $("#{{ form.repo_sync_centos.checkbox_id }}").prop('disabled', true);
+  $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('disabled', true);
+  $("#{{ form.repo_sync_additional.checkbox_id }}").prop('disabled', true);
+
+  get_ids = function(){
+    var data = $("input");
+
+    // This loop goes through the id of all input elements on the page. If that element
+    // is not already in the list it adds it, otherwise, it ignores it.
+    $.each(data, function( key, value ) {
+      id = $(value).attr('id');
+      //if( !(id in input_data) ) {
+        input_data[id] = $( "#" + id ).val();
+      //}
+    });
+  }
+
+  callbacks.add( get_ids );
+
+  set_id_value = function(id, value) {
+    input_data[id] = value;
+  }
+
+  function _initialize_host(hostname) {
+    hosts[hostname] = {};
+    hosts[hostname]["ip"] = {};
+    hosts[hostname]["mac"] = {};
+    hosts[hostname]["boot_drive"] = {};
+    hosts[hostname]["pxe_type"] = {};    
+  }
+
+  // This function is used internally for converting a hostname from one of the
+  // generic numbered hosts in sensor or server.html to their real hostname (if
+  // it exists)
+  function _resolve_hostname(hostname) {
+    if(hostname in input_data) {
+      return input_data[hostname];
+    } else {
+      return hostname;
+    }
+  }
+
+  // We use this to add data for a specific hosts. The if condition checks to see
+  // if a host already exists in the list of hosts and if it doesn't it creates
+  // a new dictionary for that host
+  set_host_value = function(hostname, key, value) {    
+      hosts[hostname][key] = value;    
+  }
+
+  $("#{{ form.is_offline_build.checkbox_id }}").change(event, function() {
+    if ( $('#{{ form.is_offline_build.checkbox_id }}').is(":checked") ) {
+      $("#{{ form.is_offline_build.checkbox_id }}").prop('checked', true);
+      $("#{{ form.repo_sync_centos.checkbox_id }}").prop('checked', false);
+      $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('checked', false);
+      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('checked', false);  
+      
+      $("#{{ form.repo_sync_centos.checkbox_id }}").prop('disabled', true);
+      $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('disabled', true);
+      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('disabled', true);
+    } else {
+      $("#{{ form.repo_sync_centos.checkbox_id }}").prop('disabled', false);
+      $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('disabled', false);
+      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('disabled', false);
+      set_id_value("{{ form.is_offline_build.checkbox_id }}", false);
+    }
+  });
+
+  {% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.dns.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %}
+  $('#{{ field }}').keyup(function (event) {     
+    validate_all();
+  });
+  {% endfor %}
+  
+  validate_all = function() {
+    if (system_settings_validate()) {
+      console.log("system is valid moving on")
+       if(document.getElementById("number_of_nodes_field").checkValidity() && node_validate()) {
+         if( $( "#generate_inventory" ).is(':disabled') ) {
+             $( "#generate_inventory" ).prop( "disabled", false );
+           }
+       }
+       else{
+        $( "#generate_inventory" ).prop( "disabled", true );
+       }
+    }
+    else{
+        $( "#generate_inventory" ).prop( "disabled", true );
+    }    
+  }
+
+  system_settings_validate = function () {    
+    if({% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.dns.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %} true) {
+      return true;
+    }
+    return false;   
+  }
+
+  // This disables the enter key. You don't want the form to accidentally reset
+  // if the user presses enter.
+  $(document).keypress(
+    function(event){
+      // 13 corresponds to the enter key
+      if (event.which == '13') {
+        event.preventDefault();
+      }
+    });
+
+  $( "#{{ form.advanced_settings_button.generic_button_id }}" ).click(function (event) {
+    if( !advanced_settings_enabled ){
+      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}" ).show()
+      advanced_settings_enabled = true;
+    } else {
+      $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}" ).hide()
+      advanced_settings_enabled = false;
+    }
+  });
+
+    // This handles the case when someone clicks the generate inventory button
+    $( "#generate_inventory" ).click(function(event){    
+      
+      // Clear hosts each time so its fresh
+      hosts = {}      
+
+      for(var i = 0; i < $('#number_of_nodes_field').val(); i++) {           
+       tmp = i+1;      
+       hostname=$("#hostname_field_" + tmp).val();
+       ip=$("#ip_address_field_" + tmp).val();
+       mac=$("#mac_address_field_" + tmp).val();
+       boot_drive=$("#boot_drive_field_" + tmp).val();
+       pxe_type=$("#pxe_type_dropdown_" + tmp).val();
+       _initialize_host(hostname);
+       set_host_value(hostname,"ip",ip);
+       set_host_value(hostname,"mac",mac);
+       set_host_value(hostname,"boot_drive",boot_drive);
+       set_host_value(hostname,"pxe_type",pxe_type);
+      };
+
+      system_settings = {};
+
+      // Global Settings
+      dhcp_start =$("#dhcp_start_field").val(); 
+      dhcp_end =$("#dhcp_end_field").val();
+      dns =$("#dns_field").val();
+      gateway =$("#gateway_field").val();
+      netmask = $("#netmask_field").val();
+      root_password=$("#root_password_field").val(); 
+
+      // Advanced Settings
+      offline=$("#is_offline_build_checkbox").prop("checked");
+      repo_sync_centos=$("#repo_sync_centos_checkbox").prop("checked");
+      repo_sync_rhel=$("#repo_sync_rhel_checkbox").prop("checked");
+      repo_sync_additional=$("#repo_sync_additional_checkbox").prop("checked");       
+      timezone=$("#timezone_dropdown").val();     
+      
+      system_settings["dhcp_start"] = dhcp_start;
+      system_settings["dhcp_end"] = dhcp_end;
+      system_settings["dns"] = dns;
+      system_settings["gateway"] = gateway;
+      system_settings["netmask"] = netmask;
+      system_settings["root_password"] = root_password;
+      system_settings["offline"] = offline;
+      system_settings["timezone"] = timezone;
+      system_settings["repo_sync_centos"] = repo_sync_centos;
+      system_settings["repo_sync_rhel"] = repo_sync_rhel;
+      system_settings["repo_sync_additional"] = repo_sync_additional;
+
+      $.get("{{ url_for('_generate_kickstart_inventory') }}", {system_settings: JSON.stringify(system_settings), hosts: JSON.stringify(hosts)}, function(data){});
+    });
+
+});
+
+</script>
+
+<div class="jumbotron">
+  <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
+  <p class="lead">We're really trying to make this easier!</p>
+</div>
+<div id="main_form">
+  <div class="card" id="direct_to_disk_selected">
+    <div class="card-body">
+      <h4 class="card-title">Global Settings</h4>
+      <p class="card-text">
+        blah blah blah here
+      </p>
+      <hr>
+      <h5>DHCP Settings</h5>
+      {% with object = form.dhcp_start %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.dhcp_end %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      <br />
+      <h5>Static Interface Settings</h5>      
+      {% with object = form.dns %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.gateway %}
+        {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.netmask %}
+        {% include "text_input.html" %}
+      {% endwith %} 
+      <h5>System Settings</h5>
+      {% with object = form.root_password %}
+        {% include "text_input.html" %}
+      {% endwith %} 
+    </div>
+  {% with form = form.node_settings, card_title = "Node Settings" %}
+    {% include "card.html" %}
+  {% endwith %}
+  <!-- This is extended by servers.html. It is not actually blank as it might seem.
+       Check out foozandfuncs to see how this modification happens. You can search
+       for the id server_accordion. -->
+  <div class="accordion" id="{{ [form.number_of_nodes.form_name, 'accordion'] | join('_') }}"></div>
+  <br>
+  <form>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <p><button id="generate_inventory" class="btn btn-primary" type="button" disabled>Generate Inventory</button></p>
+      </div>
+      <div class="form-group col-md-6">
+        <p><button id="{{ form.advanced_settings_button.generic_button_id }}" class="btn btn-primary" type="button">{{ form.advanced_settings_button.label }}</button></p>
+      </div>
+    </div>
+  </form>
+  <hr>
+  <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' }}">
+    <h3>Advanced System Settings</h3>
+    <p class='font-weight-light'>{{ form.advanced_system_settings_text }}</p>
+    <div class="card">
+      <div class="card-body">
+          <h5>Advanced System Settings</h5>
+          {% for option in form.timezone_settings %}
+            {% if option.include_html is defined %}
+              {% with object = option %}
+                {% include option.include_html %}
+              {% endwith %}
+            {% endif %}
+          {% endfor %}  
+          <br />
+          <h5>Offline Build</h5>
+          <form id='#{{ form.is_offline_build.form_name }}' role=form>
+          <div class="form-check">
+            <input class="form-check-input {{ form.is_offline_build.css_class }}" type="checkbox" value="" id="{{ form.is_offline_build.checkbox_id }}">
+            <label class="form-check-label" for="{{ form.is_offline_build.checkbox_id }}">
+              {{ form.is_offline_build.label }}
+            </label>
+          </div>  
+          </form> 
+          <br />      
+          <h5>Repo Sync Settings</h5> 
+          <form id='#{{ form.repo_sync_centos.form_name }}' role=form>
+            <div class="form-check">
+              <input class="form-check-input {{ form.repo_sync_centos.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_centos.checkbox_id }}">
+              <label class="form-check-label" for="{{ form.repo_sync_centos.checkbox_id }}">
+                {{ form.repo_sync_centos.label }}
+              </label>
+            </div>            
+            <div class="form-check">
+                <input class="form-check-input {{ form.repo_sync_rhel.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_rhel.checkbox_id }}">
+                <label class="form-check-label" for="{{ form.repo_sync_rhel.checkbox_id }}">
+                  {{ form.repo_sync_rhel.label }}
+                </label>
+              </div>             
+            <div class="form-check">
+                <input class="form-check-input {{ form.repo_sync_additional.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_additional.checkbox_id }}">
+                <label class="form-check-label" for="{{ form.repo_sync_additional.checkbox_id }}">
+                  {{ form.repo_sync_additional.label }}
+                </label>
+              </div>           
+          </form>
+      </div>
+    </div>
+  </div>
+        
+</div>
+{% endblock %}

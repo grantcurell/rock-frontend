@@ -182,6 +182,7 @@ class InventoryForm:
 
   navbar_elements = {
     'Kit Configuration': 'kit_configuration'
+  , 'Kickstart Configuration': 'kickstart'
   , 'Help': 'help'
   }
 

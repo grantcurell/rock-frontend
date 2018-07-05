@@ -12,3 +12,11 @@ class Server:
     hostname = None
     management_ipv4 = None
     ceph_drive_list = []
+
+
+class Node:
+    hostname = None
+    ip_address = None
+    mac_address = None   
+    pxe_type = None
+    boot_drive = None

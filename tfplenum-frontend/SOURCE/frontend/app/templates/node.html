@@ -1,0 +1,83 @@
+<script>
+
+  get_ids();
+
+  // Adding this allows this code to be identified in a browser debugger
+  //@ sourceURL=node.js
+  $(document).ready(function(){
+
+    node_get_ids = function(){
+      get_ids();
+    }   
+
+    // This causes the manual server resource validation to fire
+{% for i in range(node_count) %}
+{% for field in [form.hostname.field_id + '_' + ((i+1) | string), form.ip_address.field_id + '_' + ((i+1) | string), form.ip_address.field_id + '_' + ((i+1) | string), form.mac_address.field_id + '_' + ((i+1) | string),form.boot_drive.field_id + '_' + ((i+1) | string), form.pxe_type.dropdown_id + '_' + ((i+1) | string)] %}
+  $('#{{ field }}').keyup(function (event) {     
+    validate_all();    
+  });
+{% endfor %}
+{% endfor %}
+
+node_validate = function() {
+
+  if({% for i in range(node_count) %}{% for field in [form.hostname.field_id + '_' + ((i+1) | string), form.ip_address.field_id + '_' + ((i+1) | string), form.ip_address.field_id + '_' + ((i+1) | string), form.mac_address.field_id + '_' + ((i+1) | string),form.boot_drive.field_id + '_' + ((i+1) | string), form.pxe_type.dropdown_id + '_' + ((i+1) | string) ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %}{% endfor %} true) {
+    return true;
+  }
+
+  return false;
+  
+}
+
+    callbacks.add( node_get_ids ); 
+
+  });
+</script>
+
+{# This loop goes from 0 to node_count #}
+{% for i in range(node_count) %}
+<div class="node_slide card">
+  <div class="card-header" id="{{ ['node_accordion_header', i+1] | join('_') }}">
+    <h5 class="mb-0">
+      <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#{{ ['node_collapse', i+1] | join('_') }}" aria-expanded="true" aria-controls="{{ ['node_collapse', i+1] | join('_') }}">
+        node {{ i + 1 }}<span id="node_{{ i + 1 }}_hostname"></span>
+      </button>
+    </h5>
+  </div>
+  <div id="{{ ['node_collapse', i+1] | join('_') }}" class="c-ollapse show" aria-labelledby="{{ ['node_accordion_header', i+1] | join('_') }}">
+      <div class="card-body">
+      {% with object = form.hostname.change_values(
+        (['hostname_form', i+1] | join('_')),
+          (form.hostname.field_id + '_' + ((i+1) | string))) %}
+          {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.ip_address.change_values(
+        (['ip_address_form', i+1] | join('_')),
+         (form.ip_address.field_id + '_' + ((i+1) | string))) %}
+         {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.mac_address.change_values(
+        (['mac_address_form', i+1] | join('_')),
+         (form.mac_address.field_id + '_' + ((i+1) | string))) %}
+         {% include "text_input.html" %}
+      {% endwith %}
+      {% with object = form.boot_drive.change_values(
+        (['boot_drive_form', i+1] | join('_')),
+         (form.boot_drive.field_id + '_' + ((i+1) | string))) %}
+         {% include "text_input.html" %}
+      {% endwith %}
+      {% for option in form.pxe_type_settings %}
+      {% if option.include_html is defined %}
+        {% with object = option %}
+          {% with object = form.pxe_type.change_values(
+            (['pxe_type_form', i+1] | join('_')),
+            (form.pxe_type.dropdown_id + '_' + ((i+1) | string))) %}
+            {% include option.include_html %}
+          {% endwith %}
+        {% endwith %}
+      {% endif %}
+    {% endfor %}  
+   </div>
+  </div>  
+</div>
+{% endfor %}
