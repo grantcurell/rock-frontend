@@ -15,6 +15,10 @@ $(document).ready(function(){
     set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "bro_workers", parseInt($( "#{{ (form.bro_workers.field_id + '_' + ((i+1) | string)) }}" ).val()));
     set_host_value("{{ 'sensor_' + ((i+1) | string) + '_hostname' }}", "moloch_threads", parseInt($( "#{{ (form.moloch_threads.field_id + '_' + ((i+1) | string)) }}" ).val()));
     {% endfor %}
+
+    for(i=1; i <= home_net_count; i++) {
+      set_home_net(i, $( "#{{ form.home_net.field_id }}" + String(home_net_count) ).val());
+    }
   }
   callbacks.add( sensor_get_ids );
 
@@ -189,6 +193,11 @@ $(document).ready(function(){
     }
   });
 });
+
+// This is the number of home net boxes which exist. It starts at one because by
+// default we draw one of them, but then draw more as needed. It is used by the
+// home_net.js file.
+var home_net_count = 1;
 </script>
 
 <div class="card">
@@ -217,11 +226,16 @@ $(document).ready(function(){
     <p class="card-text text-danger"><span id="sensor_resource_percentage_warnings"></span></p>
     <hr>
     <h6 class="card-subtitle mb-2 text-muted">Home NET Settings</h6>
-    <br>
-    {% with object = form.home_net %}
-      {% include "button.html" %}
-    {% endwith %}
     <hr>
+    <!-- We modify the below because it shouldn't just be the generic form name.
+    It needs to start at one. If they add another home net field it will be 2, etc -->
+    {% with object = form.home_net.change_values(
+      ([form.home_net.form_name, 1] | join('_')),
+      ([form.home_net.field_id, 1] | join('_')),
+      ([form.home_net.button_id, 1] | join('_'))) %}
+      {% include object.include_html %}
+    {% endwith %}
+    <div id="{{ form.home_net.field_id + '_div' }}"></div>
   </div>
 </div>
 {# This loop goes from 0 to sensor_count #}

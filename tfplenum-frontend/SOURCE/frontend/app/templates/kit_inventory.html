@@ -117,6 +117,18 @@ $(document).ready(function(){
     }
   }
 
+  set_home_net = function(home_net_number, value) {
+    if("home_nets" in input_data) {
+      input_data["home_nets"][home_net_number] = value;
+      console.log("HERE1");
+    } else {
+      input_data["home_nets"] = {};
+      input_data["home_nets"][home_net_number] = value;
+      console.log("HERE2");
+    }
+    alert(input_data["home_nets"][home_net_number]);
+  }
+
   get_advanced_settings_status = function() {
     return advanced_settings_enabled;
   }

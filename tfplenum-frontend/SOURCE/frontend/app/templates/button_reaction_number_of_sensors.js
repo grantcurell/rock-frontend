@@ -3,6 +3,7 @@
 // to determine how many server forms should be made. (IE if the user types
 // 5 in Number of Servers it will be transfered as the variable server_count)
 // here.
+$( "#generate_inventory" ).prop( "disabled", false );
 $.get("{{ url_for('_sensor') }}", { sensor_count: $( 'input[name={{ object.field_id }}]' ).val() }, function(data){
   // The hide method is here because effects only work if the element
   // begins in a hidden state

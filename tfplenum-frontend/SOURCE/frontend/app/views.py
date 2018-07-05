@@ -24,7 +24,7 @@ def _sensor():
 
 @app.route('/_gather_device_facts')
 def _gather_device_facts():
-    # This request wil be received from jquery on the client side
+    # This request will be received from jquery on the client side
     management_ip = request.args.get('management_ip')
     password = request.args.get('password')
     node = get_system_info(management_ip, password)
@@ -39,6 +39,21 @@ def _gather_device_facts():
                    disks= json.dumps([disk. __dict__ for disk in node.disks]),
                    hostname=node.hostname,
                    potential_monitor_interfaces=potential_monitor_interfaces)
+
+@app.route('/_render_home_net')
+def _render_home_net():
+
+    # This request wil be received from jquery on the client side
+    home_net_count = request.args.get('home_net_count')
+
+    form = InventoryForm()
+
+    # We have to modify the button returned to include a unique ID. In this case
+    # we are using the number of home net fields to generate the unique ID for each
+    # button
+    object = form.home_net.change_values((form.home_net.form_name + "_" + home_net_count), (form.home_net.field_id + "_" + home_net_count), (form.home_net.button_id + "_" + home_net_count));
+
+    return render_template("button.html", object=object, form=form)
 
 @app.route('/_display_monitor_interfaces')
 def _display_monitor_interfaces():

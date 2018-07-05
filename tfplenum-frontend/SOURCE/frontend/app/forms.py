@@ -657,7 +657,7 @@ class InventoryForm:
    , html5_constraint = 'pattern=(\\/[\\w]+)+'
    , valid_feedback = 'Good to go!'
    , invalid_feedback = 'You must enter a CIDR IP'
-   , required = True
+   , required = False
    , description =
    "These are the values Bro and Suricata will use for their home nets. Home Nets \
    are the networks you are trying to protect."
