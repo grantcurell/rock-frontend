@@ -1115,6 +1115,8 @@ class InventoryForm:
 
 class KickstartInventoryForm:
 
+  inventory_path = "/opt/tfplenum-deployer/playbooks/inventory.yml"
+
   ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
 
   navbar_elements = {
@@ -1133,24 +1135,15 @@ class KickstartInventoryForm:
     , label = 'Show/Hide Advanced Settings'
   )
 
+  inventory_generated_modal = ModalPopUp(
+  name = 'inventory_generated_modal'
+  , modal_title = 'Success'
+  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page.'
+  , primary_button_text = 'Close')
+
   ###########################
   # Common Settings         #
   ###########################
-
-  dns_ip = Field(
-    form_name = 'dns_ip'
-  , label = 'DNS IP Address'
-  , placeholder = "Same as Master Server management IP"
-  , input_type = 'text'
-  , html5_constraint = 'ip_constraint'
-  , invalid_feedback = 'You must enter a valid IP address'
-  , required = False
-  , description =
-  "The IP address of the system DNS server. You may define this or it will   \
-   default  to using the master server's management IP. We suggest you leave \
-   it to default  unless you have a specific reason to use a different DNS   \
-   server. Keep in mind  you will need to manually provide all required DNS  \
-   entries on your separate  DNS Server or the kit will break.")
 
   is_offline_build = CheckBox(
     form_name = "is_offline_build"
@@ -1159,26 +1152,15 @@ class KickstartInventoryForm:
   "Check this if you are setting up your build using the prebuilt offline installer.\
   By default, this should be checked.  If unchecked, this option requires an internet connection.")
 
-  enable_dhcp_server = CheckBox(
-    form_name = "enable_dhcp"
-  , label = "Enable DHCP Server?"
-  , description =
-  "Check this if you are not using an external dhcp server.  A dhcp server is required for kickstart.")
-
-  enable_dns_server = CheckBox(
-    form_name = "enable_dns_server"
-  , label = "Enable DNS Server?"
-  , description =
-  "Check this if you are not using an external dns server.")
-
   dhcp_start = Field(
     form_name = 'dhcp_start'
   , label = 'DHCP Starting Ip Address'
-  , placeholder = "192.168.1.50"
+  , placeholder = "The beginning of your DHCP start range"
   , input_type = 'text'
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
+  , default_value = "192.168.5.50"
   , description = "This field is used to identify the starting ip address of the dhcp range.  The dhcp range is only used during the network boot process.\
   The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time. \
   Be sure not to use a range will be cause conflicts with existing network devices.")
@@ -1186,22 +1168,24 @@ class KickstartInventoryForm:
   dhcp_end = Field(
     form_name = 'dhcp_end'
   , label = 'DHCP Ending Ip Address'
-  , placeholder = "192.168.1.60"
+  , placeholder = "The end of your DHCP range"
   , input_type = 'text'
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
+  , default_value = "192.168.5.90"
   , description = "This field is used to identify the ending ip address of the dhcp range.  \
   The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time.")
 
   dns = Field(
     form_name = 'dns'
   , label = 'DNS'
-  , placeholder = "192.168.1.1"
+  , placeholder = "Enter your kit's DNS here"
   , input_type = 'text'
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
+  , default_value = "192.168.5.1"
   , description = "The dns field or Domain Name Resolution is the address used to resolve ip addresses to domain names. \
   During the system installation the dns address should be the ansible controllers ip address unless you are using an external dns server. \
   This field is specifically used as a part of the static interface assignment during the operating system installation.")
@@ -1209,11 +1193,12 @@ class KickstartInventoryForm:
   gateway = Field(
     form_name = 'gateway'
   , label = 'Gateway'
-  , placeholder = "192.168.1.1"
+  , placeholder = "Enter your kit's gateway here"
   , input_type = 'text'
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
+  , default_value = "192.168.5.1"
   , description = "The gateway address or default gateway is usually a routable address to the local network.  \
   This field is specifically used as a part of the static interface assignment during the operating system installation.")
 
@@ -1225,6 +1210,7 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
+  , default_value = "255.255.255.0"
   , description = "The netmask is the network address used for subnetting.  \
   This field is specifically used as a part of the static interface assignment during the operating system installation.")
 
@@ -1255,19 +1241,18 @@ class KickstartInventoryForm:
   , html5_constraint = 'min=2'
   , required = True
   , valid_feedback = 'Looks good! Now hit \"Submit\" on the right!'
-  , invalid_feedback = 'You must have at least two server.'
+  , invalid_feedback = 'You must have at least two servers.'
   , reaction_file = 'button_reaction_number_of_nodes.js')
 
   ip_address = Field(
     form_name = 'ip_address'
   , label = 'IP Address'
-  , placeholder = "192.168.1.20"
+  , placeholder = "Enter your node IP address here"
   , input_type = 'text'
-  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
-  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
+  , default_value = "192.168.5.50"
   , description = "The node ip address is used during the kickstart process to statically assign the node's interface.")
 
   mac_address = Field(
@@ -1275,8 +1260,6 @@ class KickstartInventoryForm:
   , label = 'MAC Address'
   , placeholder = "01:23:45:67:89:ab"
   , input_type = 'text'
-  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
-  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
   , html5_constraint = 'pattern=(^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$)'
   , invalid_feedback = 'You must enter a valid mac address'
   , required = True
@@ -1289,8 +1272,6 @@ class KickstartInventoryForm:
   , label = 'Boot Drive'
   , placeholder = "sda"
   , input_type = 'text'
-  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
-  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
   , html5_constraint = ""
   , invalid_feedback = ''
   , required = True
@@ -1300,10 +1281,8 @@ class KickstartInventoryForm:
   hostname = Field(
     form_name = 'hostname'
   , label = 'Hostname'
-  , placeholder = "rockserver1.lan"
+  , placeholder = "tfserver1.lan"
   , input_type = 'text'
-  # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
-  # for a good explanation of this type of regex. I got the original code from: https://gist.github.com/nikic/4162505
   , html5_constraint = ""
   , invalid_feedback = 'You must enter a valid hostname.'
   , required = True
@@ -1354,7 +1333,12 @@ class KickstartInventoryForm:
   "This options is used to download the public EPEL, kubernetes, RockNSM, and Ceph yum repositories to the ansible controller.\
   This option requires an internet connection.")
 
-  kickstart_form_settings = [dhcp_start, dhcp_end, dns, gateway, netmask, root_password,
-  pxe_type, number_of_nodes, hostname, ip_address, mac_address, boot_drive,
-  pxe_type, timezone, is_offline_build, repo_sync_centos, repo_sync_rhel,
-  repo_sync_additional]
+  dhcp_settings = [dhcp_start, dhcp_end]
+  interface_settings = [dns,gateway, netmask]
+  system_settings = [root_password]
+  pxe_type_settings = [pxe_type]
+  node_settings = [number_of_nodes]
+  node_options = [hostname, ip_address,mac_address, boot_drive, pxe_type_settings]
+  timezone_settings = [timezone]
+  advanced_system_settings = [is_offline_build, repo_sync_centos, repo_sync_rhel, repo_sync_additional]
+  kickstart_form_settings = dhcp_settings + interface_settings + system_settings + pxe_type_settings + node_settings + node_options + timezone_settings + advanced_system_settings

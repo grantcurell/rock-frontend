@@ -202,11 +202,24 @@ $(document).ready(function(){
       system_settings["repo_sync_additional"] = repo_sync_additional;
 
       $.get("{{ url_for('_generate_kickstart_inventory') }}", {system_settings: JSON.stringify(system_settings), hosts: JSON.stringify(hosts)}, function(data){});
+
+      $( "#{{ form.inventory_generated_modal.button_id_primary }}" ).click(function(event){
+
+        // This hides the modal box. If you don't have this, the modal box stays on
+        // the screen
+        $( "#{{ form.inventory_generated_modal.modal_id }}" ).modal('hide');
+      });
+
+      $( '#{{ form.inventory_generated_modal.modal_id }}' ).modal('show');
     });
 
 });
 
 </script>
+
+{% with object = form.inventory_generated_modal %}
+  {% include "modal_button.html" %}
+{% endwith %}
 
 <div class="jumbotron">
   <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
@@ -243,7 +256,7 @@ $(document).ready(function(){
   <br />
   {% with form = form.node_settings, card_title = "Node Settings" %}
     {% include "card.html" %}
-  {% endwith %}  
+  {% endwith %}
   <!-- This is extended by servers.html. It is not actually blank as it might seem.
        Check out foozandfuncs to see how this modification happens. You can search
        for the id server_accordion. -->
