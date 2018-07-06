@@ -117,46 +117,52 @@ $(document).ready(function(){
       }
       {% endfor %}
 
-      // Now we need to calculate what percentage of the cores each resource will
-      // receive. Remember 1000m = 1 core in Kubernetes.
-      total_cpu_power_avaliable = lowest_cpus * 1000;
+      lowest_cpus -= 1;
 
-      {% for field in form.sensor_resource_percentages %}
-      var {{ field.field_id + "_cpus" }} = Math.floor(total_cpu_power_avaliable * ({{ field.field_id + "_var" }}/100));
+      if(lowest_cpus > 0) {
+        // Now we need to calculate what percentage of the cores each resource will
+        // receive. Remember 1000m = 1 core in Kubernetes.
+        total_cpu_power_avaliable = lowest_cpus * 1000;
 
-      // We need the below so that these values can be retrieved when we go to generate
-      // the inventory file
-      set_id_value("{{ field.label[0].split(' ')[0] + '_cpu_request' }}", {{ field.field_id + "_cpus" }});
-      $( "#{{ field.field_id + '_span' }}" ).text(({{ field.field_id + "_cpus" }}/1000).toFixed(2));
-      {% endfor %}
+        {% for field in form.sensor_resource_percentages %}
+        var {{ field.field_id + "_cpus" }} = Math.floor(total_cpu_power_avaliable * ({{ field.field_id + "_var" }}/100));
 
-      set_sensor_resources_validated(true);
-      $( "#sensor_resource_percentage_warnings" ).text("");
-
-      // We only do this calculation if the algorithm is currently enabled
-      if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
-
-        // Configure Sensor Moloch Threads
-        if ({{ form.moloch_cpu_percentage.field_id + "_cpus" }} < 1000) {
-          moloch_threads = 1;
-        } else {
-          moloch_threads = Math.round({{ form.moloch_cpu_percentage.field_id + "_cpus" }}/1000);
-        }
-
-        {% for i in range(sensor_count) %}
-        $( "#{{ form.moloch_threads.field_id + '_' }}{{ i + 1 }}" ).val(moloch_threads);
+        // We need the below so that these values can be retrieved when we go to generate
+        // the inventory file
+        set_id_value("{{ field.label[0].split(' ')[0] + '_cpu_request' }}", {{ field.field_id + "_cpus" }});
+        $( "#{{ field.field_id + '_span' }}" ).text(({{ field.field_id + "_cpus" }}/1000).toFixed(2));
         {% endfor %}
 
-        // Configure Sensor Bro Threads
-        if ({{ form.bro_cpu_percentage.field_id + "_cpus" }} < 1000) {
-          bro_workers = 1;
-        } else {
-          bro_workers = Math.round({{ form.bro_cpu_percentage.field_id + "_cpus" }}/1000);
-        }
+        set_sensor_resources_validated(true);
+        $( "#sensor_resource_percentage_warnings" ).text("");
 
-        {% for i in range(sensor_count) %}
-        $( "#{{ form.bro_workers.field_id + '_' }}{{ i + 1 }}" ).val(bro_workers);
-        {% endfor %}
+        // We only do this calculation if the algorithm is currently enabled
+        if ( !$('#{{ form.disable_autocalculate.checkbox_id }}').is(":checked") ) {
+
+          // Configure Sensor Moloch Threads
+          if ({{ form.moloch_cpu_percentage.field_id + "_cpus" }} < 1000) {
+            moloch_threads = 1;
+          } else {
+            moloch_threads = Math.round({{ form.moloch_cpu_percentage.field_id + "_cpus" }}/1000);
+          }
+
+          {% for i in range(sensor_count) %}
+          $( "#{{ form.moloch_threads.field_id + '_' }}{{ i + 1 }}" ).val(moloch_threads);
+          {% endfor %}
+
+          // Configure Sensor Bro Threads
+          if ({{ form.bro_cpu_percentage.field_id + "_cpus" }} < 1000) {
+            bro_workers = 1;
+          } else {
+            bro_workers = Math.round({{ form.bro_cpu_percentage.field_id + "_cpus" }}/1000);
+          }
+
+          {% for i in range(sensor_count) %}
+          $( "#{{ form.bro_workers.field_id + '_' }}{{ i + 1 }}" ).val(bro_workers);
+          {% endfor %}
+        }
+      } else {
+        set_sensor_resources_validated(false);
       }
     } else {
       set_sensor_resources_validated(false);
@@ -224,6 +230,7 @@ var home_net_count = 1;
         {% endwith %}
       {% endif %}
     {% endfor %}
+    <p class="text-info">Keep in mind that each sensor will have one core set aside for everything else. This may lead to the system telling you that you have insufficient cores though it seems like you have enough.</p>
     <p class="card-text">The default values above were derived from testing with SuperMicro ThinkMates based on 1.25 Gb/s of HTTP/SMB/FTP/YouTube. We used TCPReplay on each sensor with PCAP to avoid the interfaces throttling how much we could play. The system will use the sensor with the lowest CPU count for calculations. Keep in mind, this does not mean faster systems won't use that speed, the above are effectively ratios. See field descriptions for more information.</p>
     <p class="card-text">Percentage Allocated: <span id="sensor_resource_percentage_allocated">0</span></p>
     <p class="card-text text-danger"><span id="sensor_resource_percentage_warnings"></span></p>

@@ -454,6 +454,9 @@ $(document).ready(function(){
   // This function runs all validations to ensure
   validate_all = function () {
 
+    var kubernetes_cidr_validated = true;
+    var validation_failed = true;
+
     // See https://www.w3schools.com/js/js_validation_api.asp
     if(document.getElementById("{{ form.kubernetes_services_cidr.field_id }}").checkValidity() == true ) {
 
@@ -465,12 +468,53 @@ $(document).ready(function(){
           $( "#generate_inventory" ).prop( "disabled", false );
         }
 
+        validation_failed = false;
+
       // If all variables are not valid, make sure we disable the generate inventory button
       } else {
         $( "#generate_inventory" ).prop( "disabled", true );
       }
     } else {
       $( "#generate_inventory" ).prop( "disabled", true );
+      kubernetes_cidr_validated = false;
+    }
+
+    $( "#validation" ).html("");
+
+    if(validation_failed) {
+      if( !clustered_storage_validated ) {
+        $( "#validation ").append("<p class='text-info'>- Clustered storage failed to validate. Make sure you have space for everything by checking the total system resources. Maybe you forgot to add a Ceph drive?</p>");
+      }
+
+      if ( !ceph_drives_validated ) {
+        $( "#validation ").append("<p class='text-info'>- Ceph drives failed to validate. You have to have at least two drives in your Ceph cluster!</p>");
+      }
+
+      if ( !elasticsearch_validated ) {
+        $( "#validation ").append("<p class='text-info'>- Elasticsearch failed to validate. Check the server section and make sure Elasticsearch has enough RAM and CPU resources.</p>");
+      }
+
+      if ( !monitor_interfaces_validated ) {
+        $( "#validation ").append("<p class='text-info'>- Monitor interfaces failed to validate. You need to select at least one monitor interface on each sensor.</p>");
+      }
+
+      if ( !master_server_validated ) {
+        $( "#validation ").append("<p class='text-info'>- Master server failed to validate. Did you remember to select a master server? (It's the checkbox that says '{{ form.server_is_master_server_checkbox.label }}')</p>");
+      }
+
+      if ( !sensor_resources_validated ) {
+        $( "#validation ").append("<p class='text-info'>- Your sensor resources failed to validate. Check the sensor resources and make sure you have sufficient CPU resources fro Bro, Suricata, etc.</p>");
+      }
+
+      if ( !pcap_drives_validated ) {
+        $( "#validation ").append("<p class='text-info'>- PCAP drives failed to validate. Did you remember to select a PCAP drive for each sensor?</p>");
+      }
+
+      if ( !kubernetes_cidr_validated ) {
+        $( "#validation ").append("<p class='text-info'>- Kubernetes services CIDR failed to validate. Make sure you type in a valid Kubernetes services CIDR under Global Settings.</p>");
+      }
+    } else {
+      $( "#validation ").append("<p class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>");
     }
   }
 
@@ -743,6 +787,13 @@ $(document).ready(function(){
       </div>
     </div>
   </form>
+  <div class="card">
+    <div class="card-header">
+      Validation
+    </div>
+    <div class="card-body" id="validation">
+    </div>
+  </div>
   <hr>
   <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' }}">
     <h3>Advanced System Settings</h3>
