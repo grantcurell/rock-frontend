@@ -1,4 +1,5 @@
 import copy
+from collections import OrderedDict
 
 # https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/Constraint_validation
 # form_name (str): The name which will be applied to the form in which this field is placed
@@ -187,11 +188,12 @@ class InventoryForm:
   cidr_constraint = "pattern=(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/(3[0-2]|[1-2]?[0-9])";
 
   # If you need to add elements to the navbar you can do it here
-  navbar_elements = {
-    'Kit Configuration': 'kit_configuration'
-  , 'Kickstart Configuration': 'kickstart'
-  , 'Help': 'help'
-  }
+  # In python2 you must use an ordered dict because python 2 sucks and for some reason
+  # does not respect dictionary declaration order. I hate python 2.
+  navbar_elements = OrderedDict([
+    ('Kit Configuration', 'kit_configuration')
+  , ('Kickstart Configuration', 'kickstart')
+  , ('Help', 'help')])
 
   advanced_system_settings_text = 'All of the required settings below will autopopulate \
   based on facts gathered from the servers. It is not necessary to change any of \
@@ -1119,12 +1121,6 @@ class KickstartInventoryForm:
 
   ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
 
-  navbar_elements = {
-    'Kit Configuration': 'kit_configuration'
-  , 'Kickstart Configuration': 'kickstart'
-  , 'Help': 'help'
-  }
-
   advanced_system_settings_text = 'All of the required settings below will autopopulate \
   based on facts gathered from the servers. It is not necessary to change any of \
   them in order for the system to function. However, you may want to update some \
@@ -1140,6 +1136,8 @@ class KickstartInventoryForm:
   , modal_title = 'Success'
   , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page.'
   , primary_button_text = 'Close')
+
+  navbar_elements = InventoryForm().navbar_elements
 
   ###########################
   # Common Settings         #

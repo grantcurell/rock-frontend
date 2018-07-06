@@ -20,9 +20,13 @@ flask run --host=0.0.0.0
 
 ----------------------------
 
+yum install -y python2-pip
 pip install flask virtualenv virtualenvwrapper
 pip install --upgrade pip
 export WORKON_HOME=~/Envs
 source /usr/bin/virtualenvwrapper.sh
 mkvirtualenv my-venv
 workon my-venv
+
+For development mode run: export FLASK_ENV=development
+flask run --host=0.0.0.0
