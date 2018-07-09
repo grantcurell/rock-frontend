@@ -112,6 +112,6 @@ all:
             {{ hostname }}:              
               ip: {{ attributes.ip_address }}              
               mac: {{ attributes.mac_address }}
-              boot_drive: {{ attributes.boot_drive }}              
-              pxe_type: {{ attributes.pxe_type }}
+              boot_drive: {{ attributes.boot_drive|lower() }}              
+              pxe_type: {{ attributes.pxe_type|lower() }}
             {% endfor %}
