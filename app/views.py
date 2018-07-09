@@ -137,8 +137,10 @@ def _generate_inventory():
     form = InventoryForm
     input_data[form.kubernetes_services_cidr.field_id] = input_data[form.kubernetes_services_cidr.field_id] + "/28"
 
-    if form.sensor_storage_type.dropdown_id in input_data:
-        if input_data[form.sensor_storage_type.dropdown_id] == form.sensor_storage_type.options[0].replace(" ", "_"):
+    if form.sensor_storage_type.dropdown_id in input_data:        
+        # Remove the dropdown name from the value (sensor_storage_type_dropdown_)
+        tmp = input_data[form.sensor_storage_type.dropdown_id].replace("sensor_storage_type_dropdown_","")        
+        if tmp == form.sensor_storage_type.options[0].replace(" ", "_"):
             use_ceph_for_pcap = True
         else:
             use_ceph_for_pcap = False
