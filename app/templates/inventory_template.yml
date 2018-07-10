@@ -72,7 +72,7 @@ all:
     # will assign to PCAP. It should be zero if use_ceph_for_pcap is false.
     # Remember, this will be spread out across every drive in the ceph cluster
     # as defined in the variable "ceph_drive_list".
-    moloch_pcap_pv_size: {{ input_data[form.moloch_pcap_pv.field_id] }}
+    moloch_pcap_pv_size: {{ input_data[form.moloch_pcap_pv.field_id] // ((sensors | length) + (remote_sensors | length)) }}
 
     # Advanced Moloch settings, do not touch unless you know what you're doing
     moloch_spiDataMaxIndices: "{{ input_data[form.moloch_spiDataMaxIndices.field_id] }}"
