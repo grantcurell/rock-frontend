@@ -20,6 +20,13 @@
 function gather_facts(is_remote_sensor) {
 {% endif %}
   $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val(), password: $( "#{{ form.password.field_id }}").val() }, function(data){
+
+    if (data.error_message != undefined){
+        $( '#{{ form.common_error_modal.modal_id }} .modal-dialog .modal-body' ).text(data.error_message)
+        $( '#{{ form.common_error_modal.modal_id }}' ).modal('show');
+        return;
+    }
+
     var current_total_cpus = data.cpus_available + parseInt($( "#{{ object.args[5] }}_cpus_available" ).text());
     $( "#{{ object.args[5] }}_cpus_available" ).text(current_total_cpus);
 

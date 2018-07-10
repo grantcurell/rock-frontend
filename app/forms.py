@@ -233,6 +233,13 @@ class InventoryForm:
   , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page.'
   , primary_button_text = 'Close')
 
+  common_error_modal = ModalPopUp(
+    name = 'common_error_modal',
+    modal_title= 'Error',
+    modal_text= 'Error!',
+    primary_button_text = 'Close'
+  )
+
   ###########################
   # Common Settings         #
   ###########################

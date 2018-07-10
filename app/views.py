@@ -32,20 +32,24 @@ def _node():
 @app.route('/_gather_device_facts')
 def _gather_device_facts():
     # This request will be received from jquery on the client side
-    management_ip = request.args.get('management_ip')
-    password = request.args.get('password')
-    node = get_system_info(management_ip, password)
-    potential_monitor_interfaces = []
+    try:
+        management_ip = request.args.get('management_ip')
+        password = request.args.get('password')
+        node = get_system_info(management_ip, password)
+        potential_monitor_interfaces = []
 
-    for interface in node.interfaces:
-        if interface.ip_address != management_ip:
-            potential_monitor_interfaces.append(interface.name)
+        for interface in node.interfaces:
+            if interface.ip_address != management_ip:
+                potential_monitor_interfaces.append(interface.name)
 
-    return jsonify(cpus_available=node.cpu_cores,
-                   memory_available=node.memory_gb,
-                   disks= json.dumps([disk. __dict__ for disk in node.disks]),
-                   hostname=node.hostname,
-                   potential_monitor_interfaces=potential_monitor_interfaces)
+        return jsonify(cpus_available=node.cpu_cores,
+                       memory_available=node.memory_gb,
+                       disks= json.dumps([disk. __dict__ for disk in node.disks]),
+                       hostname=node.hostname,
+                       potential_monitor_interfaces=potential_monitor_interfaces)
+    except Exception as e:
+        #TODO Add logging later
+        return jsonify(error_message=str(e))
 
 @app.route('/_render_home_net')
 def _render_home_net():

@@ -645,14 +645,20 @@ $(document).ready(function(){
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){
         $( '#{{ form.inventory_generated_modal.modal_id }}' ).modal('show');
       });
-
     });
 
+    $( "#{{ form.common_error_modal.button_id_primary }}" ).click(function(event){
+      $( "#{{ form.common_error_modal.modal_id }}" ).modal('hide');
+    });
 });
 
 </script>
 
 {% with object = form.inventory_generated_modal %}
+  {% include "modal_button.html" %}
+{% endwith %}
+
+{% with object = form.common_error_modal %}
   {% include "modal_button.html" %}
 {% endwith %}
 
