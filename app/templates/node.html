@@ -20,13 +20,100 @@
 {% endfor %}
 
 node_validate = function() {
+  var node_fields_results = false;
+  var node_hostnames = false;
+  var node_mac_address = false;
+  var node_ip_address = false;
 
   if({% for i in range(node_count) %}{% for field in [form.hostname.field_id + '_' + ((i+1) | string), form.ip_address.field_id + '_' + ((i+1) | string), form.ip_address.field_id + '_' + ((i+1) | string), form.mac_address.field_id + '_' + ((i+1) | string),form.boot_drive.field_id + '_' + ((i+1) | string), form.pxe_type.dropdown_id + '_' + ((i+1) | string) ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %}{% endfor %} true) {
+    node_fields_results = true;
+  }
+
+  node_hostnames = check_hostnames();
+  node_mac_address = check_mac_address();
+  node_ip_address = check_ip_address();
+    
+  if (node_fields_results && node_hostnames && node_mac_address && node_ip_address){
     return true;
   }
 
   return false;
   
+}
+
+  check_hostnames = function(){
+    var hostnameList = [];
+    {% for i in range(node_count) %}{% for field in [form.hostname.field_id + '_' + ((i+1) | string)] %}
+    {% raw %}if(document.getElementById("{% endraw %}{{ field }}{% raw %}").checkValidity()){
+    hostnameList.push($("#{% endraw %}{{ field }}{% raw %}").val())
+    }{% endraw %}
+    {% endfor %}{% endfor %}
+
+    var hostnameArr = hostnameList.sort();
+    var hostnameDuplicates = [];
+
+    for (var i = 0; i < hostnameArr.length - 1; i++) {
+      if (hostnameArr[i + 1] == hostnameArr[i]) {
+        hostnameDuplicates.push(hostnameArr[i]);
+      }
+    }
+
+    if(hostnameDuplicates.length > 0){
+      $( "#validation ").append("<p class='text-info'>- Duplicate hostnames found: " + hostnameDuplicates + " Node must have a unique hostnames.</p>");      
+      return false;
+    }
+
+      return true;
+  }
+
+  check_mac_address = function(){
+  var macList = [];
+  {% for i in range(node_count) %}{% for field in [form.mac_address.field_id + '_' + ((i+1) | string)] %}
+  {% raw %}if(document.getElementById("{% endraw %}{{ field }}{% raw %}").checkValidity()){
+    macList.push($("#{% endraw %}{{ field }}{% raw %}").val())
+  }{% endraw %}
+  {% endfor %}{% endfor %}
+
+  var macArr = macList.sort();
+  var macDuplicates = [];
+
+  for (var i = 0; i < macArr.length - 1; i++) {
+    if (macArr[i + 1] == macArr[i]) {
+      macDuplicates.push(macArr[i]);
+    }
+  }
+
+  if(macDuplicates.length > 0){
+    $( "#validation ").append("<p class='text-info'>- Duplicate mac addresses found: " + macDuplicates + " Nodes must have a unique mac address.</p>");    
+    return false;
+  }
+
+  return true;
+}
+
+  check_ip_address = function(){
+  var ipList = [];
+  {% for i in range(node_count) %}{% for field in [form.ip_address.field_id + '_' + ((i+1) | string)] %}
+  {% raw %}if(document.getElementById("{% endraw %}{{ field }}{% raw %}").checkValidity()){
+    ipList.push($("#{% endraw %}{{ field }}{% raw %}").val())
+  }{% endraw %}
+  {% endfor %}{% endfor %}
+
+  var ipArr = ipList.sort();
+  var ipDuplicates = [];
+
+  for (var i = 0; i < ipArr.length - 1; i++) {
+    if (ipArr[i + 1] == ipArr[i]) {
+      ipDuplicates.push(ipArr[i]);
+    }
+  }
+
+  if(ipDuplicates.length > 0){
+    $( "#validation ").append("<p class='text-info'>- Duplicate ip addresses found: " + ipDuplicates + " Nodes must have a unique ip address.</p>");    
+    return false;
+  }
+
+    return true;
 }
 
     callbacks.add( node_get_ids ); 

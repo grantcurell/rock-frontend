@@ -127,6 +127,11 @@ def ansible_setup(server_ip, passwd):
     """
     # Disable ssh host key checking
     os.environ['ANSIBLE_HOST_KEY_CHECKING'] = 'False'
+    # Remove known_hosts file
+    try:
+        os.remove('/root/.ssh/known_hosts')
+    except OSError:
+        pass    
     # The following runs ansible setup module on the target node
     # sed magic removes the "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
     p = os.popen("ansible all -m setup -e ansible_ssh_pass=" + passwd + " -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()

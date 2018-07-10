@@ -109,19 +109,22 @@ $(document).ready(function(){
   {% endfor %}
 
   validate_all = function() {
-    if (system_settings_validate()) {
-      console.log("system is valid moving on")
-       if(document.getElementById("number_of_nodes_field").checkValidity() && node_validate()) {
-         if( $( "#generate_inventory" ).is(':disabled') ) {
-             $( "#generate_inventory" ).prop( "disabled", false );
-           }
-       }
-       else{
-        $( "#generate_inventory" ).prop( "disabled", true );
-       }
+    $( "#validation" ).html("");   
+    var system_settings_results = false;
+    system_settings_results = system_settings_validate();
+    var node_results = false;
+    
+    // Only check node settings when you have filled out the number of nodes input
+    if(document.getElementById("number_of_nodes_field").checkValidity()){
+      node_results = node_validate();
+    }
+
+    if(system_settings_results && node_results){
+      $( "#validation ").append("<p class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>");      
+      $( "#generate_inventory" ).prop( "disabled", false );      
     }
     else{
-        $( "#generate_inventory" ).prop( "disabled", true );
+      $( "#generate_inventory" ).prop( "disabled", true );
     }
   }
 
@@ -273,7 +276,14 @@ $(document).ready(function(){
       </div>
     </div>
   </form>
-  <hr>
+  <div class="card">
+    <div class="card-header">
+      Validation
+    </div>
+    <div class="card-body" id="validation">
+    </div>
+  </div>
+  <hr>  
   <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' }}">
     <h3>Advanced System Settings</h3>
     <p class='font-weight-light'>{{ form.advanced_system_settings_text }}</p>

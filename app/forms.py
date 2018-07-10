@@ -1217,8 +1217,8 @@ class KickstartInventoryForm:
   , label = 'Root Password'
   , placeholder = ""
   , input_type = 'password'
-  , html5_constraint = ""
-  , invalid_feedback = 'You must enter a root password.'
+  , html5_constraint = 'pattern=(^.{6,}$)'
+  , invalid_feedback = 'You must enter a root password with a minimum length of 6 characters.'
   , required = True
   , description = "The root password will be how to log into each node after the kickstart process completes.\
   Do not forget this password or you will not be able to complete the system installation.")
@@ -1250,13 +1250,13 @@ class KickstartInventoryForm:
   , html5_constraint = ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
-  , default_value = "192.168.5.50"
+  , default_value = ""
   , description = "The node ip address is used during the kickstart process to statically assign the node's interface.")
 
   mac_address = Field(
     form_name = 'mac_address'
   , label = 'MAC Address'
-  , placeholder = "01:23:45:67:89:ab"
+  , placeholder = "Enter a mac address"
   , input_type = 'text'
   , html5_constraint = 'pattern=(^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$)'
   , invalid_feedback = 'You must enter a valid mac address'
@@ -1268,7 +1268,7 @@ class KickstartInventoryForm:
   boot_drive = Field(
     form_name = 'boot_drive'
   , label = 'Boot Drive'
-  , placeholder = "sda"
+  , placeholder = "Enter a boot drive for example: sda"
   , input_type = 'text'
   , html5_constraint = ""
   , invalid_feedback = ''
@@ -1279,10 +1279,10 @@ class KickstartInventoryForm:
   hostname = Field(
     form_name = 'hostname'
   , label = 'Hostname'
-  , placeholder = "tfserver1.lan"
+  , placeholder = "Enter a node hostname ending with .lan"
   , input_type = 'text'
-  , html5_constraint = ""
-  , invalid_feedback = 'You must enter a valid hostname.'
+  , html5_constraint = "pattern=(.*\.lan$)"
+  , invalid_feedback = 'You must enter a valid hostname ending with .lan'
   , required = True
   , description = "The hostname is the nodes name that will be assigned during the installation of the operating system.  This should match the hostname used by the DNS server.")
 
