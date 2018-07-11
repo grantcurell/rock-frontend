@@ -131,10 +131,15 @@ def ansible_setup(server_ip, passwd):
     try:
         os.remove('/root/.ssh/known_hosts')
     except OSError:
-        pass    
+        pass
+
     # The following runs ansible setup module on the target node
     # sed magic removes the "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
-    p = os.popen("ansible all -m setup -e ansible_ssh_pass=" + passwd + " -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
+    passwd = passwd.replace('"', '\\"')
+    if passwd.find("'") != -1:
+        raise ValueError("The password you typed contained a single ' which is not allowed.")
+
+    p = os.popen("ansible all -m setup -e ansible_ssh_pass='" + passwd + "' -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
     json_object = json.loads(p)
 
     if 'unreachable' in json_object:

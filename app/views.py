@@ -7,6 +7,7 @@ from app.forms import InventoryForm,KickstartInventoryForm, DropDown
 from app.inventory_classes import Sensor, Server, Node
 import json
 import os
+import traceback
 
 @app.route('/_server')
 def _server():
@@ -49,6 +50,7 @@ def _gather_device_facts():
                        potential_monitor_interfaces=potential_monitor_interfaces)
     except Exception as e:
         #TODO Add logging later
+        traceback.print_exc()
         return jsonify(error_message=str(e))
 
 @app.route('/_render_home_net')
