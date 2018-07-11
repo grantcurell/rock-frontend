@@ -3,7 +3,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app
 from api.node_facts import *
-from app.forms import InventoryForm,KickstartInventoryForm, DropDown
+from app.forms import InventoryForm, KickstartInventoryForm, ErrorForm
 from app.inventory_classes import Sensor, Server, Node
 import json
 import os
@@ -257,3 +257,8 @@ def help():
     form = InventoryForm()
     kickstart_form = KickstartInventoryForm()
     return render_template("help.html", form=form, kickstart_form=kickstart_form)
+
+@app.route('/error')
+def error():
+    form = ErrorForm("Browser Error! Google Chrome is the only supported browser.")
+    return render_template("error.html", form=form)

@@ -187,6 +187,11 @@ class ModalPopUp:
         return copy_of_self
 
 
+class ErrorForm():
+    def __init__(self, text):
+        self.error_text = text
+
+
 class InventoryForm:
 
   inventory_path = '/opt/tfplenum/playbooks/inventory.yml'
