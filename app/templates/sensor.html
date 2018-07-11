@@ -273,7 +273,7 @@ var home_net_count = 1;
       <br>
       <!-- This is the modal button for confirming whether or not this is a remote
       sensor -->
-      {% with object = form.sensor_gather_facts_modal %}
+      {% with object = form.sensor_gather_facts_modal.change_values(i) %}
         {% include "modal_button.html" %}
       {% endwith %}
       <!-- For a description of what these arguments are see button_reaction_gather_device_facts -->

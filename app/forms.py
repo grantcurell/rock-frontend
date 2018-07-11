@@ -164,6 +164,7 @@ class DropDown:
 #                         and false if you don't
 class ModalPopUp:
     def __init__(self, name, modal_title, modal_text, primary_button_text=None, secondary_button_text=None, secondary_button_close=True):
+      self.name = name
       self.button_id = name + "_button_id"
       self.modal_id = name + "_modal_id"
       self.modal_label_id = name + "_modal_label_id"
@@ -174,6 +175,17 @@ class ModalPopUp:
       self.button_id_primary = name + "_modal_button_id_primary"
       self.primary_button_text = primary_button_text
       self.secondary_button_close = secondary_button_close
+
+    def change_values(self, i):
+
+        copy_of_self = copy.deepcopy(self)
+        self.button_id = self.name + "_button_id_" + str(i)
+        self.modal_id = self.name + "_modal_id_" + str(i)
+        self.modal_label_id = self.name + "_modal_label_id_" + str(i)
+        self.button_id_secondary = self.name + "_modal_button_id_secondary_" + str(i)
+        self.button_id_primary = self.name + "_modal_button_id_primary_" + str(i)
+        return copy_of_self
+
 
 class InventoryForm:
 

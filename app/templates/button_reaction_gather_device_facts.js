@@ -55,7 +55,7 @@ function gather_facts(is_remote_sensor) {
 
     // args[3] correlates to server_{{ i + 1}}_hostname (or sensor in the case of sensor) in server.html
     // The line below tacks on the hostname next to Server or Sensor #
-    $( "#{{ object.args[3] }}" ).replaceWith(" - " + '<span id="{{ object.args[3] }}">' + data.hostname + "</span>");
+    $( "#{{ object.args[3] }}" ).text(" - " + data.hostname);
     set_id_value("{{ object.args[3] }}", data.hostname)
 
     {# The below condition will only exist for the sensor. For the server it will always be the same #}
@@ -64,9 +64,8 @@ function gather_facts(is_remote_sensor) {
 
       // args[4] correlates to i (the server number) in server.html
       $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, hostname: "{{ object.args[3] }}" }, function(data){
-        // The hide method is here because effects only work if the element
-        // begins in a hidden state
-        $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+
+        $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data);
       });
 
     } else {
@@ -75,17 +74,15 @@ function gather_facts(is_remote_sensor) {
       if ( is_remote_sensor ) {
         // args[4] correlates to i (the server number) in server.html
         $.get("{{ url_for('_pcap_disks_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, hostname: "{{ object.args[3] }}" }, function(data){
-          // The hide method is here because effects only work if the element
-          // begins in a hidden state
-          $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+
+          $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data);
         });
       } else {
     {% endif %}
         // args[4] correlates to i (the server number) in server.html
         $.get("{{ url_for('_ceph_drives_list') }}", { disks: data.disks, device_number: {{ object.args[4] }}, isServer: "{{ True if object.args[5] == 'server' else False }}", hostname: "{{ object.args[3] }}" }, function(data){
-          // The hide method is here because effects only work if the element
-          // begins in a hidden state
-          $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data).hide().slideDown("slow");
+
+          $( "#{{ [object.args[5] + '_ceph_drive_list', object.args[4]] | join('_') }}" ).html(data);
         });
     {% if object.args[5] == 'sensor' %}
       }
@@ -109,9 +106,8 @@ function gather_facts(is_remote_sensor) {
     // This section is for facts specific to only the sensor.
     {% if object.args[5] == 'sensor' %}
       $.get("{{ url_for('_display_monitor_interfaces') }}", { interfaces: JSON.stringify(data.potential_monitor_interfaces), instance_number: {{ object.args[4] }}, hostname: "{{ object.args[3] }}"}, function(data){
-        // The hide method is here because effects only work if the element
-        // begins in a hidden state
-        $( "#{{ form.sensor_monitor_interface }}_{{ object.args[4] }}" ).html(data).hide().slideDown("slow");
+
+        $( "#{{ form.sensor_monitor_interface }}_{{ object.args[4] }}" ).html(data);
       });
 
       recalculate_sensor_resource_percentages();
@@ -141,8 +137,6 @@ $( "#{{ form.sensor_gather_facts_modal.button_id_primary }}" ).click(function(ev
 
   set_host_value("{{ object.args[3] }}", "is_remote_sensor", false);
 
-  // This hides the modal box. If you don't have this, the modal box stays on
-  // the screen
   $( "#{{ form.sensor_gather_facts_modal.modal_id }}" ).modal('hide');
 });
 
@@ -152,8 +146,6 @@ $( "#{{ form.sensor_gather_facts_modal.button_id_secondary }}" ).click(function(
 
   set_host_value("{{ object.args[3] }}", "is_remote_sensor", true);
 
-  // This hides the modal box. If you don't have this, the modal box stays on
-  // the screen
   $( "#{{ form.sensor_gather_facts_modal.modal_id }}" ).modal('hide');
 });
 

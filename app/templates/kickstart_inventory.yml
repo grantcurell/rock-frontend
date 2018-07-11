@@ -7,10 +7,10 @@
 
 all:
   vars:
-    # offline: This option should be false when initially setting up ansible controller.  
+    # offline: This option should be false when initially setting up ansible controller.
     # After all the repos and dependencies are available on the ansible controller this option can be set to true.
     # Tasks requiring an internet connection will not execute such as repo syncs or downloading additional dependencies from the internet.
-    # Default: true   
+    # Default: true
     offline: {{ system_settings["offline"]|lower() }}
 
     # dnsmasq: By default the ansible controller is used as the dns server during setup.
@@ -23,7 +23,7 @@ all:
     # dhcp: a dhcp server is required to properly pxe machines.  By default the ansible controller will act as the dhcp server.
     # If this is set to false then the proper options such must be configured on the external dhcp server.
     # Default: true
-    dhcp: true   
+    dhcp: true
     # dhcp_start: This is the DHCP range starting ip address.
     # Default: null
     dhcp_start: '{{ system_settings["dhcp_start"] }}'
@@ -35,9 +35,9 @@ all:
     dhcp_mask: '{% raw %}{{ ansible_default_ipv4.netmask }}{% endraw %}'
     # dhcp_net: Network Ip address used for dhcp configuration (ie: 192.168.1.0).
     # Default: The same network as the ansible controller.
-    dhcp_net: '{% raw %}{{ ansible_default_ipv4.network }}{% endraw %}' 
-       
-    
+    dhcp_net: '{% raw %}{{ ansible_default_ipv4.network }}{% endraw %}'
+
+
     # Below are networking options for node static addressing.
     # dns:  This is the ip address of the dns server.  By default we recommend using the ansible controller.
     # Default: ansible controllers ip address
@@ -62,9 +62,9 @@ all:
     pull_rhel_repos: {{ system_settings["repo_sync_rhel"]|lower() }}
     # pull_additional_repos: This pull down epel, rocknsm, and ceph yum repos.
     # Default: false
-    pull_additional_repos: {{ system_settings["repo_sync_additional"]|lower() }}   
+    pull_additional_repos: {{ system_settings["repo_sync_additional"]|lower() }}
 
-  
+
     # The following variables are used to setup the kickstart operating system:
     # iso_pth: Path to operating system iso
     # Default: null
@@ -85,15 +85,15 @@ all:
     # timezone: Set the timezone for each node.
     # Define: America/Chicago
     {% if system_settings['timezone'] == 'Chicago' or  system_settings['timezone'] == 'Los_Angeles' or system_settings['timezone'] == 'New_York' %}
-    timezone: 'America/{{ system_settings['timezone'] }}'    
+    timezone: 'America/{{ system_settings['timezone'] }}'
     {% else %}
     timezone: 'UTC'
     {% endif %}
-    
+
     # default_boot_drive: This is the default drive used for operating system installation.
     # Default: sda
     default_boot_drive: sda
-    # server_ip: ansible controller ip address used to defined kickstart server
+    # server_ip: ansible controller ip address used to define kickstart server
     # Default: ansible controller ip address
     server_ip: '{% raw %}{{ ansible_default_ipv4.address }}{% endraw %}'
 
@@ -108,9 +108,9 @@ all:
       children:
         servers:
           hosts:
-            {% for hostname, attributes in nodes.iteritems() %}            
-            {{ hostname }}:              
-              ip: {{ attributes.ip_address }}              
+            {% for hostname, attributes in nodes.iteritems() %}
+            {{ hostname }}:
+              ip: {{ attributes.ip_address }}
               mac: {{ attributes.mac_address }}
               boot_drive: {{ attributes.boot_drive|lower() }}              
               pxe_type: {{ attributes.pxe_type|lower() }}
