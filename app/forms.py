@@ -1354,6 +1354,15 @@ class KickstartInventoryForm:
   , description =
   "This options is used to download the public EPEL, kubernetes, RockNSM, and Ceph yum repositories to the ansible controller.\
   This option requires an internet connection.")
+  
+  controller_interface = GenericButton(
+    form_name = 'controller_interface'
+  , label = 'Controller Interface'
+  # , required = True
+  , description = "The interfaces on the controller you would like to use."
+  , callback = 'controller_interface_callback')
+ 
+  controller_interface_form = 'controller_interface_form'
 
   dhcp_settings = [dhcp_start, dhcp_end]
   interface_settings = [dns,gateway, netmask]

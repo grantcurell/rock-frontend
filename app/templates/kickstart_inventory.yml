@@ -72,7 +72,7 @@ all:
     # iso_url: url to download operating system iso
     # This will only work if the ansible controller has internet connection.
     # Default: null
-    iso_url: #http://mirror.wdc1.us.leaseweb.net/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1804.iso
+    iso_url: http://mirror.wdc1.us.leaseweb.net/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1804.iso
     # os_name provide the kickstart installation with the operationg system name.
     # Default: centos  /  Available options: atomic, centos, coreos, or rhel
     os_name: centos
@@ -95,7 +95,7 @@ all:
     default_boot_drive: sda
     # server_ip: ansible controller ip address used to define kickstart server
     # Default: ansible controller ip address
-    server_ip: '{% raw %}{{ ansible_default_ipv4.address }}{% endraw %}'
+    server_ip: '{{ system_settings['controller_interface_ip'] }}'
 
     # COREOS VARS
     # Only used if you are loading coreos operating system

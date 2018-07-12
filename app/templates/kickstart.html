@@ -29,6 +29,13 @@ var hosts = {};
 
 $(document).ready(function(){
 
+  $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: 'localhost', password: "" }, function(data){
+    $.get("{{ url_for('_display_controller_interfaces') }}", { interfaces: data.interfaces, instance_number: 0, hostname: "localhost"}, function(data){
+
+      $( "#{{ form.controller_interface_form }}" ).html(data);
+    });
+  });
+
   $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
 
   var advanced_settings_enabled = false;
@@ -77,6 +84,21 @@ $(document).ready(function(){
     }
   }
 
+  var controller_interface_ip = "";
+  var controller_interface_ip_validate = false;
+  set_controller_interface = function(hostname, ip, value) {
+    if (value){
+      controller_interface_ip = ip;
+      controller_interface_ip_validate = true;
+    validate_all();
+    }
+    else{
+      controller_interface_ip = "";
+      controller_interface_ip_validate = false;
+      validate_all();
+    }
+  }
+
   // We use this to add data for a specific hosts. The if condition checks to see
   // if a host already exists in the list of hosts and if it doesn't it creates
   // a new dictionary for that host
@@ -119,7 +141,7 @@ $(document).ready(function(){
       node_results = node_validate();
     }
 
-    if(system_settings_results && node_results){
+    if(system_settings_results && node_results && controller_interface_ip_validate){
       $( "#validation ").append("<p class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>");      
       $( "#generate_inventory" ).prop( "disabled", false );      
     }
@@ -203,6 +225,7 @@ $(document).ready(function(){
       system_settings["repo_sync_centos"] = repo_sync_centos;
       system_settings["repo_sync_rhel"] = repo_sync_rhel;
       system_settings["repo_sync_additional"] = repo_sync_additional;
+      system_settings["controller_interface_ip"] = controller_interface_ip;
 
       $.get("{{ url_for('_generate_kickstart_inventory') }}", {system_settings: JSON.stringify(system_settings), hosts: JSON.stringify(hosts)}, function(data){});
 
@@ -254,6 +277,10 @@ $(document).ready(function(){
       {% with object = form.root_password %}
         {% include "text_input.html" %}
       {% endwith %}
+      <hr>
+      <h5>Controller Settings</h5>
+      <br>
+      <div id="{{ form.controller_interface_form }}"></div>
     </div>
   </div>
   <br />

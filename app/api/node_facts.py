@@ -126,12 +126,8 @@ def ansible_setup(server_ip, passwd):
 
     """
     # Disable ssh host key checking
-    os.environ['ANSIBLE_HOST_KEY_CHECKING'] = 'False'
-    # Remove known_hosts file
-    try:
-        os.remove('/root/.ssh/known_hosts')
-    except OSError:
-        pass
+    os.environ['ANSIBLE_SSH_ARGS'] = "-o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"    
+    
 
     # The following runs ansible setup module on the target node
     # sed magic removes the "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
@@ -139,10 +135,25 @@ def ansible_setup(server_ip, passwd):
     if passwd.find("'") != -1:
         raise ValueError("The password you typed contained a single ' which is not allowed.")
 
-    p = os.popen("ansible all -m setup -e ansible_ssh_pass='" + passwd + "' -i " + server_ip + ", | sed '1 s/^.*|.*=>.*$/{/g'").read()
-    json_object = json.loads(p)
+    p = {}
+    ansible_string = "ansible all -m setup -e ansible_ssh_pass='" + passwd + "' -i " + server_ip + ","
 
-    if 'unreachable' in json_object:
+    if(server_ip == "localhost" or server_ip == "127.0.0.1"):        
+        ansible_string = "ansible -m setup "+ server_ip
+    
+    p = os.popen(ansible_string).read()
+    
+    json_object = {}    
+
+    if(p.startswith(server_ip + " | UNREACHABLE! => ")):
+        p = p.replace(server_ip + " | UNREACHABLE! => ","")
+        json_object = json.loads(p)         
+    
+    if(p.startswith(server_ip + " | SUCCESS => ")):
+        p = p.replace(server_ip + " | SUCCESS => ","")
+        json_object = json.loads(p) 
+    
+    if 'unreachable' in json_object and json_object['unreachable'] == True:
         raise Exception("Error: " + json_object['msg'])
 
     return json_object
@@ -182,23 +193,26 @@ def transform(json_object):
             for k in json_object['ansible_facts']['ansible_device_links']['masters'][i]:
                 masterlinks[k] = i
         # Get Interfaces
-        interfaces = []
-        for i in json_object['ansible_facts']['ansible_interfaces']:
+        interfaces = []    
+        for i in json_object['ansible_facts']['ansible_interfaces']:        
             ip=""
             mac=""
             # Do not return interfaces with veth, cni, docker or flannel
             if "veth" not in i and "cni" not in i and "docker" not in i and "flannel" not in i and "virbr0" not in i:
-                name="ansible_" + i
-                interface=json_object['ansible_facts'][name]
-                if 'ipv4' in interface:
-                    ip=interface['ipv4']['address']
-                if 'macaddress' in interface:
-                    mac=interface['macaddress']
-                interfaces.append(Interface(i, ip, mac))
+                try:
+                    name="ansible_" + i
+                    interface=json_object['ansible_facts'][name]
+                    if 'ipv4' in interface:
+                        ip=interface['ipv4']['address']
+                    if 'macaddress' in interface:
+                        mac=interface['macaddress']
+                    interfaces.append(Interface(i, ip, mac))
+                except:
+                    pass
 
         # Determine location of root
         for i in json_object['ansible_facts']['ansible_mounts']:
-           if i["mount"] == "/" or i["mount"] == "/boot":
+            if i["mount"] == "/" or i["mount"] == "/boot":
                 #Use the established reverse dictionaries to get our partition
                 partVal = disklinks.get(i['uuid'])
 

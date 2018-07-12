@@ -1,0 +1,67 @@
+
+<script>
+    // Adding this allows this code to be identified in a browser debugger
+    //@ sourceURL=ceph_interface_list
+    
+      $(document).ready(function(){
+    
+        controller_interface_get_ids = function(){
+          get_ids();
+        }
+        callbacks.add( controller_interface_get_ids );
+    
+        // This is used to track how many interfaces are selected. For the system
+        // to validate and allow you to continue you must have at least one interface
+        // selected
+        var interface_count = 0;
+    
+        {% for interface in interfaces %}
+        {% if interface['name'] != 'lo' %}
+        $( "#{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).on('click', function (event) {
+    
+          if($( "#{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).hasClass( "active" )) {
+            $( "#{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
+            $( "#{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).html("{{ interface['name'] + ' - ' + interface['ip_address'] }}");
+            set_controller_interface("{{ hostname }}", "{{ interface['ip_address'] }}", false)
+            interface_count -= 1;
+          } else {
+            $( "#{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).addClass( "active" );
+            $( "#{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).html("{{ interface['name'] + ' - ' + interface['ip_address'] + ' - selected'}}");
+            set_controller_interface("{{ hostname }}", "{{ interface['ip_address'] }}", true)
+            interface_count += 1;
+          }
+          
+        });
+        {% endif %}
+        {% endfor %}
+    
+    
+      });
+    </script>
+    
+    <div class="card" style="width: 20rem;">
+      <div class="card-header">
+        Select Controller Interface
+      </div>
+      <div class="card-body">
+        <p class="card-text">Select which interface you would like to use as controller interface.  This will be the interface used for services provided to the kit.</p>
+        <p class="card-text text-danger">Note: The management interface will not be listed below. It is not eligble for use as a controller interface.</p>
+      </div>
+      <div class="btn-group-vertical" role="group">
+        {% if (interfaces | length) > 0 %}
+        {% for interface in interfaces %}
+        {% if interface['name'] != 'lo' %}
+        <button type="button" class="btn btn-primary" id="{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}">{{ interface['name'] + ' - ' + interface['ip_address'] }}</button>
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="alert alert-danger" role="alert">
+          No interfaces found! Are you sure you have a second eligible interface that is not the management interface?
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <a href="{{ url_for('help') + '#anchor_' + form.controller_interface.label | replace(' ','_') }}" target="_blank">
+      <label>What is this?</label>
+    </a>
+    
