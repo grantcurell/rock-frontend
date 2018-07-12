@@ -32,12 +32,7 @@ all:
     dhcp_end: '{{ system_settings["dhcp_end"] }}'
     # dhcp_mask: Subnet mask used for dhcp configuration.
     # Default: The same subnet as the ansible controller.
-    dhcp_mask: '{% raw %}{{ ansible_default_ipv4.netmask }}{% endraw %}'
-    # dhcp_net: Network Ip address used for dhcp configuration (ie: 192.168.1.0).
-    # Default: The same network as the ansible controller.
-    dhcp_net: '{% raw %}{{ ansible_default_ipv4.network }}{% endraw %}'
-
-
+ 
     # Below are networking options for node static addressing.
     # dns:  This is the ip address of the dns server.  By default we recommend using the ansible controller.
     # Default: ansible controllers ip address
