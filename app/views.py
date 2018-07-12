@@ -205,6 +205,7 @@ def _generate_inventory():
             else:
                 _assign_sensor(sensors)
 
+    input_data[form.moloch_pcap_pv.field_id] = int(input_data[form.moloch_pcap_pv.field_id])
     inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
 
     if not os.path.exists("/opt/tfplenum/playbooks/"):
