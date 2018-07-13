@@ -3,12 +3,10 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block navbar %}
-{% with navbar_elements = form.navbar_elements
-      , current_page = 'help' %}
 {% include "navbar.html" %}
-{% endwith %}
 {% endblock %}
 {% block body %}
+<div class="container card" id="topheader">
 <div class="jumbotron">
   <h1 class="display-4">TFPlenum Help</h1>
   <p class="lead">We're really trying to make this easier!</p>
@@ -93,4 +91,5 @@
 </dl>
 {% endif %}
 {% endfor %}
+</div>
 {% endblock %}

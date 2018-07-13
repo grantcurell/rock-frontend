@@ -1,0 +1,15 @@
+---
+confluence_spaces:
+  - space_name: THISISCVAH
+    site: https://confluence.di2e.net
+    confluence_templates_dir: ../app/templates/thisiscvah/
+    confluence_images_url_path: /static/images/thisiscvah/
+    confluence_views: ../app/confluence/thisiscvah_views.py
+    sorter: leftnavbar_layout.yml
+    download_attachments: True
+  - space_name: OJCCTM
+    site: https://confluence.di2e.net
+    confluence_templates_dir: ../app/templates/ojcctm/
+    confluence_images_url_path: /static/images/ojcctm/
+    confluence_views: ../app/confluence/ojcctm_views.py
+    download_attachments: True

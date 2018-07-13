@@ -1,16 +1,12 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-primary">
+<nav class="navbar navbar-expand-lg navbar-light bg-primary fixed-top">
   <a class="navbar-brand" href="#">TFPlenum Configurator Beta</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      {% for text,url in navbar_elements.iteritems() %}
-      {% if current_page|string() == url|string() %}
-        <a class="nav-link active" href="{{ url_for(url) }}">{{ text }}<span class="sr-only">(current)</span></a>
-      {% else %}
-        <a class="nav-item nav-link" href="{{ url_for(url) }}">{{ text }}</a>
-      {% endif %}
+      {% for text,item in form.navbar_elements.iteritems() %}
+        <a id="{{ item.key }}" class="nav-item nav-link" href="{{ item.url }}">{{ text }}</a>
       {% endfor %}
     </div>
   </div>

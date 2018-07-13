@@ -190,7 +190,7 @@ class ModalPopUp:
 class ErrorForm():
     def __init__(self, text):
         self.error_text = text
-
+    
 
 class InventoryForm:
 
@@ -221,9 +221,12 @@ class InventoryForm:
   # In python2 you must use an ordered dict because python 2 sucks and for some reason
   # does not respect dictionary declaration order. I hate python 2.
   navbar_elements = OrderedDict([
-    ('Kickstart Configuration', 'kickstart')
-  , ('Kit Configuration', 'kit_configuration')
-  , ('Help', 'help')])
+    ('Kickstart Configuration', {'url': '/kickstart', 'key': 'tn_kickstart'})
+  , ('Kit Configuration', {'url': '/kit_configuration', 'key': 'tn_kit_configuration'})
+  , ('Confluence THISISCVAC', {'url': '/THISISCVAH/THISISCVAH_system_design', 'key': 'tn_system_design'})
+  , ('Confluence JCCTM', {'url': '/OJCCTM/OJCCTM_u_capabilities_by_category_softwareortools_uororfouo', 
+                          'key': 'tn_capabilities_by_category_softwareortools'})
+  , ('Help', {'url': '/help', 'key': 'tn_help'})])
 
   advanced_system_settings_text = 'All of the required settings below will autopopulate \
   based on facts gathered from the servers. It is not necessary to change any of \
@@ -1384,3 +1387,7 @@ class KickstartInventoryForm:
   timezone_settings = [timezone]
   advanced_system_settings = [is_offline_build, repo_sync_centos, repo_sync_rhel, repo_sync_additional]
   kickstart_form_settings = dhcp_settings + interface_settings + system_settings + pxe_type_settings + node_settings + node_options + timezone_settings + advanced_system_settings
+
+
+class ConfluenceForm():
+    navbar_elements = InventoryForm.navbar_elements    

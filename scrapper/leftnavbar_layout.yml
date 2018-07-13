@@ -1,0 +1,83 @@
+---
+# The following yaml file maintains the correct order of our navbar
+# for the scrapped confluence pages.
+- title: System Design
+  children: 
+    - title: Ansible Controller
+    - title: TFPlenum Inventory File
+    - title: Architecture Diagram
+    - title: Deploying the OS
+    - title: Generating the Inventory File
+    - title: I Can Do Math (ICDM)
+    - title: Networking
+    - title: Node Types
+    - title: Ports Protocols and Services
+      children:
+        - title: Firewall Ports
+    - title: Purpose
+    - title: Sensor Software
+    - title: Technical Notes
+- title: System Setup
+  children:
+    - title: DIP System Setup
+      children:
+        - title: Physical Setup
+        - title: TFPlenum Setup
+          children:
+            - title: Building the Controller
+            - title: Deploying the System
+            - title: Install Operating Systems
+        - title: DIP Server Setup
+          children:
+            - title: ESXi Installation
+            - title: PFSense Setup
+            - title: Create and Install Windows Server 2012 VM
+            - title: Endgame Installation
+    - title: MIP System Setup
+      children:
+        - title: Building  the MIP from Scratch
+- title: Operating the System
+  children:
+    - title: DIP
+      children:
+        - title: DIP Server
+        - title: TFPlenum Subsystem
+          children:
+            - title: Power Up the Kit
+            - title: Adding a node
+            - title: Check System Health
+            - title: Adding/Removing Bro and Suricata Rules
+            - title: Elasticsearch - How to export and backup your data (using elasticdump)
+            - title: Elasticsearch - How to import and restore your backup data (via elasticdump)
+            - title: Functional Test Checklist
+              children:
+                - title: Prerequisites
+                - title: Get External Service Ip Addresses
+                - title: Kubernetes Readiness Check
+                - title: Ceph
+                - title: Elasticsearch
+                - title: Kibana
+                - title: Kafka
+                - title: Bro
+                - title: Moloch
+                - title: Suricata
+                - title: System Readiness Confirmation
+            - title: Known Limitations
+            - title: Removing a node
+    - title: MIP
+- title: System Testing
+  children:
+    - title: DIP System Testing
+      children:
+        - title: Performance Benchmarking
+        - title: TFPlenum System Test Scenarios
+    - title: MIP System Test
+- title: IA Policies
+  children:
+    - title: Approved Products List & Application Store
+    - title: CLSAs
+    - title: Software and Deviations
+    - title: Software List and Monthly Scans
+- title: ECS (Elastic Common Schema) Compliance  
+- title: CentOS vs Red Hat  
+- title: Technical Style Guide  

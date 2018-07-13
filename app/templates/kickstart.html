@@ -3,10 +3,7 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 {% block navbar %}
-{% with navbar_elements = form.navbar_elements
-      , current_page = 'kickstart' %}
 {% include "navbar.html" %}
-{% endwith %}
 {% endblock %}
 {% block body %}
 
@@ -256,7 +253,7 @@ $(document).ready(function(){
 {% with object = form.inventory_generated_modal %}
   {% include "modal_button.html" %}
 {% endwith %}
-
+<div class="container" id="topheader">
 {% with object = form.common_error_modal %}
   {% include "modal_button.html" %}
 {% endwith %}
@@ -371,5 +368,6 @@ $(document).ready(function(){
     </div>
   </div>
 
+</div>
 </div>
 {% endblock %}

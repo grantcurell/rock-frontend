@@ -6,6 +6,7 @@
     <title>{% block title %}{% endblock %}</title>
     <!-- Bootstrap core CSS -->
     <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='bootstrap/css/custom.css') }}" rel="stylesheet">
     <! -- Verify that the browser is chrome and not some other browser. -->
     <script>
       // Ensures that chrome is being used otherwise we display an error page
@@ -26,11 +27,10 @@
     <script type=text/javascript src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
   </head>
   <body>
-    <div class="container" id="topheader">
       {% block navbar %}
       {% endblock %}
       {% block body %}
       {% endblock %}
-    </div>
+      <script type=text/javascript src="{{ url_for('static', filename='bootstrap/js/topnav.js') }}"></script>
   </body>
 </html>
