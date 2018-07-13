@@ -143,9 +143,9 @@ def _generate_inventory():
     form = InventoryForm
     input_data[form.kubernetes_services_cidr.field_id] = input_data[form.kubernetes_services_cidr.field_id] + "/28"
 
-    if form.sensor_storage_type.dropdown_id in input_data:        
+    if form.sensor_storage_type.dropdown_id in input_data:
         # Remove the dropdown name from the value (sensor_storage_type_dropdown_)
-        tmp = input_data[form.sensor_storage_type.dropdown_id].replace("sensor_storage_type_dropdown_","")        
+        tmp = input_data[form.sensor_storage_type.dropdown_id].replace("sensor_storage_type_dropdown_","")
         if tmp == form.sensor_storage_type.options[0].replace(" ", "_"):
             use_ceph_for_pcap = True
         else:
@@ -241,13 +241,13 @@ def _generate_kickstart_inventory():
 
     return "Finished"
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index.html', methods=['GET', 'POST'])
 @app.route('/kit_configuration', methods=['GET', 'POST'])
 def kit_configuration():
     form = InventoryForm()
     return render_template('kit_inventory.html', title='Configure Inventory', form=form)
 
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index.html', methods=['GET', 'POST'])
 @app.route('/kickstart', methods=['GET', 'POST'])
 def kickstart():
     form = KickstartInventoryForm()
