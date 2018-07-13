@@ -126,11 +126,9 @@ def ansible_setup(server_ip, passwd):
 
     """
     # Disable ssh host key checking
-    os.environ['ANSIBLE_SSH_ARGS'] = "-o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"    
-    
+    os.environ['ANSIBLE_SSH_ARGS'] = "-o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
     # The following runs ansible setup module on the target node
-    # sed magic removes the "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
     passwd = passwd.replace('"', '\\"')
     if passwd.find("'") != -1:
         raise ValueError("The password you typed contained a single ' which is not allowed.")
@@ -146,10 +144,12 @@ def ansible_setup(server_ip, passwd):
     json_object = {}    
 
     if(p.startswith(server_ip + " | UNREACHABLE! => ")):
+        # This removes "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
         p = p.replace(server_ip + " | UNREACHABLE! => ","")
         json_object = json.loads(p)         
     
     if(p.startswith(server_ip + " | SUCCESS => ")):
+        # This removes "hostname | status =>" (ie: "192.168.1.21 | SUCCESS =>") from the beginning of the return to make the return a valid json object.
         p = p.replace(server_ip + " | SUCCESS => ","")
         json_object = json.loads(p) 
     

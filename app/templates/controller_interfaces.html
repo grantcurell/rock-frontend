@@ -29,6 +29,14 @@
             $( "#{{ [form.controller_interface.generic_button_id, interface['name'], device_number, device_type] | join('_') }}" ).html("{{ interface['name'] + ' - ' + interface['ip_address'] + ' - selected'}}");
             set_controller_interface("{{ hostname }}", "{{ interface['ip_address'] }}", true)
             interface_count += 1;
+            
+            // Deselect all other interfaces only show one selected at a time.
+            {% for i in interfaces %}
+            {% if interface != i %}
+            $( "#{{ [form.controller_interface.generic_button_id, i['name'], device_number, device_type] | join('_') }}" ).removeClass( "active" );
+            $( "#{{ [form.controller_interface.generic_button_id, i['name'], device_number, device_type] | join('_') }}" ).html("{{ i['name'] + ' - ' + i['ip_address'] }}");
+            {% endif %}
+            {% endfor %}
           }
           
         });

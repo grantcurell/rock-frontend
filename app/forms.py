@@ -1364,6 +1364,13 @@ class KickstartInventoryForm:
  
   controller_interface_form = 'controller_interface_form'
 
+  common_error_modal = ModalPopUp(
+  name = 'common_error_modal',
+  modal_title= 'Error',
+  modal_text= 'Error!',
+  primary_button_text = 'Close'
+  )
+
   dhcp_settings = [dhcp_start, dhcp_end]
   interface_settings = [dns,gateway, netmask]
   system_settings = [root_password]

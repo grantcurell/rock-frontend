@@ -29,11 +29,21 @@ var hosts = {};
 
 $(document).ready(function(){
 
-  $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: 'localhost', password: "" }, function(data){
+  $( "#{{ form.controller_interface_form }}" ).html("Gathering controller info please wait...");
+
+  $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: 'localhost', password: "" }, function(data){    
+    if(data.interfaces.length > 0){
     $.get("{{ url_for('_display_controller_interfaces') }}", { interfaces: data.interfaces, instance_number: 0, hostname: "localhost"}, function(data){
 
       $( "#{{ form.controller_interface_form }}" ).html(data);
     });
+    }
+    else{
+      console.error("Unable to find controller interface.");       
+        $( '#{{ form.common_error_modal.modal_id }} .modal-dialog .modal-body' ).text("Unable to find controller interface.  Verify the controller has at least one interface.")
+        $( '#{{ form.common_error_modal.modal_id }}' ).modal('show');
+        return;     
+    }
   });
 
   $( ".{{ form.advanced_settings_button.generic_button_id + 'div_element' }}").hide();
@@ -96,7 +106,7 @@ $(document).ready(function(){
       controller_interface_ip = "";
       controller_interface_ip_validate = false;
       validate_all();
-    }
+    }    
   }
 
   // We use this to add data for a specific hosts. The if condition checks to see
@@ -238,12 +248,18 @@ $(document).ready(function(){
 
       $( '#{{ form.inventory_generated_modal.modal_id }}' ).modal('show');
     });
-
+    $( "#{{ form.common_error_modal.button_id_primary }}" ).click(function(event){
+      $( "#{{ form.common_error_modal.modal_id }}" ).modal('hide');
+    });
 });
 
 </script>
 
 {% with object = form.inventory_generated_modal %}
+  {% include "modal_button.html" %}
+{% endwith %}
+
+{% with object = form.common_error_modal %}
   {% include "modal_button.html" %}
 {% endwith %}
 

@@ -41,13 +41,15 @@ def _gather_device_facts():
 
         for interface in node.interfaces:
             if interface.ip_address != management_ip:
-                potential_monitor_interfaces.append(interface.name)
+                potential_monitor_interfaces.append(interface.name)       
 
         return jsonify(cpus_available=node.cpu_cores,
                        memory_available=node.memory_gb,
                        disks= json.dumps([disk. __dict__ for disk in node.disks]),
                        hostname=node.hostname,
                        potential_monitor_interfaces=potential_monitor_interfaces,
+                       # This for loop takes the list of interface objects (interfaces) and converts the list to json also known as serialization.
+                       # json.dumps is not able to serialize a list of objects.  Using the __dict__ converts each interface object to a dict object first during the for loop
                        interfaces=json.dumps([interface. __dict__ for interface in node.interfaces]))
     except Exception as e:
         #TODO Add logging later
@@ -83,14 +85,18 @@ def _display_monitor_interfaces():
 
 @app.route('/_display_controller_interfaces')
 def _display_controller_interfaces():
-
-    form = KickstartInventoryForm()
-
-    device_number = request.args.get('instance_number')
-    interfaces = json.loads(request.args.get('interfaces'))
-    hostname = request.args.get('hostname')
-    
-    return render_template("controller_interfaces.html", form=form, device_number=device_number, interfaces=interfaces, device_type="controller", hostname=hostname)
+    # This request will be received from jquery on the client side
+    try:
+        form = KickstartInventoryForm()
+        device_number = request.args.get('instance_number')
+        interfaces = json.loads(request.args.get('interfaces'))
+        hostname = request.args.get('hostname')
+        
+        return render_template("controller_interfaces.html", form=form, device_number=device_number, interfaces=interfaces, device_type="controller", hostname=hostname)
+    except Exception as e:
+        #TODO Add logging later
+        traceback.print_exc()
+        return jsonify(error_message=str(e))
 
 @app.route('/_ceph_drives_list')
 def _ceph_drives_list():
