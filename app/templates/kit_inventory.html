@@ -549,6 +549,15 @@ $(document).ready(function(){
 
   $( '#{{ form.kubernetes_services_cidr.field_id }}' ).keyup(function (event) {
     validate_all();
+
+    // The below will grab the 4th octet of the IP address entered by the user
+    var octet_4 = parseInt($( '#{{ form.kubernetes_services_cidr.field_id }}' ).val().split('.')[3]);
+    if( isNaN(octet_4) ) {
+      $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Incomplete IP Address");
+    } else {
+      octet_4 += 15;
+      $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + $( '#{{ form.kubernetes_services_cidr.field_id }}' ).val() + "-" + String(octet_4));
+    }
   });
 
   // The purpose of the below is to disable or enable the Moloch PCAP folder field
@@ -751,6 +760,7 @@ $(document).ready(function(){
       {% with object = form.kubernetes_services_cidr %}
         {% include "text_input.html" %}
       {% endwith %}
+      <div id="{{ form.kubernetes_services_cidr.field_id + '_div' }}"></div>
     </div>
   </div>
   <br>

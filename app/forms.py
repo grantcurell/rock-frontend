@@ -196,7 +196,20 @@ class InventoryForm:
 
   inventory_path = '/opt/tfplenum/playbooks/inventory.yml'
 
-  ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
+  # See https://www.tutorialspoint.com/javascript/javascript_regexp_object.htm
+
+  # This version of the regex will only let you set an IP address up to the end of
+  # the class C address space (223.255.255.0). It will also prevent you from selecting
+  # a final octet of 255 (which in our scenario will not be a valid IP)
+  ip_constraint = 'pattern=^((2[0-2][0-3])|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){2}\.((25[0-4])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))$'
+
+  # This version of the regex allows you to enter IP addresses or subnets
+  ip_constraint_with_subnet = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
+
+  # This constraint is for the kubernetes services CIDR. The range for services
+  # will always be 16 addresses so you can't have an ending octet here higher
+  # than 240.
+  kube_cidr_constraint = 'pattern=^((2[0-2][0-3])|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){2}\.((240)|(2[0-3]\d)|(1\d\d)|([1-9]?\d))$'
 
   # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
   # ^ I left the line above because it was helpful, but I didn't end up using it
@@ -208,8 +221,8 @@ class InventoryForm:
   # In python2 you must use an ordered dict because python 2 sucks and for some reason
   # does not respect dictionary declaration order. I hate python 2.
   navbar_elements = OrderedDict([
-    ('Kit Configuration', 'kit_configuration')
-  , ('Kickstart Configuration', 'kickstart')
+    ('Kickstart Configuration', 'kickstart')
+  , ('Kit Configuration', 'kit_configuration')
   , ('Help', 'help')])
 
   advanced_system_settings_text = 'All of the required settings below will autopopulate \
@@ -288,10 +301,10 @@ class InventoryForm:
 
   kubernetes_services_cidr = Field(
     form_name = 'kubernetes_services_cidr'
-  , label = 'Kubernetes Service CIDR'
+  , label = 'Kubernetes Service IP Range Start'
   , placeholder = "Put your Kubernetes Services CIDR here."
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = kube_cidr_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
   , description =
@@ -1143,8 +1156,6 @@ class KickstartInventoryForm:
 
   inventory_path = "/opt/tfplenum-deployer/playbooks/inventory.yml"
 
-  ip_constraint = 'pattern=((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$'
-
   advanced_system_settings_text = 'All of the required settings below will autopopulate \
   based on facts gathered from the servers. It is not necessary to change any of \
   them in order for the system to function. However, you may want to update some \
@@ -1179,7 +1190,7 @@ class KickstartInventoryForm:
   , label = 'DHCP Starting Ip Address'
   , placeholder = "The beginning of your DHCP start range"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
   , default_value = "192.168.5.50"
@@ -1192,7 +1203,7 @@ class KickstartInventoryForm:
   , label = 'DHCP Ending Ip Address'
   , placeholder = "The end of your DHCP range"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
   , default_value = "192.168.5.90"
@@ -1204,7 +1215,7 @@ class KickstartInventoryForm:
   , label = 'DNS'
   , placeholder = "Enter your kit's DNS here"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
   , default_value = "192.168.5.1"
@@ -1217,7 +1228,7 @@ class KickstartInventoryForm:
   , label = 'Gateway'
   , placeholder = "Enter your kit's gateway here"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
   , default_value = "192.168.5.1"
@@ -1229,7 +1240,7 @@ class KickstartInventoryForm:
   , label = 'Netmask'
   , placeholder = "255.255.255.0"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = InventoryForm().ip_constraint_with_subnet
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
   , default_value = "255.255.255.0"
@@ -1271,7 +1282,7 @@ class KickstartInventoryForm:
   , label = 'IP Address'
   , placeholder = "Enter your node IP address here"
   , input_type = 'text'
-  , html5_constraint = ip_constraint
+  , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
   , default_value = ""
@@ -1354,14 +1365,14 @@ class KickstartInventoryForm:
   , description =
   "This options is used to download the public EPEL, kubernetes, RockNSM, and Ceph yum repositories to the ansible controller.\
   This option requires an internet connection.")
-  
+
   controller_interface = GenericButton(
     form_name = 'controller_interface'
   , label = 'Controller Interface'
   # , required = True
   , description = "The interfaces on the controller you would like to use."
   , callback = 'controller_interface_callback')
- 
+
   controller_interface_form = 'controller_interface_form'
 
   common_error_modal = ModalPopUp(
