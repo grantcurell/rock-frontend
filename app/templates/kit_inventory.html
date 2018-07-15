@@ -550,13 +550,36 @@ $(document).ready(function(){
   $( '#{{ form.kubernetes_services_cidr.field_id }}' ).keyup(function (event) {
     validate_all();
 
-    // The below will grab the 4th octet of the IP address entered by the user
+    // The below will grab the 4 octets of the kubernetes services IP address
+    // entered by the user
+    var octet_1 = $( '#{{ form.kubernetes_services_cidr.field_id }}' ).val().split('.')[0] + '.';
+    var octet_2 = $( '#{{ form.kubernetes_services_cidr.field_id }}' ).val().split('.')[1] + '.';
+    var octet_3 = $( '#{{ form.kubernetes_services_cidr.field_id }}' ).val().split('.')[2] + '.';
     var octet_4 = parseInt($( '#{{ form.kubernetes_services_cidr.field_id }}' ).val().split('.')[3]);
+
     if( isNaN(octet_4) ) {
       $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Incomplete IP Address");
     } else {
-      octet_4 += 15;
-      $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + $( '#{{ form.kubernetes_services_cidr.field_id }}' ).val() + "-" + String(octet_4));
+      while(octet_4 > 0) {
+        // The magic number 16 correlates to a /28. We're basically looking for
+        // the first subnet which matches a /28 and that will end up being the
+        // base address for the range. If the number is evenly divisible by 16
+        // that means we've found the base of the address range and 15 beyond that
+        // is the maximum range.
+        if( octet_4 % 16 == 0) {
+          break;
+        } else {
+          octet_4 -= 1;
+        }
+      }
+      // You can't have an address of 0 so Metallb will actually increment this by
+      // 1 in this case.
+      if( octet_4 == 0 ) {
+        octet_4 = 1;
+        $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + octet_1 + octet_2 + octet_3 + String(octet_4) + "-" + String(octet_4+14));
+      } else {
+        $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + octet_1 + octet_2 + octet_3 + String(octet_4) + "-" + String(octet_4+15));
+      }
     }
   });
 

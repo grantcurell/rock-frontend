@@ -208,8 +208,8 @@ class InventoryForm:
 
   # This constraint is for the kubernetes services CIDR. The range for services
   # will always be 16 addresses so you can't have an ending octet here higher
-  # than 240.
-  kube_cidr_constraint = 'pattern=^((2[0-2][0-3])|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){2}\.((240)|(2[0-3]\d)|(1\d\d)|([1-9]?\d))$'
+  # than 239.
+  kube_cidr_constraint = 'pattern=^((2[0-2][0-3])|(1\d\d)|([1-9]?\d))(\.((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){2}\.((2[0-3]\d)|(1\d\d)|([1-9]?\d))$'
 
   # See: https://stackoverflow.com/questions/34758562/regular-expression-how-can-i-match-all-numbers-less-than-or-equal-to-twenty-fo
   # ^ I left the line above because it was helpful, but I didn't end up using it
