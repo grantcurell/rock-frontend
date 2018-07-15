@@ -41,7 +41,7 @@ def _gather_device_facts():
 
         for interface in node.interfaces:
             if interface.ip_address != management_ip:
-                potential_monitor_interfaces.append(interface.name)       
+                potential_monitor_interfaces.append(interface.name)
 
         return jsonify(cpus_available=node.cpu_cores,
                        memory_available=node.memory_gb,
@@ -91,7 +91,11 @@ def _display_controller_interfaces():
         device_number = request.args.get('instance_number')
         interfaces = json.loads(request.args.get('interfaces'))
         hostname = request.args.get('hostname')
-        
+
+        for interface in interfaces:
+            if not interface["ip_address"]:
+                interfaces.remove(interface)
+
         return render_template("controller_interfaces.html", form=form, device_number=device_number, interfaces=interfaces, device_type="controller", hostname=hostname)
     except Exception as e:
         #TODO Add logging later
