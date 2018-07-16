@@ -36,7 +36,7 @@ all:
     # Below are networking options for node static addressing.
     # dns:  This is the ip address of the dns server.  By default we recommend using the ansible controller.
     # Default: ansible controllers ip address
-    dns: '{{ system_settings["dns"] }}'
+    dns: '{{ system_settings['controller_interface_ip'] }}'
     # gateway: This is used to configure the nodes with a default gateway.
     # Default: null
     gateway: '{{ system_settings["gateway"] }}'

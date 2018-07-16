@@ -1210,19 +1210,6 @@ class KickstartInventoryForm:
   , description = "This field is used to identify the ending ip address of the dhcp range.  \
   The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time.")
 
-  dns = Field(
-    form_name = 'dns'
-  , label = 'DNS'
-  , placeholder = "Enter your kit's DNS here"
-  , input_type = 'text'
-  , html5_constraint = InventoryForm().ip_constraint
-  , invalid_feedback = 'You must enter a valid IP address.'
-  , required = True
-  , default_value = "192.168.5.1"
-  , description = "The dns field or Domain Name Resolution is the address used to resolve ip addresses to domain names. \
-  During the system installation the dns address should be the ansible controllers ip address unless you are using an external dns server. \
-  This field is specifically used as a part of the static interface assignment during the operating system installation.")
-
   gateway = Field(
     form_name = 'gateway'
   , label = 'Gateway'
@@ -1383,7 +1370,7 @@ class KickstartInventoryForm:
   )
 
   dhcp_settings = [dhcp_start, dhcp_end]
-  interface_settings = [dns,gateway, netmask]
+  interface_settings = [gateway, netmask]
   system_settings = [root_password]
   pxe_type_settings = [pxe_type]
   node_settings = [number_of_nodes]

@@ -134,7 +134,7 @@ $(document).ready(function(){
     }
   });
 
-  {% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.dns.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %}
+  {% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %}
   $('#{{ field }}').keyup(function (event) {
     validate_all();
   });
@@ -161,7 +161,7 @@ $(document).ready(function(){
   }
 
   system_settings_validate = function () {
-    if({% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.dns.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %} true) {
+    if({% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %} true) {
       return true;
     }
     return false;
@@ -211,8 +211,7 @@ $(document).ready(function(){
 
       // Global Settings
       dhcp_start =$("#dhcp_start_field").val();
-      dhcp_end =$("#dhcp_end_field").val();
-      dns =$("#dns_field").val();
+      dhcp_end =$("#dhcp_end_field").val();      
       gateway =$("#gateway_field").val();
       netmask = $("#netmask_field").val();
       root_password=$("#root_password_field").val();
@@ -225,8 +224,7 @@ $(document).ready(function(){
       timezone=$("#timezone_dropdown").val();
 
       system_settings["dhcp_start"] = dhcp_start;
-      system_settings["dhcp_end"] = dhcp_end;
-      system_settings["dns"] = dns;
+      system_settings["dhcp_end"] = dhcp_end;      
       system_settings["gateway"] = gateway;
       system_settings["netmask"] = netmask;
       system_settings["root_password"] = root_password;
@@ -278,10 +276,7 @@ $(document).ready(function(){
         {% include "text_input.html" %}
       {% endwith %}
       <hr>
-      <h5>Static Interface Settings</h5>
-      {% with object = form.dns %}
-        {% include "text_input.html" %}
-      {% endwith %}
+      <h5>Static Interface Settings</h5>      
       {% with object = form.gateway %}
         {% include "text_input.html" %}
       {% endwith %}
