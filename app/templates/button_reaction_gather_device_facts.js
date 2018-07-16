@@ -131,23 +131,23 @@ function gather_facts(is_remote_sensor) {
 // asking if the sensor in question is a remote sensor.
 }
 
-$( "#{{ form.sensor_gather_facts_modal.button_id_primary }}" ).click(function(event){
+$( "#{{ form.sensor_gather_facts_modal.button_id_primary + '_' + (object.args[4]|string) }}" ).click(function(event){
 
   gather_facts(false);
 
   set_host_value("{{ object.args[3] }}", "is_remote_sensor", false);
 
-  $( "#{{ form.sensor_gather_facts_modal.modal_id }}" ).modal('hide');
+  $( "#{{ form.sensor_gather_facts_modal.modal_id  + '_' + (object.args[4]|string) }}" ).modal('hide');
 });
 
-$( "#{{ form.sensor_gather_facts_modal.button_id_secondary }}" ).click(function(event){
+$( "#{{ form.sensor_gather_facts_modal.button_id_secondary + '_' + (object.args[4]|string) }}" ).click(function(event){
 
   gather_facts(true);
 
   set_host_value("{{ object.args[3] }}", "is_remote_sensor", true);
 
-  $( "#{{ form.sensor_gather_facts_modal.modal_id }}" ).modal('hide');
+  $( "#{{ form.sensor_gather_facts_modal.modal_id + '_' + (object.args[4]|string) }}" ).modal('hide');
 });
 
-$( '#{{ form.sensor_gather_facts_modal.modal_id }}' ).modal('show');
+$( '#{{ form.sensor_gather_facts_modal.modal_id + '_' + (object.args[4]|string) }}' ).modal('show');
 {% endif %}
