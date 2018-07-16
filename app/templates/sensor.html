@@ -119,7 +119,7 @@ $(document).ready(function(){
       cpus = parseInt($( "#{{ 'sensor_' + ((i + 1) | string) + '_cpus_available' }}" ).text());
       if(cpus < lowest_cpus) {
         lowest_cpus = cpus;
-        if(lowest_cpus == 0) {
+        if(lowest_cpus == 1) {
           $( '#{{ form.insufficient_sensor_cpus_warning.modal_id }}' ).modal('show');
         }
       }
