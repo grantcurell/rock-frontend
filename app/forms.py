@@ -179,11 +179,11 @@ class ModalPopUp:
     def change_values(self, i):
 
         copy_of_self = copy.deepcopy(self)
-        self.button_id = self.name + "_button_id_" + str(i)
-        self.modal_id = self.name + "_modal_id_" + str(i)
-        self.modal_label_id = self.name + "_modal_label_id_" + str(i)
-        self.button_id_secondary = self.name + "_modal_button_id_secondary_" + str(i)
-        self.button_id_primary = self.name + "_modal_button_id_primary_" + str(i)
+        copy_of_self.button_id = self.name + "_button_id_" + str(i)
+        copy_of_self.modal_id = self.name + "_modal_id_" + str(i)
+        copy_of_self.modal_label_id = self.name + "_modal_label_id_" + str(i)
+        copy_of_self.button_id_secondary = self.name + "_modal_button_id_secondary_" + str(i)
+        copy_of_self.button_id_primary = self.name + "_modal_button_id_primary_" + str(i)
         return copy_of_self
 
 
