@@ -1,7 +1,7 @@
 
 <script>
 // Adding this allows this code to be identified in a browser debugger
-//@ sourceURL=pcap_disk_list
+//@ sourceURL=pcap_disk_list_{{ device_number }}
 
   $(document).ready(function(){
 
@@ -29,7 +29,7 @@
       // and flips its disabled status to be the opposite of what it currently is.
       // This has the effect of only allowing one of the PCAP drives to be selected
       // at any given time.
-      $( ".pcap_disk" ).not( "#" + event.target.id ).each(function() {
+      $( ".pcap_disk_{{ device_number }}" ).not( "#" + event.target.id ).each(function() {
         if($(this).hasClass( "active" )){
           $( this ).removeClass( "active" );
           // The two lines below gets the current button text and modifies it. For example,
@@ -57,7 +57,7 @@
   <div class="btn-group-vertical" role="group">
     {% if (disks | length) > 0 %}
     {% for disk in disks %}
-    <button type="button" class="btn btn-primary pcap_disk" id="{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}">{{ disk['name'] }}</button>
+    <button type="button" class="btn btn-primary pcap_disk_{{ device_number }}" id="{{ [form.use_as_pcap_storage.generic_button_id, disk['name'], device_number, device_type] | join('_') }}">{{ disk['name'] }}</button>
     {% endfor %}
     {% else %}
     <div class="alert alert-danger" role="alert">

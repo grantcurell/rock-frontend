@@ -92,8 +92,13 @@ $(document).ready(function(){
   }
   {% endfor %}
 
+  $( "#{{ form.insufficient_sensor_cpus_warning.button_id_primary }}" ).click(function(event){
+    $( "#{{ form.insufficient_sensor_cpus_warning.modal_id }}" ).modal('hide');
+  });
+
   // This function calculates the total of all the sensor resource percentage fields.
   recalculate_sensor_resource_percentages = function() {
+
     {% for field in form.sensor_resource_percentages %}
       var {{ field.field_id + "_var" }} = parseInt($( "#{{ field.field_id }}" ).val());
     {% endfor %}
@@ -114,10 +119,13 @@ $(document).ready(function(){
       cpus = parseInt($( "#{{ 'sensor_' + ((i + 1) | string) + '_cpus_available' }}" ).text());
       if(cpus < lowest_cpus) {
         lowest_cpus = cpus;
+        if(lowest_cpus == 0) {
+          $( '#{{ form.insufficient_sensor_cpus_warning.modal_id }}' ).modal('show');
+        }
       }
       {% endfor %}
 
-      lowest_cpus -= 1;
+      lowest_cpus = lowest_cpus - 1;
 
       if(lowest_cpus > 0) {
         // Now we need to calculate what percentage of the cores each resource will
@@ -209,6 +217,18 @@ $(document).ready(function(){
 var home_net_count = 1;
 </script>
 
+{% with object = form.insufficient_sensor_cpus_warning %}
+  {% include "modal_button.html" %}
+{% endwith %}
+
+<!-- This is the modal button for confirming whether or not this is a remote
+sensor -->
+{% for i in range(sensor_count) %}
+{% with object = form.sensor_gather_facts_modal.change_values(i+1) %}
+  {% include "modal_button.html" %}
+{% endwith %}
+{% endfor %}
+
 <div class="card">
   <div class="card-header">
     Total Sensor Resources
@@ -271,11 +291,6 @@ var home_net_count = 1;
         </ul>
       </div>
       <br>
-      <!-- This is the modal button for confirming whether or not this is a remote
-      sensor -->
-      {% with object = form.sensor_gather_facts_modal.change_values(i) %}
-        {% include "modal_button.html" %}
-      {% endwith %}
       <!-- For a description of what these arguments are see button_reaction_gather_device_facts -->
       {% with object = form.host_sensor.change_values(
         (['sensor_form', i+1] | join('_')),

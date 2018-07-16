@@ -528,24 +528,26 @@ $(document).ready(function(){
   });
   {% endfor %}
 
-{% for field in [form.elastic_cpu_percentage.field_id, form.elastic_memory_percentage.field_id, form.elastic_cpus_per_instance_ideal.field_id, form.elastic_cpus_to_mem_ratio.field_id, form.logstash_replicas.field_id, form.logstash_cpu_percentage.field_id] %}
-  $('#{{ field }}').keyup(function (event) {
-    // Only do this if autocalculate is enabled
-    if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
-      recalculate_elasticsearch_recommendations();
-    }
-  });
-{% endfor %}
+  {% for field in [form.elastic_cpu_percentage.field_id, form.elastic_memory_percentage.field_id, form.elastic_cpus_per_instance_ideal.field_id, form.elastic_cpus_to_mem_ratio.field_id, form.logstash_replicas.field_id, form.logstash_cpu_percentage.field_id] %}
+    $('#{{ field }}').keyup(function (event) {
+      // Only do this if autocalculate is enabled
+      if ( !$( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
+        recalculate_elasticsearch_recommendations();
+      }
+    });
+  {% endfor %}
 
-// This causes the manual server resource validation to fire
-{% for field in [form.elastic_masters.field_id, form.elastic_datas.field_id, form.elastic_cpus.field_id, form.elastic_memory.field_id, form.elastic_pv_size.field_id, form.moloch_pcap_pv.field_id, form.logstash_cpu_percentage.field_id, form.logstash_replicas.field_id] %}
-  $('#{{ field }}').keyup(function (event) {
-    // Only do this if autocalculate is disabled
-    if ( $( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
-      validate_manual_entries();
-    }
-  });
-{% endfor %}
+  // This causes the manual server resource validation to fire
+  {% for field in [form.elastic_masters.field_id, form.elastic_datas.field_id, form.elastic_cpus.field_id, form.elastic_memory.field_id, form.elastic_pv_size.field_id, form.moloch_pcap_pv.field_id, form.logstash_cpu_percentage.field_id, form.logstash_replicas.field_id] %}
+    $('#{{ field }}').keyup(function (event) {
+      // Only do this if autocalculate is disabled
+      if ( $( '#{{ form.disable_autocalculate.checkbox_id }}' ).is(":checked") ) {
+        validate_manual_entries();
+      }
+    });
+  {% endfor %}
+
+  var kubernetes_services_cidr_start = NaN;
 
   $( '#{{ form.kubernetes_services_cidr.field_id }}' ).keyup(function (event) {
     validate_all();
@@ -576,9 +578,11 @@ $(document).ready(function(){
       // 1 in this case.
       if( octet_4 == 0 ) {
         octet_4 = 1;
-        $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + octet_1 + octet_2 + octet_3 + String(octet_4) + "-" + String(octet_4+14));
+        kubernetes_services_cidr_start = octet_1 + octet_2 + octet_3 + String(octet_4);
+        $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + kubernetes_services_cidr_start + "-" + String(octet_4+14));
       } else {
-        $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + octet_1 + octet_2 + octet_3 + String(octet_4) + "-" + String(octet_4+15));
+        kubernetes_services_cidr_start = octet_1 + octet_2 + octet_3 + String(octet_4);
+        $( "#{{ form.kubernetes_services_cidr.field_id + '_div' }}").text("Kubernetes services range will be: " + kubernetes_services_cidr_start + "-" + String(octet_4+15));
       }
     }
   });
@@ -651,21 +655,24 @@ $(document).ready(function(){
       // This section of code updates the hostnames to be the correct hostnames
       // rather than the numerical hostnames used within sensors and servers
       if(!yes) {
-      callbacks.fire();
-      $.each(hosts, function( key, value ) {
-        if(key.includes("sensor")) {
-          set_host_value(key, "is_server", false);
-        } else {
-          set_host_value(key, "is_server", true);
-        }
-        proper_hostname = _resolve_hostname(key);
-        if (proper_hostname != key) {
-          hosts[proper_hostname] = hosts[key];
-          delete hosts[key];
-        }
-        yes = true;
-      });
+        callbacks.fire();
+        $.each(hosts, function( key, value ) {
+          if(key.includes("sensor")) {
+            set_host_value(key, "is_server", false);
+          } else {
+            set_host_value(key, "is_server", true);
+          }
+          proper_hostname = _resolve_hostname(key);
+          if (proper_hostname != key) {
+            hosts[proper_hostname] = hosts[key];
+            delete hosts[key];
+          }
+          yes = true;
+        });
       }
+
+      // We need to override whatever the user entered with the correct value here
+      input_data["{{ form.kubernetes_services_cidr.field_id }}"] = kubernetes_services_cidr_start;
 
       $( "#{{ form.inventory_generated_modal.button_id_primary }}" ).click(function(event){
 

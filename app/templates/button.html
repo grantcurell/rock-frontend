@@ -2,6 +2,9 @@
      button in forms.py-->
 
 <script type="text/javascript">
+
+  //@ sourceURL=button_{{ object.button_id }}
+
   $(document).ready(function(){
 
     button_get_ids = function(){
@@ -13,6 +16,7 @@
     // number of servers button.
     // See: https://api.jquery.com/click/
     $('#{{ object.button_id }}').click(function (event) {
+
       // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
       // selection set. To access the DOM properties you have to select the first
       // item. checkValidity is an HTML5 built in function we are calling against

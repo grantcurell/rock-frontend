@@ -699,6 +699,12 @@ class InventoryForm:
   # Sensor Settings         #
   ###########################
 
+  insufficient_sensor_cpus_warning = ModalPopUp(
+  name = 'insufficient_sensor_cpus_warning_modal'
+  , modal_title = 'Sensor has insufficient CPUs!'
+  , modal_text = 'This sensor only has one CPU! This is not enough to run TFPlenum. Your sensors need at least two cores! You will not be able to continue.'
+  , primary_button_text = 'Close')
+
   home_net = Button(
      form_name = 'home_net'
    , label = 'Home Net CIDR IP'
