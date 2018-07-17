@@ -49,9 +49,9 @@ $(document).ready(function(){
 
   // By default set offline build true and disable repo sync checkboxes
   $("#{{ form.is_offline_build.checkbox_id }}").prop('checked', true);
-  $("#{{ form.repo_sync_centos.checkbox_id }}").prop('disabled', true);
-  $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('disabled', true);
-  $("#{{ form.repo_sync_additional.checkbox_id }}").prop('disabled', true);
+  $("#{{ form.download_dependencies.checkbox_id }}").prop('disabled', true);
+  $("#{{ form.iso_url.field_id }}").prop('disabled', true);
+  
 
   get_ids = function(){
     var data = $("input");
@@ -115,23 +115,21 @@ $(document).ready(function(){
 
   $("#{{ form.is_offline_build.checkbox_id }}").change(event, function() {
     if ( $('#{{ form.is_offline_build.checkbox_id }}').is(":checked") ) {
-      $("#{{ form.is_offline_build.checkbox_id }}").prop('checked', true);
-      $("#{{ form.repo_sync_centos.checkbox_id }}").prop('checked', false);
-      $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('checked', false);
-      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('checked', false);
-
-      $("#{{ form.repo_sync_centos.checkbox_id }}").prop('disabled', true);
-      $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('disabled', true);
-      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('disabled', true);
+      $("#{{ form.is_offline_build.checkbox_id }}").prop('checked', true);      
+      $("#{{ form.download_dependencies.checkbox_id }}").prop('checked', false);
+      $("#{{ form.download_dependencies.checkbox_id }}").prop('disabled', true);    
+      $("#{{ form.iso_url.field_id }}").prop('disabled', true); 
+      $("#{{ form.iso_url.field_id }}").val("{{ form.iso_url.default_value }}")
+      
     } else {
-      $("#{{ form.repo_sync_centos.checkbox_id }}").prop('disabled', false);
-      $("#{{ form.repo_sync_rhel.checkbox_id }}").prop('disabled', false);
-      $("#{{ form.repo_sync_additional.checkbox_id }}").prop('disabled', false);
+      $("#{{ form.iso_url.field_id }}").prop('disabled', false);
+      $("#{{ form.download_dependencies.checkbox_id }}").prop('disabled', false);      
       set_id_value("{{ form.is_offline_build.checkbox_id }}", false);
+
     }
   });
 
-  {% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %}
+  {% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id,form.gateway.field_id, form.netmask.field_id, form.root_password.field_id, form.iso_path.field_id, form.iso_checksum.field_id ] %}
   $('#{{ field }}').keyup(function (event) {
     validate_all();
   });
@@ -198,7 +196,7 @@ $(document).ready(function(){
  }
 
   system_settings_validate = function () {
-    if({% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %} true) {
+    if({% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id, form.iso_path.field_id, form.iso_checksum.field_id ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %} true) {
       return true;
     }
     return false;
@@ -254,22 +252,26 @@ $(document).ready(function(){
       root_password=$("#root_password_field").val();
 
       // Advanced Settings
-      offline=$("#is_offline_build_checkbox").prop("checked");
-      repo_sync_centos=$("#repo_sync_centos_checkbox").prop("checked");
-      repo_sync_rhel=$("#repo_sync_rhel_checkbox").prop("checked");
-      repo_sync_additional=$("#repo_sync_additional_checkbox").prop("checked");
       timezone=$("#timezone_dropdown").val();
+      os_name=$("#os_name_dropdown").val();
+      offline=$("#is_offline_build_checkbox").prop("checked");
+      download_dependencies=$("#download_dependencies_checkbox").prop("checked");
+      iso_url=$("#iso_url_field").val();   
+      iso_path=$("#iso_path_field").val();
+      iso_checksum=$("#iso_checksum_field").val();
 
       system_settings["dhcp_start"] = dhcp_start;
       system_settings["dhcp_end"] = dhcp_end;      
       system_settings["gateway"] = gateway;
       system_settings["netmask"] = netmask;
       system_settings["root_password"] = root_password;
-      system_settings["offline"] = offline;
       system_settings["timezone"] = timezone;
-      system_settings["repo_sync_centos"] = repo_sync_centos;
-      system_settings["repo_sync_rhel"] = repo_sync_rhel;
-      system_settings["repo_sync_additional"] = repo_sync_additional;
+      system_settings["os_name"] = os_name;
+      system_settings["offline"] = offline;      
+      system_settings["download_dependencies"] = download_dependencies;    
+      system_settings["iso_url"] = iso_url; 
+      system_settings["iso_path"] = iso_path;
+      system_settings["iso_checksum"] = iso_checksum;
       system_settings["controller_interface_ip"] = controller_interface_ip;
 
       $.get("{{ url_for('_generate_kickstart_inventory') }}", {system_settings: JSON.stringify(system_settings), hosts: JSON.stringify(hosts)}, function(data){});
@@ -373,6 +375,14 @@ $(document).ready(function(){
             {% endif %}
           {% endfor %}
           <br/>
+          {% for option in form.os_name_settings %}
+          {% if option.include_html is defined %}
+            {% with object = option %}
+              {% include option.include_html %}
+            {% endwith %}
+          {% endif %}
+          {% endfor %} 
+        <br />
           <h5>Offline Build</h5>
           <form id='#{{ form.is_offline_build.form_name }}' role=form>
           <div class="form-check">
@@ -381,29 +391,24 @@ $(document).ready(function(){
               {{ form.is_offline_build.label }}
             </label>
           </div>
+          <div class="form-check">
+            <input class="form-check-input {{ form.download_dependencies.css_class }}" type="checkbox" value="" id="{{ form.download_dependencies.checkbox_id }}">
+            <label class="form-check-label" for="{{ form.download_dependencies.checkbox_id }}">
+              {{ form.download_dependencies.label }}
+            </label>
+          </div>          
           </form>
           <br />
-          <h5>Repo Sync Settings</h5>
-          <form id='#{{ form.repo_sync_centos.form_name }}' role=form>
-            <div class="form-check">
-              <input class="form-check-input {{ form.repo_sync_centos.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_centos.checkbox_id }}">
-              <label class="form-check-label" for="{{ form.repo_sync_centos.checkbox_id }}">
-                {{ form.repo_sync_centos.label }}
-              </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input {{ form.repo_sync_rhel.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_rhel.checkbox_id }}">
-                <label class="form-check-label" for="{{ form.repo_sync_rhel.checkbox_id }}">
-                  {{ form.repo_sync_rhel.label }}
-                </label>
-              </div>
-            <div class="form-check">
-                <input class="form-check-input {{ form.repo_sync_additional.css_class }}" type="checkbox" value="" id="{{ form.repo_sync_additional.checkbox_id }}">
-                <label class="form-check-label" for="{{ form.repo_sync_additional.checkbox_id }}">
-                  {{ form.repo_sync_additional.label }}
-                </label>
-            </div>
-          </form>
+          <h5>Installation Media Details</h5>
+          {% with object = form.iso_url %}
+            {% include "text_input.html" %}
+          {% endwith %}
+          {% with object = form.iso_path %}
+            {% include "text_input.html" %}
+          {% endwith %}
+          {% with object = form.iso_checksum %}
+            {% include "text_input.html" %}
+          {% endwith %}
       </div>
     </div>
   </div>

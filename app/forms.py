@@ -1336,26 +1336,48 @@ class KickstartInventoryForm:
     , dropdown_text = 'Timezone'
     , default_option = 'Chicago')
 
-  repo_sync_centos = CheckBox(
-    form_name = "repo_sync_centos"
-  , label = "CentOS"
-  , description =
-  "This options is used to download the public centos yum repositories to the ansible controller.  \
-  This option requires an internet connection.")
 
-  repo_sync_rhel = CheckBox(
-    form_name = "repo_sync_rhel"
-  , label = "RHEL"
-  , description =
-  "This options is used to download the required Red Hat Enterprise Linux(RHEL) 7 yum repositories to the ansible controller.\
-  This option requires an internet connection and a RHEL subscription.")
 
-  repo_sync_additional = CheckBox(
-    form_name = "repo_sync_additional"
-  , label = "Additional (EPEL, RockNSM, Ceph, Kubernetes)"
+  download_dependencies = CheckBox(
+    form_name = "download_dependencies"
+  , label = "Download All Dependencies (requires internet connection)"
   , description =
-  "This options is used to download the public EPEL, kubernetes, RockNSM, and Ceph yum repositories to the ansible controller.\
-  This option requires an internet connection.")
+  "This options is used to download the required dependencies to be hosted on the controller for deployment of the system.  Dependancies include yum repositories, pip and nmp modules and docker images.")
+
+  iso_path = Field(
+  form_name = 'iso_path'
+  , label = 'ISO Path Location'
+  , placeholder = "Path to centos/rhel iso"
+  , input_type = 'text'
+  , html5_constraint = "pattern=(.*\.iso$)"
+  , invalid_feedback = 'You must enter a valid path to a centos/rhel iso.'
+  , required = False
+  , default_value = "/root/CentOS-7-x86_64-Minimal-1804.iso"
+  , description = "This should be the path of the iso for centos/rhel minimal installation.  \
+  The iso is downloaded manually or automatically if a valid ISO URL is provided (requires internet connection).")
+
+  iso_url = Field(
+  form_name = 'iso_url'
+  , label = 'ISO URL'
+  , placeholder = "Path to centos/rhel iso url"
+  , input_type = 'text'
+  , html5_constraint = "pattern=(^(ftp:\/\/.|http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?\.iso$)"
+  , invalid_feedback = 'You must enter a valid URL for centos/rhel minimal iso ending with .iso'
+  , required = False
+  , default_value = "http://mirrors.mit.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1804.iso"
+  , description = "This is the url to download the centos/rhel minimal installation iso.  \
+  If the iso is already on the controller provide disregard this option.  Verify the ISO Path Location is the correct.")
+
+  iso_checksum = Field(
+  form_name = 'iso_checksum'
+  , label = 'ISO Checksum'
+  , placeholder = "Enter sha256 checksum for the centos/rhel iso"
+  , input_type = 'text'
+  , html5_constraint = ""
+  , invalid_feedback = 'You must enter the sha256 checksum for the centos/rhel iso'
+  , required = True
+  , default_value = "714acc0aefb32b7d51b515e25546835e55a90da9fb00417fbee2d03a62801efd"
+  , description = "This is the checksum for the centos/rhel iso. This is required to verify validity of the iso.")
 
   controller_interface = GenericButton(
     form_name = 'controller_interface'
@@ -1373,6 +1395,17 @@ class KickstartInventoryForm:
   primary_button_text = 'Close'
   )
 
+  os_name = DropDown(
+  form_name = 'os_name'
+  , label = 'Operating System'
+  #, required = True TODO NEED TO ADD A DEFAULT
+  , description = "This option is used to determine which operating system will be installed on each node.  By default the tfplenum should use centos."
+  , options = ['centos', 'rhel', 'coreos', 'atomic']
+  # WARNING: Do not change the order of these options. There are several parts of the code
+  # which depend on them. You can search for them by looking for form.sensor_storage_type.options
+  , dropdown_text = 'Operating System'
+  , default_option = 'centos')
+
   dhcp_settings = [dhcp_start, dhcp_end]
   interface_settings = [gateway, netmask]
   system_settings = [root_password]
@@ -1380,8 +1413,9 @@ class KickstartInventoryForm:
   node_settings = [number_of_nodes]
   node_options = [hostname, ip_address,mac_address, boot_drive, pxe_type_settings]
   timezone_settings = [timezone]
-  advanced_system_settings = [is_offline_build, repo_sync_centos, repo_sync_rhel, repo_sync_additional]
-  kickstart_form_settings = dhcp_settings + interface_settings + system_settings + pxe_type_settings + node_settings + node_options + timezone_settings + advanced_system_settings
+  os_name_settings = [os_name]
+  advanced_system_settings = [is_offline_build, download_dependencies, iso_path, iso_url]
+  kickstart_form_settings = dhcp_settings + interface_settings + system_settings + pxe_type_settings + node_settings + node_options + timezone_settings + advanced_system_settings + os_name_settings
 
 
 class ConfluenceForm():

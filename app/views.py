@@ -284,6 +284,23 @@ def _generate_kickstart_inventory():
         nodes[host].boot_drive = value["boot_drive"]
         nodes[host].pxe_type = value["pxe_type"]
 
+    # Set all sync repos to false by default
+    system_settings['repo_sync_centos'] = False
+    system_settings['repo_sync_rhel'] = False
+    system_settings['repo_sync_additional'] = False
+
+    # If this is an online build and download dependencies is checked
+    # Lets configure the correct repos to be downloaded.
+    # everyone gets additional
+    # rhel will sync rhel repos
+    # centos will sync centos repo
+    if system_settings['offline'] == False and system_settings['download_dependencies'] == True:
+        system_settings['repo_sync_additional'] = True
+        if system_settings['os_name'] == "centos":
+            system_settings['repo_sync_centos'] = True
+        if system_settings['os_name'] == "rhel":
+            system_settings['repo_sync_rhel'] = True
+
     inventory_template = render_template('kickstart_inventory.yml', system_settings=system_settings, nodes=nodes)
 
     if not os.path.exists("/opt/tfplenum-deployer/playbooks/"):
