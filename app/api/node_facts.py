@@ -69,13 +69,14 @@ class Interface(object):
 
     """
 
-    def __init__(self, name, ip_address, mac_address):
+    def __init__(self, name, ip_address, mac_address, speed):
         self.name = name
         self.ip_address = ip_address
         self.mac_address = mac_address
+        self.speed = int(speed)
 
     def __str__(self):
-        return "Interface: %s Ip: %s Mac: %s" % (self.name, self.ip_address, self.mac_address)
+        return "Interface: %s Ip: %s Mac: %s Speed: %d" % (self.name, self.ip_address, self.mac_address, self.speed)
 
 class Disk(object):
 
@@ -193,7 +194,7 @@ def transform(json_object):
             for k in json_object['ansible_facts']['ansible_device_links']['masters'][i]:
                 masterlinks[k] = i
         # Get Interfaces
-        interfaces = []    
+        interfaces = []
         for i in json_object['ansible_facts']['ansible_interfaces']:        
             ip=""
             mac=""
@@ -206,7 +207,9 @@ def transform(json_object):
                         ip=interface['ipv4']['address']
                     if 'macaddress' in interface:
                         mac=interface['macaddress']
-                    interfaces.append(Interface(i, ip, mac))
+                    if 'speed' in interface:
+                        speed=interface['speed']
+                    interfaces.append(Interface(i, ip, mac, speed))
                 except:
                     pass
 

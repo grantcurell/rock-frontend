@@ -34,6 +34,7 @@ def _node():
 def _gather_device_facts():
     # This request will be received from jquery on the client side
     try:
+        min_mbps = 1000        
         management_ip = request.args.get('management_ip')
         password = request.args.get('password')
         node = get_system_info(management_ip, password)
@@ -41,7 +42,12 @@ def _gather_device_facts():
 
         for interface in node.interfaces:
             if interface.ip_address != management_ip:
-                potential_monitor_interfaces.append(interface.name)
+                potential_monitor_interfaces.append(interface.name)            
+            if interface.ip_address == management_ip:
+                if interface.speed < min_mbps:
+                    return jsonify(error_message="ERROR: Please check your "
+                                  "network configuration. The link speed on {} is less than {} Mbps."
+                                  .format(interface.name, min_mbps))
 
         return jsonify(cpus_available=node.cpu_cores,
                        memory_available=node.memory_gb,
