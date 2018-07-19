@@ -155,11 +155,25 @@ def _pcap_disks_list():
     form = InventoryForm()
     return render_template("pcap_disks_list.html", form=form, device_number=device_number, disks=disks, hostname=hostname)
 
+
+def _change_zookeeper_replicas_based_on_node_count(input_data, form):
+    """
+    Changes the zookeeper replica count to 1 if there is less than 3 nodes.
+    Otherwise the value passed in is unchanged.
+
+    :param input_data: A python dictionary object that contains
+                     the form data submitted from the kit_configuration page
+    :param form: The form object that pertains to the view in question.
+    :return: None
+    """
+    node_count = int(input_data["number_of_sensors_field"]) + int(input_data["number_of_servers_field"])
+    if node_count < 3:
+        input_data[form.zookeeper_replicas.field_id] = u'1'
+
+
 @app.route('/_generate_inventory')
 def _generate_inventory():
-
-    form = InventoryForm();
-
+    form = InventoryForm()
     input_data = json.loads(request.args.get('input_data'))
     hosts = json.loads(request.args.get('hosts'))
 
@@ -233,8 +247,12 @@ def _generate_inventory():
             else:
                 _assign_sensor(sensors)
 
+    _change_zookeeper_replicas_based_on_node_count(input_data, form)
     input_data[form.moloch_pcap_pv.field_id] = int(input_data[form.moloch_pcap_pv.field_id])
-    inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data, sensors=sensors, remote_sensors=remote_sensors, master_server=master_server, servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
+    inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data,
+                                         sensors=sensors, remote_sensors=remote_sensors,
+                                         master_server=master_server,
+                                         servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
 
     if not os.path.exists("/opt/tfplenum/playbooks/"):
         os.makedirs("/opt/tfplenum/playbooks/")
