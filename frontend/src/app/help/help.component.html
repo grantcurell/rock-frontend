@@ -1,0 +1,69 @@
+<div class="container card" id="topheader">
+    <div class="jumbotron">
+      <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
+      <p class="lead">We're really trying to make this easier!</p>
+    </div>
+    <h2>{{ form.what_is_ceph['label'] }}</h2>
+    {{ form.what_is_ceph['description'] }}
+    <br><br>
+    <a name="{{ 'anchor_' + form.help_me_decide['label'].replace(' ','_') }}">
+        <h2>Deciding Between Ceph PCAP Storage and Direct to Disk</h2>
+    </a>
+    {{ form.help_me_decide['description'] }}
+    <br><br>
+
+    <h2>Kickstart Installation Settings</h2>
+    <dl *ngFor="let key of objectKeys(kickstart)" class="row">      
+        <dt class="col-sm-3">{{ kickstart[key].label }}<a id="{{ kickstart[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kickstart[key].description }}</dd>
+    </dl>
+
+    <h2>Kickstart Node Settings</h2>
+    <dl *ngFor="let key of objectKeys(kickstartNode)" class="row">      
+        <dt class="col-sm-3">{{ kickstartNode[key].label }}<a id="{{ kickstartNode[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kickstartNode[key].description }}</dd>
+    </dl>
+
+    <h2>Advanced Kickstart Settings</h2>
+    <dl *ngFor="let key of objectKeys(kickstart.advanced_settings)" class="row">      
+        <dt class="col-sm-3">{{ kickstart.advanced_settings[key].label }}<a id="{{ kickstart.advanced_settings[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kickstart.advanced_settings[key].description }}</dd>
+    </dl>
+    
+    <h2>Kit Form Settings</h2>
+    <dl *ngFor="let key of objectKeys(kitForm)" class="row">      
+        <dt class="col-sm-3">{{ kitForm[key].label }}<a id="{{ kitForm[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kitForm[key].description }}</dd>
+    </dl>
+
+    <h2>Kit Server Settings</h2>
+    <dl *ngFor="let key of objectKeys(kitServer)" class="row">      
+        <dt class="col-sm-3">{{ kitServer[key].label }}<a id="{{ kitServer[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kitServer[key].description }}</dd>
+    </dl>
+
+    <h2>Kit Sensor Settings</h2>
+    <dl *ngFor="let key of objectKeys(kitSensor)" class="row">      
+        <dt class="col-sm-3">{{ kitSensor[key].label }}<a id="{{ kitSensor[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kitSensor[key].description }}</dd>
+    </dl>
+
+    <h2>Advanced Moloch Settings</h2>
+    <dl *ngFor="let key of objectKeys(kitForm.advanced_moloch_settings)" class="row">      
+        <dt class="col-sm-3">{{ kitForm.advanced_moloch_settings[key].label }}<a id="{{ kitForm.advanced_moloch_settings[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kitForm.advanced_moloch_settings[key].description }}</dd>
+    </dl>
+
+    <h2>Advanced Elastic Search Settings</h2>
+    <dl *ngFor="let key of objectKeys(kitForm.advanced_elasticsearch_settings)" class="row">      
+        <dt class="col-sm-3">{{ kitForm.advanced_elasticsearch_settings[key].label }}<a id="{{ kitForm.advanced_elasticsearch_settings[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kitForm.advanced_elasticsearch_settings[key].description }}</dd>
+    </dl>
+
+    <h2>Advanced Kafka Settings</h2>
+    <dl *ngFor="let key of objectKeys(kitForm.advanced_kafka_settings)" class="row">      
+        <dt class="col-sm-3">{{ kitForm.advanced_kafka_settings[key].label }}<a id="{{ kitForm.advanced_kafka_settings[key].anchor }}"></a></dt>
+        <dd class="col-sm-9">{{ kitForm.advanced_kafka_settings[key].description }}</dd>
+    </dl>
+    
+</div>

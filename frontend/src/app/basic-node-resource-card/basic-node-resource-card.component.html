@@ -1,0 +1,14 @@
+<div class="card" style="width: 20rem;">
+  <div class="card-header">
+    {{ title }}
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">CPU Cores Available:
+      <span>{{ basicNodeResource.cpu_cores }}</span>
+    </li>
+    <li class="list-group-item">Memory Available:
+      <span id="server_1_memory_available">{{ basicNodeResource.memory }}</span> GB</li>
+    <li class="list-group-item border-bottom">Total Drive Space Available:
+      <span id="server_1_disk_space_available">{{ basicNodeResource.total_drive_space }}</span> GB</li>
+  </ul>
+</div>

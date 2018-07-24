@@ -13,3 +13,4 @@ app/static/images/thisiscvah/
 app/templates/thisiscvah/
 app/templates/ojcctm/
 app/confluence/*_views.py
+.vscode/

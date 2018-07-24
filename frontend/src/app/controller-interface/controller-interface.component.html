@@ -1,0 +1,21 @@
+<div [formGroup]="parentForm">
+  <div class="card" style="width: 20rem;">
+    <div class="card-header">
+      Select Controller Interface
+    </div>
+    <div class="card-body">
+      <p class="card-text">Select which interface you would like to use as the controller interface.  This will be the interface used for services provided to the kit.</p>
+      <p class="card-text text-danger">Warning: Interfaces without IP addresses will not be listed!</p>
+    </div>
+    <input type="hidden" formControlName="{{ controlName }}" [value]="selectedValue" required>
+    <div id="button_group" class="btn-group-vertical" role="group">        
+        <input *ngFor="let interface of interfaceData" type="button" (click)="selectedButton($event, interface)" required class="btn btn-primary" value="{{ interface.name }} - {{ interface.ip_address }}">      
+      <div *ngIf="!interfaceData" class="alert alert-danger" role="alert">
+        No interfaces found! Are you sure you have a second eligible interface that is not the management interface?
+      </div>      
+    </div>
+  </div>
+  <a routerLink="/help">
+    <label>What is this?</label>
+  </a>
+</div>

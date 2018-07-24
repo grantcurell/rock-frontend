@@ -1,0 +1,230 @@
+<app-modal-dialog [modal]="kitModal"></app-modal-dialog>
+<div class="container" id="topheader">
+  <div class="jumbotron">
+    <h1 class="display-4">TFPlenum Kit Configuration</h1>
+    <p class="lead">We're really trying to make this easier!</p>
+  </div>
+  <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">
+    <div class="card" >
+      <div class="card-body">
+        <h4 class="card-title">Select Storage Type</h4>
+        <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown>
+      </div>      
+    </div>
+    <br>
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Global Settings</h4>
+        <p class="card-text">
+          Dependent on your resources, these are generally sane defaults if you don't know what you are doing and just want to get started. 
+          Unlike the storage settings, you can always come back and adjust them if you change your mind. 
+          The only field you *have* to fill out is Kubernetes Service IP Range Start.
+        </p>
+        <hr>
+        <br>
+        <h5>Credentials</h5>
+        <app-text-input [parentForm]="kitForm" controlName="root_password"></app-text-input>
+        <br>
+        <h5>Elasticsearch Settings</h5>
+        <app-text-input [parentForm]="kitForm" controlName="elastic_cpu_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
+        <app-text-input [parentForm]="kitForm" controlName="elastic_memory_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
+        <app-text-input [parentForm]="kitForm" controlName="logstash_cpu_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
+        <p class="text-info">We found that on the typical DIP kit 1 instance with 5 CPU cores was enough. You may need to adjust based on your traffic profile.</p>
+        <app-text-input [parentForm]="kitForm" controlName="logstash_replicas" (keyupEvent)="triggerValidations($event)"></app-text-input>
+        <p class="text-info">Note: Elasticsearch only runs on servers. It will not run on sensors. The percentages above are only applicable to server resources - not sensor.</p>
+        <app-text-input [parentForm]="kitForm" controlName="elastic_storage_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
+        <p>Storage Assigned to Elasticsearch (GBs): <span>{{ storageCalculator.elasticStorageAvailable }}</span></p>
+        <p class="text-info">Note: The amount of storage assigned to Elasticsearch will update as you discover your hosts below. It will start at 0.</p>
+        <br>
+
+        <div *ngIf="!isMolochPercentageHidden">
+          <h5>Moloch PCAP Storage Percentage</h5>
+          <app-text-input [parentForm]="kitForm" controlName="moloch_pcap_storage_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <p>Storage Assigned to Moloch PCAP (GBs): <span>{{ storageCalculator.molochStorageAvailable }}</span></p>
+          <p class="text-info">Note: The amount of storage assigned to Moloch will update as you discover your hosts below. It will start at 0.</p>
+          <br>
+        </div>
+
+        <h5>Kubernetes Settings</h5>
+        <app-text-input [parentForm]="kitForm" controlName="kubernetes_services_cidr" (keyupEvent)="kubernetesInputEvent($event)"></app-text-input>
+        <div>{{ kitForm.kubernetesCidrInfoText }}</div>
+      </div>
+    </div>
+    <br>
+    <app-total-system-resource-card [totalSystemResources]="kitForm.system_resources"></app-total-system-resource-card>
+    <br>
+    
+    <app-total-server-resources-card [totalServerResources]="kitForm.controls.server_resources"></app-total-server-resources-card>
+    <div formArrayName="servers">
+      <div *ngIf="!servers.hidden">
+        <div *ngFor="let server of servers.controls; let i = index" class="card">
+          <div [formGroup]="server">
+              <input type="hidden" formControlName="hostname">
+          </div>
+          <div class="card-header">
+            <h5 class="mb-0">
+              <button class="btn btn-link" type="button" (click)="toggleServer(server)">Server {{ i + 1 }} - {{ server.hostname.value }}</button>
+              <button class="btn btn-danger" type="button" (click)="removeServer(i)" style="float:right;">Remove</button>
+            </h5>
+            
+          </div>
+          
+          <div *ngIf="!server.hidden" class="card-body">
+            <app-basic-node-resource-card title="Server {{ i + 1 }} resources" [basicNodeResource]="server.basicNodeResource"></app-basic-node-resource-card>
+            <br>
+            <app-text-input [parentForm]="server" controlName="host_server" (buttonClick)="gatherFacts(server)"></app-text-input>
+            <app-checkbox [parentForm]="server" controlName="is_master_server" (is_checked)="disableOtherMasterOrReenable($event, i)"></app-checkbox>
+            <br>
+            <div *ngIf="server.deviceFacts">                
+                  <app-card-selector [parentForm]="server" [optionSelections]="server.driveSelections" 
+                                      controlName="ceph_drives" (onSelect)="cephDriveSelected($event, server)"></app-card-selector>                
+            </div>              
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+          <button class="btn btn-primary" type="button" (click)="addServer()">Add Server</button>
+      </div>        
+    </div>
+    
+    <br>
+    <app-total-sensor-resources-card [sensorResourceForm]="kitForm.controls.sensor_resources" ></app-total-sensor-resources-card>
+    <div formArrayName="sensors">
+      <div *ngIf="!sensors.hidden">
+        <div *ngFor="let sensor of sensors.controls; let i = index" class="card">
+          <div [formGroup]="sensor">
+            <input type="hidden" formControlName="hostname">
+          </div>
+          <div class="card-header">
+            <h5 class="mb-0">
+              <div [formGroup]="sensor">
+                <input type="hidden" formControlName="hostname">
+              </div>
+              <button class="btn btn-link" type="button" (click)="toggleSensor(sensor)">Sensor {{ i + 1 }} - {{ sensor.hostname.value }}</button>
+              <button class="btn btn-danger" type="button" (click)="removeSensor(i)" style="float:right;">Remove</button>
+            </h5>
+          </div>
+          
+          <div *ngIf="!sensor.hidden" class="card-body">
+            <app-basic-node-resource-card title="Sensor {{ i + 1 }} resources" [basicNodeResource]="sensor.basicNodeResource"></app-basic-node-resource-card>
+            <br>
+            <app-dropdown [parentForm]="sensor" controlName="sensor_type" (dropDownChanged)="sensorTypeChange($event, i)"></app-dropdown>
+            <app-text-input [parentForm]="sensor" controlName="host_server" (buttonClick)="gatherFacts(sensor)"></app-text-input>            
+            <br>
+
+            <div *ngIf="!isAdvancedOptionsHidden">
+              <app-text-input [parentForm]="sensor" controlName="bro_workers" ></app-text-input>
+              <app-text-input [parentForm]="sensor" controlName="moloch_threads" ></app-text-input>
+            </div>
+
+            <div *ngIf="sensor.deviceFacts">
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local'" [parentForm]="sensor" [optionSelections]="sensor.driveSelections" 
+                                     controlName="ceph_drives" (onSelect)="cephDriveSelected($event, sensor)"></app-card-selector>
+                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Remote'" [parentForm]="sensor" [optionSelections]="sensor.driveSelections"
+                                     controlName="pcap_drives"></app-card-selector>
+                </div>
+                <div class="form-group col-md-6">
+                  <app-card-selector [parentForm]="sensor" [optionSelections]="sensor.interfaceSelections" 
+                                     controlName="monitor_interface" style="float: right;"></app-card-selector>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+          <button class="btn btn-primary" type="button" (click)="addSensor()">Add Sensor</button>
+      </div>
+    </div>
+
+    <br>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid">Generate Inventory</button>
+      </div>        
+      <div class="form-group col-md-6">
+        <button class="btn btn-primary" type="button" (click)="toggleAdvancedSettings()" style="float:right;">Show/Hide Advanced Settings</button>
+      </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+          Validation
+        </div>
+        <div class="card-body" id="validation">
+            <p *ngIf="kitForm.valid" class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>
+            <div *ngIf="kitForm.hasError('errors')">
+              <p *ngFor="let error of kitForm.getError('errors');" class='text-danger'>{{ error }}</p>
+            </div>            
+        </div>
+      </div>
+
+    <div *ngIf="!isAdvancedOptionsHidden">
+      <hr>
+      <h3>Advanced System Settings</h3>
+      <p class="font-weight-light">All of the required settings below will autopopulate based on facts gathered from the servers. It is not necessary to change
+        any of them in order for the system to function. However, you may want to update some fields manually based on your specific
+        use cases.
+      </p>
+      <div class="card">
+        <div class="card-body">
+          <p class="card-text text-danger">
+            Unless you really know what you are doing here, you should not change the DNS. Seriously, there's only an incredibly niche
+            case for changing this and chances are you aren't in it.
+          </p>
+          <app-text-input [parentForm]="kitForm" controlName="dns_ip"></app-text-input>
+          <app-checkbox [parentForm]="kitForm" controlName="disable_autocalculate" (is_checked)="toggleAutocalculate($event)"></app-checkbox>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Advanced Elasticsearch Settings</h4>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_masters" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_datas" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_cpus" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_memory" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_pv_size" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_curator_threshold"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_cpus_per_instance_ideal" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_cpus_to_mem_ratio" (keyupEvent)="triggerValidations($event)"></app-text-input>
+        </div>        
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Advanced Moloch Settings</h4>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_pcap_pv_size" (keyupEvent)="triggerValidations($event)"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_bpf"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_dontSaveBPFs"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_spiDataMaxIndices"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_pcapWriteMethod"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_pcapWriteSize"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_dbBulkSize"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_maxESConns"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_maxESRequests"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_packetsPerPoll"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_magicMode"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_maxPacketsInQueue"></app-text-input>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Advanced Moloch Settings</h4>
+            <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="kafka_jvm_memory"></app-text-input>
+            <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="kafka_pv_size" (keyupEvent)="triggerValidations($event)"></app-text-input>
+            <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="zookeeper_jvm_memory"></app-text-input>
+            <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="zookeeper_pv_size" (keyupEvent)="triggerValidations($event)"></app-text-input>
+            <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="zookeeper_replicas"></app-text-input>
+          </div>
+      </div>
+    </div>
+  </form>
+</div>

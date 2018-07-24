@@ -1,0 +1,21 @@
+<div [formGroup]="parentForm">
+  <div formArrayName="{{ controlName }}" class="card" style="width: 20rem;">
+    <div class="card-header">
+      {{ input_control.label }}
+    </div>
+    <div class="card-body">
+      <p class="card-text">{{ input_control.card_text }}</p>
+      <p class="card-text text-danger">{{ input_control.card_notes }}</p>
+    </div>
+    <input *ngFor="let item of htmlCardSelectorFormArray.controls; let i=index" type="hidden" [formControlName]="i">
+    <div id="button_group" class="btn-group-vertical" role="group">        
+        <input *ngFor="let selection of optionSelections" type="button" (click)="selectedButton($event, selection)" required class="btn btn-primary" value="{{ selection.label }}">      
+      <div *ngIf="!optionSelections" class="alert alert-danger" role="alert">
+        {{ input_control.invalid_feedback }}
+      </div>      
+    </div>
+  </div>
+  <a routerLink="/help" fragment="{{ input_control.anchor }}">
+    <label>What is this?</label>
+  </a>
+</div>

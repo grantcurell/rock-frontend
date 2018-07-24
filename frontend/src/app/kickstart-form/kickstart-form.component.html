@@ -1,0 +1,103 @@
+<app-modal-dialog [modal]="kickStartModal"></app-modal-dialog>
+<div class="container" id="topheader">
+  <div class="jumbotron">
+    <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
+    <p class="lead">We're really trying to make this easier!</p>
+  </div>
+  <div id="main_form">
+    <form [formGroup]="kickStartForm" (ngSubmit)="onSubmit()">
+      <div class="card">
+        <div class="card-body">
+          <h5>DHCP Settings</h5>
+          <app-text-input [parentForm]="kickStartForm" controlName="dhcp_start"></app-text-input>
+          <app-text-input [parentForm]="kickStartForm" controlName="dhcp_end"></app-text-input>
+          <hr>
+          <h5>Static Interface Settings</h5>
+          <app-text-input [parentForm]="kickStartForm" controlName="gateway"></app-text-input>
+          <app-text-input [parentForm]="kickStartForm" controlName="netmask"></app-text-input>
+          <hr>
+          <h5>System Settings</h5>
+          <app-text-input [parentForm]="kickStartForm" controlName="root_password"></app-text-input>
+          <app-text-input [parentForm]="kickStartForm" controlName="re_password"></app-text-input>
+          <hr>
+          <h5>Controller Settings</h5>
+          <br>
+          <div *ngIf="deviceFacts">
+              <app-controller-interface [parentForm]="kickStartForm" 
+                                        [interfaceData]="deviceFacts.interfaces" 
+                                        controlName="controller_interface"></app-controller-interface>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Node Settings</h4>
+          <app-text-input [parentForm]="kickStartForm" controlName="number_of_nodes" (buttonClick)="addNodes()"></app-text-input>
+        </div>
+      </div>
+      <div formArrayName="nodes">
+        <div *ngIf="!nodes.hidden">
+          <div *ngFor="let node of nodes.controls; let i=index" class="card">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <button class="btn btn-link" type="button" (click)="toggleNode(node)">node {{ i + 1 }}</button>
+              </h5>
+            </div>
+            <div *ngIf="!node.hidden" class="card-body">
+              <app-text-input [parentForm]="node" controlName="hostname"></app-text-input>
+              <app-text-input [parentForm]="node" controlName="ip_address"></app-text-input>
+              <app-text-input [parentForm]="node" controlName="mac_address"></app-text-input>
+              <app-text-input [parentForm]="node" controlName="boot_drive"></app-text-input>
+              <app-dropdown [parentForm]="node" controlName="pxe_type"></app-dropdown>
+              <app-dropdown [parentForm]="node" controlName="node_type"></app-dropdown>
+            </div>
+          </div>
+        </div>
+      </div>      
+      <br>
+      <div *ngIf="!kickStartForm.controls.advanced_settings.hidden" class="card">          
+        <div class="card-body">
+          <h3 class="card-title">Advanced System Settings</h3>
+          <p class="font-weight-light">All of the required settings below will autopopulate based on facts gathered from the servers. 
+            It is not necessary to change any of them in order for the system to function. However, 
+            you may want to update some fields manually based on your specific use cases.
+          </p>
+          <hr>
+          <app-dropdown [parentForm]="kickStartForm.controls.advanced_settings" controlName="timezone"></app-dropdown>
+          <app-dropdown [parentForm]="kickStartForm.controls.advanced_settings" controlName="os_name"></app-dropdown>
+          <app-checkbox [parentForm]="kickStartForm.controls.advanced_settings" controlName="is_offline_build" (is_checked)="toggleDownloadDependencies($event)"></app-checkbox>
+          <app-checkbox [parentForm]="kickStartForm.controls.advanced_settings" controlName="download_dependencies"></app-checkbox>
+          <app-text-input [parentForm]="kickStartForm.controls.advanced_settings" controlName="iso_url"></app-text-input>
+          <app-text-input [parentForm]="kickStartForm.controls.advanced_settings" controlName="iso_path"></app-text-input>
+          <app-text-input [parentForm]="kickStartForm.controls.advanced_settings" controlName="iso_checksum"></app-text-input>
+        </div>
+      </div>
+      <br>
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <button class="btn btn-primary" type="submit" [disabled]="!kickStartForm.valid">Generate Inventory</button>
+        </div>        
+        <div class="form-group col-md-6">
+          <button class="btn btn-primary" type="button" (click)="toggleAdvancedSettings(kickStartForm.controls.advanced_settings)">Show/Hide Advanced Settings</button>
+        </div>
+
+        <!-- <div class="form-group col-md-6">
+          <button class="btn btn-primary" type="button" (click)="openModal()">Open Modal</button>
+        </div> -->
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          Validation
+        </div>
+        <div class="card-body" id="validation">
+            <p *ngIf="kickStartForm.valid" class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>
+            <div *ngIf="kickStartForm.hasError('errors')">
+              <p *ngFor="let error of kickStartForm.getError('errors');" class='text-danger'>{{ error }}</p>
+            </div>            
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<!-- id="controlName" -->
+<div [formGroup]="parentForm">
+  <div class="form-check">
+    <input formControlName="{{ controlName }}"
+           class="form-check-input" 
+           type="checkbox"           
+           [checked]="input_control.checked"
+           (change)="callParent($event)">
+    <label class="form-check-label" for="{{ controlName }}">
+      {{ input_control.label }}
+    </label>
+  </div>
+  <a routerLink="/help" fragment="{{ input_control.anchor }}">
+    <label>What is this?</label>
+  </a>
+</div>

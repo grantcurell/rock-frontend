@@ -1,0 +1,34 @@
+<div [formGroup]="parentForm" class="input-group mb-3">
+  <div class="input-group-prepend">
+    <a routerLink="/help" fragment="{{ input_control.anchor }}">
+      <span class="input-group-text">{{ input_control.label }}</span>
+    </a>
+  </div>
+  <div *ngIf="input_control.control_disabled">
+    <input type="hidden"
+           formControlName="{{ controlName }}" 
+           [required]="input_control.required">
+    <span style="margin-left: 10px;">{{ input_control.value }}</span>
+  </div>
+  <input *ngIf="!input_control.control_disabled" 
+         formControlName="{{ controlName }}"
+         class="form-control"
+         [required]="input_control.required"
+         [type]="input_control.input_type"
+         [placeholder]="input_control.placeholder"
+         (keyup)="callParentKeyUp($event)">
+  <div *ngIf="input_control.has_button" class="input-group-append">
+    <button class="{{ input_control.button_css }}" type="button" (click)="callParent()">{{ input_control.button_text }}</button>
+  </div>
+  <div *ngIf="input_control.invalid && (input_control.dirty || input_control.touched)" class="invalid-feedback2">
+      <div *ngIf="input_control.errors.required">This field is required.</div>
+      <div *ngIf="input_control.errors.pattern">{{ input_control.invalid_feedback }}</div>
+      <div *ngIf="input_control.hasError('custom_error')">
+        <div>{{ input_control.getError('custom_error') }}</div>
+      </div>
+  </div>
+  
+  <div *ngIf="input_control.valid" class="valid-feedback2">
+    {{ input_control.valid_feedback }}
+  </div>
+</div>
