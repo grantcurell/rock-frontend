@@ -14,6 +14,10 @@
 // args[4] correlates to i (the server number) in server.html
 // args[5] correlates to the word server or sensor in server.html or sensor.html respectively
 
+$( "#{{ object.button_id }}" ).prop( "disabled", true );
+$( "#{{ object.field_id }}" ).prop( "disabled", true );
+$( "#{{ [object.args[5], object.args[4]] | join('_') + '_processing_span' }}" ).text("Processing...");
+
 // The below only needs to be a function for the sensors. When a server calls gather
 // facts it doesn't need to be.
 {% if object.args[5] == 'sensor' %}
@@ -21,6 +25,9 @@ function gather_facts(is_remote_sensor) {
 {% endif %}
   $.getJSON("{{ url_for('_gather_device_facts') }}", { management_ip: $( 'input[name={{ object.field_id }}]' ).val(), password: $( "#{{ form.password.field_id }}").val() }, function(data){
 
+    $( "#{{ object.button_id }}" ).prop( "disabled", false );
+    $( "#{{ object.field_id }}" ).prop( "disabled", false );
+    $( "#{{ [object.args[5], object.args[4]] | join('_') + '_processing_span' }}" ).text("");
     if (data.error_message != undefined){
         $( '#{{ form.common_error_modal.modal_id }} .modal-dialog .modal-body' ).text(data.error_message)
         $( '#{{ form.common_error_modal.modal_id }}' ).modal('show');

@@ -304,6 +304,7 @@ sensor -->
          'sensor') %}
          {% include "button.html" %}
       {% endwith %}
+      <span class="text-info" id="{{ ['sensor', i+1] | join('_') + '_processing_span' }}"></span>
       <br>
       <div class="{{ form.advanced_settings_button.generic_button_id + 'div_element' + '_' + (i | string) }}">
         <p class='font-weight-light'>{{ form.bro_workers.label }} and {{ form.moloch_threads.label }} are both advanced settings and will be autopopulated based on the resources available to the devices you input. You do not have to fill in these values.</p>

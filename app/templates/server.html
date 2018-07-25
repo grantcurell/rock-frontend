@@ -134,6 +134,7 @@
          'server') %}
          {% include "button.html" %}
       {% endwith %}
+      <span class="text-info" id="{{ ['server', i+1] | join('_') + '_processing_span' }}"></span>
       <form id='#{{ [form.server_is_master_server_checkbox.form_name, i+1] | join('_') }}' role=form>
       <div class="form-check">
         <input class="form-check-input {{ form.server_is_master_server_checkbox.css_class }}" type="checkbox" value="" id="{{ [form.server_is_master_server_checkbox.checkbox_id, i+1] | join('_') }}">
