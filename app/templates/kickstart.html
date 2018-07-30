@@ -142,13 +142,19 @@ $(document).ready(function(){
     var system_settings_results = false;
     system_settings_results = system_settings_validate();
     var node_results = false;
+    var dhcp_range_results = false;    
+    var controller_dhcp_result = false;
     
+    dhcp_range_results = dhcp_range_validate();
+    controller_dhcp_result = controller_dhcp_validate();
+    
+
     // Only check node settings when you have filled out the number of nodes input
     if(document.getElementById("number_of_nodes_field").checkValidity()){
       node_results = node_validate();
     }
 
-    if(system_settings_results && node_results && controller_interface_ip_validate){
+    if(system_settings_results && node_results && controller_interface_ip_validate && dhcp_range_results && controller_dhcp_result){
       $( "#validation ").append("<p class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>");      
       $( "#generate_inventory" ).prop( "disabled", false );      
     }
@@ -156,6 +162,40 @@ $(document).ready(function(){
       $( "#generate_inventory" ).prop( "disabled", true );
     }
   }
+
+  dhcp_range_validate = function(){
+    dhcp_start = $( '#{{ form.dhcp_start.field_id }}' ).val().split('.').map(Number);
+    dhcp_end = $( '#{{ form.dhcp_end.field_id }}' ).val().split('.').map(Number);
+
+    if(dhcp_start[0] == dhcp_end[0] && dhcp_start[1] == dhcp_end[1] && dhcp_start[2] == dhcp_end[2]){
+      if(dhcp_start[3] < dhcp_end[3]){
+        return true;
+      }
+    }
+    $( "#validation ").append("<p class='text-info'>- Invalid DHCP Range - Verify dhcp start and end fields.</p>");
+    return false;
+  }
+
+  controller_dhcp_validate = function(){    
+
+      dhcp_start = $( '#{{ form.dhcp_start.field_id }}' ).val().split('.').map(Number);
+      dhcp_end = $( '#{{ form.dhcp_end.field_id }}' ).val().split('.').map(Number);
+      controller_ip = controller_interface_ip.split('.').map(Number);
+        
+        if(controller_ip[0] == dhcp_start[0] && controller_ip[1] == dhcp_start[1] && controller_ip[2] == dhcp_start[2] && controller_ip[0] == dhcp_end[0]  && controller_ip[1] == dhcp_end[1] && controller_ip[2] == dhcp_end[2]){
+            if(controller_ip[3] < dhcp_start[3] || controller_ip[3] > dhcp_end[3]){
+              return true;
+            }
+            else{
+              $( "#validation ").append("<p class='text-info'>- The selected Controller Interface " + controller_interface_ip + " cannot be within the DHCP range " + $( '#{{ form.dhcp_start.field_id }}' ).val() + " - " + $( '#{{ form.dhcp_end.field_id }}' ).val() +"</p>");
+            }
+        }
+        else{
+          $( "#validation ").append("<p class='text-info'>- DHCP range must be on the same network as the selected Controller Interface " + controller_interface_ip + "</p>");         
+        }
+
+   return false;
+ }
 
   system_settings_validate = function () {
     if({% for field in [form.dhcp_start.field_id, form.dhcp_end.field_id, form.gateway.field_id, form.netmask.field_id, form.root_password.field_id ] %} document.getElementById("{{ field }}").checkValidity() && {% endfor %} true) {
