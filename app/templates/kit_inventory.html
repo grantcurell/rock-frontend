@@ -737,26 +737,12 @@ $(document).ready(function(){
         Dependent on your resources, these are generally sane defaults if you don't know what you are doing and just want to get started. Unlike the storage settings, you can always come back and adjust them if you change your mind. The only field you *have* to fill out is {{ form.kubernetes_services_cidr.label }}.
       </p>
       <hr>
-      <br>
-      <h5>Offline Build</h5>
-      <form id='#{{ form.is_offline_build.form_name }}' role=form>
-      <div class="form-check">
-        <input class="form-check-input {{ form.is_offline_build.css_class }}" type="checkbox" value="" id="{{ form.is_offline_build.checkbox_id }}">
-        <label class="form-check-label" for="{{ form.is_offline_build.checkbox_id }}">
-          {{ form.is_offline_build.label }}
-        </label>
-      </div>
-      <a href="{{ url_for('help') + '#anchor_' + form.is_offline_build.label | replace(' ','_') }}" target="_blank">
-        <label>What is this?</label>
-      </a>
-      <br>
-      <br>
+      <br>          
       <h5>Credentials</h5>
       {% with object = form.password %}
         {% include "text_input.html" %}
       {% endwith %}
-      <br>
-      </form>
+      <br>      
       <h5>Elasticsearch Settings</h5>
       {% with object = form.elastic_cpu_percentage %}
         {% include "text_input.html" %}

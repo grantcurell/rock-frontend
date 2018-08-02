@@ -7,7 +7,7 @@
 
 all:
   vars:
-    offline: {{ input_data["is_offline"] | default(false, true) }} # Offline install repos and dependencies are hosted on ansible controller
+    offline: {{ input_data["is_offline"] | default(false, true) }} # Deprecated, please do not change this value. Offline install repos and dependencies are hosted on ansible controller
 
     #############################
     # General System Settings   #
