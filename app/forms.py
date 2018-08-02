@@ -712,12 +712,12 @@ class InventoryForm:
      form_name = 'home_net'
    , label = 'Home Net CIDR IP'
    , button_text = 'Add another'
-   , placeholder = "Enter your home net CIDR IP here (or leave it blank)"
+   , placeholder = "Enter your home net CIDR IP here"
    , input_type = 'text'
    , html5_constraint = cidr_constraint
    , valid_feedback = 'Good to go!'
    , invalid_feedback = 'You must enter a CIDR IP'
-   , required = False
+   , required = True
    , description =
    "These are the values Bro and Suricata will use for their home nets. Home Nets \
    are the networks you are trying to protect."

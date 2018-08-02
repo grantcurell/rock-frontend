@@ -440,17 +440,39 @@ $(document).ready(function(){
     pcap_drives_validated = value;
     validate_all();
   }
+  
+  validate_home_nets = function(){
+    var ret_val = false;
+    var home_nets = $('input[name^="{{ form.home_net.field_id }}"]');        
+
+    if (home_nets.length == 0){
+      return ret_val;
+    }
+
+    var i;
+    for (i = 0; i < home_nets.length; i++) {
+      if (home_nets[i] && home_nets[i].checkValidity()){
+        ret_val = true;
+      } else {
+        ret_val = false;
+        break;
+      }
+    }
+    return ret_val;    
+  }
 
   // This function runs all validations to ensure
   validate_all = function () {
-
     var kubernetes_cidr_validated = true;
-    var validation_failed = true;
-
+    var validation_failed = true; 
+    var home_nets_validated = validate_home_nets();
+    
     // See https://www.w3schools.com/js/js_validation_api.asp
     if(document.getElementById("{{ form.kubernetes_services_cidr.field_id }}").checkValidity() == true ) {
 
-      if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && monitor_interfaces_validated && master_server_validated && sensor_resources_validated && pcap_drives_validated) {
+      if( clustered_storage_validated && ceph_drives_validated && elasticsearch_validated && 
+          monitor_interfaces_validated && master_server_validated && sensor_resources_validated && 
+          pcap_drives_validated && home_nets_validated) {
 
         // If for whatever reason the inventory was ready to be generated, disable
         // the generate inventory button.
@@ -622,9 +644,10 @@ $(document).ready(function(){
   $(document).keypress(
     function(event){
       // 13 corresponds to the enter key
+      validate_all();
       if (event.which == '13') {
         event.preventDefault();
-      }
+      }      
     });
 
     $( "#{{ form.advanced_settings_button.generic_button_id }}" ).click(function (event) {
