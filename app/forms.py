@@ -705,7 +705,7 @@ class InventoryForm:
   home_net = Button(
      form_name = 'home_net'
    , label = 'Home Net CIDR IP'
-   , button_text = 'Remove'
+   , button_text = 'Add another'
    , placeholder = "Enter your home net CIDR IP here"
    , input_type = 'text'
    , html5_constraint = cidr_constraint
