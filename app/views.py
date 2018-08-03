@@ -177,89 +177,97 @@ def _generate_inventory():
     input_data = json.loads(request.args.get('input_data'))
     hosts = json.loads(request.args.get('hosts'))
 
-    servers = {}
-    sensors = {}
-    remote_sensors = {}
-    master_server = None
-    use_ceph_for_pcap = False
-    form = InventoryForm
-    input_data[form.kubernetes_services_cidr.field_id] = input_data[form.kubernetes_services_cidr.field_id] + "/28"
+    try:    
+        servers = {}
+        sensors = {}
+        remote_sensors = {}
+        master_server = None
+        use_ceph_for_pcap = False
+        form = InventoryForm
+        input_data[form.kubernetes_services_cidr.field_id] = input_data[form.kubernetes_services_cidr.field_id] + "/28"
 
-    if form.sensor_storage_type.dropdown_id in input_data:
-        # Remove the dropdown name from the value (sensor_storage_type_dropdown_)
-        tmp = input_data[form.sensor_storage_type.dropdown_id].replace("sensor_storage_type_dropdown_","")
-        if tmp == form.sensor_storage_type.options[0].replace(" ", "_"):
-            use_ceph_for_pcap = True
+        if form.sensor_storage_type.dropdown_id in input_data:
+            # Remove the dropdown name from the value (sensor_storage_type_dropdown_)
+            tmp = input_data[form.sensor_storage_type.dropdown_id].replace("sensor_storage_type_dropdown_","")
+            if tmp == form.sensor_storage_type.options[0].replace(" ", "_"):
+                use_ceph_for_pcap = True
+            else:
+                use_ceph_for_pcap = False
+
+                # If we are not using Ceph for PCAP the PCAP PV size should be 0
+                input_data[form.moloch_pcap_pv] = 0
         else:
             use_ceph_for_pcap = False
 
-            # If we are not using Ceph for PCAP the PCAP PV size should be 0
-            input_data[form.moloch_pcap_pv] = 0
-    else:
-        use_ceph_for_pcap = False
-
-    for host, attributes in hosts.iteritems():
-        # This is purely a convienience function. Master server and servers
-        # are identical aside from their type and this just makes it so you
-        # don't have unnecessary code duplication
-        if attributes["is_server"]:
-            if not form.server_is_master_server_checkbox.field_id in attributes:
-                attributes[form.server_is_master_server_checkbox.field_id] = False
-            if attributes[form.server_is_master_server_checkbox.field_id]:
-                master_server = Server()
-                master_server.hostname = host
-                master_server.management_ipv4 = attributes["management_ip"]
-                for drive_name, value in attributes["ceph_drives"].iteritems():
-                    if value and not drive_name in master_server.ceph_drive_list:
-                        master_server.ceph_drive_list.append(drive_name)
-            else:
-                servers[host] = Server()
-                servers[host].hostname = host
-                servers[host].management_ipv4 = attributes["management_ip"]
-                for drive_name, value in attributes["ceph_drives"].iteritems():
-                    if value and not drive_name in servers[host].ceph_drive_list:
-                        servers[host].ceph_drive_list.append(drive_name)
-        else:
-            # This is purely a convienience function. Remote sensors and sensors
+        for host, attributes in hosts.iteritems():
+            # This is purely a convienience function. Master server and servers
             # are identical aside from their type and this just makes it so you
             # don't have unnecessary code duplication
-            def _assign_sensor(type_of_sensor):
-                type_of_sensor[host] = Sensor()
-                type_of_sensor[host].hostname = host
-                type_of_sensor[host].management_ipv4 = attributes["management_ip"]
-                type_of_sensor[host].bro_workers = attributes["bro_workers"]
-                type_of_sensor[host].moloch_threads = attributes["moloch_threads"]
-                for drive_name, value in attributes["ceph_drives"].iteritems():
-
-                    # This condition may seem a bit unintuitive - it's just there
-                    # to make sure duplicates don't make it in. It's the same for
-                    # the other conditions with the same structure.
-                    if value and not drive_name in type_of_sensor[host].ceph_drive_list:
-                        type_of_sensor[host].ceph_drive_list.append(drive_name)
-                for interface, value in attributes["monitor_interfaces"].iteritems():
-                    if value and not interface in type_of_sensor[host].sensor_monitor_interfaces:
-                        type_of_sensor[host].sensor_monitor_interfaces.append(interface)
-                for drive_name, value in attributes["pcap_drives"].iteritems():
-                    if value:
-                        type_of_sensor[host].pcap_disk = drive_name
-            if attributes["is_remote_sensor"]:
-                _assign_sensor(remote_sensors)
+            if attributes["is_server"]:
+                if not form.server_is_master_server_checkbox.field_id in attributes:
+                    attributes[form.server_is_master_server_checkbox.field_id] = False
+                if attributes[form.server_is_master_server_checkbox.field_id]:
+                    master_server = Server()
+                    master_server.hostname = host
+                    master_server.management_ipv4 = attributes["management_ip"]
+                    for drive_name, value in attributes["ceph_drives"].iteritems():
+                        if value and not drive_name in master_server.ceph_drive_list:
+                            master_server.ceph_drive_list.append(drive_name)
+                else:
+                    servers[host] = Server()
+                    servers[host].hostname = host
+                    servers[host].management_ipv4 = attributes["management_ip"]
+                    for drive_name, value in attributes["ceph_drives"].iteritems():
+                        if value and not drive_name in servers[host].ceph_drive_list:
+                            servers[host].ceph_drive_list.append(drive_name)
             else:
-                _assign_sensor(sensors)
+                # This is purely a convienience function. Remote sensors and sensors
+                # are identical aside from their type and this just makes it so you
+                # don't have unnecessary code duplication
+                def _assign_sensor(type_of_sensor):
+                    type_of_sensor[host] = Sensor()
+                    type_of_sensor[host].hostname = host
+                    type_of_sensor[host].management_ipv4 = attributes["management_ip"]
+                    type_of_sensor[host].bro_workers = attributes["bro_workers"]
+                    type_of_sensor[host].moloch_threads = attributes["moloch_threads"]
+                    for drive_name, value in attributes["ceph_drives"].iteritems():
 
-    _change_zookeeper_replicas_based_on_node_count(input_data, form)
-    input_data[form.moloch_pcap_pv.field_id] = int(input_data[form.moloch_pcap_pv.field_id])
-    inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data,
-                                         sensors=sensors, remote_sensors=remote_sensors,
-                                         master_server=master_server,
-                                         servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
+                        # This condition may seem a bit unintuitive - it's just there
+                        # to make sure duplicates don't make it in. It's the same for
+                        # the other conditions with the same structure.
+                        if value and not drive_name in type_of_sensor[host].ceph_drive_list:
+                            type_of_sensor[host].ceph_drive_list.append(drive_name)
+                    for interface, value in attributes["monitor_interfaces"].iteritems():
+                        if value and not interface in type_of_sensor[host].sensor_monitor_interfaces:
+                            type_of_sensor[host].sensor_monitor_interfaces.append(interface)
+                    for drive_name, value in attributes["pcap_drives"].iteritems():
+                        if value:
+                            type_of_sensor[host].pcap_disk = drive_name
+                if attributes["is_remote_sensor"]:
+                    _assign_sensor(remote_sensors)
+                else:
+                    _assign_sensor(sensors)
 
-    if not os.path.exists("/opt/tfplenum/playbooks/"):
-        os.makedirs("/opt/tfplenum/playbooks/")
+        _change_zookeeper_replicas_based_on_node_count(input_data, form)
+        input_data[form.moloch_pcap_pv.field_id] = int(input_data[form.moloch_pcap_pv.field_id])
+        inventory_template = render_template('inventory_template.yml', form=form, input_data=input_data,
+                                            sensors=sensors, remote_sensors=remote_sensors,
+                                            master_server=master_server,
+                                            servers=servers, use_ceph_for_pcap=use_ceph_for_pcap)
 
-    # to save the results
-    with open("/opt/tfplenum/playbooks/inventory.yml", "w") as inventory_file:
-        inventory_file.write(inventory_template)
+        if not os.path.exists("/opt/tfplenum/playbooks/"):
+            os.makedirs("/opt/tfplenum/playbooks/")
+
+        # to save the results
+        with open("/opt/tfplenum/playbooks/inventory.yml", "w") as inventory_file:
+            inventory_file.write(inventory_template)
+
+    except Exception as e:
+        #TODO Add logging later
+        traceback.print_exc()
+        return jsonify(error_message="An unknown error has occured. Please make sure everything is filled out correctly.  \
+                                      If this error persists, please refresh your browser and resubmit the Kit Configuration form. \
+                                      Error:" + str(e))
 
     return "Finished"
 

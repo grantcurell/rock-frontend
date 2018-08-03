@@ -682,6 +682,12 @@ $(document).ready(function(){
       });
 
       $.get("{{ url_for('_generate_inventory') }}", {input_data: JSON.stringify(input_data), hosts: JSON.stringify(hosts)}, function(data){
+        console.log(data);
+        if (data.error_message != undefined){
+          $( '#{{ form.common_error_modal.modal_id }} .modal-dialog .modal-body' ).text(data.error_message)
+          $( '#{{ form.common_error_modal.modal_id }}' ).modal('show');
+          return;
+        }
         $( '#{{ form.inventory_generated_modal.modal_id }}' ).modal('show');
       });
     });
