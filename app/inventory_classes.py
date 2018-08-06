@@ -1,22 +1,25 @@
+class Sensor:    
+    def __init__(self):
+        self.hostname = None
+        self.management_ipv4 = None
+        self.bro_workers = None
+        self.moloch_threads = None
+        self.sensor_monitor_interfaces = []
+        self.pcap_disk = None
+        self.ceph_drive_list = []
 
-class Sensor:
-    hostname = None
-    management_ipv4 = None
-    bro_workers = None
-    moloch_threads = None
-    sensor_monitor_interfaces = []
-    pcap_disk = None
-    ceph_drive_list = []
 
 class Server:
-    hostname = None
-    management_ipv4 = None
-    ceph_drive_list = []
+    def __init__(self):
+        self.hostname = None
+        self.management_ipv4 = None
+        self.ceph_drive_list = []
 
 
 class Node:
-    hostname = None
-    ip_address = None
-    mac_address = None   
-    pxe_type = None
-    boot_drive = None
+    def __init__(self):
+        self.hostname = None
+        self.ip_address = None
+        self.mac_address = None   
+        self.pxe_type = None
+        self.boot_drive = None
