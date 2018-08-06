@@ -1202,7 +1202,7 @@ class KickstartInventoryForm:
   , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
-  , default_value = "192.168.5.50"
+  , default_value = ""
   , description = "This field is used to identify the starting ip address of the dhcp range.  The dhcp range is only used during the network boot process.\
   The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time. \
   Be sure not to use a range will be cause conflicts with existing network devices.")
@@ -1215,7 +1215,7 @@ class KickstartInventoryForm:
   , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = False
-  , default_value = "192.168.5.90"
+  , default_value = ""
   , description = "This field is used to identify the ending ip address of the dhcp range.  \
   The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time.")
 
@@ -1227,7 +1227,7 @@ class KickstartInventoryForm:
   , html5_constraint = InventoryForm().ip_constraint
   , invalid_feedback = 'You must enter a valid IP address.'
   , required = True
-  , default_value = "192.168.5.1"
+  , default_value = ""
   , description = "The gateway address or default gateway is usually a routable address to the local network.  \
   This field is specifically used as a part of the static interface assignment during the operating system installation.")
 
