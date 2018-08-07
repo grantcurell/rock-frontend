@@ -29,7 +29,7 @@ all:
     suricata_cpu_request: {{ input_data[form.suricata_cpu_percentage.label[0].split(' ')[0] + '_cpu_request'] }}m
     kafka_cpu_request: {{ input_data[form.kafka_cpu_percentage.label[0].split(' ')[0] + '_cpu_request'] }}m
     zookeeper_cpu_request: {{ input_data[form.zookeeper_cpu_percentage.label[0].split(' ')[0] + '_cpu_request'] }}m
-    logstash_cpu_request: {{ input_data["logstash_cpus"] }}m
+    logstash_cpu_request: {{ (input_data["logstash_cpus"] * 1000) | int }}m
     elasticsearch_cpu_request: {{ (input_data[form.elastic_cpus.field_id] | int) * 1000 }}m
 
     #############################
