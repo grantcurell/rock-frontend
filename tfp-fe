@@ -1,3 +1,5 @@
-#!/bin/bash
-source /opt/tfplenum-frontend/tfp-env/bin/activate
+export WORKON_HOME=~/Envs
+source /usr/bin/virtualenvwrapper.sh
+mkvirtualenv my-venv
+workon my-venv
 python /opt/tfplenum-frontend/run.py
