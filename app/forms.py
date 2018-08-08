@@ -190,7 +190,7 @@ class ModalPopUp:
 class ErrorForm():
     def __init__(self, text):
         self.error_text = text
-    
+
 
 class InventoryForm:
 
@@ -224,7 +224,7 @@ class InventoryForm:
     ('Kickstart Configuration', {'url': '/kickstart', 'key': 'tn_kickstart'})
   , ('Kit Configuration', {'url': '/kit_configuration', 'key': 'tn_kit_configuration'})
   , ('Confluence THISISCVAC', {'url': '/THISISCVAH/THISISCVAH_system_design', 'key': 'tn_system_design'})
-  , ('Confluence JCCTM', {'url': '/OJCCTM/OJCCTM_u_capabilities_by_category_softwareortools_uororfouo', 
+  , ('Confluence JCCTM', {'url': '/OJCCTM/OJCCTM_u_capabilities_by_category_softwareortools_uororfouo',
                           'key': 'tn_capabilities_by_category_softwareortools'})
   , ('Help', {'url': '/help', 'key': 'tn_help'})])
 
@@ -263,7 +263,7 @@ class InventoryForm:
   inventory_generated_modal = ModalPopUp(
     name = 'inventory_generated_modal'
   , modal_title = 'Success'
-  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page.'
+  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page. Log into the controller at /opt/tfplenum/playbooks and run the command make.'
   , primary_button_text = 'Close')
 
   common_error_modal = ModalPopUp(
@@ -1178,7 +1178,7 @@ class KickstartInventoryForm:
   inventory_generated_modal = ModalPopUp(
   name = 'inventory_generated_modal'
   , modal_title = 'Success'
-  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page.'
+  , modal_text = 'Inventory file generated successfully! File located at ' + inventory_path + '. You can now navigate away from the page. Log into the controller at /opt/tfplenum-deployer/playbooks and run the command make.'
   , primary_button_text = 'Close')
 
   navbar_elements = InventoryForm().navbar_elements
@@ -1390,4 +1390,4 @@ class KickstartInventoryForm:
 
 
 class ConfluenceForm():
-    navbar_elements = InventoryForm.navbar_elements    
+    navbar_elements = InventoryForm.navbar_elements
