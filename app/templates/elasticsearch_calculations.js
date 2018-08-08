@@ -204,7 +204,14 @@ recalculate_elasticsearch_recommendations = function() {
     do {
 
       for(i = 0; i < number_of_servers; i++) {
-        server_cpus_list[i] = Math.floor((parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text()) - 1) * (elastic_cpu_percentage/100));
+
+        // This is the number of CPUs the server has avialable
+        var total_server_cpus = parseInt($( "#server_" + String(i+1) + "_cpus_available" ).text());
+
+        // This line takes the total number of cores available on each server, takes the percenteage of the CPUs the user requests and
+        // then subtracts one because you should always have one core left over
+        server_cpus_list[i] = Math.floor(total_server_cpus * (elastic_cpu_percentage/100));
+
       }
 
       elasticsearch_successful_allocation_cpu = true;
@@ -212,9 +219,7 @@ recalculate_elasticsearch_recommendations = function() {
       logstash_successful_allocation = true;
       mem_warning_reached = false;
 
-      // Stores block id of the block allocated to a
-      // process
-      console.log(elastic_instances);
+      // Stores block id of the block allocated to a process
       var elasticsearch_cpu_allocation = new Array(elastic_instances);
       var elasticsearch_memory_allocation = new Array(elastic_instances);
 
