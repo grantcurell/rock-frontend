@@ -1,12 +1,14 @@
 import copy
 import getpass
+import jinja2
 import json
 import os
 import requests
 import shutil
 import xmlrpclib
 import yaml
-from jinja2 import Environment, select_autoescape, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
+
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 ROOT_DIR = os.path.dirname(SCRIPT_DIR) + '/'
@@ -16,7 +18,7 @@ os.chdir(SCRIPT_DIR)
 
 JINJA_ENV = Environment(
     loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
+    autoescape=jinja2.select_autoescape(['html', 'xml'])
 )
 
 
@@ -42,6 +44,19 @@ def get_foldername(path):
 
 class NotFoundError(Exception):
     pass
+
+
+def gen_topnavbar(thisiscvah_url="/THISISCVAH/THISISCVAH_1_tfplenum_system_design", 
+                  jcctm_url="/OJCCTM/OJCCTM_u_capability_catalogue_softwareortools_uororfouo"):
+        """
+        Renders the object for top navigation bar.
+
+        :return: None
+        """        
+        template = JINJA_ENV.get_template("topnavbar.template")
+        navbar_template = template.render(thisiscvah_url=thisiscvah_url, jcctm_url=jcctm_url)
+        with open("../app/navbar_elements.py", "w") as navbar_file:
+            navbar_file.write(navbar_template.encode('utf-8'))
 
 
 class NavigationGenerator:
@@ -120,11 +135,13 @@ class NavigationGenerator:
         Renders the python left navigation bar.
         
         :return: None
-        """        
+        """
         template = JINJA_ENV.get_template(self._leftnavbar_template)
         navbar_template = template.render(page_tree=self._nav_tree)
         with open(self._leftnavbar_html_path, "w") as navbar_file:
             navbar_file.write(navbar_template.encode('utf-8'))
+
+        return self._nav_tree[0]    
 
     def _find_index(self, nav_tree, title_to_look_for):
         """
@@ -164,19 +181,21 @@ class HtmlGenerator:
     A class that generates the HTML files for offline confluence documentation.
     """
 
-    def __init__(self, space_config):
+    def __init__(self, space_config, username, password):
         """
         Initializes the HTML Generation class.
         """
+        self._username = username
+        self._password = password
         self._space_config = space_config
         self._server = xmlrpclib.ServerProxy(self._space_config['site'] + '/rpc/xmlrpc')
-        self._token = self._server.confluence2.login(self._space_config['username'],
-                                                     self._space_config['password'])
+        self._token = self._server.confluence2.login(self._username,
+                                                     self._password)
                 
         self._confluence_images_dir = "../app" + self._space_config['confluence_images_url_path']
         self._view_template = "confluence_views.template"
         self._nav_generator = NavigationGenerator(self._space_config)
-        self._templates_folder = get_foldername(self._space_config['confluence_templates_dir'])
+        self._templates_folder = get_foldername(self._space_config['confluence_templates_dir'])        
 
     def _to_filename(self, space_name, title_str):
         """
@@ -354,7 +373,7 @@ class HtmlGenerator:
 
         :return: None
         """
-        response = requests.get(attachment['url'], stream=True, auth=(self._space_config['username'], self._space_config['password']))
+        response = requests.get(attachment['url'], stream=True, auth=(self._username, self._password))
         print("Filename: {} Http_code: {}".format(attachment['fileName'], str(response.status_code)))
         if response.status_code == 200:
             file_path = self._confluence_images_dir + attachment['fileName']
@@ -376,7 +395,9 @@ class HtmlGenerator:
         for page in self._server.confluence2.getPages(self._token, self._space_config['space_name']):
             page_id = page['id']
             page_dict = self._server.confluence2.getPage(self._token, page_id)
-            #self._clear_tags(page_dict, 'ac:parameter');
+            if self._space_config['clear_parameter_tags']:
+                self._clear_tags(page_dict, 'ac:parameter')
+
             self._replace_plain_text_body(page_dict)
             
             page_attachments = self._server.confluence2.getAttachments(self._token, page_id)
@@ -401,12 +422,12 @@ class HtmlGenerator:
         self._nav_generator.build_tree(pages, space_id)
         
         self._gen_python_views_file(pages)
-        self._nav_generator.gen_leftnavbar()
+        return self._nav_generator.gen_leftnavbar()
     
     def execute2(self):
         url = self._server.confluence2.exportSpace(self._token, self._space_config['space_name'], "TYPE_HTML")
         print(url)
-        response = requests.get(url, stream=True, auth=(self._space_config['username'], self._space_config['password']))
+        response = requests.get(url, stream=True, auth=(self._username, self._password))
         if response.status_code == 200:
             file_path = '/root/space.zip'
             with open(file_path, 'wb') as fhandle:
@@ -431,15 +452,42 @@ def prompt_password():
 
 def main():
     scrapper_config = read_yaml('scrapper_config.yml')
-    for space_config in scrapper_config['confluence_spaces']:
-        if not space_config.get('username'):
-            space_config['username'] = prompt_username()
-        if not space_config.get('password'):
-            space_config['password'] = prompt_password()
-        print(json.dumps(space_config, indent=4, sort_keys=True))
-        html_gen = HtmlGenerator(space_config)        
-        html_gen.execute()        
+    if not scrapper_config.get('username'):
+        username = prompt_username()
+    else:
+        username = scrapper_config.get('username')
 
+    if not scrapper_config.get('password'):
+        password = prompt_password()
+    else:
+        password = scrapper_config.get('password')
+        
+    top_nav_urls = []
+    for space_config in scrapper_config['confluence_spaces']:        
+        html_gen = HtmlGenerator(space_config, username, password)        
+        topnav_url = html_gen.execute()
+        top_nav_urls.append(topnav_url)
+    
+    # TODO ugly hack which will get fixed in the refactor.
+    try:
+        thisiscvah_url = top_nav_urls[0]['url']
+    except Exception:
+        thisiscvah_url = None
+
+    try:
+        jcctm_url = top_nav_urls[1]['url']
+    except Exception:
+        jcctm_url = None
+
+
+    if thisiscvah_url and jcctm_url:
+        gen_topnavbar(thisiscvah_url, jcctm_url)
+    elif thisiscvah_url:
+        gen_topnavbar(thisiscvah_url)
+    elif jcctm_url:
+        gen_topnavbar(jcctm_url=jcctm_url)
+    else:
+        gen_topnavbar()
 
 if __name__ == "__main__":
     main()    
