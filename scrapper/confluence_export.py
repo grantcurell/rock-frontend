@@ -7,9 +7,7 @@ import requests
 import shutil
 import xmlrpclib
 import yaml
-import traceback
 from jinja2 import Environment, FileSystemLoader
-from time import sleep
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -428,7 +426,9 @@ class HtmlGenerator:
             sleep(30)
             page_id = page['id']
             page_dict = self._server.confluence2.getPage(self._token, page_id)
-            
+            if self._space_config['clear_parameter_tags']:
+                self._clear_tags(page_dict, 'ac:parameter')
+
             self._replace_plain_text_body(page_dict)
             page_attachments = self._server.confluence2.getAttachments(self._token, page_id)
             for attachment in page_attachments:
