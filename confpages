@@ -1,0 +1,3 @@
+#!/bin/bash
+source /opt/tfplenum-frontend/tfp-env/bin/activate
+python /opt/tfplenum-frontend/scrapper/confluence_export.py
