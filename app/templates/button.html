@@ -1,6 +1,6 @@
 <!-- Object comes from the caller of this template and should be an instance of class
      button in forms.py-->
-
+<div id="{{ object.form_name }}_outer_div">
 <script type="text/javascript">
 
   //@ sourceURL=button_{{ object.button_id }}
@@ -17,6 +17,11 @@
     // See: https://api.jquery.com/click/
     $('#{{ object.button_id }}').click(function (event) {
 
+      //A javascript file that runs no matter what.
+      {% if object.reaction_file_override is not none %}
+        {% include object.reaction_file_override %}
+      {% endif %}
+
       // Using [0] here because when you use $( "#form_servers" ) you get a jQuery
       // selection set. To access the DOM properties you have to select the first
       // item. checkValidity is an HTML5 built in function we are calling against
@@ -30,7 +35,7 @@
       // If this file is not defined, nothing happens.
       {% if object.reaction_file is not none %}
         {% include object.reaction_file %}
-      {%endif %}
+      {% endif %}
       }
       $( "#{{ object.form_name }}" ).addClass('was-validated');
 
@@ -62,7 +67,7 @@
   </div>
   <input name="{{ object.field_id }}" id="{{ object.field_id }}" type="{{ object.input_type | default("text", true) }}" {{ object.html5_constraint }} class="form-control" placeholder="{{ object.placeholder }}" {{ 'required' if object.required is not none }}>
   <div class="input-group-append">
-    <button class="btn btn-primary" id="{{ object.button_id }}" type="button">{{ object.button_text }}</button>
+    <button class="{{ object.button_css }}" id="{{ object.button_id }}" type="button">{{ object.button_text }}</button>
   </div>
   <div class="valid-feedback">
   {{ object.valid_feedback | default("Looks good!", true) }}
@@ -72,3 +77,4 @@
   </div>
 </div>
 </form>
+</div>

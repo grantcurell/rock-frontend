@@ -209,6 +209,18 @@ $(document).ready(function(){
       {% endfor %}
     }
   });
+  
+  $( "#home_net_add_button" ).click(function(){
+    home_net_count += 1;  
+    $.get("{{ url_for('_render_home_net') }}", { home_net_count: home_net_count}, function(data){
+      
+      // This line gets the HTML inside the template field in sensor.html and then
+      // appends it to the div for home net.
+      $( "#{{ form.home_net.field_id + '_div' }}" ).append( data );
+      validate_all();
+    });
+  });
+  
 });
 
 // This is the number of home net boxes which exist. It starts at one because by
@@ -257,15 +269,20 @@ sensor -->
     <hr>
     <h6 class="card-subtitle mb-2 text-muted">Home NET Settings</h6>
     <hr>
+    <button class="btn btn-primary" id="home_net_add_button" type="button">+ Add Home Net</button>
+    <hr>
     <!-- We modify the below because it shouldn't just be the generic form name.
     It needs to start at one. If they add another home net field it will be 2, etc -->
-    {% with object = form.home_net.change_values(
-      ([form.home_net.form_name, 1] | join('_')),
-      ([form.home_net.field_id, 1] | join('_')),
-      ([form.home_net.button_id, 1] | join('_'))) %}
-      {% include object.include_html %}
-    {% endwith %}
-    <div id="{{ form.home_net.field_id + '_div' }}"></div>
+
+    
+    <div id="{{ form.home_net.field_id + '_div' }}">
+      {% with object = form.home_net.change_values(
+        ([form.home_net.form_name, 1] | join('_')),
+        ([form.home_net.field_id, 1] | join('_')),
+        ([form.home_net.button_id, 1] | join('_'))) %}
+        {% include object.include_html %}
+      {% endwith %}
+    </div>
   </div>
 </div>
 {# This loop goes from 0 to sensor_count #}

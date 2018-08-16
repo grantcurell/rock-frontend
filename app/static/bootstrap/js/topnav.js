@@ -1,6 +1,6 @@
 $( document ).ready(function() {
     if (location.pathname == "/"){
-        $('#tn_kit_configuration').addClass('active');
+        $('#tn_kickstart').addClass('active');
     } else if (location.pathname == "/help"){
         $('#tn_help').addClass('active');
     } else if (location.pathname == "/kickstart"){

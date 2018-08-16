@@ -66,14 +66,17 @@ class Field:
 # reaction_file (str): A file containing the javascript you would like executed
 #                      when someone clicks the button. This will be included as
 #                      part of the else condition.
+# reaction_file_override (str): A file that will run no matter what when a button is clicked.
 # For all other arguments see field. This class inherits from field so any argument
 # which may be applied to field may also be applied here.
 class Button(Field, object):
-    def __init__(self, button_text, reaction_file=None, **kwargs):
+    def __init__(self, button_text, reaction_file=None, reaction_file_override=None, button_css="btn btn-primary", **kwargs):
         super(Button, self).__init__(**kwargs)
         self.button_id = kwargs.get('form_name') + '_button'
         self.button_text = button_text
         self.reaction_file = reaction_file
+        self.reaction_file_override = reaction_file_override
+        self.button_css = button_css
 
         # This is the HTML file generally associated with displaying this field.
         # You don't have to use this, but it is handy for displaying things in a loop.
@@ -702,7 +705,7 @@ class InventoryForm:
   home_net = Button(
      form_name = 'home_net'
    , label = 'Home Net CIDR IP'
-   , button_text = 'Add another'
+   , button_text = 'Remove'
    , placeholder = "Enter your home net CIDR IP here"
    , input_type = 'text'
    , html5_constraint = cidr_constraint
@@ -711,8 +714,9 @@ class InventoryForm:
    , required = True
    , description =
    "These are the values Bro and Suricata will use for their home nets. Home Nets \
-   are the networks you are trying to protect."
-   , reaction_file = 'home_net.js')
+   are the networks you are trying to protect."   
+   , reaction_file_override= 'home_net.js'
+   , button_css="btn btn-danger")
 
   sensor_storage_type = DropDown(
     form_name = 'sensor_storage_type'

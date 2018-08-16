@@ -525,6 +525,11 @@ $(document).ready(function(){
       if ( !kubernetes_cidr_validated ) {
         $( "#validation ").append("<p class='text-info'>- Kubernetes services CIDR failed to validate. Make sure you type in a valid Kubernetes services CIDR under Global Settings.</p>");
       }
+
+      console.log(home_nets_validated);
+      if ( !home_nets_validated ){
+        $( "#validation ").append("<p class='text-info'>- Home nets failed to validate. Make sure you type in a valid x.x.x.0/24 address under Home NET Settings.</p>");
+      }
     } else {
       $( "#validation ").append("<p class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>");
     }
