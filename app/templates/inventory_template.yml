@@ -331,7 +331,7 @@ all:
             {{ hostname }}:
               ansible_user: root
               ansible_connection: ssh
-              management_ipv4: {{ attributes.management_ipv4 }}
+              management_ipv4: "{{ attributes.management_ipv4 }}"
               ceph_drive_list:
               {% for drive in attributes.ceph_drive_list %}
                 - {{ "/dev/" + drive }}
@@ -354,7 +354,7 @@ all:
             {{ master_server.hostname }}:
               ansible_user: root
               ansible_connection: ssh
-              management_ipv4: {{ master_server.management_ipv4 }}
+              management_ipv4: "{{ master_server.management_ipv4 }}"
               ceph_drive_list:
               {% for drive in master_server.ceph_drive_list %}
                 - {{ "/dev/" + drive }}
