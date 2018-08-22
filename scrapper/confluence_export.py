@@ -7,6 +7,7 @@ import requests
 import shutil
 import xmlrpclib
 import yaml
+import traceback
 from jinja2 import Environment, FileSystemLoader
 
 
@@ -292,7 +293,7 @@ class HtmlGenerator:
                 return page['id']
         raise NotFoundError()
 
-    def _clear_tags(self, page_dict, tag_name):
+    def _clear_tags(self, page_dict, tag_name, clear_content=False):
         """
         Clears all tags with a specified name in the page_dict content.
         It is important to note that it clears both the tag and the tag's contents.
@@ -300,15 +301,26 @@ class HtmlGenerator:
         :param page_dict: A python dictionary returned from the confluence API. EX:
         :param tag_name:  A tagname without its angle brakets. EX: 'ac:test' would 
                           clear all <ac:test>contents</ac:test>
+        :clear_content: If set to true will clear the tags contents, by default, 
+                        it will only remove the tags and keep the content
         :return: None
         """
         begin_tag = '<' + tag_name
         end_tag = '</' + tag_name + '>'
         while True:
             try:
-                begin_pos = page_dict['content'].index(begin_tag)
-                end_pos = page_dict['content'].index(end_tag, begin_pos) + len(end_tag)
-                page_dict['content'] = page_dict['content'][0:begin_pos] + page_dict['content'][end_pos:]
+                if clear_content:
+                    begin_pos = page_dict['content'].index(begin_tag)
+                    end_pos = page_dict['content'].index(end_tag, begin_pos) + len(end_tag)
+                    page_dict['content'] = page_dict['content'][0:begin_pos] + page_dict['content'][end_pos:]
+                else:
+                    begin_pos_start_tag = page_dict['content'].index(begin_tag)
+                    end_pos_start_tag = page_dict['content'].index('>', begin_pos_start_tag) + 1
+
+                    page_dict['content'] = page_dict['content'][0:begin_pos_start_tag] + page_dict['content'][end_pos_start_tag:]
+                    begin_pos_end_tag = page_dict['content'].index(end_tag, begin_pos_start_tag) 
+                    end_pos_end_tag = begin_pos_end_tag + len(end_tag)
+                    page_dict['content'] = page_dict['content'][0:begin_pos_end_tag] + page_dict['content'][end_pos_end_tag:]                
             except ValueError:
                 return
 
@@ -326,7 +338,7 @@ class HtmlGenerator:
         page_dict['content'] = page_dict['content'].replace('<![CDATA[', '')        
         page_dict['content'] = page_dict['content'].replace(start_tag, '<pre><code>')
         page_dict['content'] = page_dict['content'].replace(end_tag, '</pre></code>')        
-        
+
     def _replace_image_tag(self, page_dict, image_name):
         """
         Replaces the <ac:image tag with an appropriate img source tag.
@@ -342,27 +354,46 @@ class HtmlGenerator:
 
         :param image_name: The image we are searching for.        
         :return: None
-        """
+        """        
         replacement_tag = '<img src="' + self._space_config['confluence_images_url_path'] + image_name + '">'
-        pos = page_dict['content'].find(image_name)
+        return self._replace_tag(page_dict, image_name, replacement_tag)
+    
+    def _replace_attachement_tag(self, page_dict, attachment_name):
+        replacement_tag = '<a href="' + self._space_config['confluence_images_url_path'] + attachment_name + '">Click to download ' + attachment_name + '</a>'
+        return self._replace_tag(page_dict, attachment_name, replacement_tag)
+
+    def _replace_tag(self, page_dict, attachment_name, replacement_tag):
+        """
+        Replaces the <ac:image tag with an appropriate img source tag.
+
+        :param page_dict: A python dictionary returned from the confluence API. EX:
+        :param attachement_name: The image or attachement we are searching for.        
+        :param start_of_tag: The start of the tag
+        :param end_of_tag: The end of the tag
+        :return: None
+        """
+        pos = page_dict['content'].find(attachment_name)
         if pos == -1:
-            print("Failed to find String: {} in page content: {}.".format(image_name, page_dict['title']))
-            return
+            print("Failed to find String: {} in page content: {}.".format(attachment_name, page_dict['title']))
+            return False
 
         try:
-            image_start_pos = page_dict['content'].rindex('<ac:image', 0, pos)
-            image_end_pos = page_dict['content'].index('</ac:image>', pos) + 11
+            image_start_pos = page_dict['content'].rindex('<', 0, pos)
+            image_end_pos = page_dict['content'].index('>', pos) + 1
+
             page_dict['content'] = page_dict['content'][0:image_start_pos] + replacement_tag + page_dict['content'][image_end_pos:]
+            return True
         except ValueError as e:
             offset = 100
             print("=======================================================")
-            print("Failed to replace image tag for {} on page {}".format(image_name, page_dict['title']))
+            print("Failed to replace tag for {} on page {}".format(attachment_name, page_dict['title']))
             print("After pos: " + page_dict['content'][pos:pos + offset])
             if pos >= offset:
                 print("Before pos: " + page_dict['content'][pos-offset:pos])
             else:
                 print("Before pos: " + page_dict['content'][0:pos])
             print("=======================================================")
+        return False
 
     def _download_attachment(self, attachment):
         """
@@ -377,38 +408,47 @@ class HtmlGenerator:
         print("Filename: {} Http_code: {}".format(attachment['fileName'], str(response.status_code)))
         if response.status_code == 200:
             file_path = self._confluence_images_dir + attachment['fileName']
-            with open(file_path, 'wb') as fhandle:
-                for chunk in response.iter_content(1024):
-                    fhandle.write(chunk)                    
+            if not os.path.exists(file_path):
+                with open(file_path, 'wb') as fhandle:
+                    for chunk in response.iter_content(1024):
+                        fhandle.write(chunk)                    
 
     def execute(self):
         """
         Executes the html generation process.
         :return:
-        """        
+        """
         self._reset_confluence_template_dir()
-
         if self._space_config['download_attachments']:
-            self._reset_confluence_images_dir()
+           self._reset_confluence_images_dir()
 
         pages = []
         for page in self._server.confluence2.getPages(self._token, self._space_config['space_name']):
             page_id = page['id']
             page_dict = self._server.confluence2.getPage(self._token, page_id)
-            if self._space_config['clear_parameter_tags']:
-                self._clear_tags(page_dict, 'ac:parameter')
-
-            self._replace_plain_text_body(page_dict)
             
+            self._replace_plain_text_body(page_dict)
             page_attachments = self._server.confluence2.getAttachments(self._token, page_id)
             for attachment in page_attachments:
-                if attachment['contentType'] == 'image/png' or attachment['contentType'] == 'image/jpeg':
-                    if self._space_config['download_attachments']:
-                        self._download_attachment(attachment)
-                    self._replace_image_tag(page_dict, attachment["fileName"])
-                else:                    
+                try:
+                    if attachment['contentType'] == 'image/png' or attachment['contentType'] == 'image/jpeg':
+                        if self._replace_image_tag(page_dict, attachment["fileName"]):
+                            if self._space_config['download_attachments']:
+                                self._download_attachment(attachment)
+                    else:
+                        if self._replace_attachement_tag(page_dict, attachment["fileName"]):
+                            if self._space_config['download_attachments']:
+                                self._download_attachment(attachment)
+                except KeyError as e:
                     print("Attachment type {} is not supoorted".format(attachment['contentType']))
+                except Exception as e:
+                    print("Unknown attachement failure" + str(e))
+                    traceback.print_exc()                    
                 
+            if self._space_config['clear_parameter_tags']:
+                self._clear_tags(page_dict, 'ac:parameter')
+                self._clear_tags(page_dict, 'ac:structured-macro')
+
             file_name = self._to_filename(self._space_config['space_name'], page_dict["title"])
             file_path = self._space_config['confluence_templates_dir'] + file_name + ".html"
             self._gen_html_file(file_path, page_dict)
@@ -432,7 +472,7 @@ class HtmlGenerator:
             file_path = '/root/space.zip'
             with open(file_path, 'wb') as fhandle:
                 for chunk in response.iter_content(1024):
-                    fhandle.write(chunk)                    
+                    fhandle.write(chunk)
 
     def get_spaces(self):
         spaces = self._server.confluence2.getSpaces(self._token)

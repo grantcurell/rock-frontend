@@ -1,4 +1,9 @@
 ---
+# Username and password are optional fields.  If you do not provide them, 
+# the scraper will prompt for them automatically.
+
+#username: die2e username
+#password: your password
 confluence_spaces:  
   - space_name: THISISCVAH
     site: https://confluence.di2e.net
