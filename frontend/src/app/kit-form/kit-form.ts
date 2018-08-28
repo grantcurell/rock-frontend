@@ -87,19 +87,13 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         //Reset selections if user clicks on Gather facts twice.
         this.interfaceSelections = new Array();
         this.driveSelections = new Array();
+        this.driveSelections = SetDriveSelections(this.deviceFacts);
 
         for (let item of this.deviceFacts["interfaces"]){
             if (item["name"] == 'lo'){
                 continue;
             }
             this.interfaceSelections.push({value: item["name"], label: item["name"] + " - " + item["ip_address"]})
-        }
-        
-        for (let item of this.deviceFacts["disks"]){
-            if (item["hasRoot"]){
-                continue;
-            }
-            this.driveSelections.push({value: item["name"], label: item["name"] + " - " + item["size_gb"] + " GB"})
         }
     }    
 

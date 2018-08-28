@@ -36,7 +36,7 @@ all:
     # Below are networking options for node static addressing.
     # dns:  This is the ip address of the dns server.  By default we recommend using the ansible controller.
     # Default: ansible controllers ip address
-    dns: '{{ template_ctx["controller_interface"] }}'
+    dns: '{{ template_ctx["controller_interface"][0] }}'
 
     # gateway: This is used to configure the nodes with a default gateway.
     # Default: null
@@ -94,7 +94,7 @@ all:
     default_boot_drive: sda
     # server_ip: ansible controller ip address used to define kickstart server
     # Default: ansible controller ip address
-    server_ip: '{{ template_ctx["controller_interface"] }}'
+    server_ip: '{{ template_ctx["controller_interface"][0] }}'
 
     # COREOS VARS
     # Only used if you are loading coreos operating system

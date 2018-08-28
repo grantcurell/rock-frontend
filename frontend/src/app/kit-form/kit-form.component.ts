@@ -116,9 +116,11 @@ export class KitFormComponent implements OnInit {
 
   removeSensor(index: number){
     let sensor = this.kitForm.sensors.at(index) as SensorFormGroup;
-    this.kitForm.system_resources.subtractFromDeviceFacts(sensor.deviceFacts);
-    this.kitForm.sensor_resources.subtractFromDeviceFacts(sensor.deviceFacts);
-    this._remove_sensor_cluster_storage(sensor.deviceFacts);
+    if (sensor.deviceFacts != null){
+      this.kitForm.system_resources.subtractFromDeviceFacts(sensor.deviceFacts);
+      this.kitForm.sensor_resources.subtractFromDeviceFacts(sensor.deviceFacts);
+      this._remove_sensor_cluster_storage(sensor.deviceFacts);
+    }    
     this.kitForm.sensors.removeAt(index);
   }
 

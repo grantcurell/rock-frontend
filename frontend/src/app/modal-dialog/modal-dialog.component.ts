@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HtmlModalPopUp } from '../html-elements';
 
 @Component({
@@ -11,9 +11,16 @@ export class ModalDialogComponent implements OnInit {
   @Input()
   modal: HtmlModalPopUp;
 
+  @Output()
+  primaryButtonClick: EventEmitter<any> = new EventEmitter();
+
   constructor() { }
 
   ngOnInit() {
+  }
+
+  triggerPrimaryClickEvent(event: any){
+    this.primaryButtonClick.emit(event);
   }
 
 }

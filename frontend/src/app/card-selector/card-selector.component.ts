@@ -31,6 +31,7 @@ export class CardSelectorComponent implements OnInit {
     this.htmlCardSelectorFormArray = this.parentForm.get(this.controlName) as HtmlCardSelector;
     //Fixes a bug when we rerender the same card selector.
     this.clearFormArray();
+    this.setDefaultValues(this.htmlCardSelectorFormArray.default_selections);
   }
 
   private clearFormArray(){
@@ -49,12 +50,31 @@ export class CardSelectorComponent implements OnInit {
     }
   }
 
-  selectedButton(event, selection: { value: string, label: string }) {
+  public setDefaultValues(selectedOptions: Array<string>){    
+    this.clearFormArray();
+    this.clearSelectedButtons();
+
+    for (let default_value of selectedOptions){
+      //this.optionSelections.push();
+      this.set_selectedValue(default_value);
+      for (let option of this.optionSelections){
+        if (option.value == default_value){
+          option.label = option.label + ' - selected';
+        }
+      }
+    }
+  }
+
+  selectedButton(event, selection: { value: string, label: string }) {    
     if (!this.htmlCardSelectorFormArray.is_multi_select) {
       this.clearFormArray();
       this.clearSelectedButtons();
     }
-    
+        
+    if (selection.label.indexOf('selected') > -1){
+      selection.label = selection.label.replace(' - selected', '');
+    }    
+
     if (event.srcElement.value.indexOf('selected') > -1) {
       //Only triggered when the selected word is in the value of the srcElement.
       event.srcElement.value = selection.label;
@@ -71,7 +91,7 @@ export class CardSelectorComponent implements OnInit {
     this.onSelect.emit(this.htmlCardSelectorFormArray.value);
   }
 
-  private set_selectedValue(newValue: string) {
+  private set_selectedValue(newValue: string) {    
     this.htmlCardSelectorFormArray.push(new FormControl(newValue));
   }
 

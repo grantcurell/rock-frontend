@@ -9,7 +9,6 @@ import { KickstartFormComponent } from './kickstart-form/kickstart-form.componen
 import { AppRoutingModule } from './/app-routing.module';
 import { HelpComponent } from './help/help.component';
 import { TextInputComponent } from './text-input/text-input.component';
-import { ControllerInterfaceComponent } from './controller-interface/controller-interface.component';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { CheckboxComponent } from './checkbox/checkbox.component';
 import { ModalDialogComponent } from './modal-dialog/modal-dialog.component';
@@ -26,8 +25,7 @@ import { TotalSystemResourceCardComponent } from './total-system-resource-card/t
     TopNavbarComponent,
     KickstartFormComponent,
     HelpComponent,
-    TextInputComponent,
-    ControllerInterfaceComponent,
+    TextInputComponent,    
     DropdownComponent,
     CheckboxComponent,
     ModalDialogComponent,

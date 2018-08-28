@@ -20,6 +20,7 @@ TEMPLATE_DIR = APP_DIR / 'templates'  # type: Path
 _client = MongoClient('mongodb://localhost:27017/')
 _tfplenum_database = _client.tfplenum_database  # type: Database
 mongo_kickstart = _tfplenum_database.kickstart  # type: Collection
+mongo_kickstart_archive = _tfplenum_database.kickstart_archive  # type: Collection
 
 LOG_FILENAME = "/var/log/tfplenum/tfplenum.log"
 logger = logging.getLogger('tfplenum_logger')

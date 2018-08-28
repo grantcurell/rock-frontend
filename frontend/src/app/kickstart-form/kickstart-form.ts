@@ -1,7 +1,7 @@
 import { FormGroup, FormArray, AbstractControl } from '@angular/forms';
-import { ValidateKickStartInventoryForm } from '../form-validation';
+import { ValidateKickStartInventoryForm } from './kickstart-form-validation';
 import { IP_CONSTRAINT, URL_CONSTRAINT, IP_CONSTRAINT_WITH_SUBNET, DESC_ROOT_PASSWORD, INVALID_FEEDBACK_IP } from '../frontend-constants';
-import { HtmlInput, HtmlDropDown, HtmlCheckBox, GenericHtmlButton } from '../html-elements';
+import { HtmlInput, HtmlDropDown, HtmlCheckBox, GenericHtmlButton, HtmlCardSelector } from '../html-elements';
 
 export class NodeFormGroup extends FormGroup {
   public hidden: boolean;
@@ -15,6 +15,18 @@ export class NodeFormGroup extends FormGroup {
     super.addControl('pxe_type', this.pxe_type);
     super.addControl('node_type', this.node_type);
     this.hidden = hidden;
+  }
+
+  /**
+   * Overridden method
+   */
+  reset(value?: any, options?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    super.reset({'pxe_type': this.pxe_type.default_value,
+                 'node_type': this.node_type.default_value
+    });
   }
 
   hostname = new HtmlInput(
@@ -99,6 +111,22 @@ export class AdvancedSettingsFormGroup extends FormGroup {
     super.addControl('iso_checksum', this.iso_checksum);
     super.addControl('is_offline_build', this.is_offline_build);
     super.addControl('download_dependencies', this.download_dependencies);
+  }
+
+  /**
+   * Overridden method for form reset functionality.
+   * 
+   * @param value 
+   * @param options 
+   */
+  reset(value?: any, options?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void{    
+    super.reset({'iso_url': this.iso_url.default_value,
+                 'iso_path': this.iso_path.default_value,
+                 'iso_checksum': this.iso_checksum.default_value
+    });
   }
 
   timezone = new HtmlDropDown(
@@ -189,6 +217,8 @@ export class NodesFormArray extends FormArray {
 
 export class KickstartInventoryForm extends FormGroup {
   nodes: NodesFormArray;
+  interfaceSelections: Array<{value: string, label: string}>;
+
   constructor() {
     super({}, ValidateKickStartInventoryForm);
     super.addControl('dhcp_start', this.dhcp_start);
@@ -198,15 +228,17 @@ export class KickstartInventoryForm extends FormGroup {
     super.addControl('root_password', this.root_password);
     super.addControl('re_password', this.re_password);
     
-    super.addControl('controller_interface', this.controller_interface);
-    super.addControl('number_of_nodes', this.number_of_nodes);
+    super.addControl('controller_interface', this.controller_interface);    
     this.nodes = new NodesFormArray([], true);
     super.addControl('nodes', this.nodes);
-
-    //Add two hidden nodes so that form validation is properly enforced.
-    this.addNodeGroup(undefined, true);
-    this.addNodeGroup(undefined, true);
     super.addControl('advanced_settings', this.advanced_settings);
+    this.interfaceSelections = new Array();
+  }
+
+  public setInterfaceSelections(deviceFacts: Object){
+    for (let item of deviceFacts["interfaces"]){
+      this.interfaceSelections.push({value: item["ip_address"], label: item["name"] + ' - ' + item["ip_address"] });
+    }
   }
 
   public clearNodes() {
@@ -220,6 +252,18 @@ export class KickstartInventoryForm extends FormGroup {
     this.nodes.push(new NodeFormGroup(hidden));
   }
 
+  /**
+   * Overridden method
+   */
+  reset(value?: any, options?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    console.log("Reset");
+    super.reset({'advanced_settings.iso_url': this.advanced_settings.iso_url.default_value, 
+                 'netmask': this.netmask.default_value });
+  }
+
   advanced_settings = new AdvancedSettingsFormGroup(true);
 
   dhcp_start = new HtmlInput(
@@ -230,7 +274,7 @@ export class KickstartInventoryForm extends FormGroup {
     IP_CONSTRAINT,
     INVALID_FEEDBACK_IP,
     false,
-    "192.168.5.50",
+    "",
     "This field is used to identify the starting ip address of the dhcp range.  The dhcp range is only used during the network boot process.\
     The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time. \
     Be sure not to use a range will be cause conflicts with existing network devices.")
@@ -243,19 +287,19 @@ export class KickstartInventoryForm extends FormGroup {
     IP_CONSTRAINT,
     INVALID_FEEDBACK_IP,
     false,
-    "192.168.5.90",
+    "",
     "This field is used to identify the ending ip address of the dhcp range.  \
       The dhcp range should be enough addresses to temporary support all nodes to be network booted at the same time.")
 
   gateway = new HtmlInput(
     'gateway',
     'Gateway',
-    "Enter your kit's gateway here",
+      "Enter your kit's gateway here",
     'text',
     IP_CONSTRAINT,
     INVALID_FEEDBACK_IP,
     true,
-    "192.168.5.1",
+    "",
     "The gateway address or default gateway is usually a routable address to the local network.  \
       This field is specifically used as a part of the static interface assignment during the operating system installation.")
 
@@ -294,24 +338,14 @@ export class KickstartInventoryForm extends FormGroup {
     DESC_ROOT_PASSWORD
   )
 
-  controller_interface = new GenericHtmlButton(
+  controller_interface = new HtmlCardSelector (
     'controller_interface',
-    'Controller Interface',
-    "The interfaces on the controller you would like to use."
+    "Controller Interface",      
+    "The interfaces on the controller you would like to use.",
+    "Select which interface you would like to use as the controller interface. This will be the interface used for services provided to the kit.",
+    "Warning: Interfaces without IP addresses will not be listed!",
+    "No interfaces found! Are you sure you have a second eligible interface that is not the management interface?",
+    false
   )
 
-  number_of_nodes = new HtmlInput(
-    'number_of_nodes',
-    'Number of Nodes',
-    "Enter the number of nodes you have",
-    'number',
-    '^[2-9]|[0-9]\\d+$',
-    'You must have at least two servers.',
-    true,
-    '',
-    '',
-    'Looks good! Now hit \"Submit\" on the right!',
-    undefined,
-    true
-  )
 }

@@ -30,10 +30,6 @@ export class KickstartService {
     }    
   }
 
-  private mapKickstartForm(data: any){
-    console.log(data);
-  }
-
   gatherDeviceFacts(management_ip: string, password: string): Observable<Object> { //: Observable<DeviceFacts[]> {
     // const url = `/api/_gather_device_facts?management_ip=${management_ip}&password=${password}`
     // return this.http.get(url)
@@ -42,8 +38,7 @@ export class KickstartService {
     //   );
 
     const url = '/api/gather_device_facts';
-    let post_payload = {"management_ip": management_ip, "password": password};
-    this.log(post_payload);
+    let post_payload = {"management_ip": management_ip, "password": password};    
     return this.http.post(url, post_payload , httpOptions).pipe(
       tap(data => this.mapDeviceFacts(data)),
       catchError(this.handleError('gatherDeviceFacts'))
@@ -52,19 +47,22 @@ export class KickstartService {
 
   generateKickstartInventory(kickStartForm: Object){
     this.log(kickStartForm);
-    const url = '/api/generate_kickstart_inventory';
-    let test = this.http.post(url, kickStartForm, httpOptions);
+    const url = '/api/generate_kickstart_inventory';    
     
     return this.http.post(url, kickStartForm, httpOptions).pipe(
       catchError(this.handleError('generateKickstartInventory'))
     );
   }
 
+  removeKickstartInventoryAndArchive(){
+    const url = '/api/remove_and_archive_kickstart';
+    return this.http.post(url, null);
+  }
+
   getKickstartForm(){
     const url = '/api/get_kickstart_form'
     return this.http.get(url)
-      .pipe(
-        tap(data => this.mapKickstartForm(data)),
+      .pipe(        
         catchError(this.handleError('gatherDeviceFacts', []))
       );
   }

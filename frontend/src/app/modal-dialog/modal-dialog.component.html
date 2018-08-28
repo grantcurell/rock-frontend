@@ -13,7 +13,7 @@
       </div>
       <div class="modal-footer">
         <button *ngIf="modal._secondary_button_text" type="button" class="btn btn-secondary" data-dismiss="modal">{{ modal._secondary_button_text }}</button>
-        <button *ngIf="modal._primary_button_text" type="button" class="btn btn-primary" data-dismiss="modal">{{ modal._primary_button_text }}</button>
+        <button *ngIf="modal._primary_button_text" type="button" class="btn btn-primary" data-dismiss="modal" (click)="triggerPrimaryClickEvent($event)">{{ modal._primary_button_text }}</button>
       </div>
     </div>
   </div>

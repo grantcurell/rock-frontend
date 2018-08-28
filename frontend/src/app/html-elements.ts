@@ -249,7 +249,8 @@ export class HtmlCardSelector extends FormArray implements HelpPageInterface, Ht
     public card_text: string,
     public card_notes: string,
     public invalid_feedback: string,
-    public is_multi_select: boolean = false    
+    public is_multi_select: boolean = false,
+    public default_selections: Array<string> = []
   ) {
     super([], null, null);
     this.anchor = 'anchor_' + form_name;

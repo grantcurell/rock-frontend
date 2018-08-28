@@ -4,9 +4,10 @@ This is the main module for all the various rest calls
 import json
 import traceback
 
-from app import app, logger, mongo_kickstart
+from app import app, logger, mongo_kickstart, mongo_kickstart_archive
 from app.node_facts import get_system_info
 from app.inventory_generator import KickstartInventoryGenerator, KitInventoryGenerator
+from datetime import datetime
 from flask import request, jsonify, Response
 from typing import Dict, Tuple
 
@@ -16,6 +17,8 @@ from pymongo.results import InsertOneResult
 MIN_MBPS = 1000
 OK_RESPONSE = Response()
 OK_RESPONSE.status_code = 200
+KICKSTART_ID = {"_id": "kickstart_form"}
+
 
 
 @app.route('/api/gather_device_facts', methods=['POST'])
@@ -97,13 +100,30 @@ def generate_kickstart_inventory() -> Response:
     _modify_advanced_settings(payload)
 
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
-    mongo_kickstart.find_one_and_replace({"_id": "kickstart_form"},
+    mongo_kickstart.find_one_and_replace(KICKSTART_ID,
                                          {"_id": "kickstart_form", "payload": payload},
                                          upsert=True)  # type: InsertOneResult
 
     kickstart_generator = KickstartInventoryGenerator(payload)
     kickstart_generator.generate()
 
+    return OK_RESPONSE
+
+
+@app.route('/api/remove_and_archive_kickstart', methods=['POST'])
+def remove_and_archive() -> Response:
+    """
+    Removes the kickstart inventory from the main collection and then
+    archives it in a separate collection.
+
+    :return:
+    """
+    kickstart_form = mongo_kickstart.find_one(KICKSTART_ID)
+    if kickstart_form is not None:
+        del kickstart_form['_id']
+        kickstart_form['archive_date'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        mongo_kickstart_archive.insert_one(kickstart_form)
+        mongo_kickstart.delete_one(KICKSTART_ID)
     return OK_RESPONSE
 
 
@@ -145,17 +165,13 @@ def generate_kit_inventory() -> Response:
     :return: Response object
     """
     payload = request.get_json()
-    
-
     payload['kubernetes_services_cidr'] = payload['kubernetes_services_cidr'] + "/28"
     payload['use_ceph_for_pcap'] = False
     if payload["sensor_storage_type"] == "Use Ceph clustered storage for PCAP":
         payload['use_ceph_for_pcap'] = True
 
     _set_sensor_type_counts(payload)
-    #TODO _change_zookeeper_replicas_based_on_node_count(input_data, form)
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
     kit_generator = KitInventoryGenerator(payload)
     kit_generator.generate()
     return OK_RESPONSE
-    

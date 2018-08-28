@@ -1,4 +1,4 @@
-<app-modal-dialog [modal]="kickStartModal"></app-modal-dialog>
+<app-modal-dialog [modal]="kickStartModal" (primaryButtonClick)="resetForm()"></app-modal-dialog>
 <div class="container" id="topheader">
   <div class="jumbotron">
     <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
@@ -7,6 +7,9 @@
   <div id="main_form">
     <form [formGroup]="kickStartForm" (ngSubmit)="onSubmit()">
       <div class="card">
+        <div class="card-header">
+            <button class="btn btn-danger" type="button" (click)="openResetConfirmation()">Archive Form</button>
+        </div>
         <div class="card-body">
           <h5>DHCP Settings</h5>
           <app-text-input [parentForm]="kickStartForm" controlName="dhcp_start"></app-text-input>
@@ -23,25 +26,19 @@
           <h5>Controller Settings</h5>
           <br>
           <div *ngIf="deviceFacts">
-              <app-controller-interface [parentForm]="kickStartForm" 
-                                        [interfaceData]="deviceFacts.interfaces" 
-                                        controlName="controller_interface"></app-controller-interface>
+              <app-card-selector #cardSelector [parentForm]="kickStartForm" [optionSelections]="kickStartForm.interfaceSelections" 
+                                  controlName="controller_interface"></app-card-selector>
           </div>
         </div>
       </div>
       <br>
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Node Settings</h4>
-          <app-text-input [parentForm]="kickStartForm" controlName="number_of_nodes" (buttonClick)="addNodes()"></app-text-input>
-        </div>
-      </div>
       <div formArrayName="nodes">
         <div *ngIf="!nodes.hidden">
           <div *ngFor="let node of nodes.controls; let i=index" class="card">
             <div class="card-header">
               <h5 class="mb-0">
                 <button class="btn btn-link" type="button" (click)="toggleNode(node)">node {{ i + 1 }}</button>
+                <button class="btn btn-danger" type="button" (click)="removeNode(i)" style="float:right;">Remove</button>
               </h5>
             </div>
             <div *ngIf="!node.hidden" class="card-body">
@@ -54,7 +51,13 @@
             </div>
           </div>
         </div>
-      </div>      
+      </div>
+      <div class="card">
+        <div class="card-header">
+            <button class="btn btn-primary" type="button" (click)="addNode()">Add Node</button>
+        </div>        
+      </div>
+
       <br>
       <div *ngIf="!kickStartForm.controls.advanced_settings.hidden" class="card">          
         <div class="card-body">
@@ -79,12 +82,8 @@
           <button class="btn btn-primary" type="submit" [disabled]="!kickStartForm.valid">Generate Inventory</button>
         </div>        
         <div class="form-group col-md-6">
-          <button class="btn btn-primary" type="button" (click)="toggleAdvancedSettings(kickStartForm.controls.advanced_settings)">Show/Hide Advanced Settings</button>
+          <button class="btn btn-primary" type="button" style="float: right;" (click)="toggleAdvancedSettings(kickStartForm.controls.advanced_settings)">Show/Hide Advanced Settings</button>
         </div>
-
-        <!-- <div class="form-group col-md-6">
-          <button class="btn btn-primary" type="button" (click)="openModal()">Open Modal</button>
-        </div> -->
       </div>
 
       <div class="card">
