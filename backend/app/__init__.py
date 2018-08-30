@@ -6,6 +6,7 @@ import logging
 
 from flask_cors import CORS
 from flask import Flask
+from flask_socketio import SocketIO
 from logging.handlers import RotatingFileHandler
 from logging import Logger
 from pathlib import Path
@@ -21,6 +22,7 @@ _client = MongoClient('mongodb://localhost:27017/')
 _tfplenum_database = _client.tfplenum_database  # type: Database
 mongo_kickstart = _tfplenum_database.kickstart  # type: Collection
 mongo_kickstart_archive = _tfplenum_database.kickstart_archive  # type: Collection
+mongo_console = _tfplenum_database.console  # type: Collection
 
 LOG_FILENAME = "/var/log/tfplenum/tfplenum.log"
 logger = logging.getLogger('tfplenum_logger')
@@ -47,7 +49,13 @@ setup_logger(logger)
 
 # Setup Flask
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
 CORS(app)
+socketio = SocketIO(app)
+
+# Start the job manager
+from app.job_manager import start_job_manager
+start_job_manager()
 
 # Load the views
 from app import views

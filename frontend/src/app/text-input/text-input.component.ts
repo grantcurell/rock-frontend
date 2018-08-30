@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
+declare var $: any;
+
 @Component({
   selector: 'app-text-input',
   templateUrl: './text-input.component.html',
@@ -23,6 +25,14 @@ export class TextInputComponent implements OnInit {
   constructor() { }
 
   ngOnInit() { }
+  ngAfterViewInit(){
+    this.update_tooltip();
+  }
+
+  private update_tooltip(){
+    let selector = $('[name="'+this.controlName+'"]')
+    selector.tooltip();
+  }
 
   callParent(){    
     this.buttonClick.emit(null);

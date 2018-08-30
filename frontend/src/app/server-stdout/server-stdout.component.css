@@ -1,0 +1,10 @@
+.console {
+    overflow: auto;
+    max-height: 100px;
+    background-color: #333333;
+}
+
+.console p {
+    margin: 0px;
+    color: lightgreen;
+}

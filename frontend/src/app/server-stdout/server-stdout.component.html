@@ -1,0 +1,14 @@
+<div class="container" id="topheader">
+  <div class="jumbotron">
+    <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
+    <p class="lead">We're really trying to make this easier!</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+        <button class="btn btn-danger" style="float: right;" (click)="clearConsole()">Clear Console</button>
+    </div>
+    <div #console class="card-body console">
+      <p *ngFor="let msg of messages">{{ msg }}</p>
+    </div>  
+</div>

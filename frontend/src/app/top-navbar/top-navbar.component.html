@@ -5,10 +5,11 @@
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav">
+    <div class="navbar-nav" style="width: 100%;">
       <a class="nav-item nav-link" routerLink="/kickstart">Kickstart Configuration</a>
       <a class="nav-item nav-link" routerLink="/kit_configuration">Kit Configuration</a>
       <a class="nav-item nav-link" routerLink="/help">Help</a>
+      <a class="nav-item nav-link" style="cursor: pointer" (click)="toggleMatrix()">{{ matrixText }}</a>
     </div>
   </div>
 </nav>

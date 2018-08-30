@@ -249,7 +249,7 @@ export class SensorResourcesForm extends FormGroup {
 
     kafka_cpu_percentage = new HtmlInput(
         'kafka_cpu_percentage',
-        'Kafka CPU Percentage',
+        'Kafka CPU %',
         "% of CPUs for Kafka",
         'number',
         CONSTRAINT_MIN_ONE,
@@ -261,7 +261,7 @@ export class SensorResourcesForm extends FormGroup {
 
     moloch_cpu_percentage = new HtmlInput(
         'moloch_cpu_percentage',
-        'Moloch CPU Percentage',
+        'Moloch CPU %',
         "% of CPUs for Moloch",
         'number',
         CONSTRAINT_MIN_ONE,
@@ -273,7 +273,7 @@ export class SensorResourcesForm extends FormGroup {
 
     bro_cpu_percentage = new HtmlInput(
         'bro_cpu_percentage',
-        'Bro CPU Percentage',
+        'Bro CPU %',
         "% of CPUs for Bro",
         'number',
         CONSTRAINT_MIN_ONE,
@@ -285,7 +285,7 @@ export class SensorResourcesForm extends FormGroup {
 
     suricata_cpu_percentage = new HtmlInput(
         'suricata_cpu_percentage',
-        'Suricata CPU Percentage',
+        'Suricata CPU %',
         "% of CPUs for Suricata",
         'number',
         CONSTRAINT_MIN_ONE,
@@ -297,7 +297,7 @@ export class SensorResourcesForm extends FormGroup {
 
     zookeeper_cpu_percentage = new HtmlInput(
         'zookeeper_cpu_percentage',
-        'Zookeeper CPU Percentage',
+        'Zookeeper CPU %',
         "% of CPUs for Zookeeper",
         'number',
         CONSTRAINT_MIN_ONE,

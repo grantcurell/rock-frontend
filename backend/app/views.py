@@ -4,14 +4,18 @@ This is the main module for all the various rest calls
 import json
 import traceback
 
-from app import app, logger, mongo_kickstart, mongo_kickstart_archive
+from app import (app, logger, mongo_kickstart,
+                 mongo_kickstart_archive, socketio,
+                 mongo_console)
 from app.node_facts import get_system_info
 from app.inventory_generator import KickstartInventoryGenerator, KitInventoryGenerator
+from app.job_manager import spawn_job
+from app.socket_service import log_to_console
 from datetime import datetime
 from flask import request, jsonify, Response
-from typing import Dict, Tuple
-
+from flask_socketio import send, emit
 from pymongo.results import InsertOneResult
+from typing import Dict, Tuple
 
 
 MIN_MBPS = 1000
@@ -19,6 +23,21 @@ OK_RESPONSE = Response()
 OK_RESPONSE.status_code = 200
 KICKSTART_ID = {"_id": "kickstart_form"}
 
+
+@socketio.on('connect')
+def connect():
+    print('Client connected')
+
+
+@socketio.on('disconnect')
+def disconnect():
+    print('Client disconnected')
+
+
+@socketio.on('message')
+def handle_message(msg):
+    print(msg)
+    emit('message', {'message': msg})
 
 
 @app.route('/api/gather_device_facts', methods=['POST'])
@@ -107,6 +126,11 @@ def generate_kickstart_inventory() -> Response:
     kickstart_generator = KickstartInventoryGenerator(payload)
     kickstart_generator.generate()
 
+    spawn_job("Kickstart",
+              "make",
+              ["kickstart"],
+              log_to_console,
+              working_directory="/opt/tfplenum-deployer/playbooks")
     return OK_RESPONSE
 
 
@@ -174,4 +198,22 @@ def generate_kit_inventory() -> Response:
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
     kit_generator = KitInventoryGenerator(payload)
     kit_generator.generate()
+    spawn_job("Kit",
+              "make",
+              ["kit"],
+              log_to_console,
+              working_directory="/opt/tfplenum/playbooks")
+    return OK_RESPONSE
+
+
+@app.route('/api/generate_kit_inventory/<job_name>', methods=['GET'])
+def get_console_logs(job_name: str):
+    logs = list(mongo_console.find({"jobName": job_name}, {'_id': False}))
+    return jsonify(logs)
+
+
+@app.route('/api/remove_console_output', methods=['POST'])
+def remove_console_logs():
+    payload = request.get_json()
+    mongo_console.delete_many({'jobName': payload['jobName']})
     return OK_RESPONSE

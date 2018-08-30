@@ -18,6 +18,10 @@ import { TotalServerResourcesCardComponent } from './total-server-resources-card
 import { TotalSensorResourcesCardComponent } from './total-sensor-resources-card/total-sensor-resources-card.component';
 import { CardSelectorComponent } from './card-selector/card-selector.component';
 import { TotalSystemResourceCardComponent } from './total-system-resource-card/total-system-resource-card.component';
+import { ServerStdoutComponent } from './server-stdout/server-stdout.component';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+
+const config: SocketIoConfig = { url: 'http://172.16.77.251:5001', options: {} };
 
 @NgModule({
   declarations: [
@@ -34,14 +38,16 @@ import { TotalSystemResourceCardComponent } from './total-system-resource-card/t
     TotalServerResourcesCardComponent,
     TotalSensorResourcesCardComponent,
     CardSelectorComponent,
-    TotalSystemResourceCardComponent
+    TotalSystemResourceCardComponent,
+    ServerStdoutComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    SocketIoModule.forRoot(config) 
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -5,16 +5,13 @@
     <p class="lead">We're really trying to make this easier!</p>
   </div>
   <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">
-    <div class="card" >
-      <div class="card-body">
-        <h4 class="card-title">Select Storage Type</h4>
-        <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown>
-      </div>      
-    </div>
     <br>
     <div class="card">
+      <div class="card-header">
+        <button class="btn btn-primary" type="button" style="margin-right: 10px;" (click)="openConsole()">Open Console</button>
+      </div>
       <div class="card-body">
-        <h4 class="card-title">Global Settings</h4>
+        <h5 class="card-title">Global Settings</h5>
         <p class="card-text">
           Dependent on your resources, these are generally sane defaults if you don't know what you are doing and just want to get started. 
           Unlike the storage settings, you can always come back and adjust them if you change your mind. 
@@ -22,6 +19,9 @@
         </p>
         <hr>
         <br>
+        
+        <h5>Select Storage Type</h5>
+        <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown>        
         <h5>Credentials</h5>
         <app-text-input [parentForm]="kitForm" controlName="root_password"></app-text-input>
         <br>
@@ -146,7 +146,7 @@
     <br>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid">Generate Inventory</button>
+        <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid">Execute Kit</button>
       </div>        
       <div class="form-group col-md-6">
         <button class="btn btn-primary" type="button" (click)="toggleAdvancedSettings()" style="float:right;">Show/Hide Advanced Settings</button>
@@ -154,26 +154,27 @@
     </div>
 
     <div class="card">
-        <div class="card-header">
-          Validation
-        </div>
-        <div class="card-body" id="validation">
-            <p *ngIf="kitForm.valid" class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>
-            <div *ngIf="kitForm.hasError('errors')">
-              <p *ngFor="let error of kitForm.getError('errors');" class='text-danger'>{{ error }}</p>
-            </div>            
-        </div>
+      <div class="card-header">
+        Validation
       </div>
-
+      <div class="card-body" id="validation">
+          <p *ngIf="kitForm.valid" class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>
+          <div *ngIf="kitForm.hasError('errors')">
+            <p *ngFor="let error of kitForm.getError('errors');" class='text-danger'>{{ error }}</p>
+          </div>            
+      </div>
+    </div>
+    <br>    
     <div *ngIf="!isAdvancedOptionsHidden">
-      <hr>
-      <h3>Advanced System Settings</h3>
-      <p class="font-weight-light">All of the required settings below will autopopulate based on facts gathered from the servers. It is not necessary to change
-        any of them in order for the system to function. However, you may want to update some fields manually based on your specific
-        use cases.
-      </p>
       <div class="card">
+        <div class="card-header">
+          Advanced System Settings
+        </div>
         <div class="card-body">
+          <p class="font-weight-light">All of the required settings below will autopopulate based on facts gathered from the servers. It is not necessary to change
+              any of them in order for the system to function. However, you may want to update some fields manually based on your specific
+              use cases.
+          </p>
           <p class="card-text text-danger">
             Unless you really know what you are doing here, you should not change the DNS. Seriously, there's only an incredibly niche
             case for changing this and chances are you aren't in it.
@@ -184,8 +185,10 @@
       </div>
       <br>
       <div class="card">
+        <div class="card-header">
+          Advanced Elasticsearch Settings
+        </div>
         <div class="card-body">
-          <h4 class="card-title">Advanced Elasticsearch Settings</h4>
           <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_masters" (keyupEvent)="triggerValidations($event)"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_datas" (keyupEvent)="triggerValidations($event)"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_cpus" (keyupEvent)="triggerValidations($event)"></app-text-input>
@@ -198,8 +201,10 @@
       </div>
       <br>
       <div class="card">
+        <div class="card-header">
+          Advanced Moloch Settings
+        </div>
         <div class="card-body">
-          <h4 class="card-title">Advanced Moloch Settings</h4>
           <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_pcap_pv_size" (keyupEvent)="triggerValidations($event)"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_bpf"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_dontSaveBPFs"></app-text-input>
@@ -216,8 +221,10 @@
       </div>
       <br>
       <div class="card">
+          <div class="card-header">
+            Advanced Kafka Settings
+          </div>
           <div class="card-body">
-            <h4 class="card-title">Advanced Moloch Settings</h4>
             <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="kafka_jvm_memory"></app-text-input>
             <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="kafka_pv_size" (keyupEvent)="triggerValidations($event)"></app-text-input>
             <app-text-input [parentForm]="kitForm.controls.advanced_kafka_settings" controlName="zookeeper_jvm_memory"></app-text-input>

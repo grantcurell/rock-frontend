@@ -4,13 +4,13 @@
       <p class="lead">We're really trying to make this easier!</p>
     </div>
     <h2>{{ form.what_is_ceph['label'] }}</h2>
-    {{ form.what_is_ceph['description'] }}
+    <p>{{ form.what_is_ceph['description'] }}</p>
     <br><br>
     <a name="{{ 'anchor_' + form.help_me_decide['label'].replace(' ','_') }}">
         <h2>Deciding Between Ceph PCAP Storage and Direct to Disk</h2>
     </a>
-    {{ form.help_me_decide['description'] }}
-    <br><br>
+    <p>{{ form.help_me_decide['description'] }}<p>
+    <br>
 
     <h2>Kickstart Installation Settings</h2>
     <dl *ngFor="let key of objectKeys(kickstart)" class="row">      

@@ -13,6 +13,8 @@ class HelpForm {
   constructor(){}
 }
 
+declare var $: any;
+
 @Component({
   selector: 'app-help',
   templateUrl: './help.component.html',
@@ -55,7 +57,9 @@ export class HelpComponent implements OnInit {
   ngAfterViewInit() {
     if (this.fragment){
       document.querySelector('#' + this.fragment).scrollIntoView();
-      window.scrollBy(0, -60);
-    }      
+      window.scrollBy(0, -70);
+    }
+        
+    $('.tooltip').remove();
   }
 }

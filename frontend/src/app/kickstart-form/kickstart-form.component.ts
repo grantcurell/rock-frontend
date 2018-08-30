@@ -5,7 +5,7 @@ import { KickstartService } from '../kickstart.service';
 import { FormArray, FormGroup, FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { CardSelectorComponent } from '../card-selector/card-selector.component';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-kickstart-form',
@@ -17,13 +17,15 @@ export class KickstartFormComponent implements OnInit {
   kickStartForm: KickstartInventoryForm;
   advancedSettingsFormGroup: AdvancedSettingsFormGroup;
   deviceFacts: Object;
-  isPosted: Object;  
 
   @ViewChild('cardSelector')
   monitorInterfaceSelector: CardSelectorComponent;
 
   //Magically Injected by Angular
-  constructor(private kickStartSrv: KickstartService, private title: Title) {
+  constructor(private kickStartSrv: KickstartService, 
+              private title: Title, 
+              private router: Router) 
+  {
     this.kickStartForm = new KickstartInventoryForm();
     this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');    
@@ -81,7 +83,10 @@ export class KickstartFormComponent implements OnInit {
    * Executes after the constructor and after the view is rendered.
    */
   ngOnInit(): void {
-    this.title.setTitle("Kickstart Configuration");
+    this.title.setTitle("Kickstart Configuration");    
+  }
+
+  ngAfterViewInit(){
     this.initializeView();
   }
 
@@ -92,26 +97,27 @@ export class KickstartFormComponent implements OnInit {
         this.deviceFacts = data;
         this.kickStartForm.setInterfaceSelections(this.deviceFacts);
         this.kickStartSrv.getKickstartForm().subscribe(data => {
-          this._map_to_form(data, this.kickStartForm);
 
+          if (this.monitorInterfaceSelector == undefined){
+            return;
+          }
+          this._map_to_form(data, this.kickStartForm);
           //Fixes a bug so that I do not have to touch the box.
-          this.kickStartForm.re_password.updateValueAndValidity();
+          this.kickStartForm.re_password.updateValueAndValidity();          
         });
       });
   }
 
   onSubmit(): void {    
     this.kickStartSrv.generateKickstartInventory(this.kickStartForm.value)
-      .subscribe(data => this.isPosted = data);
+      .subscribe(data => {
+        //this.isPosted = data;
+        this.openConsole();
+      });
+  }
 
-    this.kickStartModal.updateModal('Success',
-      'Inventory file generated successfully! \
-       File located at /opt/tfplenum-deployer/playbooks/inventory.yml. \
-       You can now navigate away from the page.',
-      undefined,
-      'Close'
-    );
-    this.kickStartModal.openModal();
+  openConsole(){
+    this.router.navigate(['/stdout/Kickstart'])
   }
   
   addNodes() {    

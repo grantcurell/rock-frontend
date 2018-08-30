@@ -10,6 +10,8 @@ import { StorageCalculator } from './storage-calculations';
 import { MolochBroCalculator } from './moloch-bro-calculations';
 import { ManualCalculator } from './manual-calculations';
 import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-kit-form',
@@ -30,7 +32,7 @@ export class KitFormComponent implements OnInit {
   isAdvancedOptionsHidden: boolean;
   isMolochPercentageHidden: boolean;  
 
-  constructor(private kickStartSrv: KickstartService, private title: Title) {
+  constructor(private kickStartSrv: KickstartService, private title: Title, private router: Router) {
     this.kitForm = new KitInventoryForm();
     this.advancedElasticSearchForm = this.kitForm.advanced_elasticsearch_settings;
     this.servers = this.kitForm.servers;
@@ -68,18 +70,12 @@ export class KitFormComponent implements OnInit {
   onSubmit(){    
     this.kickStartSrv.generateKitInventory(this.kitForm.value)
     .subscribe(data => {
-      console.log(data);
+      this.openConsole();
     });
+  }
 
-    this.kitModal.updateModal('Success',
-      'Inventory file generated successfully! \
-       File located at /opt/tfplenum/playbooks/inventory.yml. \
-       You can now navigate away from the page.',
-       undefined,
-       'Close'
-    );
-
-    this.kitModal.openModal();
+  openConsole(){
+    this.router.navigate(['/stdout/Kit'])
   }
 
   toggleServer(server: ServerFormGroup) {    

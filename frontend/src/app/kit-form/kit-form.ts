@@ -355,7 +355,7 @@ export class AdvancedElasticSearchSettingsFormGroup extends FormGroup {
 
     elastic_pv_size = new HtmlInput(
         'elastic_pv_size',
-        'Elasticsearch Persistent Volume Size',
+        'ES Persistent Volume Size',
         "Storage space in GB per Elasticsearch instance",
         'number',
         CONSTRAINT_MIN_EIGHT,
@@ -371,7 +371,7 @@ export class AdvancedElasticSearchSettingsFormGroup extends FormGroup {
 
     elastic_curator_threshold = new HtmlInput(
         'elastic_curator_threshold',
-        'Elasticsearch Curator Threshold',
+        'ES Curator Threshold',
         PERCENT_PLACEHOLDER,
         'number',
         PERCENT_MIN_MAX,
@@ -804,7 +804,7 @@ export class KitInventoryForm extends FormGroup {
 
     elastic_cpu_percentage = new HtmlInput(
         'elastic_cpu_percentage',
-        'Elasticsearch CPU Percentage',
+        'Elasticsearch CPU %',
         PERCENT_PLACEHOLDER,
         'number',
         PERCENT_MIN_MAX,
@@ -825,7 +825,7 @@ export class KitInventoryForm extends FormGroup {
 
     elastic_memory_percentage = new HtmlInput(
         'elastic_memory_percentage',
-        'Elasticsearch RAM Percentage',
+        'Elasticsearch RAM %',
         PERCENT_PLACEHOLDER,
         'number',
         PERCENT_MIN_MAX,
@@ -846,7 +846,7 @@ export class KitInventoryForm extends FormGroup {
 
     logstash_cpu_percentage = new HtmlInput(
         'logstash_cpu_percentage',
-        'Logstash Servers CPU Percentage',
+        'Logstash Servers CPU %',
         PERCENT_PLACEHOLDER,
         'number',
         PERCENT_MIN_MAX,
@@ -873,7 +873,7 @@ export class KitInventoryForm extends FormGroup {
 
     elastic_storage_percentage = new HtmlInput (
         'elastic_storage_percentage',
-        'Elasticsearch Storage Space Percentage',
+        'ES Storage Space %',
         PERCENT_PLACEHOLDER,
         'number',
         PERCENT_MIN_MAX,

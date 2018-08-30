@@ -72,3 +72,62 @@ pre code {
     letter-spacing: normal;
     word-break: break-all;
 }
+
+/* body {
+    background-color: #333;
+} */
+
+.form-control { 
+    background-color: #222;
+    color: #28a745;
+}
+
+.form-control:active {
+    background-color: lightgrey;
+}
+
+.form-control:focus {
+    background-color: lightgrey;
+}
+    
+
+.input-group-text {
+    /* max-width: 200px; */
+    width: 200px;
+    word-wrap: break-word;
+}
+
+dt {
+    color: #28a745;
+}
+
+dd {
+    color: lightgreen;
+}
+
+p {
+    color: lightgreen;
+}
+
+.card-header {
+    background-color: #375a7f;
+}
+
+.btn-primary {
+    background-color: #0C2B4C;
+    border-color: #0C2B4C;
+}
+
+.tooltip-inner {
+    max-width: 350px;
+    /* If max-width does not work, try using width instead */
+    width: 350px; 
+}
+
+body {
+    background-color: #111111;
+}
+
+hr {
+    border-top: 1px solid white;
+}
