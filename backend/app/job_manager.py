@@ -10,8 +10,8 @@ import psutil
 import subprocess
 from typing import Callable, List, Tuple
 from threading import Thread
-#from gevent import sleep
-from time import sleep
+from gevent import sleep
+
 
 JOB_QUEUE = []
 LOCK_IDS = {}
@@ -23,9 +23,14 @@ class SynchronousIPLockException(Exception):
 
 
 class ProcJob(object):
-    def __init__(self, job_name: str, command: str, func_output: Callable=None,
-                 funcs_before: List[Callable]=[], funcs_after: List[Callable]=[],
-                 lock_ids: List[str]=[], silent: bool=False, working_directory: str=None):
+    def __init__(self, job_name: str,
+                 command: str,
+                 func_output: Callable=None,
+                 funcs_before: List[Callable]=[],
+                 funcs_after: List[Callable]=[],
+                 lock_ids: List[str]=[],
+                 silent: bool=False,
+                 working_directory: str=None):
         """
         Initializes a Process Job.
 
@@ -56,9 +61,8 @@ class ProcJob(object):
                 self.process.pid, self.job_name, self.job_id,
                 self.lock_ids, self.isProcRunning, self.silent)
         else:
-            return "Job: %s ID: %s Locked IPs: %s isProcRunning: %s isSilent: %s" % (self.job_name, self.job_id,
-                                                                                     self.lock_ids, self.isProcRunning,
-                                                                                     self.silent)
+            return ("Job: %s ID: %s Locked IPs: %s isProcRunning: %s isSilent: %s"
+                    % (self.job_name, self.job_id, self.lock_ids, self.isProcRunning, self.silent))
 
     def is_pid(self) -> bool:
         """
@@ -203,12 +207,12 @@ def _async_read2(job):
 
 def shell(command: str, async: bool=True) -> Tuple[bytes, bytes]:
     """
-    Runs a command and returns std out and serr
-    :param command:
-    :param async:
+    Runs a command and returns std out and stderr.
+
+    :param command: The command to be run.
+    :param async: If set to true the output is gathered will the process is running otherwise it blocks and return
     :return:
     """
-    # merge stderr and stdout
     sout = None
     serr = None
     proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -233,7 +237,12 @@ def _log_queues() -> None:
             logger.debug(str(job))
 
 
-def _spawn_jobqueue():
+def _spawn_jobqueue() -> None:
+    """
+    Spawns a job queue:
+
+    :return:
+    """
     logger.info("Starting job queue!")
     future_time = datetime.utcnow() + timedelta(seconds=10)
     while True:
@@ -279,8 +288,7 @@ def start_job_manager() -> None:
     :return:
     """
     job_thread = socketio.start_background_task(target=_spawn_jobqueue)  # type: Thread
-    if not job_thread.is_alive():
-        job_thread.start()
+    job_thread.start()
 
 
 def spawn_job(job_name: str, command: str,
@@ -298,7 +306,7 @@ def spawn_job(job_name: str, command: str,
     :param command: The command to be run
     :param lock_ids: A list of ids that identifies the locking mechanism for this process.
     :param output_func: The callback to run for process output.
-    :param funcs_before: A List of function pointers to call before executing the process.
+    :param funcs_before: A List of function pointers to call before the process is executed.
     :param funcs_after: A List of function pointers to call after process is done executing.
     :param silent: If set to true, no output will be captured.
     :param working_directory: The working directory of where we want to run the command.
@@ -306,7 +314,7 @@ def spawn_job(job_name: str, command: str,
     """
     logger.info("Spawning %s %s" % (job_name, command))
     job = ProcJob(job_name, command, output_func, funcs_before,
-                funcs_after, lock_ids, silent, working_directory)
+                  funcs_after, lock_ids, silent, working_directory)
     JOB_QUEUE.append(job)
     logger.debug("QUEUE size after add: %d" % len(JOB_QUEUE))
 

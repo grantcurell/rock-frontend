@@ -27,7 +27,7 @@ export class KickstartFormComponent implements OnInit {
               private router: Router) 
   {
     this.kickStartForm = new KickstartInventoryForm();
-    this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;
+    this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;    
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');    
   }
 
@@ -140,8 +140,8 @@ export class KickstartFormComponent implements OnInit {
     node.hidden = !node.hidden;
   }
 
-  toggleAdvancedSettings(advancedForm: NodeFormGroup){
-    advancedForm.hidden = !advancedForm.hidden;
+  toggleAdvancedSettings(){
+    this.advancedSettingsFormGroup.hidden = !this.advancedSettingsFormGroup.hidden;    
   }
 
   get nodes() {

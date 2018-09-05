@@ -7,7 +7,7 @@
       <p class="card-text">{{ input_control.card_text }}</p>
       <p class="card-text text-danger">{{ input_control.card_notes }}</p>
     </div>
-    <input *ngFor="let item of htmlCardSelectorFormArray.controls; let i=index" type="hidden" [formControlName]="i">
+    <input *ngFor="let item of input_control.controls; let i=index" type="hidden" [formControlName]="i">
     <div id="button_group" class="btn-group-vertical" role="group">        
         <input *ngFor="let selection of optionSelections" type="button" (click)="selectedButton($event, selection)" required class="btn btn-primary" value="{{ selection.label }}">      
       <div *ngIf="!optionSelections" class="alert alert-danger" role="alert">

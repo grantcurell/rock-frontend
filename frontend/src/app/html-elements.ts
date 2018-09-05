@@ -89,6 +89,30 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
     this._id = id;
   }
 
+  get id(): string {
+    return this._id;
+  }
+
+  get title(): string {
+    return this._title;
+  }
+
+  get text(): string {
+    return this._text;
+  }
+
+  get primary_button_text(): string {
+    return this._primary_button_text;
+  }
+
+  get secondary_button_text(): string {
+    return this._secondary_button_text;
+  }
+
+  get type(): ModalType {
+    return this._type;
+  } 
+
   updateModal(title: string, text: string,
     primary_button_text: string, secondary_button_text?: string,
     type: ModalType = ModalType.general) {    

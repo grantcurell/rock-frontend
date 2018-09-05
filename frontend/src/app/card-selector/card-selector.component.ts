@@ -108,7 +108,7 @@ export class CardSelectorComponent implements OnInit {
     }
   }
 
-  get input_control() {
+  get input_control(): HtmlCardSelector {
     return this.htmlCardSelectorFormArray;
   }
 }

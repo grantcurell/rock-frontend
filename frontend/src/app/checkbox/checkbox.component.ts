@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { HtmlCheckBox } from '../html-elements';
 
 @Component({
   selector: 'app-checkbox',
@@ -22,8 +23,8 @@ export class CheckboxComponent implements OnInit {
   ngOnInit() {
   }
 
-  get input_control() {
-    return this.parentForm.get(this.controlName);
+  get input_control(): HtmlCheckBox {
+    return this.parentForm.get(this.controlName) as HtmlCheckBox;
   }
 
   callParent(event){    

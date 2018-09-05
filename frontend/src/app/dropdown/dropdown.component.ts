@@ -34,8 +34,8 @@ export class DropdownComponent implements OnInit {
     this.triggerChangedEvent();
   }
 
-  get input_control() { 
-    return this.parentForm.get(this.controlName);
+  get input_control(): HtmlDropDown { 
+    return this.parentForm.get(this.controlName) as HtmlDropDown;
   }
 
   private triggerChangedEvent(){

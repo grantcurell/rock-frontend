@@ -20,8 +20,9 @@ import { CardSelectorComponent } from './card-selector/card-selector.component';
 import { TotalSystemResourceCardComponent } from './total-system-resource-card/total-system-resource-card.component';
 import { ServerStdoutComponent } from './server-stdout/server-stdout.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { environment } from '../environments/environment';
 
-const config: SocketIoConfig = { url: 'http://172.16.77.251:5001', options: {} };
+const config: SocketIoConfig = environment.socket_config; // { url: 'http://172.16.77.251:8080', options: {} };
 
 @NgModule({
   declarations: [

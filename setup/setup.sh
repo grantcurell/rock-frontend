@@ -1,4 +1,73 @@
 #!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+FRONTEND_DIR="/opt/tfplenum-frontend"
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root or use sudo."
+  exit
+fi
+
+pushd $SCRIPT_DIR > /dev/null
+source ./common.in
+
+
+function _install_nodejs(){
+    run_cmd wget https://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.xz
+    run_cmd tar xf node-v8.11.4-linux-x64.tar.xz
+    run_cmd cd node-v8.11.4-linux-x64/
+    run_cmd cp -R * /usr/local/    		
+    run_cmd cd ..
+	run_cmd rm -rf node-v8.11.4-linux-x64/
+	run_cmd rm -f node-v8.11.4-linux-x64.tar.xz
+    run_cmd node -v
+    run_cmd npm -v
+}
+
+function _install_angular(){
+    run_cmd npm install -g @angular/cli
+	pushd $FRONTEND_DIR/frontend > /dev/null	
+    run_cmd npm install --save-dev @angular-devkit/build-angular	
+    run_cmd npm install
+	popd > /dev/null
+}
+
+function _open_firewall_ports(){
+    firewall-cmd --permanent --add-port=4200/tcp
+    firewall-cmd --permanent --add-port=443/tcp
+    firewall-cmd --reload
+}
+
+function _setup_pythonenv {
+	pushd $FRONTEND_DIR/ > /dev/null
+	run_cmd rm -rf /opt/tfplenum-frontend/tfp-env
+	run_cmd python3.6 -m venv tfp-env
+	run_cmd /opt/tfplenum-frontend/tfp-env/bin/pip install --upgrade pip
+	run_cmd /opt/tfplenum-frontend/tfp-env/bin/pip install -r requirements.txt
+	popd > /dev/null
+}
+
+function _configure_httpd {
+	local private_key="/etc/ssl/private/apache-selfsigned.key"
+	local certificate="/etc/ssl/certs/apache-selfsigned.crt"
+	run_cmd yum -y install httpd
+	run_cmd yum -y install mod_ssl
+	mkdir /etc/ssl/private
+	run_cmd chmod 700 /etc/ssl/private
+	run_cmd openssl req -x509 -nodes -subj "/C=US/ST=Texas/L=Dallas/O=uknown/CN=tfplenum" -days 36500 -newkey rsa:4096 -keyout $private_key -out $certificate
+	run_cmd chmod 600 $private_key
+	run_cmd chmod 644 $certificate
+	run_cmd openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 4096
+	run_cmd cat /etc/ssl/certs/dhparam.pem | sudo tee -a /etc/ssl/certs/apache-selfsigned.crt
+	mv -v /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.bak
+	run_cmd cp -v ./tfplenum.conf /etc/httpd/conf.d/
+}
+
+function _install_and_configure_gunicorn {	
+	cp ./tfplenum-frontend.service /etc/systemd/system/
+	run_cmd systemctl daemon-reload	
+	run_cmd systemctl enable tfplenum-frontend.service
+}
+
 
 function _install_and_start_mongo40 {
 
@@ -11,11 +80,19 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 EOF
 
-	yum install -y mongodb-org	
-	systemctl enable mongod
-    systemctl start mongod
+	run_cmd yum install -y mongodb-org
+	run_cmd systemctl enable mongod
 }
 
-_install_and_start_mongo40
-
 mkdir -p /var/log/tfplenum/
+_install_nodejs
+_install_angular
+_setup_pythonenv
+_configure_httpd
+_deploy_angular_application
+_install_and_configure_gunicorn
+_install_and_start_mongo40
+_restart_services
+_open_firewall_ports
+
+popd > /dev/null

@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { HtmlInput } from '../html-elements';
 
 declare var $: any;
 
@@ -42,8 +43,8 @@ export class TextInputComponent implements OnInit {
     this.keyupEvent.emit(event);
   }
 
-  get input_control() {
-    return this.parentForm.get(this.controlName);
+  get input_control(): HtmlInput {
+    return this.parentForm.get(this.controlName) as HtmlInput;
   }
 
 }
