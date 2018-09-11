@@ -37,6 +37,10 @@ function _open_firewall_ports(){
     firewall-cmd --reload
 }
 
+function _install_python36(){
+	run_cmd yum install -y python36 python36-devel
+}
+
 function _setup_pythonenv {
 	pushd $FRONTEND_DIR/ > /dev/null
 	run_cmd rm -rf /opt/tfplenum-frontend/tfp-env
@@ -70,7 +74,6 @@ function _install_and_configure_gunicorn {
 
 
 function _install_and_start_mongo40 {
-
 cat <<EOF > /etc/yum.repos.d/mongodb-org-4.0.repo
 [mongodb-org-4.0]
 name=MongoDB Repository
@@ -79,7 +82,6 @@ gpgcheck=1
 enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 EOF
-
 	run_cmd yum install -y mongodb-org
 	run_cmd systemctl enable mongod
 }
@@ -87,6 +89,7 @@ EOF
 mkdir -p /var/log/tfplenum/
 _install_nodejs
 _install_angular
+_install_python36
 _setup_pythonenv
 _configure_httpd
 _deploy_angular_application
