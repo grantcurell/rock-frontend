@@ -9,6 +9,7 @@ import xmlrpclib
 import yaml
 import traceback
 from jinja2 import Environment, FileSystemLoader
+from time import sleep
 
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -424,6 +425,7 @@ class HtmlGenerator:
 
         pages = []
         for page in self._server.confluence2.getPages(self._token, self._space_config['space_name']):
+            sleep(30)
             page_id = page['id']
             page_dict = self._server.confluence2.getPage(self._token, page_id)
             
