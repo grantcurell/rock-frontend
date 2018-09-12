@@ -152,21 +152,6 @@ export class KickstartFormComponent implements OnInit {
     this.kickStartModal.openModal();
   }
 
-  toggleDownloadDependencies(isChecked) {
-    let depCheckBox = this.advancedSettingsFormGroup.get('download_dependencies') as HtmlCheckBox;
-    let isoURL = this.advancedSettingsFormGroup.get('iso_url') as HtmlInput;
-    
-    if (isChecked){      
-      depCheckBox.checked = false;
-      depCheckBox.setValue(false);
-      depCheckBox.disable();
-      isoURL.disable();
-    } else {
-      depCheckBox.enable();
-      isoURL.enable();
-    }    
-  }
-
   openResetConfirmation() {
     this.kickStartModal.updateModal('WARNING',
       'Are you sure you want to archive this form? Doing so will erase any fields \

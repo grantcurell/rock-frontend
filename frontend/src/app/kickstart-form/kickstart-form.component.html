@@ -89,12 +89,6 @@
           </p>
           <hr>
           <app-dropdown [parentForm]="kickStartForm.controls.advanced_settings" controlName="timezone"></app-dropdown>
-          <app-dropdown [parentForm]="kickStartForm.controls.advanced_settings" controlName="os_name"></app-dropdown>
-          <app-checkbox [parentForm]="kickStartForm.controls.advanced_settings" controlName="is_offline_build" (is_checked)="toggleDownloadDependencies($event)"></app-checkbox>
-          <app-checkbox [parentForm]="kickStartForm.controls.advanced_settings" controlName="download_dependencies"></app-checkbox>
-          <app-text-input [parentForm]="kickStartForm.controls.advanced_settings" controlName="iso_url"></app-text-input>
-          <app-text-input [parentForm]="kickStartForm.controls.advanced_settings" controlName="iso_path"></app-text-input>
-          <app-text-input [parentForm]="kickStartForm.controls.advanced_settings" controlName="iso_checksum"></app-text-input>
         </div>
       </div>
     </form>

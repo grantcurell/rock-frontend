@@ -105,12 +105,6 @@ export class AdvancedSettingsFormGroup extends FormGroup {
   constructor(public hidden: boolean) {
     super({});
     super.addControl('timezone', this.timezone);
-    super.addControl('os_name', this.os_name);
-    super.addControl('iso_url', this.iso_url);
-    super.addControl('iso_path', this.iso_path);
-    super.addControl('iso_checksum', this.iso_checksum);
-    super.addControl('is_offline_build', this.is_offline_build);
-    super.addControl('download_dependencies', this.download_dependencies);
   }
 
   /**
@@ -119,15 +113,15 @@ export class AdvancedSettingsFormGroup extends FormGroup {
    * @param value 
    * @param options 
    */
-  reset(value?: any, options?: {
-    onlySelf?: boolean;
-    emitEvent?: boolean;
-  }): void{    
-    super.reset({'iso_url': this.iso_url.default_value,
-                 'iso_path': this.iso_path.default_value,
-                 'iso_checksum': this.iso_checksum.default_value
-    });
-  }
+  // reset(value?: any, options?: {
+  //   onlySelf?: boolean;
+  //   emitEvent?: boolean;
+  // }): void{    
+  //   super.reset({'iso_url': this.iso_url.default_value,
+  //                'iso_path': this.iso_path.default_value,
+  //                'iso_checksum': this.iso_checksum.default_value
+  //   });
+  // }
 
   timezone = new HtmlDropDown(
     'timezone',
@@ -143,68 +137,6 @@ export class AdvancedSettingsFormGroup extends FormGroup {
     ['centos', 'rhel', 'coreos', 'atomic'],
     "This option is used to determine which operating system will be installed on each node.  By default the tfplenum should use centos.",
     'centos'
-  )
-
-  iso_url = new HtmlInput(
-    'iso_url',
-    'ISO URL',
-    "Path to centos/rhel iso url",
-    'text',
-    URL_CONSTRAINT,
-    'You must enter a valid URL for centos/rhel minimal iso ending with .iso',
-    false,
-    "http://mirrors.mit.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1804.iso",
-    "This is the url to download the centos/rhel minimal installation iso.  \
-      If the iso is already on the controller provide disregard this option.  Verify the ISO Path Location is the correct.",
-    undefined,
-    true
-  )
-
-  iso_path = new HtmlInput(
-    'iso_path',
-    'ISO Path Location',
-    "Path to centos/rhel iso",
-    'text',
-    ".*\\.iso$",
-    'You must enter a valid path to a centos/rhel iso.',
-    false,
-    "/root/CentOS-7-x86_64-Minimal-1804.iso",
-    "This should be the path of the iso for centos/rhel minimal installation.  \
-      The iso is downloaded manually or automatically if a valid ISO URL is provided (requires internet connection)."
-  )
-
-  iso_checksum = new HtmlInput(
-    'iso_checksum',
-    'ISO Checksum',
-    "Enter sha256 checksum for the Centos/Rhel iso",
-    'text',
-    "[A-Fa-f0-9]{64}",
-    'You must enter the sha256 checksum for the centos/rhel iso',
-    true,
-    "714acc0aefb32b7d51b515e25546835e55a90da9fb00417fbee2d03a62801efd",
-    "This is the checksum for the centos/rhel iso. This is required to verify validity of the iso."
-  )
-
-  is_offline_build = new HtmlCheckBox(
-    "is_offline_build",
-    "Is offline build?",
-    "Check this if you are setting up your build using the prebuilt offline installer. \
-      This is the installer on the control server shipped to you from the PMO. If you \
-      uncheck this, it is expected that all boxes have access to commercial internet. \
-      The online build will pull everything required from the Internet instead of the \
-      controller. Use this if you are building the system at home.",
-    false,
-    true
-  )
-
-  download_dependencies = new HtmlCheckBox(
-    "download_dependencies",
-    "Download All Dependencies (requires internet connection)",
-    "This options is used to download the required dependencies to be hosted on the \
-      controller for deployment of the system.  Dependancies include yum repositories, \
-      pip and nmp modules and docker images.",
-    true,
-    false
   )
 }
 
@@ -260,8 +192,7 @@ export class KickstartInventoryForm extends FormGroup {
     emitEvent?: boolean;
   }): void {
     console.log("Reset");
-    super.reset({'advanced_settings.iso_url': this.advanced_settings.iso_url.default_value, 
-                 'netmask': this.netmask.default_value });
+    super.reset({'netmask': this.netmask.default_value });
   }
 
   advanced_settings = new AdvancedSettingsFormGroup(true);

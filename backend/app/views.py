@@ -76,37 +76,6 @@ def gather_device_facts():
         return jsonify(error_message=str(e))
 
 
-def _modify_advanced_settings(template_ctx: Dict) -> None:
-    """
-    If this is an online build and download dependencies is checked
-    Lets configure the correct repos to be downloaded.
-    everyone gets additional
-    rhel will sync rhel repos
-    centos will sync centos repo
-
-    :param template_ctx:
-    :return:
-    """
-    template_ctx['advanced_settings']['repo_sync_centos'] = False
-    template_ctx['advanced_settings']['repo_sync_rhel'] = False
-    template_ctx['advanced_settings']['repo_sync_additional'] = False
-
-    try:
-        template_ctx['advanced_settings']['download_dependencies']
-    except KeyError:
-        template_ctx['advanced_settings']['download_dependencies'] = False
-
-    if (template_ctx['advanced_settings']['is_offline_build'] is False
-            and template_ctx['advanced_settings']['download_dependencies'] is True):
-        template_ctx['advanced_settings']['repo_sync_additional'] = True
-
-        if template_ctx['advanced_settings']['os_name'] == "centos":
-            template_ctx['advanced_settings']['repo_sync_centos'] = True
-
-        if template_ctx['advanced_settings']['os_name'] == "rhel":
-            template_ctx['advanced_settings']['repo_sync_rhel'] = True
-
-
 @app.route('/api/generate_kickstart_inventory', methods=['POST'])
 def generate_kickstart_inventory() -> Response:
     """
@@ -115,8 +84,7 @@ def generate_kickstart_inventory() -> Response:
 
     :return:
     """
-    payload = request.get_json()
-    _modify_advanced_settings(payload)
+    payload = request.get_json()    
 
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
     mongo_kickstart.find_one_and_replace(KICKSTART_ID,

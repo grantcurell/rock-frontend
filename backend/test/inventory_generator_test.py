@@ -11,11 +11,6 @@ from app.inventory_generator import KickstartInventoryGenerator
 
 TEST_DATA = {
     "advanced_settings": {
-        "is_offline_build": True,
-        "iso_checksum": "714acc0aefb32b7d51b515e25546835e55a90da9fb00417fbee2d03a62801efd",
-        "iso_path": "/root/CentOS-7-x86_64-Minimal-1804.iso",
-        "iso_url": "http://mirrors.mit.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1804.iso",
-        "os_name": "centos",
         "timezone": "Chicago"
     },
     "controller_interface": "172.16.77.251",
