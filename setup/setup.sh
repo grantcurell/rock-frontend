@@ -38,6 +38,7 @@ function _open_firewall_ports(){
 }
 
 function _install_python36(){
+	run_cmd yum install -y gcc
 	run_cmd yum install -y python36 python36-devel
 }
 
@@ -50,11 +51,16 @@ function _setup_pythonenv {
 	popd > /dev/null
 }
 
-function _configure_httpd {
+function _configure_httpd {	
 	local private_key="/etc/ssl/private/apache-selfsigned.key"
 	local certificate="/etc/ssl/certs/apache-selfsigned.crt"
 	run_cmd yum -y install httpd
 	run_cmd yum -y install mod_ssl
+
+	# On RHEL these lines are needed because they do not not automatically allow connectivity.
+	/usr/sbin/setsebool httpd_can_network_connect 1
+	/usr/sbin/setsebool -P httpd_can_network_connect 1
+
 	mkdir /etc/ssl/private
 	run_cmd chmod 700 /etc/ssl/private
 	run_cmd openssl req -x509 -nodes -subj "/C=US/ST=Texas/L=Dallas/O=uknown/CN=tfplenum" -days 36500 -newkey rsa:4096 -keyout $private_key -out $certificate

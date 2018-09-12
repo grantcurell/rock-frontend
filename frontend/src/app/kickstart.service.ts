@@ -21,6 +21,10 @@ export class KickstartService {
 
   private mapDeviceFacts(data){
     //TODO: is there a better way to do this? Look into map function later
+    if (data == undefined || data == null){
+      return;
+    }
+    
     if (data.disks){
       data['disks'] = JSON.parse(data.disks);
     }
