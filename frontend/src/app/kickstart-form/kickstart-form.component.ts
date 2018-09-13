@@ -16,7 +16,7 @@ export class KickstartFormComponent implements OnInit {
   kickStartModal: HtmlModalPopUp;
   kickStartForm: KickstartInventoryForm;
   advancedSettingsFormGroup: AdvancedSettingsFormGroup;
-  deviceFacts: Object;
+  deviceFacts: Object;  
 
   @ViewChild('cardSelector')
   monitorInterfaceSelector: CardSelectorComponent;
@@ -25,7 +25,7 @@ export class KickstartFormComponent implements OnInit {
   constructor(private kickStartSrv: KickstartService, 
               private title: Title, 
               private router: Router) 
-  {
+  {    
     this.kickStartForm = new KickstartInventoryForm();
     this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;    
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');    
@@ -41,6 +41,7 @@ export class KickstartFormComponent implements OnInit {
     if (control instanceof HtmlDropDown){      
       control.default_value = value;
       control.setValue(value);
+    
     } else if (control instanceof FormControl){
       control.setValue(value);
     }
@@ -103,7 +104,7 @@ export class KickstartFormComponent implements OnInit {
           }
           this._map_to_form(data, this.kickStartForm);
           //Fixes a bug so that I do not have to touch the box.
-          this.kickStartForm.re_password.updateValueAndValidity();          
+          this.kickStartForm.re_password.updateValueAndValidity();
         });
       });
   }
@@ -161,10 +162,29 @@ export class KickstartFormComponent implements OnInit {
     )
     this.kickStartModal.openModal();
   }
-
+  
   resetForm(){
-    console.log("resetForm");
     this.kickStartForm.reset();
     this.kickStartSrv.removeKickstartInventoryAndArchive().subscribe(data => {});
+  }
+
+  /**
+   * Triggered when a user selects a new nodeType for a given node.
+   * 
+   * @param value - The new value of the dropdown.
+   * @param index - The current index the node is in the list.
+   */
+  nodeTypeChange(value: string, index: number): void {
+    let newHostname: string = value.toLocaleLowerCase() + (index + 1) + '.lan';
+    let compare1: string = "sensor" + (index + 1) + '.lan';
+    let compare2: string = "server" + (index + 1) + '.lan';
+    let node = this.kickStartForm.nodes.at(index) as NodeFormGroup;
+    
+    if (node.hostname.value == "" || 
+        node.hostname.value == compare1 || 
+        node.hostname.value == compare2)
+    {
+      node.hostname.setValue(newHostname);
+    }    
   }
 }

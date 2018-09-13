@@ -42,12 +42,12 @@
             </h5>
           </div>
           <div *ngIf="!node.hidden" class="card-body">
+            <app-dropdown [parentForm]="node" controlName="node_type" (dropDownChanged)="nodeTypeChange($event, i)"></app-dropdown>
             <app-text-input [parentForm]="node" controlName="hostname"></app-text-input>
             <app-text-input [parentForm]="node" controlName="ip_address"></app-text-input>
             <app-text-input [parentForm]="node" controlName="mac_address"></app-text-input>
             <app-text-input [parentForm]="node" controlName="boot_drive"></app-text-input>
-            <app-dropdown [parentForm]="node" controlName="pxe_type"></app-dropdown>
-            <app-dropdown [parentForm]="node" controlName="node_type"></app-dropdown>
+            <app-dropdown [parentForm]="node" controlName="pxe_type"></app-dropdown>            
           </div>
         </div>      
       </div>
