@@ -109,12 +109,11 @@ export class KickstartFormComponent implements OnInit {
       });
   }
 
-  onSubmit(): void {    
+  onSubmit(): void {
     this.kickStartSrv.generateKickstartInventory(this.kickStartForm.value)
       .subscribe(data => {
-        //this.isPosted = data;
         this.openConsole();
-      });
+    });
   }
 
   openConsole(){

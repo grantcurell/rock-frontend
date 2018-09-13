@@ -23,11 +23,24 @@ class KickstartInventoryGenerator:
     def __init__(self, json_dict: Dict):
         self._template_ctx = json_dict
 
+    def _map_dl160_and_supermicro(self) -> None:
+        """
+        Maps the DL160 and SuperMicro values to the appropriate values for the 
+        inventory file.
+        :return:
+        """
+        for node in self._template_ctx["nodes"]:            
+            if node['pxe_type'] == "SuperMicro":
+                node['pxe_type'] = "BIOS"
+            elif node['pxe_type'] == "DL160":
+                node['pxe_type'] = "UEFI"        
+
     def generate(self) -> None:
         """
         Generates the Kickstart inventory file in
         :return:
         """
+        self._map_dl160_and_supermicro()
         template = JINJA_ENV.get_template('kickstart_inventory.yml')
         kickstart_template = template.render(template_ctx=self._template_ctx)
 

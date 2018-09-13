@@ -84,7 +84,7 @@ export class NodeFormGroup extends FormGroup {
   pxe_type = new HtmlDropDown(
     'pxe_type',
     'PXE Type',
-    ['BIOS', 'UEFI'],
+    ['BIOS', 'UEFI', 'DL160', 'SuperMicro'],
     "The PXE Type referes to the motherboards method of network booting.  \
        By default, the Supermicro uses BIOS and the HP DL160s use UEFI.\
        BIOS is sometimes called Legacy in the bios settings.",
