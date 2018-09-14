@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SetISMatrix } from '../globals';
+import { ConfluenceService }  from '../confluence.service';
+
 
 @Component({
   selector: 'app-top-navbar',
@@ -9,13 +11,18 @@ import { SetISMatrix } from '../globals';
 export class TopNavbarComponent implements OnInit {
   matrixText: string;
   isMatrixOn: boolean;
+  spaces: Object;
 
-  constructor() { 
+  constructor(private confluenceSrv: ConfluenceService) { 
     this.isMatrixOn = true;
     this.matrixText = "Turn off matrix";
   }
 
-  ngOnInit() {}
+  ngOnInit() {    
+    this.confluenceSrv.getSpaces().subscribe(data => {
+      this.spaces = data;
+    });
+  }
 
   toggleMatrix(){
     this.isMatrixOn = !this.isMatrixOn;

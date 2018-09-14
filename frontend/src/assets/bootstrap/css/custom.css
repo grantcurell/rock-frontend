@@ -9,33 +9,49 @@
     overflow-y: scroll;
     height: calc(100% - 60px);
     width: inherit;
-    padding-left: 15px;    
+    padding-left: 15px;
+    padding-bottom: 15px;
 }
 
 .leftnavbar2 ol {
     list-style-type: None;
-    padding-left: 0px;
+    padding-left: 0px;    
 }
 
 .leftnavbar2 ol{
     padding-left: 20px;
 }
 
- .active2 {
+.leftnavbar2 a {
+    cursor: pointer;
+}
+
+.active2 {
     color: #000;
     font-weight: bold;
 }
 
 .confluence h1 {
     font-size: 1.8em;
+    color: #fff;
 }
 
 .confluence h2 {
     font-size: 1.5em;
+    color: #fff;
 }
 
 .confluence h3 {
     font-size: 1.0em;
+    color: #fff;
+}
+
+.confluence {
+    color: lightgreen;
+}
+
+.confluence strong {
+    color: #fff;
 }
 
 .jumbotron {
@@ -44,13 +60,13 @@
 }
 
 pre {
-    background-color: #444444;
+    background-color: black;
     overflow: auto;
     font-family: 'Monaco', monospace;
     padding: 0 1em;
     max-height: 775px;
     min-height: 30px;
-    color: palegreen;
+    color: #fff;
     padding-top: 5px;
 }
 

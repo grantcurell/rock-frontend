@@ -36,8 +36,6 @@ export class ServerStdoutComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      console.log(params) //log the entire params object
-      console.log(params['id']) //log the value of id
       this.jobName = params['id'];
 
       this.stdoutService.getConsoleOutput(this.jobName).subscribe(data => {

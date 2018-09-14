@@ -34,7 +34,7 @@ export class KickstartService {
     }    
   }
 
-  gatherDeviceFacts(management_ip: string, password: string): Observable<Object> { //: Observable<DeviceFacts[]> {
+  gatherDeviceFacts(management_ip: string, password: string): Observable<Object> { 
     // const url = `/api/_gather_device_facts?management_ip=${management_ip}&password=${password}`
     // return this.http.get(url)
     //   .pipe(
@@ -72,8 +72,6 @@ export class KickstartService {
   }
 
   generateKitInventory(kitForm: Object){
-    this.log(kitForm);
-
     const url = '/api/generate_kit_inventory';
     return this.http.post(url, kitForm, httpOptions).pipe(
       catchError(this.handleError('generateKitInventory'))

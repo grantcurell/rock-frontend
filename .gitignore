@@ -4,12 +4,6 @@ ceph-deploy/\.remote-sync\.json
 \.remote-sync\.json
 *.pyc
 .idea/
-app/templates/confluence/
-app/static/images/ojcctm/
-app/static/images/thisiscvah/
 *.orig
-app/templates/thisiscvah/
-app/templates/ojcctm/
-app/confluence/*_views.py
 .vscode/
-
+frontend/src/assets/confluence/

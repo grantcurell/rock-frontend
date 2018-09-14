@@ -21,8 +21,9 @@ import { TotalSystemResourceCardComponent } from './total-system-resource-card/t
 import { ServerStdoutComponent } from './server-stdout/server-stdout.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { environment } from '../environments/environment';
+import { ConfluenceComponent } from './confluence/confluence.component';
 
-const config: SocketIoConfig = environment.socket_config; // { url: 'http://172.16.77.251:8080', options: {} };
+const config: SocketIoConfig = environment.socket_config;
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ const config: SocketIoConfig = environment.socket_config; // { url: 'http://172.
     TotalSensorResourcesCardComponent,
     CardSelectorComponent,
     TotalSystemResourceCardComponent,
-    ServerStdoutComponent
+    ServerStdoutComponent,
+    ConfluenceComponent
   ],
   imports: [
     BrowserModule,

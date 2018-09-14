@@ -5,12 +5,18 @@
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav" style="width: 100%;">
-      <a class="nav-item nav-link" routerLink="/kickstart">Kickstart Configuration</a>
-      <a class="nav-item nav-link" routerLink="/kit_configuration">Kit Configuration</a>
-      <a class="nav-item nav-link" routerLink="/help">Help</a>
-      <a class="nav-item nav-link" style="cursor: pointer" (click)="toggleMatrix()">{{ matrixText }}</a>
-    </div>
+    <ul class="navbar-nav" style="width: 100%;">
+      <li class="nav-item"><a class="nav-link" routerLink="/kickstart">Kickstart Configuration</a></li>
+      <li class="nav-item"><a class="nav-link" routerLink="/kit_configuration">Kit Configuration</a></li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Confluence</a>
+        <div class="dropdown-menu">
+          <a *ngFor="let space of spaces" class="nav-link" routerLink="/confluence/{{ space._id}}">{{ space._id}}</a>
+        </div>
+      </li>
+      <li class="nav-item"><a class="nav-link" routerLink="/help">Help</a></li>
+      <li class="nav-item"><a class="nav-link" style="cursor: pointer" (click)="toggleMatrix()">{{ matrixText }}</a></li>
+    </ul>
   </div>
 </nav>
 <router-outlet></router-outlet>

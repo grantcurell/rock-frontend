@@ -1,8 +1,0 @@
-<ol class="navbar-nav navbar-sidenav leftnavbar2">
-    {%- for page in page_tree recursive %}
-        <li><a id="a_{{ page.name }}" href="{{ page.url }}">{{ page.title }}</a></li>
-            {%- if page.children|length > 0 -%}
-            <ol>{{ loop(page.children) }}</ol>
-            {%- endif %}
-    {%- endfor %}
-</ol>
