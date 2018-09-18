@@ -132,6 +132,32 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
   }
 }
 
+export class HtmlModalSelectDialog extends HtmlModalPopUp {
+  private _selection: Object;
+  private _isDisabled: boolean;
+
+  constructor(id: string) {
+    super(id);
+  }
+
+  updateModalSelection(selection: Object, isPrimaryBtnDisabled=true){
+    this._selection = selection;
+    this._isDisabled = isPrimaryBtnDisabled;    
+  }
+
+  get selection(): Object {
+    return this._selection;
+  }
+
+  set isDisabled(newValue: boolean){
+    this._isDisabled = newValue;
+  }
+
+  get isDisabled(): boolean {
+    return this._isDisabled;
+  }
+}
+
 export class HtmlCheckBox extends FormControl implements HtmlCheckBoxInterface, HelpPageInterface {
   anchor: string;
   checked: boolean;

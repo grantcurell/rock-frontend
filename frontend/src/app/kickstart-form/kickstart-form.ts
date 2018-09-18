@@ -113,15 +113,12 @@ export class AdvancedSettingsFormGroup extends FormGroup {
    * @param value 
    * @param options 
    */
-  // reset(value?: any, options?: {
-  //   onlySelf?: boolean;
-  //   emitEvent?: boolean;
-  // }): void{    
-  //   super.reset({'iso_url': this.iso_url.default_value,
-  //                'iso_path': this.iso_path.default_value,
-  //                'iso_checksum': this.iso_checksum.default_value
-  //   });
-  // }
+  reset(value?: any, options?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    super.reset({'timezone': this.timezone.default_value });    
+  }
 
   timezone = new HtmlDropDown(
     'timezone',
@@ -138,6 +135,7 @@ export class AdvancedSettingsFormGroup extends FormGroup {
     "This option is used to determine which operating system will be installed on each node.  By default the tfplenum should use centos.",
     'centos'
   )
+
 }
 
 export class NodesFormArray extends FormArray {
@@ -190,9 +188,10 @@ export class KickstartInventoryForm extends FormGroup {
   reset(value?: any, options?: {
     onlySelf?: boolean;
     emitEvent?: boolean;
-  }): void {
-    console.log("Reset");
+  }): void {    
     super.reset({'netmask': this.netmask.default_value });
+    this.advanced_settings.reset();
+    this.clearNodes();
   }
 
   advanced_settings = new AdvancedSettingsFormGroup(true);

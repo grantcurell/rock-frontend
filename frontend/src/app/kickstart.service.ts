@@ -42,7 +42,7 @@ export class KickstartService {
     //   );
 
     const url = '/api/gather_device_facts';
-    let post_payload = {"management_ip": management_ip, "password": password};    
+    let post_payload = {"management_ip": management_ip, "password": password};
     return this.http.post(url, post_payload , httpOptions).pipe(
       tap(data => this.mapDeviceFacts(data)),
       catchError(this.handleError('gatherDeviceFacts'))
@@ -64,12 +64,30 @@ export class KickstartService {
   }
 
   getKickstartForm(){
-    const url = '/api/get_kickstart_form'
+    const url = '/api/get_kickstart_form';
     return this.http.get(url)
       .pipe(        
         catchError(this.handleError('gatherDeviceFacts', []))
       );
   }
+
+  getArchivedKickstartForms(): Observable<Object> {
+    const url = '/api/get_kickstart_archived';
+    return this.http.get(url)
+      .pipe(
+        catchError(this.handleError('gatherDeviceFacts', []))
+      );
+  }
+
+  restoreArchivedKickstartForm(archiveId: string): Observable<Object> {
+    const url = '/api/restore_archived';
+    let post_payload = {"_id": archiveId};    
+    return this.http.post(url, post_payload , httpOptions)
+      .pipe(
+        catchError(this.handleError('gatherDeviceFacts', []))
+      );
+  }
+  
 
   generateKitInventory(kitForm: Object){
     const url = '/api/generate_kit_inventory';

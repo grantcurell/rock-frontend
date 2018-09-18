@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { HtmlModalPopUp, HtmlCheckBox, HtmlInput, HtmlDropDown, HtmlCardSelector } from '../html-elements';
+import { HtmlModalPopUp, HtmlDropDown, HtmlCardSelector, HtmlModalSelectDialog } from '../html-elements';
 import { KickstartInventoryForm, NodeFormGroup, AdvancedSettingsFormGroup } from './kickstart-form';
 import { KickstartService } from '../kickstart.service';
 import { FormArray, FormGroup, FormControl } from '@angular/forms';
@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 export class KickstartFormComponent implements OnInit {
   kickStartModal: HtmlModalPopUp;
   kickStartForm: KickstartInventoryForm;
+  restoreModal: HtmlModalSelectDialog;
   advancedSettingsFormGroup: AdvancedSettingsFormGroup;
   deviceFacts: Object;  
 
@@ -26,9 +27,10 @@ export class KickstartFormComponent implements OnInit {
               private title: Title, 
               private router: Router) 
   {    
-    this.kickStartForm = new KickstartInventoryForm();
+    this.kickStartForm = new KickstartInventoryForm();    
     this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;    
-    this.kickStartModal = new HtmlModalPopUp('kickstart_modal');    
+    this.kickStartModal = new HtmlModalPopUp('kickstart_modal');
+    this.restoreModal = new HtmlModalSelectDialog('restore_modal')
   }
 
   private _fill_up_array(formArrayLength: number){
@@ -91,21 +93,25 @@ export class KickstartFormComponent implements OnInit {
     this.initializeView();
   }
 
+  private initalizeForm(): void {
+    this.kickStartSrv.getKickstartForm().subscribe(data => {
+
+      if (this.monitorInterfaceSelector == undefined){
+        return;
+      }
+      this._map_to_form(data, this.kickStartForm);
+      //Fixes a bug so that I do not have to touch the box.
+      this.kickStartForm.re_password.updateValueAndValidity();
+    });
+  }
+
   private initializeView(): void {
     //This is asynchronous so the browser will not block until this returns.
     this.kickStartSrv.gatherDeviceFacts("localhost", "")
       .subscribe(data => {
         this.deviceFacts = data;
         this.kickStartForm.setInterfaceSelections(this.deviceFacts);
-        this.kickStartSrv.getKickstartForm().subscribe(data => {
-
-          if (this.monitorInterfaceSelector == undefined){
-            return;
-          }
-          this._map_to_form(data, this.kickStartForm);
-          //Fixes a bug so that I do not have to touch the box.
-          this.kickStartForm.re_password.updateValueAndValidity();
-        });
+        this.initalizeForm();
       });
   }
 
@@ -148,23 +154,40 @@ export class KickstartFormComponent implements OnInit {
     return this.kickStartForm.get('nodes') as FormArray;
   }
 
-  openModal() {
-    this.kickStartModal.openModal();
-  }
-
   openResetConfirmation() {
     this.kickStartModal.updateModal('WARNING',
       'Are you sure you want to archive this form? Doing so will erase any fields \
-      you have entered on the existing page but it will archive the form. NOTE: Archival restoration has not been developed.',
+      you have entered on the existing page but it will archive the form.',
       "Yes",
       'Cancel'
     )
     this.kickStartModal.openModal();
   }
+
+  openRestoreModal(){
+    console.log('openRestoreModal')
+  
+    this.kickStartSrv.getArchivedKickstartForms().subscribe(data => {
+      this.restoreModal.updateModal('Restore Form',
+        'Please select an archived Kickstart form.  Keep in mind restoring a form will remove your current configuration.',
+        "Restore",
+        'Cancel'
+      );
+      this.restoreModal.updateModalSelection(data);
+      this.restoreModal.openModal();
+    });    
+  }
   
   resetForm(){
     this.kickStartForm.reset();
     this.kickStartSrv.removeKickstartInventoryAndArchive().subscribe(data => {});
+  }
+
+  restoreForm(formId: string){
+    this.kickStartSrv.restoreArchivedKickstartForm(formId).subscribe(data => {
+      this.kickStartForm.reset();
+      this.initalizeForm();
+    });
   }
 
   /**
@@ -186,4 +209,5 @@ export class KickstartFormComponent implements OnInit {
       node.hostname.setValue(newHostname);
     }    
   }
+
 }

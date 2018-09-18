@@ -1,4 +1,6 @@
 <app-modal-dialog [modal]="kickStartModal" (primaryButtonClick)="resetForm()"></app-modal-dialog>
+<app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
+
 <div class="container" id="topheader">
   <div class="jumbotron">
     <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
@@ -10,6 +12,7 @@
         <div class="card-header">
             <button class="btn btn-primary" type="button" style="margin-right: 10px;" (click)="openConsole()">Open Console</button>
             <button class="btn btn-danger" type="button" (click)="openResetConfirmation()">Archive Form</button>
+            <button class="btn btn-primary" style="float: right;" type="button" (click)="openRestoreModal()">Restore Form</button>
         </div>
         <div class="card-body">
           <h5>DHCP Settings</h5>

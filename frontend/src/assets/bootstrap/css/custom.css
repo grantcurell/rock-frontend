@@ -147,3 +147,7 @@ body {
 hr {
     border-top: 1px solid white;
 }
+
+.modal-header {
+    background-color: #375a7f;
+}
