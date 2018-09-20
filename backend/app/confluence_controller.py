@@ -4,7 +4,7 @@ Main module for handling all of the Confluence REST calls.
 import pymongo
 
 from app import app
-from app import _tfplenum_database as mongo_database
+from app import conn_mng
 from app.common import NOTFOUND_RESPONSE
 from flask import jsonify, Response
 from pymongo.collection import Collection
@@ -23,7 +23,7 @@ def get_confluence_page(space_id: str, page_id: str) -> Response:
     :return: Response object with a json dictionary.
     """
     mongo_collection = "confluence_" + space_id.lower()
-    mongo_col = mongo_database[mongo_collection]  # type: Collection
+    mongo_col = conn_mng.mongo_database[mongo_collection]  # type: Collection
     result = mongo_col.find_one({"_id": page_id})
     if result:
         return jsonify(result)
@@ -33,7 +33,7 @@ def get_confluence_page(space_id: str, page_id: str) -> Response:
 
 @app.route('/api/get_spaces', methods=['GET'])
 def get_confluence_spaces() -> Response:
-    mongo_col = mongo_database["confluence_trees"]  # type: Collection
+    mongo_col = conn_mng.mongo_database["confluence_trees"]  # type: Collection
     json_docs = []
     spaces_cursor =  mongo_col.find({}, CONFLUENCE_SPACE_PROJECTION).sort("_id", pymongo.ASCENDING)
     if spaces_cursor:
@@ -54,7 +54,7 @@ def get_navbar(space_id: str) -> Response:
 
     :return: Response object with a json dictionary
     """
-    mongo_col = mongo_database["confluence_trees"]  # type: Collection
+    mongo_col = conn_mng.mongo_database["confluence_trees"]  # type: Collection
     result = mongo_col.find_one({"_id": space_id})
     if result:
         return jsonify(result['nav_tree'])

@@ -23,6 +23,7 @@ import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { environment } from '../environments/environment';
 import { ConfluenceComponent } from './confluence/confluence.component';
 import { ModalSelectDialogComponent } from './modal-select-dialog/modal-select-dialog.component';
+import { PortalComponent } from './portal/portal.component';
 
 const config: SocketIoConfig = environment.socket_config;
 
@@ -44,7 +45,8 @@ const config: SocketIoConfig = environment.socket_config;
     TotalSystemResourceCardComponent,
     ServerStdoutComponent,
     ConfluenceComponent,
-    ModalSelectDialogComponent
+    ModalSelectDialogComponent,
+    PortalComponent
   ],
   imports: [
     BrowserModule,

@@ -78,6 +78,18 @@ function _install_and_configure_gunicorn {
 	run_cmd systemctl enable tfplenum-frontend.service
 }
 
+function _setup_crontab {
+
+cat <<EOF > /etc/crontab
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+* * * * * root /opt/tfplenum-frontend/tfp-env/bin/python /opt/tfplenum-frontend/backend/fabfiles/update_portal_links.py
+EOF
+
+	run_cmd systemctl restart crond.service
+}
 
 function _install_and_start_mongo40 {
 cat <<EOF > /etc/yum.repos.d/mongodb-org-4.0.repo
@@ -103,5 +115,6 @@ _install_and_configure_gunicorn
 _install_and_start_mongo40
 _restart_services
 _open_firewall_ports
+_setup_crontab
 
 popd > /dev/null

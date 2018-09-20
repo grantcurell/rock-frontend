@@ -8,6 +8,9 @@ from app.node_facts import get_system_info
 from flask import request, jsonify, Response
 
 
+MIN_MBPS = 1000
+
+
 @app.route('/api/gather_device_facts', methods=['POST'])
 def gather_device_facts() -> Response:
     """

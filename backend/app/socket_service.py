@@ -1,4 +1,4 @@
-from app import socketio, mongo_console
+from app import socketio, conn_mng
 
 
 def log_to_console(job_name: str, jobid: str, text: str) -> None:
@@ -13,5 +13,5 @@ def log_to_console(job_name: str, jobid: str, text: str) -> None:
     log = {'jobName': job_name, 'jobid': jobid, 'log': text}
     socketio.emit('message', log, broadcast=True)
     #socketio.emit(jobid, log, broadcast=True, namespace='/console')
-    mongo_console.insert_one(log)
+    conn_mng.mongo_console.insert_one(log)
 

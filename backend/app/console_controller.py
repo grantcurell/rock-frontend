@@ -2,7 +2,7 @@
 Controller responsible for handling the scrolling
 console box when we kick off jobs.
 """
-from app import app, socketio, mongo_console
+from app import app, socketio, conn_mng
 from app.common import OK_RESPONSE
 from flask import request, jsonify, Response
 from flask_socketio import emit
@@ -30,7 +30,7 @@ def get_console_logs(job_name: str) -> Response:
 
     :param job_name: The name of the job (EX: Kickstart or Kit)
     """
-    logs = list(mongo_console.find({"jobName": job_name}, {'_id': False}))
+    logs = list(conn_mng.mongo_console.find({"jobName": job_name}, {'_id': False}))
     return jsonify(logs)
 
 
@@ -42,5 +42,5 @@ def remove_console_logs() -> Response:
     :return: OK Response.
     """
     payload = request.get_json()
-    mongo_console.delete_many({'jobName': payload['jobName']})
+    conn_mng.mongo_console.delete_many({'jobName': payload['jobName']})
     return OK_RESPONSE

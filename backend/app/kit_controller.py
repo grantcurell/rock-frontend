@@ -2,17 +2,14 @@
 Main module for handling all of the Kit Configuration REST calls.
 """
 import json
-from app import app, logger
-
+from app import app, logger, conn_mng
+from shared.constants import KIT_ID
 from app.inventory_generator import KitInventoryGenerator
 from app.job_manager import spawn_job
 from app.socket_service import log_to_console
 from app.common import OK_RESPONSE
 from flask import request, Response
 from typing import Dict
-
-
-MIN_MBPS = 1000
 
 
 def _set_sensor_type_counts(payload: Dict) -> None:
@@ -50,6 +47,10 @@ def generate_kit_inventory() -> Response:
 
     _set_sensor_type_counts(payload)
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
+    conn_mng.mongo_kit.find_one_and_replace({"_id": KIT_ID},
+                                            {"_id": KIT_ID, "payload": payload},
+                                            upsert=True)  # type: InsertOneResult
+
     kit_generator = KitInventoryGenerator(payload)
     kit_generator.generate()
     spawn_job("Kit",

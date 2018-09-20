@@ -5,9 +5,11 @@ import { KickstartFormComponent } from './kickstart-form/kickstart-form.componen
 import { KitFormComponent } from './kit-form/kit-form.component'
 import { ServerStdoutComponent } from './server-stdout/server-stdout.component'
 import { ConfluenceComponent } from './confluence/confluence.component'
+import { PortalComponent } from './portal/portal.component'
 
 const routes: Routes = [
-  { path: '', redirectTo: '/kickstart', pathMatch: 'full' },
+  { path: '', redirectTo: '/portal', pathMatch: 'full' },
+  { path: 'portal', component:  PortalComponent},
   { path: 'kickstart', component: KickstartFormComponent },
   { path: 'kit_configuration', component: KitFormComponent },
   { path: 'help', component: HelpComponent },    

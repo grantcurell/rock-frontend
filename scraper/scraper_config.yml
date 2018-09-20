@@ -2,8 +2,8 @@
 # Username and password are optional fields.  If you do not provide them, 
 # the scraper will prompt for them automatically.
 
-#username: <DIE2E Username>
-#password: <DIE2E Password>
+#username: 
+#password: 
 confluence_spaces:  
   - space_name: THISISCVAH
     site: https://confluence.di2e.net
@@ -15,13 +15,13 @@ confluence_spaces:
     clear_parameter_tags: True
     # The amount of time to sleep between attachment downloads and page pulls.
     sleep_export: 10
-  - space_name: OJCCTM
-    site: https://confluence.di2e.net
-    confluence_images_dir: /opt/tfplenum-frontend/frontend/src/assets/confluence/ojcctm/images/
-    confluence_attachments_dir: /opt/tfplenum-frontend/frontend/src/assets/confluence/ojcctm/attachments/
-    confluence_images_url_path: assets/confluence/ojcctm/images/
-    confluence_attachments_url_path: assets/confluence/ojcctm/attachments/
-    download_attachments: True
-    clear_parameter_tags: False
+ - space_name: OJCCTM
+   site: https://confluence.di2e.net
+   confluence_images_dir: /opt/tfplenum-frontend/frontend/src/assets/confluence/ojcctm/images/
+   confluence_attachments_dir: /opt/tfplenum-frontend/frontend/src/assets/confluence/ojcctm/attachments/
+   confluence_images_url_path: assets/confluence/ojcctm/images/
+   confluence_attachments_url_path: assets/confluence/ojcctm/attachments/
+   download_attachments: True
+   clear_parameter_tags: False
     # The amount of time to sleep between attachment downloads and page pulls.
-    sleep_export: 10
+   sleep_export: 10

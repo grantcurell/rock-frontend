@@ -3,18 +3,16 @@ Main module for handling all of the Kickstart Configuration REST calls.
 """
 import json
 
-from app import (app, logger, mongo_kickstart,
-                 mongo_kickstart_archive)
+from app import (app, logger, conn_mng)
 from app.inventory_generator import KickstartInventoryGenerator
 from app.job_manager import spawn_job
 from app.socket_service import log_to_console
 from app.common import OK_RESPONSE, ERROR_RESPONSE
+from shared.constants import KICKSTART_ID
 from datetime import datetime
 from flask import request, jsonify, Response
 from pymongo.results import InsertOneResult
 from bson import ObjectId
-
-KICKSTART_ID = {"_id": "kickstart_form"}
 
 
 @app.route('/api/generate_kickstart_inventory', methods=['POST'])
@@ -27,9 +25,9 @@ def generate_kickstart_inventory() -> Response:
     """
     payload = request.get_json()
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
-    mongo_kickstart.find_one_and_replace(KICKSTART_ID,
-                                         {"_id": "kickstart_form", "payload": payload},
-                                         upsert=True)  # type: InsertOneResult
+    conn_mng.mongo_kickstart.find_one_and_replace({"_id": KICKSTART_ID},
+                                                  {"_id": KICKSTART_ID, "payload": payload},
+                                                  upsert=True)  # type: InsertOneResult
 
     kickstart_generator = KickstartInventoryGenerator(payload)
     kickstart_generator.generate()
@@ -50,38 +48,12 @@ def remove_and_archive() -> Response:
 
     :return:
     """
-    kickstart_form = mongo_kickstart.find_one(KICKSTART_ID)
+    kickstart_form = conn_mng.mongo_kickstart.find_one({"_id": KICKSTART_ID})
     if kickstart_form is not None:
         del kickstart_form['_id']
         kickstart_form['archive_date'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        mongo_kickstart_archive.insert_one(kickstart_form)
-        mongo_kickstart.delete_one(KICKSTART_ID)
-    return OK_RESPONSE
-
-
-#TODO remove after testing.
-@app.route('/api/test', methods=["GET"])
-def throw_away_later() -> Response:
-    kickstart_form = {'payload': {'dhcp_start': '192.168.1.123', 'dhcp_end': '192.168.1.124', 'gateway': '192.168.1.1',
-                                  'netmask': '255.255.255.0', 'root_password': 'password2', 're_password': 'password2',
-                                  'controller_interface': ['192.168.1.75'], 'nodes': [
-            {'hostname': 'server1.lan', 'ip_address': '192.168.1.3', 'mac_address': 'aa:bb:cc:dd:ee:ff',
-             'boot_drive': 'sda', 'pxe_type': 'BIOS', 'node_type': 'Server'},
-            {'hostname': 'sensor2.lan', 'ip_address': '192.168.1.7', 'mac_address': 'aa:bb:cc:dd:ee:fa',
-             'boot_drive': 'sda', 'pxe_type': 'BIOS', 'node_type': 'Sensor'}], 'advanced_settings': {'timezone': None}},
-                      'archive_date': '2018-09-18 23:15:46'}
-
-    from time import sleep
-    for i in range(20):
-        sleep(2)
-        try:
-            del kickstart_form['_id']
-        except KeyError:
-            pass
-
-        kickstart_form['archive_date'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        mongo_kickstart_archive.insert_one(kickstart_form)
-
+        conn_mng.mongo_kickstart_archive.insert_one(kickstart_form)
+        conn_mng.mongo_kickstart.delete_one({"_id": KICKSTART_ID})
     return OK_RESPONSE
 
 
@@ -95,11 +67,11 @@ def restore_archived() -> Response:
     payload = request.get_json()
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
 
-    kickstart_form = mongo_kickstart_archive.find_one_and_delete({"_id": ObjectId(payload["_id"])})
+    kickstart_form = conn_mng.mongo_kickstart_archive.find_one_and_delete({"_id": ObjectId(payload["_id"])})
     if kickstart_form:
-        mongo_kickstart.find_one_and_replace(KICKSTART_ID,
-                                         {"_id": "kickstart_form", "payload": kickstart_form['payload']},
-                                         upsert=True)  # type: InsertOneResult
+        conn_mng.mongo_kickstart.find_one_and_replace({"_id": KICKSTART_ID},
+                                                      {"_id": KICKSTART_ID, "payload": kickstart_form['payload']},
+                                                      upsert=True)  # type: InsertOneResult
         return OK_RESPONSE
     return ERROR_RESPONSE
 
@@ -111,7 +83,7 @@ def get_archived_ids() -> Response:
     :return:
     """
     ret_val = []
-    result = mongo_kickstart_archive.find({}) #, projection={"_id": True, "archive_date": True}
+    result = conn_mng.mongo_kickstart_archive.find({})  # , projection={"_id": True, "archive_date": True}
     if result:
         for item in result:
             item["_id"] = str(item["_id"])
@@ -128,7 +100,7 @@ def get_kickstart_form() -> Response:
 
     :return:
     """
-    mongo_document = mongo_kickstart.find_one({"_id": "kickstart_form"})
+    mongo_document = conn_mng.mongo_kickstart.find_one({"_id": "kickstart_form"})
     if mongo_document is None:
         return OK_RESPONSE
 
