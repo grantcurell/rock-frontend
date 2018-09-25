@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { KickstartInventoryForm, NodeFormGroup } from '../kickstart-form/kickstart-form';
 import {ActivatedRoute} from '@angular/router';
 import { KitInventoryForm, SensorFormGroup, ServerFormGroup } from '../kit-form/kit-form';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormArray } from '@angular/forms';
 import { WHAT_IS_CEPH, HELP_ME_DECIDE } from '../frontend-constants'; 
 import { Title } from '@angular/platform-browser';
 
@@ -40,10 +40,10 @@ export class HelpComponent implements OnInit {
     this.route.fragment.subscribe(fragment => { this.fragment = fragment; });
   }
 
-  objectKeys(obj: any){    
+  objectKeys(obj: any){
     let ret_val = [];
     for (let item of Object.keys(obj)){
-      if (obj[item] instanceof FormControl){
+      if (obj[item] instanceof FormControl || obj[item] instanceof FormArray){
         ret_val.push(item);
       }
     }
@@ -55,9 +55,14 @@ export class HelpComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    if (this.fragment){
-      document.querySelector('#' + this.fragment).scrollIntoView();
-      window.scrollBy(0, -70);
+    console.log("ngAfterViewInit()");
+    console.log(this.fragment);
+    if (this.fragment){      
+      let elementRef = document.querySelector('#' + this.fragment);
+      elementRef.scrollIntoView();
+      setTimeout(() => {
+        window.scrollBy(0, -80);        
+      }, 1000);
     }
         
     $('.tooltip').remove();
