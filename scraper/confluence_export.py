@@ -382,7 +382,7 @@ def prompt_username() -> str:
     Prompts for username
     :return:
     """
-    username = raw_input("Please enter your username: ")    
+    username = input("Please enter your username: ")    
     return username
 
 

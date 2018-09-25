@@ -90,7 +90,6 @@ function _validateKubernetesCIDR(control: AbstractControl, errors: Array<string>
     }    
 }
 
-
 /**
  * Ensures at least home net is filled out.
  * 
@@ -106,6 +105,27 @@ function _validateHomeNet(control: AbstractControl, errors: Array<string>): void
         for (let i = 0; i < home_nets.length; i++){
             if (!home_nets.at(i).valid){
                 errors.push("- Your home nets are not valid. You need at least one home net.");
+                return;
+            }
+        }
+    }    
+}
+
+/**
+ * Ensures at least one external net is filled out.
+ * 
+ * @param control - The KitForm Group
+ * @param errors - An array of strings to display.
+ */
+function _validateExternalNet(control: AbstractControl, errors: Array<string>): void {
+    let sensor_resources = control.get('sensor_resources');
+    
+    if (sensor_resources != null){
+        let external_nets = sensor_resources.get('external_nets') as FormArray;
+        
+        for (let i = 0; i < external_nets.length; i++){
+            if (!external_nets.at(i).valid){
+                errors.push("- Your external nets are not valid. Remove it or enter a valid value.");
                 return;
             }
         }
@@ -235,6 +255,7 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
     _validateMasterServer(control, errors);
     _validateKubernetesCIDR(control, errors);
     _validateHomeNet(control, errors);
+    _validateExternalNet(control, errors);
     _validateHosts(control, errors);
     _validateIps(control, errors);
     _validateLogstashReplicas(control, errors);

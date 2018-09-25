@@ -67,5 +67,15 @@
           <app-text-input [parentForm]="home_net" controlName="home_net" (buttonClick)="removeHomeNet(i)"></app-text-input>          
         </div>
     </div>
+    <hr>
+    <h6 class="card-subtitle mb-2 text-muted">External NET Settings</h6>
+    <hr>
+    <button type="button" class="btn btn-primary" (click)="addExternalNet()">+ Add External Net</button>
+    <hr>
+    <div formArrayName="external_nets">
+      <div *ngFor="let external_net of external_nets.controls; let i=index">          
+        <app-text-input [parentForm]="external_net" controlName="external_net" (buttonClick)="removeExternalNet(i)"></app-text-input>          
+      </div>
+    </div>
   </div>
 </div>

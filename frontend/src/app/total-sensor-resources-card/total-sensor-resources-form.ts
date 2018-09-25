@@ -31,6 +31,30 @@ export class HomeNetFormGroup extends FormGroup {
     )
 }
 
+export class ExternalNetFormGroup extends FormGroup {
+    constructor() {
+        super({});
+        super.addControl('external_net', this.external_net);
+    }
+
+    external_net = new HtmlInput(
+        'external_net',
+        'External Net CIDR IP',
+        "Enter your external net CIDR IP here.",
+        'text',
+        CIDR_CONSTRAINT,
+        'You must enter a CIDR IP in the x.x.x.x/xx format.',
+        true,
+        '',
+        "These are the values Bro for its external nets.",
+        undefined,
+        undefined,
+        true,
+        'Remove',
+        'btn btn-danger'
+    )
+}
+
 /**
  * Main class which tracks the total resources for all of the sensors.
  */
@@ -67,7 +91,9 @@ export class SensorResourcesForm extends FormGroup {
         super.addControl('suricata_cpu_percentage', this.suricata_cpu_percentage);
         super.addControl('zookeeper_cpu_percentage', this.zookeeper_cpu_percentage);
         super.addControl('home_nets', this.home_nets);
+        super.addControl('external_nets', this.external_nets);
         this.addHomeNet();
+        this.addExternalNet();
         this.setPercentAllocated();
 
         super.addControl('kafka_cpu_request', this.kafka_cpu_request);
@@ -239,7 +265,26 @@ export class SensorResourcesForm extends FormGroup {
         }
     }
 
+    /**
+     * Adds a HomeNet FormGroup.
+     */
+    public addExternalNet(){
+        this.external_nets.push(new ExternalNetFormGroup());
+    }
+
+    /**
+     * Removes a External Net FormGroup from the external_nets Array by index.
+     * At one external net is required so we do not allow deletion of the
+     * last homenet.
+     * 
+     * @param index 
+     */
+    public removeExternalNet(index: number){        
+        this.external_nets.removeAt(index);
+    }
+
     home_nets = new FormArray([]);
+    external_nets = new FormArray([]);
     //Request values that get set in the actual inventory file. They are hidden inputs on the html form document.
     kafka_cpu_request = new HtmlHidden('kafka_cpu_request', false);
     moloch_cpu_request = new HtmlHidden('kafka_cpu_request', false);
