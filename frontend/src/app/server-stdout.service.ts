@@ -26,7 +26,7 @@ export class ServerStdoutService {
   }
 
   getConsoleOutput(jobName: string){
-    const url = `/api/generate_kit_inventory/${jobName}`;
+    const url = `/api/get_console_logs/${jobName}`;
     return this.http.get(url).pipe();
   }
 

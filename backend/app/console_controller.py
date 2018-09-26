@@ -2,7 +2,7 @@
 Controller responsible for handling the scrolling
 console box when we kick off jobs.
 """
-from app import app, socketio, conn_mng
+from app import app, socketio, conn_mng, logger
 from app.common import OK_RESPONSE
 from flask import request, jsonify, Response
 from flask_socketio import emit
@@ -18,12 +18,7 @@ def disconnect():
     print('Client disconnected')
 
 
-@socketio.on('message')
-def handle_message(msg):
-    emit('message', {'message': msg})
-
-
-@app.route('/api/generate_kit_inventory/<job_name>', methods=['GET'])
+@app.route('/api/get_console_logs/<job_name>', methods=['GET'])
 def get_console_logs(job_name: str) -> Response:
     """
     Gets the console logs by Job name.

@@ -14,13 +14,13 @@ export class ServerStdoutComponent implements OnInit {
   private consoleDiv: ElementRef;
   private jobName: string;
 
-  messages: Array<string>;
+  messages: Array<{msg: string, color: string}>;
   constructor(private stdoutService: ServerStdoutService, 
               private route: ActivatedRoute,
               private title: Title
             ) {
     this.title.setTitle("Console Output");
-    this.messages = new Array<string>();
+    this.messages = new Array<{msg: string, color: string}>();
     this.jobName = null;
   }
 
@@ -40,13 +40,19 @@ export class ServerStdoutComponent implements OnInit {
 
       this.stdoutService.getConsoleOutput(this.jobName).subscribe(data => {
         for (let item in data){
-          this.messages.push(data[item]['log']);  
+          //this.messages.push(data[item]['log']);  
+          this.messages.push({msg: data[item]['log'], color: data[item]['color']});
         }
+
+        setTimeout(() => {          
+          this.scrollToBottom();
+        }, 1000);
+        
       });  
     });
     
     this.stdoutService.getMessage().subscribe(data => {
-      this.messages.push(data['log']);
+      this.messages.push({msg: data['log'], color: data['color']});
       this.scrollToBottom();
     });
     
@@ -63,7 +69,7 @@ export class ServerStdoutComponent implements OnInit {
   private resizeConsole(){
     let height: string = "";
     if (window.innerHeight > 400){
-      height = (window.innerHeight - 300) + "px";
+      height = (window.innerHeight - 170) + "px";
     } else {
       height = "100px";
     }      
@@ -76,7 +82,7 @@ export class ServerStdoutComponent implements OnInit {
   }
 
   clearConsole() {
-    this.messages = new Array<string>();
+    this.messages = new Array<{msg: string, color: string}>();
     this.stdoutService.removeConsoleOutput({jobName: this.jobName, jobid: "Not Implemented"}).subscribe();
   }
 }

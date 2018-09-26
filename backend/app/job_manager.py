@@ -20,6 +20,43 @@ LOCK_IDS = {}
 class SynchronousIPLockException(Exception):
     def __init__(self, msg=""):
         super(SynchronousIPLockException, self).__init__(msg)
+    
+
+def _async_read2(job):
+    """
+    A synchronously read stdout
+
+    :param job: A proc job object     
+
+    :return: Return true if no ouput was sent to function pointer, false otherwise.
+    """    
+    if job.silent:
+        return
+    # set non-blocking flag while preserving old flags
+    fd = job.process.stdout
+    fd2 = job.process.stderr
+
+    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+    
+    fl2 = fcntl.fcntl(fd2, fcntl.F_GETFL)
+    fcntl.fcntl(fd2, fcntl.F_SETFL, fl2 | os.O_NONBLOCK)
+
+    # read char until EOF hit
+    ch = None
+    ch2 = None
+    try:
+        sleep(0.1)
+        ch = os.read(fd.fileno(), 1024)
+        job.run_output_func(ch)
+
+        ch2 = os.read(fd2.fileno(), 1024)
+        job.run_output_func(ch2)        
+    except OSError as e:
+        # waiting for data be available on fd
+        pass
+
+    return ch is None or ch == b''
 
 
 class ProcJob(object):
@@ -45,7 +82,7 @@ class ProcJob(object):
         """
         self.job_name = job_name
         self.job_id = str(uuid4())[-12:]
-        self.process = None
+        self.process = None  # type: subprocess.Popen
         self.funcToOperateOnOuput = func_output
         self.runAfterComplete = funcs_after
         self.runBeforeComplete = funcs_before
@@ -107,17 +144,19 @@ class ProcJob(object):
         Runs the process and sets the appropriate locks.
 
         :return:
-        """
+        """        
         if self.process is None:
             if self.working_directory is None:
                 self.process = subprocess.Popen(shlex.split(self.command),
                                                 shell=False,
-                                                stdout=subprocess.PIPE)
+                                                stdout=subprocess.PIPE,
+                                                stderr=subprocess.PIPE)
             else:
                 self.process = subprocess.Popen(shlex.split(self.command),
-                                               shell=False,
-                                               stdout=subprocess.PIPE,
-                                               cwd=self.working_directory)
+                                                shell=False,
+                                                stdout=subprocess.PIPE,
+                                                stderr=subprocess.PIPE,
+                                                cwd=self.working_directory)
             for ip in self.lock_ids:
                 LOCK_IDS[ip] = True
             logger.debug("IP_ADDRESS_LOCK size after add: %d" % len(LOCK_IDS))
@@ -142,7 +181,7 @@ class ProcJob(object):
         for func in self.runAfterComplete:
             func()
 
-    def run_output_func(self, msg: bytes) -> None:
+    def run_output_func(self, msg: bytes, is_stderr=False) -> None:
         """
         Passes a message to the output function.
 
@@ -152,7 +191,13 @@ class ProcJob(object):
         if self.funcToOperateOnOuput is None:
             return
 
-        self.funcToOperateOnOuput(self.job_name, self.job_id, msg.decode("utf-8"))
+        lines = msg.decode("utf-8").split('\n')
+        if is_stderr:
+            for line in lines:
+                self.funcToOperateOnOuput(self.job_name, self.job_id, line, 'red')
+        else:
+            for line in lines:
+                self.funcToOperateOnOuput(self.job_name, self.job_id, line)
 
     def run_job_clean_up(self, index):
         """
@@ -160,7 +205,11 @@ class ProcJob(object):
 
         :param index:
         :return:
-        """
+        """ 
+        while True:
+            if _async_read2(self):
+                break
+
         JOB_QUEUE.pop(index)
         for ip in self.lock_ids:
             LOCK_IDS.pop(ip, None)
@@ -185,24 +234,6 @@ def _async_read(fd):
         except OSError:
             # waiting for data be available on fd
             pass
-
-
-def _async_read2(job):
-    if job.silent:
-        return
-    # set non-blocking flag while preserving old flags
-    fd = job.process.stdout
-    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-    # read char until EOF hit
-    ch = None
-    try:
-        sleep(0.1)
-        ch = os.read(fd.fileno(), 1024)
-        job.run_output_func(ch)
-    except OSError as e:
-        # waiting for data be available on fd
-        pass
 
 
 def shell(command: str, async: bool=True) -> Tuple[bytes, bytes]:
@@ -268,8 +299,7 @@ def _spawn_jobqueue() -> None:
                     logger.debug("Completed: %s" % str(job))
                     if job_retval != 0:
                         logger.debug("Job return value was not 0. It was %d" % int(job_retval))
-
-                    _async_read2(job)
+                    
                     job.run_funcs_after_proc_completion()
                     job.run_job_clean_up(index)
                 elif job.is_zombie():

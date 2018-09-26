@@ -125,17 +125,8 @@ export class AdvancedSettingsFormGroup extends FormGroup {
     'Timezone',
     ['Chicago', 'Los_Angeles', 'New_York', 'UTC'],
     "This option is sets each node's timezone during the kickstart provisioning process (Automated Operating System installation).",
-    'Chicago'
+    'UTC'
   )
-
-  os_name = new HtmlDropDown(
-    'os_name',
-    'Operating System',
-    ['centos', 'rhel', 'coreos', 'atomic'],
-    "This option is used to determine which operating system will be installed on each node.  By default the tfplenum should use centos.",
-    'centos'
-  )
-
 }
 
 export class NodesFormArray extends FormArray {

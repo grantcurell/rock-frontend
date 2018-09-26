@@ -1,14 +1,9 @@
-<div class="container" id="topheader">
-  <div class="jumbotron">
-    <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
-    <p class="lead">We're really trying to make this easier!</p>
-  </div>
-
-  <div class="card">
+<div class="container-fluid" id="topheader">
+  <div class="card" style="margin-top: 80px;">
     <div class="card-header">
-        <button class="btn btn-danger" style="float: right;" (click)="clearConsole()">Clear Console</button>
+        <button class="btn btn-danger" style="float: right;" (click)="clearConsole()"><i class="icon_trash"></i> Clear Console</button>
     </div>
     <div #console class="card-body console">
-      <p *ngFor="let msg of messages">{{ msg }}</p>
+      <p *ngFor="let msg of messages"><span [style.color]="msg.color">{{ msg.msg }}</span></p>
     </div>  
 </div>
