@@ -43,6 +43,17 @@ function _validateDhcp(control: AbstractControl, errors: Array<string>): void {
     errors.push("- Invalid DHCP Range - Verify dhcp start and end fields.");
 }
 
+function _validateGateway(control: AbstractControl, errors: Array<string>): void{
+    let gateway_ctrl = control.get('gateway');
+    if (gateway_ctrl == null){
+        return;        
+    }
+
+    if (!gateway_ctrl.valid){
+        errors.push("- Invalid Gateway - It is either missing or did not validate correctly.");
+    }
+}
+
 function _validateDhcpRange(control: AbstractControl, errors: Array<string>): void {
 
     let controller_interface_ctrl = control.get('controller_interface') as FormArray;
@@ -145,6 +156,7 @@ export function ValidateKickStartInventoryForm(control: AbstractControl){
   _validateDhcp(control, errors);
   _validateDhcpRange(control, errors);
   _validateNodes(control, errors);
+  _validateGateway(control, errors);
 
   if (errors.length > 0){
     return { errors: errors};
