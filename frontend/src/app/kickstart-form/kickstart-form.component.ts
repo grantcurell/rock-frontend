@@ -7,6 +7,8 @@ import { Title } from '@angular/platform-browser';
 import { CardSelectorComponent } from '../card-selector/card-selector.component';
 import { Router } from '@angular/router';
 
+const NODE_PATTERN = new RegExp('^(server|sensor)[0-9]+[.]lan$');
+
 @Component({
   selector: 'app-kickstart-form',
   templateUrl: './kickstart-form.component.html',
@@ -190,6 +192,23 @@ export class KickstartFormComponent implements OnInit {
     });
   }
 
+  private _resetNodes(srvOrSensors: Array<NodeFormGroup>, isServer: boolean) {
+    for (let i = 0; i < srvOrSensors.length; i++) {
+      let node: NodeFormGroup = srvOrSensors[i];
+      let isMatch = NODE_PATTERN.test(node.hostname.value);
+
+      if (node.hostname.value == "" || isMatch == true) {
+        if (isServer) {
+          let newHostName: string = "server" + (i + 1) + '.lan';
+          node.hostname.setValue(newHostName);
+        } else {
+          let newHostName: string = "sensor" + (i + 1) + '.lan';
+          node.hostname.setValue(newHostName);
+        }
+      }
+    }
+  }
+
   /**
    * Triggered when a user selects a new nodeType for a given node.
    * 
@@ -197,17 +216,21 @@ export class KickstartFormComponent implements OnInit {
    * @param index - The current index the node is in the list.
    */
   nodeTypeChange(value: string, index: number): void {
-    let newHostname: string = value.toLocaleLowerCase() + (index + 1) + '.lan';
-    let compare1: string = "sensor" + (index + 1) + '.lan';
-    let compare2: string = "server" + (index + 1) + '.lan';
-    let node = this.kickStartForm.nodes.at(index) as NodeFormGroup;
-    
-    if (node.hostname.value == "" || 
-        node.hostname.value == compare1 || 
-        node.hostname.value == compare2)
-    {
-      node.hostname.setValue(newHostname);
-    }    
+    let sensorArray:Array<NodeFormGroup> = [];
+    let serverArray:Array<NodeFormGroup> = [];
+
+    for (let i = 0; i < this.kickStartForm.nodes.length; i++) {
+      let node = this.kickStartForm.nodes.at(i) as NodeFormGroup;      
+
+      if (node.node_type.value == "Server"){
+        serverArray.push(node);
+      } else if  (node.node_type.value == "Sensor"){
+        sensorArray.push(node);
+      }
+    }
+
+    this._resetNodes(sensorArray, false);
+    this._resetNodes(serverArray, true);        
   }
 
 }
