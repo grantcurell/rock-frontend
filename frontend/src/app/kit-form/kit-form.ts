@@ -75,15 +75,15 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
     }
 
     hostname = new HtmlHidden('hostname', true);
-
+    
     /**
      * Sets option selections for both interfaces and CEPH drives.
      */
-    public setOptionSelections(){
+    public setSensorOptionsSelections(managementIp: string){
         if (this.deviceFacts == null){
             return;
         }        
-
+        
         //Reset selections if user clicks on Gather facts twice.
         this.interfaceSelections = new Array();
         this.driveSelections = new Array();
@@ -93,6 +93,11 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
             if (item["name"] == 'lo'){
                 continue;
             }
+
+            if (item["ip_address"] == managementIp){
+                continue;
+            }
+
             this.interfaceSelections.push({value: item["name"], label: item["name"] + " - " + item["ip_address"]})
         }
     }    

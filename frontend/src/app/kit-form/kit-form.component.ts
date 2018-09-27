@@ -118,7 +118,7 @@ export class KitFormComponent implements OnInit {
       this._remove_sensor_cluster_storage(sensor.deviceFacts);
     }    
     this.kitForm.sensors.removeAt(index);
-  }
+  }  
 
   gatherFacts(node: ServerFormGroup | SensorFormGroup) {    
     
@@ -138,8 +138,12 @@ export class KitFormComponent implements OnInit {
 
       let hasDeviceFacts: boolean = (node.deviceFacts != null);
       node.deviceFacts = data;
-
-      node.setOptionSelections();
+      if (node instanceof ServerFormGroup){
+        node.setOptionSelections();
+      } else if (node instanceof SensorFormGroup){
+        node.setSensorOptionsSelections(node.host_server.value);
+      }
+      
       node.basicNodeResource.setFromDeviceFacts(node.deviceFacts);
 
       //Ensures we do not add additional compute power and memory by accident.
