@@ -164,6 +164,23 @@ function _validateHosts(control: AbstractControl, errors: Array<string>): void {
     }
 }
 
+function _validateSensorAndServerCounts(control: AbstractControl, errors: Array<string>): void {
+    let servers = control.get('servers') as ServersFormArray;
+    let sensors = control.get('sensors') as SensorsFormArray;
+
+    if (servers != null) {
+        if (servers.length < 1){
+            errors.push('- Invalid server count. You should have at least one server defined.');
+        }
+    }
+
+    if (sensors != null) {
+        if (sensors.length < 1){
+            errors.push('- Invalid sensor count. You should have at least one sensor defined.');
+        }
+    }
+}
+
 /**
  * Ensures that logstash replicas is set appropriatley.
  * 
@@ -259,6 +276,7 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
     _validateHosts(control, errors);
     _validateIps(control, errors);
     _validateLogstashReplicas(control, errors);
+    _validateSensorAndServerCounts(control, errors);
 
     if (!GetClusteredStorageValidated()){
         errors.push("- Clustered storage failed to validate. Make sure you have space for everything by checking the total system resources. Maybe you forgot to add a Ceph drive?");

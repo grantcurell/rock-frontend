@@ -75,7 +75,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
     }
 
     hostname = new HtmlHidden('hostname', true);
-    
+
     /**
      * Sets option selections for both interfaces and CEPH drives.
      */
@@ -112,7 +112,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         true,
         undefined,
         '',
-        'Looks good! Now hit \"Gather Facts\"! Heads up, once you add a server successfully, you can\'t remove it!',
+        'Looks good! Now hit \"Gather Facts\"!',
         undefined,
         true,
         'Gather Facts'
@@ -240,7 +240,7 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
         true,
         undefined,
         '',
-        'Looks good! Now hit \"Gather Facts\"! Heads up, once you add a server successfully, you can\'t remove it!',
+        'Looks good! Now hit \"Gather Facts\"!',
         undefined,
         true,
         'Gather Facts'

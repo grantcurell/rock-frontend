@@ -77,9 +77,11 @@ export class TotalServerResources extends FormGroup {
      * @param deviceFacts - The Ansible JSON object returned from the REST API.
      */
     public subtractFromDeviceFacts(deviceFacts: Object){
-        this.cpuCoresAvailable -= deviceFacts["cpus_available"];
-        this.memoryAvailable -= deviceFacts["memory_available"];
-        this.memoryAvailable = parseFloat(this.memoryAvailable.toFixed(2));
+        if (deviceFacts){
+            this.cpuCoresAvailable -= deviceFacts["cpus_available"];
+            this.memoryAvailable -= deviceFacts["memory_available"];
+            this.memoryAvailable = parseFloat(this.memoryAvailable.toFixed(2));
+        }
     }
 
     /**
