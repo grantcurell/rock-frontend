@@ -242,6 +242,10 @@ export class KitFormComponent implements OnInit {
   toggleAutocalculate(isChecked: boolean){
 
     if (isChecked){
+      this.kitForm.elastic_cpu_percentage.disable();
+      this.kitForm.elastic_memory_percentage.disable();
+      this.kitForm.elastic_storage_percentage.disable();
+
       this.kitForm.advanced_elasticsearch_settings.elastic_masters.enable();
       this.kitForm.advanced_elasticsearch_settings.elastic_datas.enable();
       this.kitForm.advanced_elasticsearch_settings.elastic_cpus.enable();
@@ -257,6 +261,10 @@ export class KitFormComponent implements OnInit {
         sensor.moloch_threads.enable();
       }
     } else {
+      this.kitForm.elastic_cpu_percentage.enable();
+      this.kitForm.elastic_memory_percentage.enable();
+      this.kitForm.elastic_storage_percentage.enable();
+
       this.kitForm.advanced_elasticsearch_settings.elastic_masters.disable();
       this.kitForm.advanced_elasticsearch_settings.elastic_datas.disable();
       this.kitForm.advanced_elasticsearch_settings.elastic_cpus.disable();
