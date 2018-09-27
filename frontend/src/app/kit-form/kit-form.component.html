@@ -122,7 +122,9 @@
             <div *ngIf="sensor.deviceFacts">
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local'" [parentForm]="sensor" [optionSelections]="sensor.driveSelections" 
+                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local' && kitForm.sensor_storage_type.value == kitForm.sensor_storage_type.options[1]" [parentForm]="sensor" [optionSelections]="sensor.driveSelections" 
+                                     controlName="pcap_drives"></app-card-selector>
+                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local' && kitForm.sensor_storage_type.value == kitForm.sensor_storage_type.options[0]" [parentForm]="sensor" [optionSelections]="sensor.driveSelections" 
                                      controlName="ceph_drives" (onSelect)="cephDriveSelected($event, sensor)"></app-card-selector>
                   <app-card-selector *ngIf="sensor.sensor_type.value == 'Remote'" [parentForm]="sensor" [optionSelections]="sensor.driveSelections"
                                      controlName="pcap_drives"></app-card-selector>

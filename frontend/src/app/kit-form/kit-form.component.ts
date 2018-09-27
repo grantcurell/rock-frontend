@@ -172,17 +172,24 @@ export class KitFormComponent implements OnInit {
   }
 
   sensorStorageChange(dropDownValue: string){
+    // Ceph
     if (dropDownValue == this.kitForm.sensor_storage_type.options[0]){
       this.kitForm.elastic_storage_percentage.setValue(30);
       this.kitForm.moloch_pcap_storage_percentage.setValue(60);
       this.isMolochPercentageHidden = false;
-
+      
       //TODO we need to recalculate the moloch pcap pv size here.
     } else {
+      // PCAP
       this.kitForm.elastic_storage_percentage.setValue(90);
       this.kitForm.moloch_pcap_storage_percentage.setValue(this.kitForm.moloch_pcap_storage_percentage.default_value);
       this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.setValue(0);
       this.isMolochPercentageHidden = true;
+      
+      for (let i = 0; i < this.kitForm.sensors.length; i++){
+        let sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
+        this._remove_sensor_cluster_storage(sensor.deviceFacts);
+      }
     }
 
     this.elasicSearchCalculator.calculate();
