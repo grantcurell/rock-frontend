@@ -178,9 +178,14 @@ export class KitFormComponent implements OnInit {
       this.kitForm.moloch_pcap_storage_percentage.setValue(60);
       this.isMolochPercentageHidden = false;
       
+      if (this.kitForm.disable_autocalculate.value){
+        this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.enable();
+      }
+
       //TODO we need to recalculate the moloch pcap pv size here.
     } else {
       // PCAP
+      this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.disable();
       this.kitForm.elastic_storage_percentage.setValue(90);
       this.kitForm.moloch_pcap_storage_percentage.setValue(this.kitForm.moloch_pcap_storage_percentage.default_value);
       this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.setValue(0);
@@ -249,6 +254,11 @@ export class KitFormComponent implements OnInit {
   toggleAutocalculate(isChecked: boolean){
 
     if (isChecked){
+      //CEPH for PCAP option
+      if (this.kitForm.sensor_storage_type.value == this.kitForm.sensor_storage_type.options[0] ){
+        this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.enable();
+      }
+
       this.kitForm.elastic_cpu_percentage.disable();
       this.kitForm.elastic_memory_percentage.disable();
       this.kitForm.elastic_storage_percentage.disable();
@@ -268,6 +278,7 @@ export class KitFormComponent implements OnInit {
         sensor.moloch_threads.enable();
       }
     } else {
+      this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.disable();
       this.kitForm.elastic_cpu_percentage.enable();
       this.kitForm.elastic_memory_percentage.enable();
       this.kitForm.elastic_storage_percentage.enable();

@@ -96,6 +96,7 @@ pre code {
 .form-control { 
     background-color: #222;
     color: #28a745;
+    height: inherit;
 }
 
 .form-control:active {
@@ -111,6 +112,8 @@ pre code {
     /* max-width: 200px; */
     width: 200px;
     word-wrap: break-word;
+    white-space: normal;
+    text-align: left;
 }
 
 dt {
