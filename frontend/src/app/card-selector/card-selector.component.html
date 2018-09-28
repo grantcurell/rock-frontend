@@ -8,11 +8,11 @@
       <p class="card-text text-danger">{{ input_control.card_notes }}</p>
     </div>
     <input *ngFor="let item of input_control.controls; let i=index" type="hidden" [formControlName]="i">
-    <div id="button_group" class="btn-group-vertical" role="group">        
-        <input *ngFor="let selection of optionSelections" type="button" (click)="selectedButton($event, selection)" required class="btn btn-primary" value="{{ selection.label }}">      
+    <div id="button_group" class="btn-group-vertical" role="group">
+        <input name="{{ controlName }}" *ngFor="let selection of optionSelections" type="button" (click)="selectedButton($event, selection)" required class="btn btn-primary" value="{{ selection.label }}">
       <div *ngIf="!optionSelections" class="alert alert-danger" role="alert">
         {{ input_control.invalid_feedback }}
-      </div>      
+      </div>
     </div>
   </div>
   <a routerLink="/help" target="_blank" fragment="{{ input_control.anchor }}">

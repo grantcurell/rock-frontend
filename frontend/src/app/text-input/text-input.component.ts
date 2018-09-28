@@ -10,19 +10,22 @@ declare var $: any;
   styleUrls: ['./text-input.component.css']
 })
 export class TextInputComponent implements OnInit {
-  
+
   @Input()
   public parentForm: FormGroup;
 
   @Input()
   public controlName: string;
 
+  @Input()
+  public uid: string;
+
   @Output()
   buttonClick: EventEmitter<any> = new EventEmitter();
 
   @Output()
   keyupEvent: EventEmitter<any> = new EventEmitter();
-  
+
   constructor() { }
 
   ngOnInit() { }
@@ -35,7 +38,7 @@ export class TextInputComponent implements OnInit {
     selector.tooltip();
   }
 
-  callParent(){    
+  callParent(){
     this.buttonClick.emit(null);
   }
 

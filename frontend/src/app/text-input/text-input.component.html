@@ -7,11 +7,12 @@
   </div>
   <div *ngIf="input_control.control_disabled">
     <input type="hidden"
-           formControlName="{{ controlName }}" 
+           formControlName="{{ controlName }}"
            [required]="input_control.required">
     <span style="margin-left: 10px;">{{ input_control.value }}</span>
   </div>
   <input *ngIf="!input_control.control_disabled"
+         name="{{ controlName }}{{ uid }}"
          formControlName="{{ controlName }}"
          class="form-control"
          [required]="input_control.required"
@@ -28,7 +29,7 @@
         <div>{{ input_control.getError('custom_error') }}</div>
       </div>
   </div>
-  
+
   <div *ngIf="input_control.valid" class="valid-feedback2">
     {{ input_control.valid_feedback }}
   </div>

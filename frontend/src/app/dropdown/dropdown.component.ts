@@ -15,12 +15,15 @@ export class DropdownComponent implements OnInit {
   @Input()
   public controlName: string;
 
+  @Input()
+  public uid: string;
+
   @Output()
   dropDownChanged: EventEmitter<any> = new EventEmitter();
 
   selectedValue: string;
 
-  constructor() {     
+  constructor() {
   }
 
   ngOnInit() {
@@ -34,7 +37,7 @@ export class DropdownComponent implements OnInit {
     this.triggerChangedEvent();
   }
 
-  get input_control(): HtmlDropDown { 
+  get input_control(): HtmlDropDown {
     return this.parentForm.get(this.controlName) as HtmlDropDown;
   }
 
