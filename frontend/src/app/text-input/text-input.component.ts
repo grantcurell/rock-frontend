@@ -34,7 +34,7 @@ export class TextInputComponent implements OnInit {
   }
 
   private update_tooltip(){
-    let selector = $('[name="'+this.controlName+'"]')
+    let selector = $('[name="tip_'+this.controlName+'"]')
     selector.tooltip();
   }
 

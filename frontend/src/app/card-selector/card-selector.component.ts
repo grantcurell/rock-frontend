@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { HtmlCardSelector } from '../html-elements';
 
+declare var $: any;
 
 @Component({
   selector: 'app-card-selector',
@@ -22,16 +23,28 @@ export class CardSelectorComponent implements OnInit {
   @Output()
   onSelect: EventEmitter<any> = new EventEmitter();
 
+  @ViewChild('button_group')
+  private buttonGroup: ElementRef;
+
   private htmlCardSelectorFormArray: HtmlCardSelector;
 
   constructor() { }
 
   ngOnInit() {
-    
+    console.log("ngOnInit()");
     this.htmlCardSelectorFormArray = this.parentForm.get(this.controlName) as HtmlCardSelector;
     //Fixes a bug when we rerender the same card selector.
     this.clearFormArray();
     this.setDefaultValues(this.htmlCardSelectorFormArray.default_selections);
+  }
+
+  ngAfterViewInit(){
+    this.update_tooltip();
+  }
+
+  private update_tooltip(){
+    let selector = $('[name="tip_'+this.controlName+'"]')
+    selector.tooltip();
   }
 
   private clearFormArray(){
@@ -40,9 +53,8 @@ export class CardSelectorComponent implements OnInit {
     }
   }
 
-  //TODO fixed this later as this is not the proper way to do things in angular.
-  private clearSelectedButtons() {    
-    let buttons = document.getElementById('button_group').children;
+  private clearSelectedButtons() {        
+    let buttons = this.buttonGroup['nativeElement']['children'];
     for (let _index in buttons) {
       if (buttons[_index]['value']) {
         buttons[_index]['value'] = buttons[_index]['value'].replace('- selected', '');

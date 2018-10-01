@@ -25,6 +25,9 @@
         <h5>Credentials</h5>
         <app-text-input [parentForm]="kitForm" controlName="root_password"></app-text-input>
         <br>
+        <h5>Ceph Settings</h5>
+        <app-checkbox [parentForm]="kitForm" controlName="ceph_redundancy"></app-checkbox>
+        <br>
         <h5>Elasticsearch Settings</h5>
         <app-text-input [parentForm]="kitForm" controlName="elastic_cpu_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
         <app-text-input [parentForm]="kitForm" controlName="elastic_memory_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>

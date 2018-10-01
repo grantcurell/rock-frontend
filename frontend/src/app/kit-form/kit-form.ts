@@ -748,6 +748,7 @@ export class KitInventoryForm extends FormGroup {
         super.addControl('advanced_kafka_settings', this.advanced_kafka_settings);
         super.addControl('dns_ip', this.dns_ip);
         super.addControl('disable_autocalculate', this.disable_autocalculate);
+        super.addControl('ceph_redundancy', this.ceph_redundancy);
 
         this.kubernetesCidrInfoText = "";
     }
@@ -955,5 +956,13 @@ export class KitInventoryForm extends FormGroup {
         to control the allocation of resources for Elasticsearch. The algorithm was based \
         on recommendations from Elasticsearch. However, you may disable these by unchecking \
         this checkbox."
+    )
+
+    ceph_redundancy = new HtmlCheckBox(
+        "ceph_redundancy",
+        "Ceph Redundancy",
+        "You can set how many OSD are allowed to fail without losing data. For replicated pools, it is the \
+        desired number of copies/replicas of an object. Our configuration stores an object and one \
+        additional copy, The check box will enable this."
     )
 }

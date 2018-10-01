@@ -120,8 +120,7 @@ export class KitFormComponent implements OnInit {
     this.kitForm.sensors.removeAt(index);
   }  
 
-  gatherFacts(node: ServerFormGroup | SensorFormGroup) {    
-    
+  gatherFacts(node: ServerFormGroup | SensorFormGroup) {
     this.kickStartSrv.gatherDeviceFacts(node.value["host_server"], this.kitForm.root_password.value)
     .subscribe(data => {      
 

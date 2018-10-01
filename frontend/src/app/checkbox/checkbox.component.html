@@ -10,7 +10,8 @@
       {{ input_control.label }}
     </label>
   </div>
-  <a routerLink="/help" target="_blank" fragment="{{ input_control.anchor }}">
+  <a routerLink="/help" target="_blank" name="tip_{{ controlName }}" data-placement="right" 
+     fragment="{{ input_control.anchor }}" title="{{ input_control.description }}">
     <label>What is this?</label>
   </a>
 </div>

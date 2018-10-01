@@ -2,6 +2,8 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { HtmlCheckBox } from '../html-elements';
 
+declare var $: any;
+
 @Component({
   selector: 'app-checkbox',
   templateUrl: './checkbox.component.html',
@@ -21,6 +23,15 @@ export class CheckboxComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+  }
+
+  ngAfterViewInit(){
+    this.update_tooltip();
+  }
+
+  private update_tooltip(){
+    let selector = $('[name="tip_'+this.controlName+'"]')
+    selector.tooltip();
   }
 
   get input_control(): HtmlCheckBox {

@@ -58,11 +58,23 @@ class KitInventoryGenerator:
     def __init__(self, json_dict: Dict):
         self._template_ctx = json_dict
 
+    def _map_ceph_redundancy(self) -> None:
+        """
+        Sets the ceph_redundancy value to the appropriate value before 
+        adding it to the inventory file.
+        :return:
+        """
+        if self._template_ctx["ceph_redundancy"]:
+            self._template_ctx["ceph_redundancy"] = 2
+        else:
+            self._template_ctx["ceph_redundancy"] = 1        
+
     def generate(self) -> None:
         """
         Generates the Kickstart inventory file in
         :return:
         """
+        self._map_ceph_redundancy()
         template = JINJA_ENV.get_template('inventory_template.yml')
         kit_template = template.render(template_ctx=self._template_ctx)
 

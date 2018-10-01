@@ -2,6 +2,8 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms'
 import { HtmlDropDown } from '../html-elements'
 
+declare var $: any;
+
 @Component({
   selector: 'app-dropdown',
   templateUrl: './dropdown.component.html',
@@ -29,6 +31,15 @@ export class DropdownComponent implements OnInit {
   ngOnInit() {
     let dropDown: HtmlDropDown = this.parentForm.get(this.controlName) as HtmlDropDown;
     this.selectValue(dropDown.default_value);
+  }
+
+  ngAfterViewInit(){
+    this.update_tooltip();
+  }
+
+  private update_tooltip(){
+    let selector = $('[name="tip_'+this.controlName+'"]')
+    selector.tooltip();
   }
 
   selectValue(newValue: string){

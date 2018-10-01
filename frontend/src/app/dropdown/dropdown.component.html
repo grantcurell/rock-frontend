@@ -1,6 +1,8 @@
 <div [formGroup]="parentForm" class="input-group mb-3">
   <div class="input-group-prepend">
-    <a routerLink="/help" fragment="{{ input_control.anchor }}">
+    <a routerLink="/help" fragment="{{ input_control.anchor }}" name="tip_{{ controlName }}" 
+       data-placement="right" 
+       title="{{ input_control.description }}">
       <span class="input-group-text">{{ input_control.label }}</span>
     </a>
   </div>

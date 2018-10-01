@@ -20,6 +20,11 @@ all:
     # DNS Server or the kit will break.
     dns_ip: {{ template_ctx.dns_ip }}
 
+    # You can set how many OSD are allowed to fail without losing data. For replicated pools, 
+    # it is the desired number of copies/replicas of an object. Our configuration stores an 
+    # object and one additional copy, The check box will enable this.
+    ceph_redundancy: {{ template_ctx.ceph_redundancy }}
+
     #############################
     # CPU Allocations           #
     #############################
