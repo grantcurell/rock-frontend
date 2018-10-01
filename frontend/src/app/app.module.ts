@@ -19,13 +19,10 @@ import { TotalSensorResourcesCardComponent } from './total-sensor-resources-card
 import { CardSelectorComponent } from './card-selector/card-selector.component';
 import { TotalSystemResourceCardComponent } from './total-system-resource-card/total-system-resource-card.component';
 import { ServerStdoutComponent } from './server-stdout/server-stdout.component';
-import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
-import { environment } from '../environments/environment';
 import { ConfluenceComponent } from './confluence/confluence.component';
 import { ModalSelectDialogComponent } from './modal-select-dialog/modal-select-dialog.component';
 import { PortalComponent } from './portal/portal.component';
 
-const config: SocketIoConfig = environment.socket_config;
 
 @NgModule({
   declarations: [
@@ -53,8 +50,7 @@ const config: SocketIoConfig = environment.socket_config;
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule,
-    SocketIoModule.forRoot(config)
+    HttpClientModule    
   ],
   providers: [],
   bootstrap: [AppComponent]

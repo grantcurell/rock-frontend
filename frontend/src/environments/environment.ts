@@ -3,8 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,  
-  socket_config: { url: 'http://tfplenum:5001', options: {} }
+  production: false  
 };
 
 /*

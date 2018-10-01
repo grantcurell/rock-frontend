@@ -39,8 +39,7 @@ export class ServerStdoutComponent implements OnInit {
       this.jobName = params['id'];
 
       this.stdoutService.getConsoleOutput(this.jobName).subscribe(data => {
-        for (let item in data){
-          //this.messages.push(data[item]['log']);  
+        for (let item in data){          
           this.messages.push({msg: data[item]['log'], color: data[item]['color']});
         }
 

@@ -50,6 +50,10 @@ export class KitFormComponent implements OnInit {
   ngOnInit() {
     this.title.setTitle("Kit Configuration");
     this.kickStartSrv.getKickstartForm().subscribe(data => {
+      if (!data){
+        return;
+      }
+
       this.kitForm.root_password.setDefaultValue(data["root_password"]);
 
       for (let node of data["nodes"]){
@@ -64,7 +68,7 @@ export class KitFormComponent implements OnInit {
     });
 
     this.storageCalculator.recalculate_storage_recommendation();
-    this.storageCalculator.validate_ceph_drive_count();
+    this.storageCalculator.validate_ceph_drive_count();    
   }
 
   onSubmit(){    

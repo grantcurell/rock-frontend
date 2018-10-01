@@ -17,6 +17,7 @@ const NODE_PATTERN = new RegExp('^(server|sensor)[0-9]+[.]lan$');
 export class KickstartFormComponent implements OnInit {
   kickStartModal: HtmlModalPopUp;
   kickStartForm: KickstartInventoryForm;
+  hasKickstartForm: boolean;
   restoreModal: HtmlModalSelectDialog;
   advancedSettingsFormGroup: AdvancedSettingsFormGroup;
   deviceFacts: Object;
@@ -32,7 +33,8 @@ export class KickstartFormComponent implements OnInit {
     this.kickStartForm = new KickstartInventoryForm();
     this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');
-    this.restoreModal = new HtmlModalSelectDialog('restore_modal')
+    this.restoreModal = new HtmlModalSelectDialog('restore_modal');
+    this.hasKickstartForm = false;
   }
 
   private _fill_up_array(formArrayLength: number){
@@ -92,7 +94,18 @@ export class KickstartFormComponent implements OnInit {
   }
 
   ngAfterViewInit(){
+    this.setKickstartForm();
     this.initializeView();
+  }
+
+  private setKickstartForm(): void {
+    this.kickStartSrv.getKickstartForm().subscribe(data => {
+      if (data){
+        this.hasKickstartForm = true;
+      } else {
+        this.hasKickstartForm = false;
+      }
+    });
   }
 
   private initalizeForm(): void {
@@ -113,8 +126,12 @@ export class KickstartFormComponent implements OnInit {
       .subscribe(data => {
         this.deviceFacts = data;
         this.kickStartForm.setInterfaceSelections(this.deviceFacts);
-        //this.initalizeForm();
       });
+  }
+
+  restorePreviousForm(): void {
+    this.kickStartForm.reset();
+    this.initalizeForm();
   }
 
   onSubmit(): void {

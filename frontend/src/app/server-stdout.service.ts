@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../environments/environment';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -10,18 +11,32 @@ export interface Message {
   message: string
 }
 
+export class MySocket extends Socket {
+ 
+  constructor() {
+    if (environment.production){
+      super({ url: window.location.origin, options: {} });      
+    } else {
+      super({ url: "http://" + window.location.hostname + ":5001", options: {} });
+    }
+  }
+
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ServerStdoutService {
-
-  constructor(private socket: Socket, private http: HttpClient) { }
+  private socket: Socket;
+  constructor(private http: HttpClient) { 
+    this.socket = new MySocket();
+  }
 
   sendMessage(msg: string){
     this.socket.emit("message", msg);
   }
 
-  getMessage(){
+  getMessage(){    
     return this.socket.fromEvent("message").pipe();
   }
 

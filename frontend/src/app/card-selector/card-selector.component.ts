@@ -30,8 +30,7 @@ export class CardSelectorComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-    console.log("ngOnInit()");
+  ngOnInit() {    
     this.htmlCardSelectorFormArray = this.parentForm.get(this.controlName) as HtmlCardSelector;
     //Fixes a bug when we rerender the same card selector.
     this.clearFormArray();
@@ -53,25 +52,21 @@ export class CardSelectorComponent implements OnInit {
     }
   }
 
-  private clearSelectedButtons() {        
-    let buttons = this.buttonGroup['nativeElement']['children'];
-    for (let _index in buttons) {
-      if (buttons[_index]['value']) {
-        buttons[_index]['value'] = buttons[_index]['value'].replace('- selected', '');
-      }
+  private clearSelectedOptionLabels(){
+    for (let i = 0; i < this.optionSelections.length; i++){
+      this.optionSelections[i].label = this.optionSelections[i].label.replace(' - selected', '');
     }
   }
 
   public setDefaultValues(selectedOptions: Array<string>){    
     this.clearFormArray();
-    this.clearSelectedButtons();
-
+    this.clearSelectedOptionLabels();
+    
     for (let default_value of selectedOptions){
-      //this.optionSelections.push();
       this.set_selectedValue(default_value);
-      for (let option of this.optionSelections){
-        if (option.value == default_value){
-          option.label = option.label + ' - selected';
+      for (let i = 0; i < this.optionSelections.length; i++){
+        if (this.optionSelections[i].value == default_value){
+          this.optionSelections[i].label = this.optionSelections[i].label + ' - selected';
         }
       }
     }
@@ -80,7 +75,7 @@ export class CardSelectorComponent implements OnInit {
   selectedButton(event, selection: { value: string, label: string }) {    
     if (!this.htmlCardSelectorFormArray.is_multi_select) {
       this.clearFormArray();
-      this.clearSelectedButtons();
+      this.clearSelectedOptionLabels();
     }
         
     if (selection.label.indexOf('selected') > -1){
