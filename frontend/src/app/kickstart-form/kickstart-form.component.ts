@@ -19,18 +19,18 @@ export class KickstartFormComponent implements OnInit {
   kickStartForm: KickstartInventoryForm;
   restoreModal: HtmlModalSelectDialog;
   advancedSettingsFormGroup: AdvancedSettingsFormGroup;
-  deviceFacts: Object;  
+  deviceFacts: Object;
 
   @ViewChild('cardSelector')
   monitorInterfaceSelector: CardSelectorComponent;
 
   //Magically Injected by Angular
-  constructor(private kickStartSrv: KickstartService, 
-              private title: Title, 
-              private router: Router) 
-  {    
-    this.kickStartForm = new KickstartInventoryForm();    
-    this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;    
+  constructor(private kickStartSrv: KickstartService,
+              private title: Title,
+              private router: Router)
+  {
+    this.kickStartForm = new KickstartInventoryForm();
+    this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');
     this.restoreModal = new HtmlModalSelectDialog('restore_modal')
   }
@@ -42,10 +42,10 @@ export class KickstartFormComponent implements OnInit {
   }
 
   private _set_form_control(control: FormControl | HtmlDropDown, value: any){
-    if (control instanceof HtmlDropDown){      
+    if (control instanceof HtmlDropDown){
       control.default_value = value;
       control.setValue(value);
-    
+
     } else if (control instanceof FormControl){
       control.setValue(value);
     }
@@ -53,34 +53,34 @@ export class KickstartFormComponent implements OnInit {
 
   /**
    * Maps our saved form object to view.
-   * 
+   *
    * @param data - The data to map
    * @param formGroup - The form group we are mapping our data too.
    */
   private _map_to_form(data: Object, formGroup: FormGroup){
-    for (let key in data){      
+    for (let key in data){
       let someFormObject = formGroup.get(key);
-  
-      if (someFormObject instanceof FormControl){              
+
+      if (someFormObject instanceof FormControl){
         this._set_form_control(someFormObject, data[key]);
-  
+
       } else if (someFormObject instanceof FormGroup){
         this._map_to_form(data[key], someFormObject);
-  
-      } else if (someFormObject instanceof HtmlCardSelector){        
+
+      } else if (someFormObject instanceof HtmlCardSelector){
         this.monitorInterfaceSelector.setDefaultValues(data[key]);
       } else if (someFormObject instanceof FormArray && data[key] instanceof Array){
         this._fill_up_array(data[key].length);
-        
+
         for (let index = 0; index < data[key].length; index++){
           let someFormArrayObj = someFormObject.at(index);
-          if (someFormArrayObj instanceof FormControl){            
+          if (someFormArrayObj instanceof FormControl){
             this._set_form_control(someFormArrayObj, data[key][index]);
           } else if (someFormArrayObj instanceof FormGroup){
             this._map_to_form(data[key][index], someFormArrayObj);
-          }   
+          }
         }
-      }    
+      }
     }
   }
 
@@ -88,7 +88,7 @@ export class KickstartFormComponent implements OnInit {
    * Executes after the constructor and after the view is rendered.
    */
   ngOnInit(): void {
-    this.title.setTitle("Kickstart Configuration");    
+    this.title.setTitle("Kickstart Configuration");
   }
 
   ngAfterViewInit(){
@@ -113,7 +113,7 @@ export class KickstartFormComponent implements OnInit {
       .subscribe(data => {
         this.deviceFacts = data;
         this.kickStartForm.setInterfaceSelections(this.deviceFacts);
-        this.initalizeForm();
+        //this.initalizeForm();
       });
   }
 
@@ -127,8 +127,8 @@ export class KickstartFormComponent implements OnInit {
   openConsole(){
     this.router.navigate(['/stdout/Kickstart'])
   }
-  
-  addNodes() {    
+
+  addNodes() {
     let nodeNumber: number = +this.kickStartForm.get('number_of_nodes')['value'];
     this.kickStartForm.clearNodes();
     for (let _i = 0; _i < nodeNumber; _i++){
@@ -149,7 +149,7 @@ export class KickstartFormComponent implements OnInit {
   }
 
   toggleAdvancedSettings(){
-    this.advancedSettingsFormGroup.hidden = !this.advancedSettingsFormGroup.hidden;    
+    this.advancedSettingsFormGroup.hidden = !this.advancedSettingsFormGroup.hidden;
   }
 
   get nodes() {
@@ -168,7 +168,7 @@ export class KickstartFormComponent implements OnInit {
 
   openRestoreModal(){
     console.log('openRestoreModal')
-  
+
     this.kickStartSrv.getArchivedKickstartForms().subscribe(data => {
       this.restoreModal.updateModal('Restore Form',
         'Please select an archived Kickstart form.  Keep in mind restoring a form will remove your current configuration.',
@@ -177,9 +177,9 @@ export class KickstartFormComponent implements OnInit {
       );
       this.restoreModal.updateModalSelection(data);
       this.restoreModal.openModal();
-    });    
+    });
   }
-  
+
   resetForm(){
     this.kickStartForm.reset();
     this.kickStartSrv.removeKickstartInventoryAndArchive().subscribe(data => {});
@@ -211,7 +211,7 @@ export class KickstartFormComponent implements OnInit {
 
   /**
    * Triggered when a user selects a new nodeType for a given node.
-   * 
+   *
    * @param value - The new value of the dropdown.
    * @param index - The current index the node is in the list.
    */
@@ -220,7 +220,7 @@ export class KickstartFormComponent implements OnInit {
     let serverArray:Array<NodeFormGroup> = [];
 
     for (let i = 0; i < this.kickStartForm.nodes.length; i++) {
-      let node = this.kickStartForm.nodes.at(i) as NodeFormGroup;      
+      let node = this.kickStartForm.nodes.at(i) as NodeFormGroup;
 
       if (node.node_type.value == "Server"){
         serverArray.push(node);
@@ -230,7 +230,7 @@ export class KickstartFormComponent implements OnInit {
     }
 
     this._resetNodes(sensorArray, false);
-    this._resetNodes(serverArray, true);        
+    this._resetNodes(serverArray, true);
   }
 
 }
