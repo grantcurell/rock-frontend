@@ -10,6 +10,10 @@ fi
 pushd $SCRIPT_DIR > /dev/null
 source ./common.in
 
+function _install_deps(){
+	yum -y install wget epel-release
+	yum -y install ansible
+}
 
 function _install_nodejs(){
     run_cmd wget https://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.xz
@@ -25,7 +29,8 @@ function _install_nodejs(){
 
 function _install_angular(){
     run_cmd npm install -g @angular/cli
-	pushd $FRONTEND_DIR/frontend > /dev/null	
+	pushd $FRONTEND_DIR/frontend > /dev/null
+	run_cmd npm update -g
     run_cmd npm install --save-dev @angular-devkit/build-angular	
     run_cmd npm install
 	popd > /dev/null
@@ -105,6 +110,7 @@ EOF
 }
 
 mkdir -p /var/log/tfplenum/
+_install_deps
 _install_nodejs
 _install_angular
 _install_python36

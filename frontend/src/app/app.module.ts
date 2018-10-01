@@ -33,7 +33,7 @@ const config: SocketIoConfig = environment.socket_config;
     TopNavbarComponent,
     KickstartFormComponent,
     HelpComponent,
-    TextInputComponent,    
+    TextInputComponent,
     DropdownComponent,
     CheckboxComponent,
     ModalDialogComponent,
@@ -54,7 +54,7 @@ const config: SocketIoConfig = environment.socket_config;
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    SocketIoModule.forRoot(config) 
+    SocketIoModule.forRoot(config)
   ],
   providers: [],
   bootstrap: [AppComponent]

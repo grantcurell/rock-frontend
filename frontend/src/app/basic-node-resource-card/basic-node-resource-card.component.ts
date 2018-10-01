@@ -10,25 +10,25 @@ export class BasicNodeResource {
   memory: number;
   total_drive_space: number;
 
-  constructor(){
+  constructor() {
     this.initializeValues();
   }
 
-  private initializeValues(){
+  private initializeValues() {
     this.cpu_cores = 0;
     this.memory = 0;
     this.total_drive_space = 0;
   }
 
-  public setFromDeviceFacts(deviceFacts: Object){
+  public setFromDeviceFacts(deviceFacts: Object) {
     this.initializeValues();
-    this.cpu_cores = deviceFacts["cpus_available"];
-    this.memory = deviceFacts["memory_available"];
+    this.cpu_cores = deviceFacts['cpus_available'];
+    this.memory = deviceFacts['memory_available'];
     this.memory = parseFloat(this.memory.toFixed(2));
 
     let total_space: number = 0;
-    for (let disk of deviceFacts["disks"]){
-      total_space += disk["size_gb"];
+    for (let disk of deviceFacts["disks"]) {
+      total_space += disk['size_gb'];
     }
 
     this.total_drive_space = total_space;
