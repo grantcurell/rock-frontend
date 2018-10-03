@@ -12,7 +12,7 @@ source ./common.in
 
 function _install_deps(){
 	yum -y install wget epel-release
-	yum -y install ansible
+	yum -y install ansible cockpit
 }
 
 function _install_nodejs(){
@@ -91,6 +91,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
 
 * * * * * root /opt/tfplenum-frontend/tfp-env/bin/python /opt/tfplenum-frontend/backend/fabfiles/update_portal_links.py
+* * * * * root /opt/tfplenum-frontend/tfp-env/bin/python /opt/tfplenum-frontend/backend/fabfiles/kubernetes_daemon.py
 EOF
 
 	run_cmd systemctl restart crond.service
@@ -122,5 +123,7 @@ _install_and_start_mongo40
 _restart_services
 _open_firewall_ports
 _setup_crontab
+run_cmd systemctl enable cockpit.service
+run_cmd systemctl start cockpit.service
 
 popd > /dev/null

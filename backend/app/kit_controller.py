@@ -3,12 +3,13 @@ Main module for handling all of the Kit Configuration REST calls.
 """
 import json
 from app import app, logger, conn_mng
-from shared.constants import KIT_ID
+from app.common import OK_RESPONSE
 from app.inventory_generator import KitInventoryGenerator
 from app.job_manager import spawn_job
 from app.socket_service import log_to_console
-from app.common import OK_RESPONSE
 from flask import request, Response
+from pymongo.collection import ReturnDocument
+from shared.constants import KIT_ID
 from typing import Dict
 
 
@@ -46,16 +47,25 @@ def generate_kit_inventory() -> Response:
         payload['use_ceph_for_pcap'] = True
 
     _set_sensor_type_counts(payload)
+    
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
-    conn_mng.mongo_kit.find_one_and_replace({"_id": KIT_ID},
+    current_kit_configuration = conn_mng.mongo_kit.find_one_and_replace({"_id": KIT_ID},
                                             {"_id": KIT_ID, "payload": payload},
-                                            upsert=True)  # type: InsertOneResult
+                                            upsert=True,
+                                            return_document=ReturnDocument.AFTER)  # type: InsertOneResult
 
-    kit_generator = KitInventoryGenerator(payload)
-    kit_generator.generate()
-    spawn_job("Kit",
-              "make",
-              ["kit"],
-              log_to_console,
-              working_directory="/opt/tfplenum/playbooks")
-    return OK_RESPONSE
+    if current_kit_configuration:
+        if current_kit_configuration["payload"] and current_kit_configuration["payload"]["root_password"]:            
+            kit_generator = KitInventoryGenerator(payload)
+            kit_generator.generate()
+            cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + 
+                              current_kit_configuration["payload"]["root_password"] + "' site.yml")
+            spawn_job("Kit",
+                    cmd_to_execute,
+                    ["kit"],
+                    log_to_console,
+                    working_directory="/opt/tfplenum/playbooks")
+            return OK_RESPONSE
+
+    logger.error("Executing Kig configuration has failed.")
+    return ERROR_RESPONSE

@@ -65,7 +65,8 @@ export interface HtmlCardSelectorInterface {
 export enum ModalType {
   general = 1,
   error,
-  success
+  success,
+  code
 }
 
 export interface HtmlModalPopUpInterface {
@@ -114,7 +115,7 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
   } 
 
   updateModal(title: string, text: string,
-    primary_button_text: string, secondary_button_text?: string,
+    primary_button_text: string, secondary_button_text?: string,    
     type: ModalType = ModalType.general) {    
     this._title = title;
     this._text = text;

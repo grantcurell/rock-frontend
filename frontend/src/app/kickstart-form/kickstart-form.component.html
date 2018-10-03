@@ -2,10 +2,6 @@
 <app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
 
 <div class="container" id="topheader">
-  <div class="jumbotron">
-    <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
-    <p class="lead">We're really trying to make this easier!</p>
-  </div>
   <div id="main_form">
     <form [formGroup]="kickStartForm" (ngSubmit)="onSubmit()">
       <div class="card">

@@ -1,26 +1,21 @@
 <div class="container" id="topheader">
-  <div class="jumbotron">
-    <h1 class="display-4">TFPlenum Kickstart Configuration</h1>
-    <p class="lead">We're really trying to make this easier!</p>
-  </div>
-
   <div class="card">
+    <div class="card-header">
+      Dashboard Links
+    </div>
     <table class="table">
       <thead>
-        <tr>
-          <th scope="col">#</th>
+        <tr>          
           <th scope="col">IP</th>
           <th scope="col">URL</th>          
         </tr>
       </thead>
       <tbody #selections >
-        <tr *ngFor="let link of links; let i=index">
-          <td>{{ i }}</td>
+        <tr *ngFor="let link of links">          
           <td><a href="{{ link.ip }}" target="_blank">{{ link.ip }}</a></td>
           <td><a href="{{ link.dns }}" target="_blank">{{ link.dns }}</a></td>
         </tr>             
       </tbody>
     </table>
   </div>
-
 </div>

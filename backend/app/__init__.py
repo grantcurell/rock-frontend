@@ -2,10 +2,9 @@
 Main __init__.py module that initializes the
 REST interface for the frontend application.
 """
-print("app__init__.py")
 import logging
 
-from app.mongo_connection_mng import MongoConnectionManager
+from shared.mongo_connection_mng import MongoConnectionManager
 from flask_cors import CORS
 from flask import Flask
 from flask_socketio import SocketIO
@@ -58,3 +57,4 @@ from app import kickstart_controller
 from app import kit_controller
 from app import confluence_controller
 from app import portal_controller
+from app import health_controller

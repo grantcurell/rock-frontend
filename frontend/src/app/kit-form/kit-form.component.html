@@ -1,9 +1,5 @@
 <app-modal-dialog [modal]="kitModal"></app-modal-dialog>
-<div class="container" id="topheader">
-  <div class="jumbotron">
-    <h1 class="display-4">TFPlenum Kit Configuration</h1>
-    <p class="lead">We're really trying to make this easier!</p>
-  </div>
+<div class="container" id="topheader">  
   <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">
     <br>
     <div class="card">

@@ -9,7 +9,6 @@ class MongoConnectionManager(object):
     """
 
     def __init__(self):
-        print("MongoConnectionManager __init__")
         self._client = MongoClient('mongodb://localhost:27017/')
         self._tfplenum_database = self._client.tfplenum_database  # type: Database
 
@@ -67,13 +66,30 @@ class MongoConnectionManager(object):
         """
         return self._tfplenum_database.portal
 
+    @property
+    def mongo_kubernetes_pods(self) -> Collection:
+        """
+        Returns a mongo object that can do database manipulations.
+
+        :return:
+        """
+        return self._tfplenum_database.kubernetes_pods
+
+    @property
+    def mongo_kubernetes_nodes(self) -> Collection:
+        """
+        Returns a mongo object that can do database manipulations.
+
+        :return:
+        """
+        return self._tfplenum_database.kubernetes_nodes
+
     def __enter__(self):
         """
         Function executes within a given contenxt  (IE: with MongoConnectionManager() as mng:)
 
         :return:
-        """
-        print("enter")
+        """        
         return self
 
     def __exit__(self, *exc) -> None:
@@ -85,6 +101,5 @@ class MongoConnectionManager(object):
         :param exc_tb:
         :return:
         """
-        print("__exit__")
         if self._client:
             self._client.close()

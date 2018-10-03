@@ -1,0 +1,62 @@
+<app-modal-dialog [modal]="podDescribeModal"></app-modal-dialog>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      Node Health <button class="btn btn-primary" style="float: right;" (click)="performSystemsCheck()"><i class="icon_genius"></i> Perform Systems Check</button>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">IP Address</th>
+            <th scope="col">Ready</th>
+            <th scope="col">Out of Disk</th>
+            <th scope="col">Memory Pressure</th>
+            <th scope="col">Disk Pressure</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let node of nodeStatuses; let i=index">
+            <td><a title="Click me" (click)="openNodeInfo(node.metadata.name, node.status.node_info)">{{ node.metadata.name }}</a></td>
+            <td>{{ node.metadata.public_ip }}</td>
+            <td><a title="{{ node.status.conditions[3].message }}">{{ node.status.conditions[3].status }}</a></td>
+            <td><a title="{{ node.status.conditions[0].message }}">{{ node.status.conditions[0].status }}</a></td>
+            <td><a title="{{ node.status.conditions[1].message }}">{{ node.status.conditions[1].status }}</a></td>
+            <td><a title="{{ node.status.conditions[2].message }}">{{ node.status.conditions[2].status }}</a></td>
+            <td><button class="btn btn-primary" (click)="describeNode(node.metadata.name)"><i class="icon_info_alt"></i></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <br>
+  <div class="card">
+    <div class="card-header">
+      Pod Health
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Namespace</th>
+            <th scope="col">Name</th>
+            <th scope="col">Pod State</th>
+            <th scope="col">Restart Count</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pod of podsStatuses; let i=index">
+            <td>{{ pod.metadata.namespace }}</td>
+            <td><a title="Click me" (click)="openPodStatusInfo(pod.metadata.name, pod.status)">{{ pod.metadata.name }}</a></td>
+            <td>{{ pod.status.phase }}</td>
+            <td>{{ pod.status.container_statuses[0].restart_count }}</td>
+            <td><button class="btn btn-primary" (click)="describePod(pod.metadata.name)"><i class="icon_info_alt"></i></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>  
+</div>

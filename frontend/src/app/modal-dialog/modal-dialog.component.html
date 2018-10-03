@@ -1,4 +1,3 @@
-<!-- primary_button_text: string; -->
 <div class="modal fade" id="{{ modal.id }}" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -8,8 +7,15 @@
           <span aria-hidden="true">×</span>
         </button>
       </div>
-      <div class="modal-body">
-          {{ modal.text }}
+      <div class="modal-body">      
+        <div *ngIf="isGeneral()">          
+          {{ modal.text }}            
+        </div>
+        <div *ngIf="isCode()">
+          <pre>
+<code>{{ modal.text }}</code>
+          </pre>
+        </div>
       </div>
       <div class="modal-footer">
         <button *ngIf="modal.secondary_button_text" type="button" class="btn btn-secondary" data-dismiss="modal">{{ modal.secondary_button_text }}</button>

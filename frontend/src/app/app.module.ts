@@ -22,6 +22,9 @@ import { ServerStdoutComponent } from './server-stdout/server-stdout.component';
 import { ConfluenceComponent } from './confluence/confluence.component';
 import { ModalSelectDialogComponent } from './modal-select-dialog/modal-select-dialog.component';
 import { PortalComponent } from './portal/portal.component';
+import { SystemHealthComponent } from './system-health/system-health.component';
+import { SafePipe } from './globals';
+import { TerminalComponent } from './terminal/terminal.component'; 
 
 
 @NgModule({
@@ -43,7 +46,10 @@ import { PortalComponent } from './portal/portal.component';
     ServerStdoutComponent,
     ConfluenceComponent,
     ModalSelectDialogComponent,
-    PortalComponent
+    PortalComponent,
+    SystemHealthComponent,
+    SafePipe,
+    TerminalComponent
   ],
   imports: [
     BrowserModule,

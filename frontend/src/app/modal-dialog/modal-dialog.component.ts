@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { HtmlModalPopUp } from '../html-elements';
+import { HtmlModalPopUp, ModalType } from '../html-elements';
 
 @Component({
   selector: 'app-modal-dialog',
@@ -23,4 +23,11 @@ export class ModalDialogComponent implements OnInit {
     this.primaryButtonClick.emit(event);
   }
 
+  isCode(){
+    return this.modal.type === ModalType.code;
+  }
+
+  isGeneral(){
+    return this.modal.type === ModalType.general;
+  }
 }

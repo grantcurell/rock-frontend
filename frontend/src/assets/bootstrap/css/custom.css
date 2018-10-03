@@ -106,7 +106,6 @@ pre code {
 .form-control:focus {
     background-color: lightgrey;
 }
-    
 
 .input-group-text {
     /* max-width: 200px; */
@@ -128,13 +127,50 @@ p {
     color: lightgreen;
 }
 
-.card-header {
-    background-color: #375a7f;
+.card {
+    background-color: #101010;
 }
 
 .btn-primary {
-    background-color: #0C2B4C;
-    border-color: #0C2B4C;
+    /* background-color: #0C2B4C;
+    border-color: #0C2B4C; */
+    background-color: #007053;
+    border-color: #006400;
+}
+
+.btn-primary:hover {
+    background-color: #006400;
+    border-color: #007053;
+}
+
+.btn-primary.disabled, .btn-primary:disabled { 
+    background-color: #007053;
+    border-color: #006400;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show>.btn-primary.dropdown-toggle {
+    background-color: #006400;
+    border-color: #007053;
+}
+
+.btn-secondary {
+    background-color: #222;
+    border-color: #333;
+}
+
+.btn-secondary:hover {    
+    background-color: #313131;
+    border-color: #2b2a2a;
+}
+
+.btn-danger {
+    background-color: #e12e1c;
+    border-color: #d62c1a;
+}
+
+.btn-danger:hover {
+    background-color: #B22222;
+    border-color: #E74C3C;
 }
 
 .tooltip-inner {
@@ -152,5 +188,21 @@ hr {
 }
 
 .modal-header {
-    background-color: #375a7f;
+    background-color: #101010;
+}
+
+.modal-title {
+    color: lightgreen;
+}
+
+.bg-primary {
+    background-color: #101010 !important;
+}
+
+.container {
+    margin-top: 80px;
+}
+
+a {
+    color: #0f0;
 }

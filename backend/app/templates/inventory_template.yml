@@ -286,7 +286,7 @@ all:
               # This is the drive you will use. Ex: /dev/sdb. This is only used
               # if use_ceph_for_pcap is set to false. moloch_pcap_folder must be defined
               # for this to work. moloch_pcap_folder will be the mount point.
-              #TODO pcap_disk: % if attributes.pcap_disk is not none %{ "/dev/" + attributes.pcap_disk }% endif %
+              pcap_disk: {% if sensor.pcap_drives is not none %}{{ "/dev/" + sensor.pcap_drives[0] }}{% endif %}
 
               # These are the disks you will use for Ceph. These must be devices.
               # This cannot be a folder or partition. Ex: /dev/vdb. You may have

@@ -230,13 +230,13 @@ def _async_read(fd):
             # EOF
             if not ch:
                 break
-            sys.stdout.write(ch)
+            sys.stdout.write(ch.decode("utf-8"))
         except OSError:
             # waiting for data be available on fd
             pass
 
 
-def shell(command: str, async: bool=True) -> Tuple[bytes, bytes]:
+def shell(command: str, async: bool=False, working_dir=None) -> Tuple[bytes, bytes]:
     """
     Runs a command and returns std out and stderr.
 
@@ -246,7 +246,11 @@ def shell(command: str, async: bool=True) -> Tuple[bytes, bytes]:
     """
     sout = None
     serr = None
-    proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    proc = None
+    if working_dir:
+        proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir)
+    else:    
+        proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     if async:
         _async_read(proc.stdout)
     else:
