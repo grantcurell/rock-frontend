@@ -1,15 +1,8 @@
 """
 Module is responsible for updating the links for the portal page.
 """
-import os
-import sys
-from fabric import Connection
+from connection_wrappers import FabricConnectionWrapper, MongoConnectionManager
 from fabric.runners import Result
-from fabric_wrapper import FabricConnectionWrapper
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
-from shared.mongo_connection_mng import MongoConnectionManager
 from shared.constants import PORTAL_ID
 
 

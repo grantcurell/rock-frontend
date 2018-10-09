@@ -2,7 +2,7 @@
 Main module used for saving any kubernetes information about nodes.
 """
 import sys
-from fabric_wrapper import FabricConnectionWrapper
+from connection_wrappers import FabricConnectionWrapper
 
 
 def describe_node(node_name: str):

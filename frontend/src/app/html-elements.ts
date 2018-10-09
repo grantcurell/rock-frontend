@@ -1,5 +1,6 @@
 import { FormControl, Validators, AsyncValidatorFn, 
-        ValidatorFn, AbstractControlOptions, FormArray } from '@angular/forms';
+        ValidatorFn, AbstractControlOptions, 
+        FormArray, FormGroup } from '@angular/forms';
 
 declare var $: any;
 
@@ -66,7 +67,8 @@ export enum ModalType {
   general = 1,
   error,
   success,
-  code
+  code,
+  form
 }
 
 export interface HtmlModalPopUpInterface {
@@ -84,10 +86,16 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
   private _primary_button_text?: string;
   private _secondary_button_text?: string;
   private _type: ModalType;
+  private _primaryButtonCssClass: string;
+  private _modalForm: FormGroup;
 
   constructor(id: string,
   ) {
     this._id = id;
+  }
+
+  get primaryButtonCssClass(): string {
+    return this._primaryButtonCssClass;
   }
 
   get id(): string {
@@ -112,16 +120,31 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
 
   get type(): ModalType {
     return this._type;
-  } 
+  }
+
+  get modalForm(): FormGroup {
+    return this._modalForm;
+  }
 
   updateModal(title: string, text: string,
     primary_button_text: string, secondary_button_text?: string,    
-    type: ModalType = ModalType.general) {    
+    type: ModalType = ModalType.general, modalForm: FormGroup = null) {    
     this._title = title;
     this._text = text;
     this._primary_button_text = primary_button_text;
     this._secondary_button_text = secondary_button_text;
     this._type = type;
+
+    this._primaryButtonCssClass = "btn btn-primary";
+    if (this._type === ModalType.error){
+      this._primaryButtonCssClass = "btn btn-danger";
+    }
+
+    if (this._type === ModalType.form){
+      this._modalForm = modalForm;
+    } else {
+      this._modalForm = null;
+    }
   }
 
   openModal() {

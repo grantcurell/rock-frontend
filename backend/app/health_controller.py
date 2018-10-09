@@ -22,7 +22,7 @@ def describe_pod(pod_name: str) -> Response:
                      You can get it with 'kubectl get pods' on the main server node.
     """
     command = '/opt/tfplenum-frontend/tfp-env/bin/python describe_kubernetes_pod.py %s' % pod_name
-    stdout, stderr = shell(command, working_dir="/opt/tfplenum-frontend/backend/fabfiles")        
+    stdout, stderr = shell(command, working_dir="/opt/tfplenum-frontend/backend/fabfiles")
 
     if stdout:
         stdout = stdout.decode('utf-8')        

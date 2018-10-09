@@ -1,6 +1,6 @@
 <div class="modal fade" id="{{ modal.id }}" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    <div class="modal-content">
+    <div *ngIf="!isFormType()" class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{{ modal.title }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -8,7 +8,10 @@
         </button>
       </div>
       <div class="modal-body">      
-        <div *ngIf="isGeneral()">          
+        <div *ngIf="isGeneral()">
+          {{ modal.text }}
+        </div>
+        <div *ngIf="isError()">
           {{ modal.text }}            
         </div>
         <div *ngIf="isCode()">
@@ -19,8 +22,30 @@
       </div>
       <div class="modal-footer">
         <button *ngIf="modal.secondary_button_text" type="button" class="btn btn-secondary" data-dismiss="modal">{{ modal.secondary_button_text }}</button>
-        <button *ngIf="modal.primary_button_text" type="button" class="btn btn-primary" data-dismiss="modal" (click)="triggerPrimaryClickEvent($event)">{{ modal.primary_button_text }}</button>
+        <button *ngIf="modal.primary_button_text" type="button" [class]="modal.primaryButtonCssClass" data-dismiss="modal" (click)="triggerPrimaryClickEvent($event)">{{ modal.primary_button_text }}</button>
       </div>
+    </div>
+
+    <div *ngIf="isFormType()" class="modal-content">
+      <form [formGroup]="modal.modalForm" (ngSubmit)="onSubmit()">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modal.title }}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="text-info">{{ modal.text }}</div>
+          <br>
+          <div>
+            <app-text-input *ngFor="let controlName of objectKeys(modal.modalForm.controls)" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-text-input>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button *ngIf="modal.secondary_button_text" type="button" class="btn btn-secondary" data-dismiss="modal">{{ modal.secondary_button_text }}</button>
+          <button *ngIf="modal.primary_button_text" class="btn btn-primary" type="submit" [disabled]="!modal.modalForm.valid">{{ modal.primary_button_text }}</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

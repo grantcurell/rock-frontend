@@ -24,7 +24,9 @@ import { ModalSelectDialogComponent } from './modal-select-dialog/modal-select-d
 import { PortalComponent } from './portal/portal.component';
 import { SystemHealthComponent } from './system-health/system-health.component';
 import { SafePipe } from './globals';
-import { TerminalComponent } from './terminal/terminal.component'; 
+import { TerminalComponent } from './terminal/terminal.component';
+import { ConfigmapsComponent } from './configmaps/configmaps.component';
+import { ConfigmapEditorComponent } from './configmap-editor/configmap-editor.component'; 
 
 
 @NgModule({
@@ -49,7 +51,9 @@ import { TerminalComponent } from './terminal/terminal.component';
     PortalComponent,
     SystemHealthComponent,
     SafePipe,
-    TerminalComponent
+    TerminalComponent,
+    ConfigmapsComponent,
+    ConfigmapEditorComponent
   ],
   imports: [
     BrowserModule,

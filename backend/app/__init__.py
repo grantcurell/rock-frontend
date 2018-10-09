@@ -4,7 +4,15 @@ REST interface for the frontend application.
 """
 import logging
 
-from shared.mongo_connection_mng import MongoConnectionManager
+# Monkey patching is required otherwise we get nasty recursion errors when we use 
+# the Kubernetes API.
+import gevent.monkey
+gevent.monkey.patch_all()
+
+from requests.packages.urllib3.util.ssl_ import create_urllib3_context
+create_urllib3_context()
+
+from shared.connection_mngs import MongoConnectionManager
 from flask_cors import CORS
 from flask import Flask
 from flask_socketio import SocketIO
@@ -45,7 +53,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 CORS(app)
 socketio = SocketIO(app)
-
 # Start the job manager
 from app.job_manager import start_job_manager
 start_job_manager()
@@ -58,3 +65,4 @@ from app import kit_controller
 from app import confluence_controller
 from app import portal_controller
 from app import health_controller
+from app import configmap_controller

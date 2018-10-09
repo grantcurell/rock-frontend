@@ -5,12 +5,13 @@
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <ul class="navbar-nav" style="width: 100%;">
+    <ul class="navbar-nav" style="width: 100%;">      
       <li class="nav-item"><a class="nav-link" routerLink="/portal">Portal</a></li>
       <li class="nav-item"><a class="nav-link" routerLink="/terminal">Terminal</a></li>
       <li class="nav-item"><a class="nav-link" routerLink="/health">System Health</a></li>
       <li class="nav-item"><a class="nav-link" routerLink="/kickstart">Kickstart Configuration</a></li>
       <li class="nav-item"><a class="nav-link" routerLink="/kit_configuration">Kit Configuration</a></li>
+      <li class="nav-item"><a class="nav-link" routerLink="/configmaps">Config Maps</a></li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Confluence</a>
         <div class="dropdown-menu">
@@ -18,7 +19,7 @@
         </div>
       </li>
       <li class="nav-item"><a class="nav-link" routerLink="/help">Help</a></li>
-      <!-- <li class="nav-item"><a class="nav-link" style="cursor: pointer" (click)="toggleMatrix()">{{ matrixText }}</a></li> -->
+      <li class="nav-item"><a class="nav-link" style="cursor: pointer" (click)="toggleMatrix()">{{ matrixText }}</a></li>
     </ul>
   </div>
 </nav>

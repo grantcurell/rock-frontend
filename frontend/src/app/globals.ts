@@ -14,7 +14,7 @@ export function GetIsMatrix(){
     return window.IS_MATRIX_ON;
 }
 
-export const httpOptions = {
+export const HTTP_OPTIONS = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 

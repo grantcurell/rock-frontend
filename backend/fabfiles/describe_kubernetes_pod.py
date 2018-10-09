@@ -3,7 +3,7 @@ Main module used for saving any kubernetes information that the main frontend re
 for rendering pages.
 """
 import sys
-from fabric_wrapper import FabricConnectionWrapper
+from connection_wrappers import FabricConnectionWrapper
 
 
 def describe_pod(pod_name: str):

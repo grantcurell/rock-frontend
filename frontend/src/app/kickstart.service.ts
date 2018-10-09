@@ -2,10 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { HTTP_OPTIONS } from './globals';
 
-const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-};
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +41,7 @@ export class KickstartService {
 
     const url = '/api/gather_device_facts';
     let post_payload = {"management_ip": management_ip, "password": password};
-    return this.http.post(url, post_payload , httpOptions).pipe(
+    return this.http.post(url, post_payload , HTTP_OPTIONS).pipe(
       tap(data => this.mapDeviceFacts(data)),
       catchError(this.handleError('gatherDeviceFacts'))
     );
@@ -53,7 +51,7 @@ export class KickstartService {
     this.log(kickStartForm);
     const url = '/api/generate_kickstart_inventory';    
     
-    return this.http.post(url, kickStartForm, httpOptions).pipe(
+    return this.http.post(url, kickStartForm, HTTP_OPTIONS).pipe(
       catchError(this.handleError('generateKickstartInventory'))
     );
   }
@@ -81,8 +79,8 @@ export class KickstartService {
 
   restoreArchivedKickstartForm(archiveId: string): Observable<Object> {
     const url = '/api/restore_archived';
-    let post_payload = {"_id": archiveId};    
-    return this.http.post(url, post_payload , httpOptions)
+    let post_payload = {"_id": archiveId};
+    return this.http.post(url, post_payload , HTTP_OPTIONS)
       .pipe(
         catchError(this.handleError('gatherDeviceFacts', []))
       );
@@ -91,7 +89,7 @@ export class KickstartService {
 
   generateKitInventory(kitForm: Object){
     const url = '/api/generate_kit_inventory';
-    return this.http.post(url, kitForm, httpOptions).pipe(
+    return this.http.post(url, kitForm, HTTP_OPTIONS).pipe(
       catchError(this.handleError('generateKitInventory'))
     );
   }
