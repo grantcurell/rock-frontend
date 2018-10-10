@@ -201,7 +201,7 @@ function _validateLogstashReplicas(control: AbstractControl, errors: Array<strin
     if (sensors != null){
         for (let i = 0; i < sensors.length; i++){
             let sensor = sensors.at(i) as SensorFormGroup;
-            if (sensor.sensor_type.value == sensor.sensor_type.options[0]){
+            if (sensor.sensor_type.value == 'Local'){
                 number_of_sensors += 1;
             }            
         }

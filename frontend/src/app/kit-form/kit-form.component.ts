@@ -60,7 +60,9 @@ export class KitFormComponent implements OnInit {
         if (node["node_type"] === "Server"){          
           this.kitForm.addServerFormGroup(node["ip_address"]);
         } else if (node["node_type"] === "Sensor"){
-          this.kitForm.addSensorFormGroup(node["ip_address"]);
+          this.kitForm.addSensorFormGroup(node["ip_address"], 'Local');
+        } else if (node["node_type"] === "Remote Sensor"){
+          this.kitForm.addSensorFormGroup(node["ip_address"], 'Remote');
         } else {
           console.error("Unknown Node type." + node["node_type"]);
         } 
@@ -88,40 +90,6 @@ export class KitFormComponent implements OnInit {
   
   toggleSensor(sensor: SensorFormGroup) {    
     sensor.hidden = !sensor.hidden;
-  }
-
-  addServer(){
-    this.kitForm.addServerFormGroup('');
-  }
-
-  removeServer(index: number){
-    let server = this.kitForm.servers.at(index) as ServerFormGroup;
-    this.kitForm.system_resources.subtractFromDeviceFacts(server.deviceFacts);
-    this.kitForm.server_resources.subtractFromDeviceFacts(server.deviceFacts);    
-    this._remove_server_cluster_storage(server.deviceFacts);
-    this.kitForm.server_resources.setErrorsOrSuccesses(
-      this.advancedElasticSearchForm.elastic_masters.value,
-      this.advancedElasticSearchForm.elastic_datas.value,
-      this.advancedElasticSearchForm.elastic_cpus.value,
-      this.advancedElasticSearchForm.elastic_memory.value);
-    this.elasicSearchCalculator.calculate();
-    this.manualCalculator.validate_manual_entries();
-
-    this.kitForm.servers.removeAt(index);
-  }
-
-  addSensor(){
-    this.kitForm.addSensorFormGroup('');
-  }
-
-  removeSensor(index: number){
-    let sensor = this.kitForm.sensors.at(index) as SensorFormGroup;
-    if (sensor.deviceFacts != null){
-      this.kitForm.system_resources.subtractFromDeviceFacts(sensor.deviceFacts);
-      this.kitForm.sensor_resources.subtractFromDeviceFacts(sensor.deviceFacts);
-      this._remove_sensor_cluster_storage(sensor.deviceFacts);
-    }    
-    this.kitForm.sensors.removeAt(index);
   }  
 
   gatherFacts(node: ServerFormGroup | SensorFormGroup) {
@@ -349,31 +317,10 @@ export class KitFormComponent implements OnInit {
 
   }
 
-  /**
-   * Triggered every time a user selects a different sensor type.
-   * 
-   * @param dropDownValue - The new dropdown value (IE: Local or Remote)
-   * @param index - The index of the sensor in question.
-   */
-  sensorTypeChange(dropDownValue: string, index: number){
-    let sensor = this.kitForm.sensors.at(index) as SensorFormGroup;
-    this._remove_sensor_cluster_storage(sensor.deviceFacts);
-  }
-
   triggerValidations(event: any){
     this.manualCalculator.validate_manual_entries();
     this.elasicSearchCalculator.calculate();
-  }
-
-  private _remove_server_cluster_storage(deviceFacts: Object){
-    if (deviceFacts != null){
-      this.kitForm.system_resources.calculateTotalCephDrives(0, deviceFacts);                
-      this.kitForm.server_resources.removeClusterStorage(deviceFacts);      
-      this.setSystemClusterStorageAvailable();
-      this.storageCalculator.recalculate_storage_recommendation();
-      this.storageCalculator.validate_ceph_drive_count();
-    }
-  }
+  }  
 
   private _remove_sensor_cluster_storage(deviceFacts: Object){
     if (deviceFacts != null){

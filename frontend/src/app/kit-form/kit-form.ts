@@ -54,7 +54,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
     public interfaceSelections: Array<{value: string, label: string}>;
     public driveSelections: Array<{value: string, label: string}>;
 
-    constructor(hidden: boolean, managementIP: string) {
+    constructor(hidden: boolean, managementIP: string, sensor_type: string) {
         super({});
         this.hidden = hidden;                
         this.host_server.setDefaultValue(managementIP);
@@ -66,6 +66,9 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         super.addControl('hostname', this.hostname);
         super.addControl('bro_workers', this.bro_workers);
         super.addControl('moloch_threads', this.moloch_threads)
+
+        //this.sensor_type.
+        this.sensor_type.setValue(sensor_type);
         super.addControl('sensor_type', this.sensor_type);
 
         this.basicNodeResource = new BasicNodeResource();
@@ -196,12 +199,18 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         true
     )
 
-    sensor_type = new HtmlDropDown(
+    sensor_type = new HtmlInput(
         'sensor_storage_type',
         'Sensor Type',
-        ['Local', 'Remote'],
+        '',
+        'text',
+        null,
+        '',   
+        true,
+        'test',
         "Indicates if the sensor in question is a local or a remote sensor.",
-        'Local'
+        undefined,
+        true
     )
 }
 
@@ -758,9 +767,9 @@ export class KitInventoryForm extends FormGroup {
         this.servers.push(new ServerFormGroup(false, managementIP));
     }
 
-    public addSensorFormGroup(managementIP: string){        
+    public addSensorFormGroup(managementIP: string, sensorType: string) {
         this.sensors.hidden = false;
-        this.sensors.push(new SensorFormGroup(false, managementIP));
+        this.sensors.push(new SensorFormGroup(false, managementIP, sensorType));
     }
 
     system_resources = new TotalSystemResources();

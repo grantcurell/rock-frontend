@@ -94,8 +94,8 @@ export class NodeFormGroup extends FormGroup {
   node_type = new HtmlDropDown(
     'node_type',
     'Node Type',
-    ['Server', 'Sensor'],
-    "The Node Type referes to whether or not the node is a server or a sensor.  A server will run TODO...",
+    ['Server', 'Sensor', 'Remote Sensor'],
+    "The Node Type referes to whether or not the node is a server, sensor or remote sensor.",
     'Server'
   )
 }

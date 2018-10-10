@@ -63,11 +63,8 @@
           <div class="card-header">
             <h5 class="mb-0">
               <button class="btn btn-link" type="button" (click)="toggleServer(server)">Server {{ i + 1 }} - {{ server.hostname.value }}</button>
-              <button class="btn btn-danger" type="button" (click)="removeServer(i)" style="float:right;">Remove</button>
             </h5>
-            
           </div>
-          
           <div *ngIf="!server.hidden" class="card-body">
             <app-basic-node-resource-card title="Server {{ i + 1 }} resources" [basicNodeResource]="server.basicNodeResource"></app-basic-node-resource-card>
             <br>
@@ -82,12 +79,6 @@
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">
-          <button class="btn btn-primary" type="button" (click)="addServer()">Add Server</button>
-      </div>        
-    </div>
-    
     <br>
     <app-total-sensor-resources-card [sensorResourceForm]="kitForm.controls.sensor_resources" ></app-total-sensor-resources-card>
     <div formArrayName="sensors">
@@ -102,14 +93,13 @@
                 <input type="hidden" formControlName="hostname">
               </div>
               <button class="btn btn-link" type="button" (click)="toggleSensor(sensor)">Sensor {{ i + 1 }} - {{ sensor.hostname.value }}</button>
-              <button class="btn btn-danger" type="button" (click)="removeSensor(i)" style="float:right;">Remove</button>
             </h5>
           </div>
           
           <div *ngIf="!sensor.hidden" class="card-body">
             <app-basic-node-resource-card title="Sensor {{ i + 1 }} resources" [basicNodeResource]="sensor.basicNodeResource"></app-basic-node-resource-card>
             <br>
-            <app-dropdown [parentForm]="sensor" controlName="sensor_type" (dropDownChanged)="sensorTypeChange($event, i)"></app-dropdown>
+            <app-text-input [parentForm]="sensor" controlName="sensor_type"></app-text-input>
             <app-text-input [parentForm]="sensor" controlName="host_server" (buttonClick)="gatherFacts(sensor)"></app-text-input>            
             <br>
 
@@ -136,11 +126,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header">
-          <button class="btn btn-primary" type="button" (click)="addSensor()">Add Sensor</button>
       </div>
     </div>
 
