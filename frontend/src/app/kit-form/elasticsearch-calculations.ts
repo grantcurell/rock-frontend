@@ -13,7 +13,7 @@ export class ElasticSearchCalculator {
     }
 
     //TODO break out various pieces of the calculate form into smaller pieces.
-    public calculate() {        
+    public calculate() {
         // server_memory_list (int array): A list of server instances and the memory available
         //                          to each one
         // number_of_servers (int): The number of servers in server_memory_list
@@ -58,17 +58,16 @@ export class ElasticSearchCalculator {
         let ideal_cpu_to_mem = elastic_cpu_to_mem_ratio;
 
         // The number of Logstash replicas for the system
-        let logstash_replicas = this.kitForm.logstash_replicas.value;
+        let logstash_replicas = parseInt(this.kitForm.logstash_replicas.value);
 
         // The percentage of the CPU power Logstash should consume
-        let logstash_cpu_percentage = this.kitForm.logstash_cpu_percentage.value;
+        let logstash_cpu_percentage = parseInt(this.kitForm.logstash_cpu_percentage.value);
 
         // The number of servers available in the system
         let number_of_servers = this.kitForm.servers.length;
 
         // The number of CPU cores Logstash will need
         let logstash_required_cpu = this.kitForm.server_resources.cpuCoresAvailable * (logstash_cpu_percentage / 100) / logstash_replicas;
-        console.log(logstash_required_cpu);
         this.kitForm.server_resources.setAssignedLogstashCpus( (logstash_required_cpu / logstash_replicas) );
 
         if (elastic_cpu_percentage < 1 || elastic_cpu_percentage > 99) {
@@ -84,9 +83,9 @@ export class ElasticSearchCalculator {
         // other functions
         let elastic_available_cpus = Math.floor((this.kitForm.server_resources.cpuCoresAvailable * (elastic_cpu_percentage / 100)) - number_of_servers);
         if (elastic_available_cpus < 0){
-            this.kitForm.server_resources.setAssignedElasticSearchCPURequest(0);
+            this.kitForm.server_resources.setTotalAssignedElasticSearchCPUs(0);
         } else {
-            this.kitForm.server_resources.setAssignedElasticSearchCPURequest(elastic_available_cpus);
+            this.kitForm.server_resources.setTotalAssignedElasticSearchCPUs(elastic_available_cpus);
         }
             
         // The total amount of memory Elasticsearch could potentially use
@@ -147,6 +146,8 @@ export class ElasticSearchCalculator {
                 elastic_instances = Math.floor(elastic_available_cpus / elastic_cpus_per_instance);
                 warning_reached = false;
             }
+
+            this.kitForm.server_resources.setTotalAssignedElasticSearchCPUs(elastic_cpus_per_instance * elastic_instances);
 
             // The memory required in production mode will be some ratio (3 by default)
             // multiplied by the number of instances of Elasticsearch, further multiplied
@@ -399,6 +400,7 @@ export class ElasticSearchCalculator {
                     this.kitForm.advanced_elasticsearch_settings.elastic_memory.setValue(elastic_memory_per_instance);
                     console.log(elastic_cpus_per_instance);
                     this.kitForm.advanced_elasticsearch_settings.elastic_cpus.setValue(elastic_cpus_per_instance);
+                    this.kitForm.server_resources.setAssignedElasticSearchCPURequest(elastic_cpus_per_instance);
                     this.storageCalculator.recalculate_storage_recommendation()                    
                     console.log("SUCCESS. ALL ELASTICSEARCH/LOGSTASH INSTANCES ALLOCATED.");
                 } else {

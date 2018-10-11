@@ -35,7 +35,7 @@ export class HelpComponent implements OnInit {
     this.kickstartNode = new NodeFormGroup(true);
     this.kitForm = new KitInventoryForm();
     this.kitServer = new ServerFormGroup(true, null);
-    this.kitSensor = new SensorFormGroup(true, null);
+    this.kitSensor = new SensorFormGroup(true, null, null);
     this.form = new HelpForm();
     this.route.fragment.subscribe(fragment => { this.fragment = fragment; });
   }
@@ -55,8 +55,6 @@ export class HelpComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    console.log("ngAfterViewInit()");
-    console.log(this.fragment);
     if (this.fragment){      
       let elementRef = document.querySelector('#' + this.fragment);
       elementRef.scrollIntoView();

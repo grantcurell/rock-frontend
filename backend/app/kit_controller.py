@@ -55,7 +55,7 @@ def generate_kit_inventory() -> Response:
                                             return_document=ReturnDocument.AFTER)  # type: InsertOneResult
 
     if current_kit_configuration:
-        if current_kit_configuration["payload"] and current_kit_configuration["payload"]["root_password"]:            
+        if current_kit_configuration["payload"] and current_kit_configuration["payload"]["root_password"]:
             kit_generator = KitInventoryGenerator(payload)
             kit_generator.generate()
             cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + 

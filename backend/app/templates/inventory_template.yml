@@ -33,7 +33,7 @@ all:
     suricata_cpu_request: {{ template_ctx.sensor_resources.suricata_cpu_request | int }}m
     kafka_cpu_request: {{ template_ctx.sensor_resources.kafka_cpu_request | int }}m
     zookeeper_cpu_request: {{ template_ctx.sensor_resources.zookeeper_cpu_request | int }}m
-    logstash_cpu_request:  {{ (template_ctx.server_resources.log_stash_cpu_request * 1000) | int }}m
+    logstash_cpu_request: {{ (template_ctx.server_resources.log_stash_cpu_request * 1000) | int }}m
     elasticsearch_cpu_request: {{ (template_ctx.server_resources.elastic_search_cpu_request * 1000) | int }}m
 
     #############################

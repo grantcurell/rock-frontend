@@ -283,9 +283,9 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
     }
 
     // TODO elastic search math is messed up.  This needs to be fixed before we uncomment the validation checks.
-    // if (!GetElasticSearchValidated()){
-    //     errors.push("- Elasticsearch failed to validate. Check the server section and make sure Elasticsearch has enough RAM and CPU resources.");
-    // }
+    if (!GetElasticSearchValidated()){
+        errors.push("- Elasticsearch failed to validate. Check the server section and make sure Elasticsearch has enough RAM and CPU resources.");
+    }
 
     if (!GetSensorResourcesValidated()){
         errors.push("- Your sensor resources failed to validate. Check the sensor resources and make sure you have sufficient CPU resources for Bro, Suricata, etc.");

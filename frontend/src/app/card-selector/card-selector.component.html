@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <p class="card-text">{{ input_control.card_text }}</p>
-      <p class="card-text text-danger">{{ input_control.card_notes }}</p>
+      <p class="card-text text-info">{{ input_control.card_notes }}</p>
     </div>
     <input *ngFor="let item of input_control.controls; let i=index" type="hidden" [formControlName]="i">
     <div #button_group class="btn-group-vertical" role="group">

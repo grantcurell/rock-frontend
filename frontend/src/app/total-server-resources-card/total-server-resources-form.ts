@@ -50,13 +50,16 @@ export class TotalServerResources extends FormGroup {
     log_stash_cpu_request = new HtmlHidden('log_stash_cpu_request', true);
     elastic_search_cpu_request = new HtmlHidden('elastic_search_cpu_request', true);
 
-    public setAssignedLogstashCpus(assignedCpus: number){
+    public setAssignedLogstashCpus(assignedCpus: number) {
         this.assignedLogstashCpus = assignedCpus;
         this.log_stash_cpu_request.setValue(this.assignedLogstashCpus);
     }
 
-    public setAssignedElasticSearchCPURequest(assignedCpus: number){
+    public setTotalAssignedElasticSearchCPUs(assignedCpus: number) {
         this.assignedElasticSearchCpus = assignedCpus;
+    }
+
+    public setAssignedElasticSearchCPURequest(assignedCpus: number){        
         this.elastic_search_cpu_request.setValue(assignedCpus);
     }
 

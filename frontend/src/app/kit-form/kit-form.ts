@@ -62,10 +62,9 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         super.addControl('monitor_interface', this.monitor_interface);
         super.addControl('ceph_drives', this.ceph_drives);
         super.addControl('pcap_drives', this.pcap_drives);
-        
         super.addControl('hostname', this.hostname);
         super.addControl('bro_workers', this.bro_workers);
-        super.addControl('moloch_threads', this.moloch_threads)
+        super.addControl('moloch_threads', this.moloch_threads);
 
         //this.sensor_type.
         this.sensor_type.setValue(sensor_type);
@@ -372,8 +371,8 @@ export class AdvancedElasticSearchSettingsFormGroup extends FormGroup {
         'ES Persistent Volume Size',
         "Storage space in GB per Elasticsearch instance",
         'number',
-        CONSTRAINT_MIN_EIGHT,
-        MIN_EIGHT_INVALID_FEEDBACK,
+        CONSTRAINT_MIN_ZERO,
+        MIN_ZERO_INVALID_FEEDBACK,
         true,
         '0',
         "The amount of space to allocate from the Ceph cluster to the persistent volume \
