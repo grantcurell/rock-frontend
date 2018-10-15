@@ -9,7 +9,7 @@ from app.common import ERROR_RESPONSE, OK_RESPONSE
 from app.job_manager import shell
 from flask import jsonify, Response, request
 from kubernetes import client, config
-from shared.connection_mngs import KubernetesWrapper
+from shared.connection_mngs import KubernetesWrapper, KitFormNotFound
 
 
 @app.route('/api/get_config_maps', methods=['GET'])
@@ -19,9 +19,13 @@ def get_config_maps() -> Response:
 
     :return: Response object with a json dictionary.
     """
-    with KubernetesWrapper(conn_mng) as kube_apiv1:
-        api_response = kube_apiv1.list_config_map_for_all_namespaces()  
-        return jsonify(api_response.to_dict())
+    try:
+        with KubernetesWrapper(conn_mng) as kube_apiv1:
+            api_response = kube_apiv1.list_config_map_for_all_namespaces()  
+            return jsonify(api_response.to_dict())
+    except KitFormNotFound as e:
+        logger.exception(e)
+        return jsonify([])
 
     return ERROR_RESPONSE
 

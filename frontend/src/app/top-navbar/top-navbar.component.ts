@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { SetISMatrix } from '../globals';
 import { ConfluenceService }  from '../confluence.service';
 import { ActivatedRoute } from '@angular/router';
@@ -14,6 +14,9 @@ export class TopNavbarComponent implements OnInit {
   isMatrixOn: boolean;
   spaces: Object;
 
+  @ViewChild('navlist')
+  navlist: ElementRef;
+  
   constructor(private confluenceSrv: ConfluenceService,
               private route: ActivatedRoute) { 
     this.isMatrixOn = true;
@@ -24,6 +27,22 @@ export class TopNavbarComponent implements OnInit {
     this.confluenceSrv.getSpaces().subscribe(data => {
       this.spaces = data;
     });
+  }
+
+  clearPreviousActive(){
+    if (this.navlist){
+      let navChildren = this.navlist.nativeElement.children;
+      for (let i = 0; i < navChildren.length; i++){
+        navChildren[i].children[0]['className'] = "nav-link";        
+      }
+    }
+  }
+
+  setActive(event: any){
+    this.clearPreviousActive();
+    if (event){
+      event['srcElement']['className'] = "nav-link active";
+    }
   }
 
   toggleMatrix(){

@@ -19,13 +19,18 @@
         </thead>
         <tbody>
           <tr *ngFor="let node of nodeStatuses; let i=index">
-            <td><a title="Click me" (click)="openNodeInfo(node.metadata.name, node.status.node_info)">{{ node.metadata.name }}</a></td>
+            <td><a title="Click me" data-toggle="tooltip" data-placement="right" (click)="openNodeInfo(node.metadata.name, node.status.node_info)">{{ node.metadata.name }}</a></td>
             <td>{{ node.metadata.public_ip }}</td>
-            <td><a title="{{ node.status.conditions[3].message }}">{{ node.status.conditions[3].status }}</a></td>
-            <td><a title="{{ node.status.conditions[0].message }}">{{ node.status.conditions[0].status }}</a></td>
-            <td><a title="{{ node.status.conditions[1].message }}">{{ node.status.conditions[1].status }}</a></td>
-            <td><a title="{{ node.status.conditions[2].message }}">{{ node.status.conditions[2].status }}</a></td>
-            <td><button class="btn btn-primary" (click)="describeNode(node.metadata.name)"><i class="icon_info_alt"></i></button></td>
+            <td>
+              <a title="{{ node.status.conditions[3].message }}" data-toggle="tooltip" data-placement="right">
+                <img *ngIf="node.status.conditions[3].status === 'True'" src="assets/bootstrap/img/icons/green-check.png" style="width:25px;height:25px;">
+                <img *ngIf="node.status.conditions[3].status === 'False'" src="assets/bootstrap/img/icons/red-x.png" style="width:25px;height:25px;">
+              </a>
+            </td>
+            <td><a title="{{ node.status.conditions[0].message }}" data-toggle="tooltip" data-placement="right">{{ node.status.conditions[0].status }}</a></td>
+            <td><a title="{{ node.status.conditions[1].message }}" data-toggle="tooltip" data-placement="right">{{ node.status.conditions[1].status }}</a></td>
+            <td><a title="{{ node.status.conditions[2].message }}" data-toggle="tooltip" data-placement="right">{{ node.status.conditions[2].status }}</a></td>
+            <td><button title="Click to run describe node." data-toggle="tooltip" data-placement="left" class="btn btn-primary" (click)="describeNode(node.metadata.name)"><i class="icon_info_alt"></i></button></td>
           </tr>
         </tbody>
       </table>
@@ -33,6 +38,12 @@
   </div>
   <br>
   <div class="card">
+    <ul class="nav nav-tabs">
+      <li class="nav-item" *ngFor="let node of nodeStatuses">
+        <a *ngIf="isActiveNodeTab(node.metadata.public_ip)" class="nav-link active" (click)="setActiveIp(node.metadata.public_ip)">{{ node.metadata.name }}</a>
+        <a *ngIf="!isActiveNodeTab(node.metadata.public_ip)" class="nav-link" (click)="setActiveIp(node.metadata.public_ip)">{{ node.metadata.name }}</a>
+      </li>                            
+    </ul>
     <div class="card-header">
       Pod Health
     </div>
@@ -49,11 +60,13 @@
         </thead>
         <tbody>
           <tr *ngFor="let pod of podsStatuses; let i=index">
-            <td>{{ pod.metadata.namespace }}</td>
-            <td><a title="Click me" (click)="openPodStatusInfo(pod.metadata.name, pod.status)">{{ pod.metadata.name }}</a></td>
-            <td>{{ pod.status.phase }}</td>
-            <td>{{ pod.status.container_statuses[0].restart_count }}</td>
-            <td><button class="btn btn-primary" (click)="describePod(pod.metadata.name)"><i class="icon_info_alt"></i></button></td>
+            <ng-container *ngIf="activeIPAddress === pod.status.host_ip ">
+              <td>{{ pod.metadata.namespace }}</td>
+              <td><a title="Click me" data-toggle="tooltip" data-placement="right" (click)="openPodStatusInfo(pod.metadata.name, pod.status)">{{ pod.metadata.name }}</a></td>
+              <td>{{ pod.status.phase }}</td>
+              <td>{{ pod.status.container_statuses[0].restart_count }}</td>
+              <td><button title="Click to run describe pod." data-toggle="tooltip" data-placement="left" class="btn btn-primary" (click)="describePod(pod.metadata.name)"><i class="icon_info_alt"></i></button></td>
+            </ng-container>
           </tr>
         </tbody>
       </table>

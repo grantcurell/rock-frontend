@@ -62,10 +62,12 @@ export class ConfluenceComponent implements OnInit {
 
   private scrollToNavElement(page_id: string){
     let some_element = document.getElementById("a_" + page_id);
-    some_element.scrollIntoView();
-    some_element.style.fontWeight = "bold";
-    some_element.style.color = "lightgreen";
-    this.lastElement = some_element;
+    if (some_element){
+      some_element.scrollIntoView();
+      some_element.style.fontWeight = "bold";
+      some_element.style.color = "lightgreen";
+      this.lastElement = some_element;
+    }
   }
 
   private resizeContainer(){

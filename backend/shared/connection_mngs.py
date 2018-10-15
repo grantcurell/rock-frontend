@@ -108,24 +108,6 @@ class MongoConnectionManager(object):
         """
         return self._tfplenum_database.portal
 
-    @property
-    def mongo_kubernetes_pods(self) -> Collection:
-        """
-        Returns a mongo object that can do database manipulations.
-
-        :return:
-        """
-        return self._tfplenum_database.kubernetes_pods
-
-    @property
-    def mongo_kubernetes_nodes(self) -> Collection:
-        """
-        Returns a mongo object that can do database manipulations.
-
-        :return:
-        """
-        return self._tfplenum_database.kubernetes_nodes
-
     def close(self):
         """
         Closes the clients mongo collection gracefully.
@@ -226,7 +208,7 @@ class KubernetesWrapper():
             os.makedirs(KUBEDIR)
 
         config_path = KUBEDIR + '/config'
-        if os.path.exists(config_path) and  os.path.isfile(config_path):
+        if not os.path.exists(config_path) or not os.path.isfile(config_path):
             with FabricConnectionWrapper(self._mongo_conn) as fab_conn:
                 fab_conn.get(config_path, config_path)
 

@@ -135,7 +135,6 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 MAILTO=root
 
 * * * * * root /opt/tfplenum-frontend/tfp-env/bin/python /opt/tfplenum-frontend/backend/fabfiles/update_portal_links.py
-* * * * * root /opt/tfplenum-frontend/tfp-env/bin/python /opt/tfplenum-frontend/backend/fabfiles/kubernetes_daemon.py
 EOF
 
 	run_cmd systemctl restart crond.service

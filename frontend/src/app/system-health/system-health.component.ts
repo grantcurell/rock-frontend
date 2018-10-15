@@ -4,30 +4,56 @@ import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { HtmlModalPopUp, ModalType } from '../html-elements';
 
+declare var $: any;
+
 @Component({
   selector: 'app-system-health',
   templateUrl: './system-health.component.html',
   styleUrls: ['./system-health.component.css']
 })
 export class SystemHealthComponent implements OnInit {
-  podsStatuses: Object;
-  nodeStatuses: Object;
+  podsStatuses: Array<Object>;
+  nodeStatuses: Array<Object>;
   podDescribeModal: HtmlModalPopUp;
+  activeIPAddress: string;
 
   constructor(private title: Title, private healthSrv: HealthServiceService, private router: Router) { 
     this.podDescribeModal = new HtmlModalPopUp('pod_describe');
+    this.activeIPAddress = "";
   }
 
   ngOnInit() {
     this.title.setTitle("System Health");
 
     this.healthSrv.getPodsStatuses().subscribe(data => {
-      this.podsStatuses = data;
+      this.podsStatuses = data as Array<Object>;
     });
 
     this.healthSrv.getNodeStatuses().subscribe(data => {
-      this.nodeStatuses = data;
+      this.nodeStatuses = data as Array<Object>;
+      if (this.nodeStatuses && this.nodeStatuses.length > 0) {
+        this.activeIPAddress = this.nodeStatuses[0]['metadata']['public_ip'];        
+      }
     });
+
+    setTimeout(() => {
+      this.updateTooltips();
+    }, 2000);
+  }
+
+  setActiveIp(ipAddress: string){
+    if (ipAddress) {
+      this.activeIPAddress = ipAddress;
+    }    
+  }
+
+  isActiveNodeTab(ipAddress: string): boolean{
+    return this.activeIPAddress === ipAddress;
+  }
+
+  private updateTooltips(){
+    let selector = $('[data-toggle="tooltip"]');
+    selector.tooltip();
   }
 
   performSystemsCheck(){

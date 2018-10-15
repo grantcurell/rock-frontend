@@ -11,6 +11,7 @@ from app.job_manager import spawn_job
 from app.socket_service import log_to_console
 from app.common import OK_RESPONSE, ERROR_RESPONSE
 from flask import request, Response, jsonify
+from shared.connection_mngs import KubernetesWrapper, objectify, KitFormNotFound
 
 
 @app.route('/api/describe_pod/<pod_name>', methods=['GET'])
@@ -78,32 +79,29 @@ def perform_systems_check() -> Response:
 
 @app.route('/api/get_pods_statuses', methods=['GET'])
 def get_pod_info() -> Response:
-    return_projection = {"metadata.name": True, "metadata.creation_timestamp": True, "metadata.namespace": True,"spec.containers.image": True, 
-                         "status.phase": True, "status.host_ip": True, "status.container_statuses": True}
-
-    results = conn_mng.mongo_kubernetes_pods.find({}, projection=return_projection)
-    ret_val = []
-    if results:
-        for item in results:
-            item["_id"] = str(item["_id"])
-            ret_val.append(item)
-
-    return jsonify(ret_val)
+    try:
+        with KubernetesWrapper(conn_mng) as kube_apiv1:
+            api_response = kube_apiv1.list_pod_for_all_namespaces(watch=False)
+            return jsonify(api_response.to_dict()['items'])
+    except KitFormNotFound as e:
+        logger.exception(e)
+        return jsonify([])
+    return ERROR_RESPONSE
 
 
 @app.route('/api/get_node_statuses', methods=['GET'])
-def get_node_statuses() -> Response:        
-    return_projection = None
-    return_projection = {"metadata.name": True, "metadata.creation_timestamp": True, 
-                         "status.conditions": True, "status.node_info": True, "metadata.annotations": True}
-    results = conn_mng.mongo_kubernetes_nodes.find({}, projection=return_projection)
-    ret_val = []
-    if results:
-        for item in results:            
-            item["_id"] = str(item["_id"])
-            public_ip = item["metadata"]["annotations"]["flannel.alpha.coreos.com/public-ip"]
-            item["metadata"]["public_ip"] = public_ip
-            del item["metadata"]["annotations"]
-            ret_val.append(item)
+def get_node_statuses() -> Response:
+    try:
+        with KubernetesWrapper(conn_mng) as kube_apiv1:
+            api_response = kube_apiv1.list_node()
+            ret_val = []
+            for item in api_response.to_dict()['items']:
+                public_ip = item["metadata"]["annotations"]["flannel.alpha.coreos.com/public-ip"]
+                item["metadata"]["public_ip"] = public_ip
+                ret_val.append(item)
+            return jsonify(ret_val)
+    except KitFormNotFound as e:
+        logger.exception(e)
+        return jsonify([])
 
-    return jsonify(ret_val)
+    return ERROR_RESPONSE

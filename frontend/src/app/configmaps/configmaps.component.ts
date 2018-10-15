@@ -40,8 +40,10 @@ export class ConfigmapsComponent implements OnInit {
 
   ngOnInit() {
     this.configMapSrv.getConfigMaps().subscribe(data => {
-      this.configMaps = data['items'];
-      this.isConfigMapVisible = new Array(this.configMaps.length).fill(false);
+      if (data['items']){
+        this.configMaps = data['items'];
+        this.isConfigMapVisible = new Array(this.configMaps.length).fill(false);
+      }
     }); 
   }
 

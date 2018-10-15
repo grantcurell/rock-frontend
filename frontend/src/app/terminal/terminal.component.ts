@@ -15,8 +15,7 @@ export class TerminalComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log(window.location);
-    let hostname = window.location.hostname;  
+    let hostname = window.location.hostname;
     this.terminalURL = `https://${hostname}:9090/cockpit/@localhost/system/terminal.html`;
   }
 
