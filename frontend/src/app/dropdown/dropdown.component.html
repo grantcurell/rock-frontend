@@ -6,8 +6,13 @@
       <span class="input-group-text">{{ input_control.label }}</span>
     </a>
   </div>
-  <div class="dropdown">
-    <!-- <input formControlName="{{ controlName }}" type="text" [value]="selectedValue"  > -->
+  <div *ngIf="input_control.control_disabled">
+    <input type="hidden"
+           formControlName="{{ controlName }}"
+           [required]="input_control.required">
+    <span style="margin-left: 10px;">{{ input_control.value }}</span>
+  </div>
+  <div class="dropdown" *ngIf="!input_control.control_disabled">
     <input formControlName="{{ controlName }}" type="button"
           name="{{ controlName }}{{ uid }}"
           class="btn btn-primary dropdown-toggle"

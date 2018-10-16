@@ -95,10 +95,17 @@ def get_node_statuses() -> Response:
         with KubernetesWrapper(conn_mng) as kube_apiv1:
             api_response = kube_apiv1.list_node()
             ret_val = []
-            for item in api_response.to_dict()['items']:
-                public_ip = item["metadata"]["annotations"]["flannel.alpha.coreos.com/public-ip"]
-                item["metadata"]["public_ip"] = public_ip
-                ret_val.append(item)
+            for item in api_response.to_dict()['items']:                
+                try:
+                    public_ip = item["metadata"]["annotations"]["flannel.alpha.coreos.com/public-ip"]
+                    item["metadata"]["public_ip"] = public_ip
+                    ret_val.append(item)
+                except KeyError as e:
+                    item["metadata"]["public_ip"] = ''
+                    ret_val.append(item)
+                except Exception as e:
+                    logger.warn(item)
+                    logger.exception(e)
             return jsonify(ret_val)
     except KitFormNotFound as e:
         logger.exception(e)

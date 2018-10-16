@@ -4,12 +4,6 @@ import { FormControl, Validators, AsyncValidatorFn,
 
 declare var $: any;
 
-export interface GenericHtmlButtonInterface {
-  form_name: string;
-  label: string;
-  description: string;
-}
-
 /**
  * Contract that enforces properties needed for the /help page.
  */
@@ -185,6 +179,7 @@ export class HtmlModalSelectDialog extends HtmlModalPopUp {
 export class HtmlCheckBox extends FormControl implements HtmlCheckBoxInterface, HelpPageInterface {
   anchor: string;
   checked: boolean;
+  control_disabled: boolean;
   constructor(public form_name: string,
     public label: string,
     public description: string,
@@ -192,28 +187,61 @@ export class HtmlCheckBox extends FormControl implements HtmlCheckBoxInterface, 
     checked: boolean = false
   ) {
     super('', null, null);
-    if (disabled) {
-      super.disable();
+    this.control_disabled = disabled;
+    if (this.control_disabled) {
+      this.disable();
     }
 
     super.setValue(checked);
     this.checked = checked;
     this.anchor = 'anchor_' + form_name;
   }
+
+  disable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    this.control_disabled = true;
+  }
+
+  enable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void{
+    this.control_disabled = false;
+  }
+
 }
 
 export class HtmlDropDown extends FormControl implements HtmlDropDownInterface, HelpPageInterface {
   anchor: string;
+  control_disabled: boolean;
   constructor(
     public form_name: string,
     public label: string,
     public options: Array<string>,
     public description: string,
-    public default_value: string = ''
+    public default_value: string = '',
+    disabled: boolean = false,
   ) {
     super('', null, null);
     this.anchor = 'anchor_' + form_name;
     super.setValue(default_value);
+    this.control_disabled = disabled;
+  }
+
+  disable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    this.control_disabled = true;
+  }
+
+  enable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    this.control_disabled = false;
   }
 }
 
@@ -297,25 +325,12 @@ export class HtmlInput extends FormControl implements HtmlInputInterface, HelpPa
 }
 
 /**
- * @deprecated - DO not use this.  Use the HtmlCardSelector instead.
- */
-export class GenericHtmlButton extends FormControl implements HelpPageInterface, GenericHtmlButtonInterface {
-  anchor: string;
-  constructor(
-    public form_name: string,
-    public label: string,
-    public description: string,
-  ) {
-    super('', null, null);
-    this.anchor = 'anchor_' + form_name;
-  }
-}
-
-/**
  * Backing object for a selection box 
  */
 export class HtmlCardSelector extends FormArray implements HelpPageInterface, HtmlCardSelectorInterface {
   anchor: string;
+  isDisabled: boolean;
+
   constructor(
     public form_name: string,
     public label: string,
@@ -324,9 +339,33 @@ export class HtmlCardSelector extends FormArray implements HelpPageInterface, Ht
     public card_notes: string,
     public invalid_feedback: string,
     public is_multi_select: boolean = false,
-    public default_selections: Array<string> = []
+    public default_selections: Array<string> = [],
+    isDisabled: boolean = false    
   ) {
     super([], null, null);
     this.anchor = 'anchor_' + form_name;
+    super.enable
   }
+
+  /**
+   * Overridden method so that this element is properly disabled.
+   * 
+   * @param opts 
+   */
+  disable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    // super.disable(opts);
+    this.isDisabled = true;
+  }
+
+  enable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    super.enable(opts);
+    this.isDisabled = false;
+  }
+
 }

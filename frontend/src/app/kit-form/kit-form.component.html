@@ -1,10 +1,20 @@
 <app-modal-dialog [modal]="kitModal"></app-modal-dialog>
+<app-modal-dialog [modal]="executeKitModal" (primaryButtonClick)="executeKit()"></app-modal-dialog>
+<app-modal-dialog [modal]="archiveKitModal" (primaryButtonClick)="archiveForm()"></app-modal-dialog>
+<app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
+
 <div class="container" id="topheader">
   <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">
     <br>
     <div class="card">
       <div class="card-header">
         <button class="btn btn-primary" type="button" style="margin-right: 10px;" (click)="openConsole()">Open Console</button>
+        <button class="btn btn-secondary" style="margin-right: 10px;" type="button" (click)="clearForm()"><i class="icon_clipboard"></i> Clear Form</button>
+        <button class="btn btn-secondary" type="button" (click)="enableForm()"><i class="icon_clipboard"></i> Enable Form</button>
+        <button class="btn btn-primary" style="float: right;" type="button" 
+                (click)="openRestoreModal()"><i class="icon_download"></i> Restore Form</button>
+        <button class="btn btn-danger" type="button" style="float: right;  margin-right: 10px;" 
+                (click)="openArchiveConfirmation()"><i class="icon_floppy_alt"></i> Archive and Clear Form</button>
       </div>
       <div class="card-body">
         <h5 class="card-title">Global Settings</h5>
@@ -132,6 +142,10 @@
     <br>
     <div class="form-row">
       <div class="form-group col-md-6">
+        <ng-container *ngIf="hasKitForm">
+          <button *ngIf="isAddNodeInsteadOfNewKit" class="btn btn-primary" style="margin-right: 10px;" 
+                  type="button" [disabled]="!kitForm.valid" click="executeAddNode()">Execute Add Node</button>
+        </ng-container>
         <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid" name="execute_kit">Execute Kit</button>
       </div>
       <div class="form-group col-md-6">

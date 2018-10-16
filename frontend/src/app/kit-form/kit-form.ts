@@ -68,12 +68,46 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
 
         //this.sensor_type.
         this.sensor_type.setValue(sensor_type);
-        super.addControl('sensor_type', this.sensor_type);
-
+        super.addControl('sensor_type', this.sensor_type);        
         this.basicNodeResource = new BasicNodeResource();
         this.deviceFacts = null;
         this.interfaceSelections = new Array();
         this.driveSelections = new Array();
+    }
+
+    getRawValue(): any {
+        let rawValue = super.getRawValue();
+        rawValue['deviceFacts'] = this.deviceFacts;
+        return rawValue;
+    }
+
+    disable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.host_sensor.disable();
+        this.monitor_interface.disable();
+        this.ceph_drives.disable();
+        this.pcap_drives.disable();
+        this.bro_workers.disable();
+        this.moloch_threads.disable();
+    }
+    /**
+     * When calling this make sure you call set_drive_selections
+     * after you have set deviceFacts.
+     * 
+     * @param mObj 
+     */
+    public from_object(mObj: Object){
+        this.deviceFacts = mObj['deviceFacts'];
+        this.bro_workers.setValue(mObj['bro_workers']);
+        this.host_sensor.setValue(mObj['host_sensor']);
+        this.hostname.setValue(mObj['hostname']);
+        this.moloch_threads.setValue(mObj['moloch_threads']);
+        this.sensor_type.setValue(mObj['sensor_type']);        
+        this.monitor_interface.default_selections = mObj['monitor_interface'];
+        this.ceph_drives.default_selections = mObj['ceph_drives'];
+        this.pcap_drives.default_selections = mObj['pcap_drives'];
     }
 
     hostname = new HtmlHidden('hostname', true);
@@ -219,7 +253,7 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
     public deviceFacts: Object;
     public driveSelections: Array<{value: string, label: string}>;
 
-    constructor(hidden: boolean, managementIP: string) {
+    constructor(hidden: boolean, managementIP: string, disableIsKubernetesMasterCheckbox: boolean=false) {
         super({});
         this.hidden = hidden;
         this.host_server.setDefaultValue(managementIP);
@@ -227,9 +261,42 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
         super.addControl('is_master_server', this.is_master_server);
         super.addControl('ceph_drives', this.ceph_drives)
         super.addControl('hostname', this.hostname);
+        if (disableIsKubernetesMasterCheckbox){
+            this.is_master_server.disable();
+        }
         this.basicNodeResource = new BasicNodeResource();
         this.driveSelections = new Array();
         this.deviceFacts = null;
+    }
+
+    disable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.host_server.disable();
+        this.is_master_server.disable();
+        this.ceph_drives.disable();
+    }
+
+    getRawValue(): any {
+        let rawValue = super.getRawValue();
+        rawValue['deviceFacts'] = this.deviceFacts;
+        return rawValue;
+    }
+
+    /**
+     * After you call this make sure you set drive selections 
+     * after you have set deviceFacts.
+     * 
+     * @param mObj 
+     */
+    public from_object(mObj: Object){
+        this.deviceFacts = mObj['deviceFacts'];
+        this.host_server.setValue(mObj['host_server']);
+        this.hostname.setValue(mObj['hostname']);        
+        this.is_master_server.checked = mObj['is_master_server'];
+        this.is_master_server.setValue(mObj['is_master_server']);
+        this.ceph_drives.default_selections = mObj['ceph_drives'];
     }
 
     public setOptionSelections(){
@@ -297,6 +364,25 @@ export class AdvancedElasticSearchSettingsFormGroup extends FormGroup {
         super.addControl('elastic_curator_threshold', this.elastic_curator_threshold);
         super.addControl('elastic_cpus_per_instance_ideal', this.elastic_cpus_per_instance_ideal);
         super.addControl('elastic_cpus_to_mem_ratio', this.elastic_cpus_to_mem_ratio);
+    }
+
+    /**
+     * Overridden method
+     */
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        super.reset({
+            'elastic_masters': this.elastic_masters.default_value,
+            'elastic_datas': this.elastic_datas.default_value,
+            'elastic_cpus': this.elastic_cpus.default_value,
+            'elastic_memory': this.elastic_memory.default_value,
+            'elastic_pv_size': this.elastic_pv_size.default_value,
+            'elastic_curator_threshold': this.elastic_curator_threshold.default_value,
+            'elastic_cpus_per_instance_ideal': this.elastic_cpus_per_instance_ideal.default_value,
+            'elastic_cpus_to_mem_ratio': this.elastic_cpus_to_mem_ratio.default_value
+        });
     }
 
     elastic_masters = new HtmlInput(
@@ -443,6 +529,22 @@ export class AdvancedKafkaSettingsFormGroup extends FormGroup {
         super.addControl('zookeeper_replicas', this.zookeeper_replicas);
     }
 
+    /**
+     * Overridden method
+     */
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        super.reset({
+            'kafka_jvm_memory': this.kafka_jvm_memory.default_value,
+            'kafka_pv_size': this.kafka_pv_size.default_value,
+            'zookeeper_jvm_memory': this.zookeeper_jvm_memory.default_value,
+            'zookeeper_pv_size': this.zookeeper_pv_size.default_value,
+            'zookeeper_replicas': this.zookeeper_replicas.default_value
+        });
+    }
+
     kafka_jvm_memory = new HtmlInput(
         'kafka_jvm_memory',
         'Kafka JVM Memory',
@@ -527,6 +629,29 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         super.addControl('moloch_packetsPerPoll', this.moloch_packetsPerPoll);
         super.addControl('moloch_magicMode', this.moloch_magicMode);
         super.addControl('moloch_maxPacketsInQueue', this.moloch_maxPacketsInQueue);
+    }
+
+    /**
+     * Overridden method
+     */
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        super.reset({
+            'moloch_pcap_pv_size': this.moloch_pcap_pv_size.default_value,
+            'moloch_bpf': this.moloch_bpf.default_value,
+            'moloch_dontSaveBPFs': this.moloch_dontSaveBPFs.default_value,
+            'moloch_spiDataMaxIndices': this.moloch_spiDataMaxIndices.default_value,
+            'moloch_pcapWriteMethod': this.moloch_pcapWriteMethod.default_value,
+            'moloch_pcapWriteSize': this.moloch_pcapWriteSize.default_value,
+            'moloch_dbBulkSize': this.moloch_dbBulkSize.default_value,
+            'moloch_maxESConns': this.moloch_maxESConns.default_value,
+            'moloch_maxESRequests': this.moloch_maxESRequests.default_value,
+            'moloch_packetsPerPoll': this.moloch_packetsPerPoll.default_value,
+            'moloch_magicMode': this.moloch_magicMode.default_value,
+            'moloch_maxPacketsInQueue': this.moloch_maxPacketsInQueue.default_value
+        });
     }
 
     moloch_pcap_pv_size = new HtmlInput(
@@ -733,7 +858,7 @@ export class KitInventoryForm extends FormGroup {
     kubernetesCidrInfoText;
 
     constructor() {
-        super({}, ValidateKitInventory);
+        super({}, ValidateKitInventory);        
         super.addControl('sensor_storage_type', this.sensor_storage_type);
         super.addControl('root_password', this.root_password);
         super.addControl('elastic_cpu_percentage', this.elastic_cpu_percentage);
@@ -761,9 +886,68 @@ export class KitInventoryForm extends FormGroup {
         this.kubernetesCidrInfoText = "";
     }
 
-    public addServerFormGroup(managementIP: string){
+   /**
+    * Overridden method
+    */
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {    
+        super.reset({'elastic_cpu_percentage': this.elastic_cpu_percentage.default_value, 
+                     'elastic_memory_percentage': this.elastic_memory_percentage.default_value,
+                     'logstash_cpu_percentage': this.logstash_cpu_percentage.default_value,
+                     'elastic_storage_percentage': this.elastic_storage_percentage.default_value,
+                     'sensor_storage_type': this.sensor_storage_type.default_value,
+                     'logstash_replicas': this.logstash_replicas.default_value
+                    });        
+        this.clearNodes();
+        this.system_resources.reinitalize();
+    }
+
+    /**
+     * Overridden method
+     * 
+     * @param opts 
+     */
+    disable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.sensor_storage_type.disable();
+        this.root_password.disable();
+        this.elastic_cpu_percentage.disable();
+        this.elastic_memory_percentage.disable();
+        this.logstash_cpu_percentage.disable();
+        this.logstash_replicas.disable();
+        this.elastic_storage_percentage.disable();
+        this.moloch_pcap_storage_percentage.disable();
+        this.kubernetes_services_cidr.disable();
+
+        this.servers.disable();
+        this.sensors.disable();
+        this.sensor_resources.disable();
+        this.server_resources.disable();
+
+        this.advanced_moloch_settings.disable();
+        this.advanced_elasticsearch_settings.disable();
+        this.advanced_kafka_settings.disable();
+        this.dns_ip.disable();
+        this.disable_autocalculate.disable();
+        this.ceph_redundancy.disable();
+    }
+
+    public clearNodes() {
+        while (this.servers.length !== 0) {
+            this.servers.removeAt(0);
+        }
+        while (this.sensors.length !== 0) {
+            this.sensors.removeAt(0);
+        }
+    }
+
+    public addServerFormGroup(managementIP: string, disableIsKubernetesMasterCheckbox: boolean=false){
         this.servers.hidden = false;
-        this.servers.push(new ServerFormGroup(false, managementIP));
+        this.servers.push(new ServerFormGroup(false, managementIP, disableIsKubernetesMasterCheckbox));
     }
 
     public addSensorFormGroup(managementIP: string, sensorType: string) {

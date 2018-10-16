@@ -29,6 +29,27 @@ export class HomeNetFormGroup extends FormGroup {
         'Remove',
         'btn btn-danger'
     )
+
+    enable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.home_net.enable();
+    }
+
+    disable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.home_net.disable();
+    }
+
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.enable();
+    }    
 }
 
 export class ExternalNetFormGroup extends FormGroup {
@@ -53,6 +74,27 @@ export class ExternalNetFormGroup extends FormGroup {
         'Remove',
         'btn btn-danger'
     )
+
+    enable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.external_net.enable();
+    }
+
+    disable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.external_net.disable();
+    }
+
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.enable();
+    }
 }
 
 /**
@@ -61,6 +103,7 @@ export class ExternalNetFormGroup extends FormGroup {
 export class SensorResourcesForm extends FormGroup {
 
     //These fields are not part of the form but they displayed on the componets interface.
+    isDisabled: boolean;
     cpuCoresAvailable: number;
     memoryAvailable: number;
     clusterStorageAvailable: number;
@@ -101,6 +144,64 @@ export class SensorResourcesForm extends FormGroup {
         super.addControl('suricata_cpu_request', this.suricata_cpu_request);
         super.addControl('zookeeper_cpu_request', this.zookeeper_cpu_request);
         this._lowest_cpus = -1;
+        this.isDisabled = false;
+    }
+
+    /**
+     * Overridden method
+     */
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        super.reset({'kafka_cpu_percentage': this.kafka_cpu_percentage.default_value,
+                     'moloch_cpu_percentage': this.moloch_cpu_percentage.default_value,
+                     'bro_cpu_percentage': this.bro_cpu_percentage.default_value,
+                     'suricata_cpu_percentage': this.suricata_cpu_percentage.default_value,
+                     'zookeeper_cpu_percentage': this.zookeeper_cpu_percentage.default_value});
+        this.cpuCoresAvailable = 0;
+        this.memoryAvailable = 0;
+        this.clusterStorageAvailable = 0;
+        this.clearHomeNets();
+        this.clearExternalNets();
+        this.initializeAllocations();
+        this.home_nets.reset();
+        this.isDisabled = false;
+    }
+
+    disable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        this.kafka_cpu_percentage.disable();
+        this.moloch_cpu_percentage.disable();
+        this.bro_cpu_percentage.disable();
+        this.suricata_cpu_percentage.disable();
+        this.zookeeper_cpu_percentage.disable();
+        this.home_nets.disable();
+        this.external_nets.disable();
+        this.isDisabled = true;
+        super.enable
+    }
+
+    enable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        super.enable(opts);
+        this.isDisabled = false;
+    }
+
+    private clearHomeNets(){
+        while (this.home_nets.length !== 0) {
+            this.home_nets.removeAt(0);
+        }
+    }
+
+    private clearExternalNets(){
+        while (this.external_nets.length !== 0) {
+            this.external_nets.removeAt(0);
+        }
     }
 
     private setLowestCpus(lowest_cpus: number){

@@ -51,12 +51,14 @@ def _async_read2(job):
         job.run_output_func(ch)
 
         ch2 = os.read(fd2.fileno(), 1024)
-        job.run_output_func(ch2)        
+        job.run_output_func(ch2, is_stderr=True)
     except OSError as e:
         # waiting for data be available on fd
         pass
 
-    return ch is None or ch == b''
+    stdout_done = ch is None or ch == b''
+    stderr_done = ch2 is None or ch2 == b''
+    return stderr_done and stderr_done
 
 
 class ProcJob(object):
@@ -67,7 +69,8 @@ class ProcJob(object):
                  funcs_after: List[Callable]=[],
                  lock_ids: List[str]=[],
                  silent: bool=False,
-                 working_directory: str=None):
+                 working_directory: str=None,
+                 is_shell=False):
         """
         Initializes a Process Job.
 
@@ -79,6 +82,7 @@ class ProcJob(object):
         :param lock_ids: A list of ids that identifies the locking mechanisme for this process.
         :param silent: If set to true, no output will be captured.
         :param working_directory: The working directory of where we want to run the command.
+        :param is_shell: The boolean that controls whether or not we are executing the command using a shell.
         """
         self.job_name = job_name
         self.job_id = str(uuid4())[-12:]
@@ -91,6 +95,7 @@ class ProcJob(object):
         self.lock_ids = lock_ids
         self.silent = silent
         self.working_directory = working_directory
+        self.is_shell = is_shell
 
     def __str__(self):
         if self.process is not None:
@@ -146,14 +151,18 @@ class ProcJob(object):
         :return:
         """        
         if self.process is None:
+            command_to_run = self.command
+            if not self.is_shell:
+                command_to_run = shlex.split(self.command)
+                
             if self.working_directory is None:
-                self.process = subprocess.Popen(shlex.split(self.command),
-                                                shell=False,
+                self.process = subprocess.Popen(command_to_run,
+                                                shell=self.is_shell,
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE)
-            else:
-                self.process = subprocess.Popen(shlex.split(self.command),
-                                                shell=False,
+            else:                
+                self.process = subprocess.Popen(command_to_run,
+                                                shell=self.is_shell,
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
                                                 cwd=self.working_directory)
@@ -331,7 +340,8 @@ def spawn_job(job_name: str, command: str,
               funcs_before: List[Callable]=[],
               funcs_after: List[Callable]=[],
               silent=False,
-              working_directory: str=None) -> None:
+              working_directory: str=None,
+              is_shell: bool=False) -> None:
     """
     The main method to call when spawning a new Job. It will instantiate
     a ProcJob object with the appropriate locks and then populate the queue.
@@ -348,7 +358,7 @@ def spawn_job(job_name: str, command: str,
     """
     logger.info("Spawning %s %s" % (job_name, command))
     job = ProcJob(job_name, command, output_func, funcs_before,
-                  funcs_after, lock_ids, silent, working_directory)
+                  funcs_after, lock_ids, silent, working_directory, is_shell)
     JOB_QUEUE.append(job)
     logger.debug("QUEUE size after add: %d" % len(JOB_QUEUE))
 

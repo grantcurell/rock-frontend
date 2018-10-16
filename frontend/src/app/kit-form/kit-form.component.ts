@@ -3,14 +3,16 @@ import { KitInventoryForm, ServersFormArray, ServerFormGroup,
          SensorFormGroup, SensorsFormArray,
          AdvancedElasticSearchSettingsFormGroup } from './kit-form';
 import { KickstartService } from '../kickstart.service';
-import { HtmlModalPopUp } from '../html-elements';
-
+import { KitService } from '../kit.service';
+import { HtmlModalPopUp, HtmlDropDown, HtmlModalSelectDialog } from '../html-elements'; 
+import { FormArray, FormGroup, FormControl } from '@angular/forms';
 import { ElasticSearchCalculator } from './elasticsearch-calculations';
 import { StorageCalculator } from './storage-calculations';
 import { MolochBroCalculator } from './moloch-bro-calculations';
 import { ManualCalculator } from './manual-calculations';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { HomeNetFormGroup, ExternalNetFormGroup } from '../total-sensor-resources-card/total-sensor-resources-form';
 
 
 @Component({
@@ -25,14 +27,28 @@ export class KitFormComponent implements OnInit {
   storageCalculator: StorageCalculator;
   molochBroCalculator: MolochBroCalculator;
   manualCalculator: ManualCalculator
+  hasKitForm: boolean;
 
   servers: ServersFormArray;
   sensors: SensorsFormArray;
   kitModal: HtmlModalPopUp;
+  executeKitModal: HtmlModalPopUp;
+  archiveKitModal: HtmlModalPopUp;
+  restoreModal: HtmlModalSelectDialog;
   isAdvancedOptionsHidden: boolean;
   isMolochPercentageHidden: boolean;
 
-  constructor(private kickStartSrv: KickstartService, private title: Title, private router: Router) {
+  //This boolean tracks if we are executing add node instead of execute kit.
+  isAddNodeInsteadOfNewKit: boolean;
+
+  //The addNodeCache
+  addNodeCache: Array<Object>;
+
+  constructor(private kickStartSrv: KickstartService, 
+              private title: Title, 
+              private router: Router, 
+              private kitSrv: KitService) 
+  {
     this.kitForm = new KitInventoryForm();
     this.advancedElasticSearchForm = this.kitForm.advanced_elasticsearch_settings;
     this.servers = this.kitForm.servers;
@@ -40,41 +56,187 @@ export class KitFormComponent implements OnInit {
     this.isAdvancedOptionsHidden = true;
     this.isMolochPercentageHidden = true;
     this.kitModal = new HtmlModalPopUp('kit_modal');
+    this.executeKitModal = new HtmlModalPopUp('execute_kit_modal');
+    this.archiveKitModal = new HtmlModalPopUp('archive_modal');
+    this.restoreModal = new HtmlModalSelectDialog("restore_modal");
 
     this.storageCalculator = new StorageCalculator(this.kitForm);
     this.molochBroCalculator = new MolochBroCalculator(this.kitForm);
     this.elasicSearchCalculator = new ElasticSearchCalculator(this.kitForm, this.storageCalculator);
     this.manualCalculator = new ManualCalculator(this.kitForm);
+    this.hasKitForm = false;
+    this.isAddNodeInsteadOfNewKit = false;
+    this.addNodeCache = new Array();
+  }
+
+  private _set_form_control(control: FormControl | HtmlDropDown, value: any){
+    if (control instanceof HtmlDropDown){
+      control.default_value = value;
+      control.setValue(value);
+
+    } else if (control instanceof FormControl){
+      control.setValue(value);
+    }
+  }
+
+  /**
+   * Maps our saved form object to view.
+   *
+   * @param data - The data to map
+   * @param formGroup - The form group we are mapping our data too.
+   */
+  private _map_to_form(data: Object, formGroup: FormGroup, rootPassword: string){
+    for (let key in data){
+      let someFormObject = formGroup.get(key);      
+
+      if (someFormObject instanceof FormControl){
+        this._set_form_control(someFormObject, data[key]);
+
+      } else if (someFormObject instanceof FormGroup){
+        this._map_to_form(data[key], someFormObject, rootPassword);
+
+      } else if (someFormObject instanceof SensorsFormArray 
+                 || someFormObject instanceof ServersFormArray) {
+        var nodeFormArray: FormArray = someFormObject as FormArray;
+
+        for (let index = 0; index < data[key].length; index++) {          
+          let srvFormGroup: SensorFormGroup | ServerFormGroup = new SensorFormGroup(false, null, null);
+          let host_key: string = "host_sensor";
+          if (someFormObject instanceof ServersFormArray){
+            srvFormGroup = new ServerFormGroup(false, null);
+            host_key = "host_server";
+          }
+          nodeFormArray.push(srvFormGroup);
+          srvFormGroup.from_object(data[key][index]);
+          this._gatherFacts(srvFormGroup, srvFormGroup.deviceFacts, host_key, true);
+          setTimeout(()=> {
+            this.cephDriveSelected(data[key][index]['ceph_drives'], srvFormGroup);
+          });
+        }
+      } 
+
+      else if (key =='home_nets' && someFormObject instanceof FormArray){
+        for (let index = 0; index < data[key].length; index++){          
+          let homeNetFormGroup = new HomeNetFormGroup();
+          homeNetFormGroup.home_net.setValue(data[key][index]['home_net']);
+          someFormObject.push(homeNetFormGroup);
+        }
+      } else if (key === 'external_nets' && someFormObject instanceof FormArray){
+        for (let index = 0; index < data[key].length; index++){
+          let externalNetFormGroup = new ExternalNetFormGroup();
+          externalNetFormGroup.external_net.setValue(data[key][index]['external_net']);
+          someFormObject.push(externalNetFormGroup);
+        }
+      }
+    }
   }
 
   ngOnInit() {
     this.title.setTitle("Kit Configuration");
+    this.kitForm.addSensorFormGroup(null, null);
+    this.kitForm.addServerFormGroup(null);
+    this.kitForm.reset();    
+  }
+
+  ngAfterViewInit() {
+    this.initalizeForm();
+  }
+
+  clearForm() {
+    this.kitForm.reset();
+    this.kitForm.enable();
+    this.hasKitForm = false;
+    this.isAddNodeInsteadOfNewKit = false;
+    this.prepopulateFromKickstart();    
+  }
+
+  enableForm(){
+    this.kitForm.enable();
+  }
+
+  private openKickstartErrorModal(): void {
+    this.kitModal.updateModal('Error',
+    "What are you doing? You cannot create a Kit until you have a Kickstart configuration. \
+    Please click on the Kickstart Configuration first and finish that form first.",
+    undefined,
+    'Close');
+
+    this.kitModal.openModal();
+  }
+
+  private prepopulateFromKickstart(){
     this.kickStartSrv.getKickstartForm().subscribe(data => {
-      if (!data){
+      if (!data) {
+        this.openKickstartErrorModal();
         return;
       }
 
       this.kitForm.root_password.setDefaultValue(data["root_password"]);
-
-      for (let node of data["nodes"]){
-        if (node["node_type"] === "Server"){
-          this.kitForm.addServerFormGroup(node["ip_address"]);
-        } else if (node["node_type"] === "Sensor"){
-          this.kitForm.addSensorFormGroup(node["ip_address"], 'Local');
-        } else if (node["node_type"] === "Remote Sensor"){
-          this.kitForm.addSensorFormGroup(node["ip_address"], 'Remote');
-        } else {
-          console.error("Unknown Node type." + node["node_type"]);
-        }
+      for (let node of data["nodes"]) {
+        this.appendNode(node);
       }
     });
 
     this.storageCalculator.recalculate_storage_recommendation();
-    this.storageCalculator.validate_ceph_drive_count();
   }
 
-  onSubmit(){
-    this.kickStartSrv.generateKitInventory(this.kitForm.value)
+  openArchiveConfirmation(): void {
+    this.archiveKitModal.updateModal('WARNING',
+      'Are you sure you want to archive this form? Doing so will erase any fields \
+      you have entered on the existing page but it will archive the form.',
+      "Yes",
+      'Cancel'
+    )
+    this.archiveKitModal.openModal();
+  }
+
+  archiveForm(): void {
+    this.clearForm();
+    this.kitSrv.removeKitInventoryAndArchive().subscribe(data => {});
+  }
+
+  openRestoreModal(){
+    this.kitSrv.getArchivedKitForms().subscribe(data => {
+      this.restoreModal.updateModal('Restore Form',
+        'Please select an archived Kickstart form.  Keep in mind restoring a form will remove your current configuration.',
+        "Restore",
+        'Cancel'
+      );
+      this.restoreModal.updateModalSelection(data);
+      this.restoreModal.openModal();
+    });
+  }
+    
+  restoreForm(formId: string){
+    this.kitForm.addSensorFormGroup(null, null);
+    this.kitForm.addServerFormGroup(null);
+    this.kitForm.reset();
+    this.kitSrv.restoreArchivedKitForm(formId).subscribe(data => {      
+      this.initalizeForm();
+    });
+  }  
+
+  onSubmit(){    
+    this.executeKitModal.updateModal('WARNING',
+      'Are you sure you wan to execute this Kit configuration? Doing so will create a new cluster \
+      with the configuration you created.  All data will be wiped out if you are running this on an existing cluster!',
+      'Execute',
+      'Cancel'
+    );
+    this.executeKitModal.openModal();    
+  }
+
+  executeAddNode(){    
+    let payload = {'kitForm': this.kitForm.getRawValue(), 'nodesToAdd': this.addNodeCache};
+    this.kitSrv.executeAddNode(payload)
+    .subscribe(data => {
+      this.openConsole();
+      this.addNodeCache = new Array();
+    });    
+  }
+
+  executeKit(){
+    this.kitSrv.executeKit(this.kitForm.getRawValue())
     .subscribe(data => {
       this.openConsole();
     });
@@ -82,6 +244,69 @@ export class KitFormComponent implements OnInit {
 
   openConsole(){
     this.router.navigate(['/stdout/Kit'])
+  }
+
+  private appendNode(node: Object, disableIsKubernetesMasterCheckbox: boolean=false){
+    if (node === undefined || node === null){
+      return;
+    }
+
+    if (node["node_type"] === "Server") {
+      this.kitForm.addServerFormGroup(node["ip_address"], disableIsKubernetesMasterCheckbox);
+    } else if (node["node_type"] === "Sensor") {
+      this.kitForm.addSensorFormGroup(node["ip_address"], 'Local');
+    } else if (node["node_type"] === "Remote Sensor") {
+      this.kitForm.addSensorFormGroup(node["ip_address"], 'Remote');
+    } else {
+      console.error("Unknown Node type." + node);
+    }
+  }
+
+  private initalizeForm(): void {
+
+    this.kickStartSrv.getKickstartForm().subscribe(kickstartData => {
+      if (!kickstartData) {
+        this.openKickstartErrorModal();        
+        return;
+      }
+
+      this.kitSrv.getKitForm().subscribe(kitData => {
+        if (kitData === null || kitData === undefined) {
+          this.prepopulateFromKickstart();
+          this.hasKitForm = false;
+          this.isAddNodeInsteadOfNewKit = false;
+          return;
+        }
+
+        this._map_to_form(kitData, this.kitForm, kitData['root_password']);
+        this.hasKitForm = true;
+        this.kitForm.disable();
+
+        outer:
+        for(let node of kickstartData['nodes']){
+
+          for (let kitServer of kitData['servers']){
+            if (kitServer["host_server"] === node["ip_address"]){
+              continue outer;
+            }
+          }
+
+          for (let kitServer of kitData['sensors']){
+            if (kitServer["host_sensor"] === node["ip_address"]){
+              continue outer;
+            }
+          }
+          
+          this.addNodeCache.push(node);
+          this.appendNode(node, true);
+
+          //We know here that we are adding nodes because our kickstart configuration is 
+          //different from our kit configuration.
+          this.isAddNodeInsteadOfNewKit = true;
+        }
+
+      });
+    });    
   }
 
   toggleServer(server: ServerFormGroup) {
@@ -92,53 +317,57 @@ export class KitFormComponent implements OnInit {
     sensor.hidden = !sensor.hidden;
   }
 
-  gatherFacts(node: ServerFormGroup | SensorFormGroup) {
-      let host_key: string = "host_server";
-      if (node instanceof SensorFormGroup){
-        host_key = "host_sensor";
-      }
-      this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value)
-      .subscribe(data => {
+  //TODO gathering facts twice after restore causes issues.
+  private _gatherFacts(node: ServerFormGroup | SensorFormGroup, data: Object, host_key: string, runCalculations: boolean) {    
+    if (data['error_message']) {
+      this.kitModal.updateModal('Error',
+        data['error_message'],
+        undefined,
+        'Close');
 
-      if (data['error_message']) {
-        this.kitModal.updateModal('Error',
-          data['error_message'],
-          undefined,
-          'Close');
-
-        this.kitModal.openModal();
-        //End execution of this if we have errors.
-        return;
-      }
-
-      let hasDeviceFacts: boolean = (node.deviceFacts != null);
-      node.deviceFacts = data;
-      if (node instanceof ServerFormGroup){
+      this.kitModal.openModal();
+      //End execution of this if we have errors.
+      return;
+    }
+    
+    node.deviceFacts = data;
+    //Ensures we do not add additional compute power and memory by accident.
+    if (runCalculations) {
+      if (node instanceof ServerFormGroup) {
         node.setOptionSelections();
-      } else if (node instanceof SensorFormGroup){
-        node.setSensorOptionsSelections(node.host_sensor.value);
+      } else if (node instanceof SensorFormGroup) {
+        node.setSensorOptionsSelections(node[host_key].value);
       }
-
       node.basicNodeResource.setFromDeviceFacts(node.deviceFacts);
 
-      //Ensures we do not add additional compute power and memory by accident.
-      if (!hasDeviceFacts){
-        this.kitForm.system_resources.setFromDeviceFacts(node.deviceFacts);
-        node.hostname.setValue(node.deviceFacts["hostname"]);
+      this.kitForm.system_resources.setFromDeviceFacts(node.deviceFacts);
+      node.hostname.setValue(node.deviceFacts["hostname"]);
 
-        if (node instanceof ServerFormGroup){
-          this.kitForm.server_resources.setFromDeviceFacts(node.deviceFacts);
-          this.kitForm.server_resources.setErrorsOrSuccesses(this.advancedElasticSearchForm.elastic_masters.value,
-                                                             this.advancedElasticSearchForm.elastic_datas.value,
-                                                             this.advancedElasticSearchForm.elastic_cpus.value,
-                                                             this.advancedElasticSearchForm.elastic_memory.value);
-          this.elasicSearchCalculator.calculate();
-          this.manualCalculator.validate_manual_entries();
-        } else if (node instanceof SensorFormGroup){
-          this.kitForm.sensor_resources.setFromDeviceFacts(node.deviceFacts);
-          this.molochBroCalculator.calculate_bro_and_moloch_threads();
-        }
+      if (node instanceof ServerFormGroup) {
+        this.kitForm.server_resources.setFromDeviceFacts(node.deviceFacts);
+        this.kitForm.server_resources.setErrorsOrSuccesses(
+          this.advancedElasticSearchForm.elastic_masters.value,
+          this.advancedElasticSearchForm.elastic_datas.value,
+          this.advancedElasticSearchForm.elastic_cpus.value,
+          this.advancedElasticSearchForm.elastic_memory.value);
+        this.elasicSearchCalculator.calculate();
+        this.manualCalculator.validate_manual_entries();
+      } else if (node instanceof SensorFormGroup) {
+        this.kitForm.sensor_resources.setFromDeviceFacts(node.deviceFacts);
+        this.molochBroCalculator.calculate_bro_and_moloch_threads();
       }
+    }
+  }
+
+  gatherFacts(node: ServerFormGroup | SensorFormGroup) {
+    let host_key: string = "host_server";
+    if (node instanceof SensorFormGroup) {
+      host_key = "host_sensor";
+    }
+    this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value)
+    .subscribe(data => {
+      let hasDeviceFacts: boolean = (node.deviceFacts != null);
+      this._gatherFacts(node, data, host_key, !hasDeviceFacts);
     });
   }
 
@@ -180,7 +409,7 @@ export class KitFormComponent implements OnInit {
     this.storageCalculator.recalculate_storage_recommendation();
   }
 
-  cephDriveSelected(drivesSelected: Array<string>, node: SensorFormGroup | ServerFormGroup){
+  private _cephDriveSelected(drivesSelected: Array<string>, node: SensorFormGroup | ServerFormGroup): void {
     this.kitForm.system_resources.calculateTotalCephDrives(drivesSelected.length, node.deviceFacts);
 
     if (node instanceof SensorFormGroup){
@@ -190,8 +419,11 @@ export class KitFormComponent implements OnInit {
     }
 
     this.setSystemClusterStorageAvailable();
-    this.storageCalculator.recalculate_storage_recommendation();
-    this.storageCalculator.validate_ceph_drive_count();
+  }
+
+  cephDriveSelected(drivesSelected: Array<string>, node: SensorFormGroup | ServerFormGroup): void {
+    this._cephDriveSelected(drivesSelected, node);
+    this.storageCalculator.recalculate_storage_recommendation();    
   }
 
   private setSystemClusterStorageAvailable(){
@@ -331,8 +563,7 @@ export class KitFormComponent implements OnInit {
       this.kitForm.system_resources.calculateTotalCephDrives(0, deviceFacts);
       this.kitForm.sensor_resources.removeClusterStorage(deviceFacts);
       this.setSystemClusterStorageAvailable();
-      this.storageCalculator.recalculate_storage_recommendation();
-      this.storageCalculator.validate_ceph_drive_count();
+      this.storageCalculator.recalculate_storage_recommendation();      
     }
   }
 }

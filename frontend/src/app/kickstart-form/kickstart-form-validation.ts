@@ -91,8 +91,8 @@ function _validateNodes(control: AbstractControl, errors: Array<string>): void {
     let has_servers = false;
     let has_sensors = false;
 
-    if (nodes == null){
-        return null;
+    if (nodes === undefined || nodes === null){
+        return;        
     }
 
     if (nodes.length < 2){
@@ -111,7 +111,9 @@ function _validateNodes(control: AbstractControl, errors: Array<string>): void {
         }
     }
 
-    errors.push("- A minium of one server and one sensor is required for the Kickstart configuration.");
+    if (!has_sensors || !has_servers){
+        errors.push("- A minium of one server and one sensor is required for the Kickstart configuration.");
+    }    
 }
   
 export function ValidateKickStartInventoryForm(control: AbstractControl){

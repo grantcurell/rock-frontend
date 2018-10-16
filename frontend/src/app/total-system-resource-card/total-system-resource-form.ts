@@ -14,6 +14,10 @@ export class TotalSystemResources {
     totalCephDrivesCache: Object;
 
     constructor(){
+        this.reinitalize();
+    }
+
+    public reinitalize(){
         this.cpuCoresAvailable = 0;
         this.memoryAvailable = 0;
         this.clusterStorageAvailable = 0;

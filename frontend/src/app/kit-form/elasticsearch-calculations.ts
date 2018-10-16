@@ -30,8 +30,7 @@ export class ElasticSearchCalculator {
         // allocation. This function will return false if it was unable to allocate the
         // instances appropriately across the servers.
 
-        if (this.kitForm.disable_autocalculate.value){
-            console.log("Auto calculations are disabled");
+        if (this.kitForm.disable_autocalculate.value){            
             return;
         }
 
@@ -220,6 +219,10 @@ export class ElasticSearchCalculator {
                 mem_warning_reached = false;
 
                 // Stores block id of the block allocated to a process
+                if (isNaN(elastic_instances)){
+                    elastic_instances = 0;
+                }
+
                 let elasticsearch_cpu_allocation = new Array(elastic_instances);
                 let elasticsearch_memory_allocation = new Array(elastic_instances);
 

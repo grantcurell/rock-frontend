@@ -25,6 +25,13 @@ export class TotalServerResources extends FormGroup {
 
     constructor(){
         super({}, null, null);
+        this.initalize();
+
+        super.addControl('log_stash_cpu_request', this.log_stash_cpu_request);
+        super.addControl('elastic_search_cpu_request', this.elastic_search_cpu_request);
+    }
+
+    private initalize(){
         this.cpuCoresAvailable = 0;
         this.memoryAvailable = 0;
         this.clusterStorageAvailable = 0;
@@ -42,9 +49,17 @@ export class TotalServerResources extends FormGroup {
         this.assignedElasicSearchMemory = 0;
         this.elasticSearchMemCss = "";
         this.elasticSearchMemErrorText= "";
+    }
 
-        super.addControl('log_stash_cpu_request', this.log_stash_cpu_request);
-        super.addControl('elastic_search_cpu_request', this.elastic_search_cpu_request);
+    /**
+     * Overridden method
+     */
+    reset(value?: any, options?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        super.reset({});
+        this.initalize();
     }
 
     log_stash_cpu_request = new HtmlHidden('log_stash_cpu_request', true);
@@ -112,12 +127,11 @@ export class TotalServerResources extends FormGroup {
 
         for (let drive of drivesSelected){
             for (let clusterDrive of deviceFacts["disks"]) {
-                if (drive === clusterDrive["name"]){
+                if (drive === clusterDrive["name"]){                                        
                     this.serverDriveStorageCache[deviceFacts["hostname"]] += clusterDrive["size_gb"];
                 }
             }
         }
-
         this.clusterStorageAvailable += this.serverDriveStorageCache[deviceFacts["hostname"]];
     }
 

@@ -9,7 +9,9 @@
     </div>
     <input *ngFor="let item of input_control.controls; let i=index" type="hidden" [formControlName]="i">
     <div #button_group class="btn-group-vertical" role="group">
-        <input name="{{ controlName }}" *ngFor="let selection of optionSelections" type="button" (click)="selectedButton($event, selection)" required class="btn btn-primary" value="{{ selection.label }}" name="{{ controlName }}{{ uid }}">
+        <input [disabled]="input_control.isDisabled" name="{{ controlName }}" 
+               *ngFor="let selection of optionSelections" type="button" (click)="selectedButton($event, selection)" 
+               required class="btn btn-primary" value="{{ selection.label }}" name="{{ controlName }}{{ uid }}">
       <div *ngIf="!optionSelections" class="alert alert-danger" role="alert">
         {{ input_control.invalid_feedback }}
       </div>

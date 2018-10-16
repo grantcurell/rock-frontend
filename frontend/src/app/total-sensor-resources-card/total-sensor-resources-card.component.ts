@@ -21,7 +21,7 @@ export class TotalSensorResourcesCardComponent implements OnInit {
   ngOnInit() {
     this.home_nets = this.sensorResourceForm.get('home_nets') as FormArray;
     this.external_nets = this.sensorResourceForm.get('external_nets') as FormArray;
-    this.sensorResourceForm.get('bro_cpu_request').setValue(5);
+    this.sensorResourceForm.get('bro_cpu_request').setValue(5);    
   }
 
   addHomeNet(){

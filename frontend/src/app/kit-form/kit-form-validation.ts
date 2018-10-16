@@ -1,7 +1,7 @@
 import {  FormArray, AbstractControl } from '@angular/forms';
 import { HtmlInput } from '../html-elements';
-import { ServerFormGroup, SensorFormGroup, SensorsFormArray, ServersFormArray } from './kit-form';
-import { GetClusteredStorageValidated, GetElasticSearchValidated, GetSensorResourcesValidated } from './kit-form-globals';
+import { ServerFormGroup, SensorFormGroup, SensorsFormArray, ServersFormArray, KitInventoryForm } from './kit-form';
+import { GetElasticSearchValidated, GetSensorResourcesValidated } from './kit-form-globals';
 import { CEPH_DRIVE_MIN_COUNT } from '../frontend-constants';
 
 /**
@@ -97,14 +97,20 @@ function _validateKubernetesCIDR(control: AbstractControl, errors: Array<string>
  * @param errors - An array of strings to display.
  */
 function _validateHomeNet(control: AbstractControl, errors: Array<string>): void {
-    let sensor_resources = control.get('sensor_resources');
+    let sensor_resources = control.get('sensor_resources');    
 
     if (sensor_resources != null){
         let home_nets = sensor_resources.get('home_nets') as FormArray;
+        const message: string = "- Your home nets are not valid. You need at least one home net.";
+
+        if (home_nets.length === 0){
+            errors.push(message);
+            return;
+        }
 
         for (let i = 0; i < home_nets.length; i++){
             if (!home_nets.at(i).valid){
-                errors.push("- Your home nets are not valid. You need at least one home net.");
+                errors.push(message);
                 return;
             }
         }
@@ -258,6 +264,48 @@ function _validateIps(control: AbstractControl, errors: Array<string>): void {
     }
 }
 
+    // Returns true if there is enough storage available and false otherwise
+function _validate_clustered_storage_committed(control: AbstractControl, errors: Array<string>) {
+    let kitForm = control as KitInventoryForm;
+    if (kitForm === undefined || kitForm === null || kitForm.system_resources === undefined){
+        return;
+    }
+    var current_storage_total = kitForm.system_resources.clusterStorageAvailable;
+    var current_storage_requested = kitForm.system_resources.clusterStorageComitted;
+
+    if (current_storage_total === 0){
+        kitForm.system_resources.clusteredStorageCss = "text-danger";
+        kitForm.system_resources.clusteredStorageErrors = ' - Error: There is no assigned cluster storage.';
+        errors.push("- Clustered storage failed to validate. Make sure you have space for everything by checking the total system resources. Maybe you forgot to add a Ceph drive?");
+    } else if (current_storage_requested > current_storage_total) {
+        // These repeated three lines redraw the text with either error or success
+        // messages. We use the parent method in this case, otherwise it would just
+        // color the number and the error message
+        kitForm.system_resources.clusteredStorageCss = "text-danger";
+        kitForm.system_resources.clusteredStorageErrors = ' - Error: Insufficient storage space available on system.';
+        errors.push("- Clustered storage failed to validate. Make sure you have space for everything by checking the total system resources. Maybe you forgot to add a Ceph drive?");
+    } else {
+        kitForm.system_resources.clusteredStorageCss = "text-success";
+        kitForm.system_resources.clusteredStorageErrors = ' - Looks good!';
+    }
+}
+
+function _validate_ceph_drive_count(control: AbstractControl, errors: Array<string>) {
+    let kitForm = control as KitInventoryForm;
+    if (kitForm === undefined || kitForm === null || kitForm.system_resources === undefined){
+        return;
+    }
+    let number_of_ceph_drives = kitForm.system_resources.totalCephDrives;
+    
+    if (number_of_ceph_drives < CEPH_DRIVE_MIN_COUNT) {
+        kitForm.system_resources.totalCephDrivesCss = "text-danger";
+        kitForm.system_resources.totalCephDrivesErrors = ' - Error: You need at least two drives in the Ceph cluster!';
+    } else {
+        kitForm.system_resources.totalCephDrivesCss = "text-success";
+        kitForm.system_resources.totalCephDrivesErrors = ' - Looks good!';
+    }
+}
+
 /**
  * The main exported function that performs all the Form Level validation for the KitForm.
  *
@@ -277,10 +325,7 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
     _validateIps(control, errors);
     _validateLogstashReplicas(control, errors);
     _validateSensorAndServerCounts(control, errors);
-
-    if (!GetClusteredStorageValidated()){
-        errors.push("- Clustered storage failed to validate. Make sure you have space for everything by checking the total system resources. Maybe you forgot to add a Ceph drive?");
-    }
+    _validate_clustered_storage_committed(control, errors);
 
     // TODO elastic search math is messed up.  This needs to be fixed before we uncomment the validation checks.
     if (!GetElasticSearchValidated()){

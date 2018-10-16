@@ -90,4 +90,28 @@ export class SystemHealthComponent implements OnInit {
     this.podDescribeModal.updateModal(podName + " status", JSON.stringify(podStatusInfo, null, 2).trim(), 'Close', undefined, ModalType.code);
     this.podDescribeModal.openModal();
   }
+
+  getPostStatus(stateObj: Object): Array<{name: string, status: string}> {
+    let containerStatuses = stateObj['container_statuses'];
+    let retVal: Array<{name: string, status: string}> = [];
+    for (let status of containerStatuses){
+      let item = {name: '', status: ''};
+      for (let key in status['state']) {
+        if (stateObj['reason']){
+          item['status'] = stateObj['reason'];
+          if (stateObj['message']){
+            item['status'] = item['status'].concat(stateObj['message']);
+          }
+        } else if (status['state'][key]){
+          item['name'] = status['name'];
+          item['status'] = item['status'].concat(key);
+          if (status['state'][key]['message']){
+            item['status'] = item['status'].concat(": " + status['state'][key]['message']);
+          }
+        }
+      }
+      retVal.push(item);
+    }
+    return retVal;
+  }
 }

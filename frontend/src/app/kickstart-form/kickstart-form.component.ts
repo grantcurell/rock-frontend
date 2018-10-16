@@ -47,7 +47,6 @@ export class KickstartFormComponent implements OnInit {
     if (control instanceof HtmlDropDown){
       control.default_value = value;
       control.setValue(value);
-
     } else if (control instanceof FormControl){
       control.setValue(value);
     }
@@ -59,16 +58,13 @@ export class KickstartFormComponent implements OnInit {
    * @param data - The data to map
    * @param formGroup - The form group we are mapping our data too.
    */
-  private _map_to_form(data: Object, formGroup: FormGroup){
+  private _map_to_form(data: Object, formGroup: FormGroup){    
     for (let key in data){
       let someFormObject = formGroup.get(key);
-
       if (someFormObject instanceof FormControl){
         this._set_form_control(someFormObject, data[key]);
-
       } else if (someFormObject instanceof FormGroup){
         this._map_to_form(data[key], someFormObject);
-
       } else if (someFormObject instanceof HtmlCardSelector){
         this.monitorInterfaceSelector.setDefaultValues(data[key]);
       } else if (someFormObject instanceof FormArray && data[key] instanceof Array){
@@ -94,29 +90,25 @@ export class KickstartFormComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-    this.setKickstartForm();
     this.initializeView();
-  }
-
-  private setKickstartForm(): void {
-    this.kickStartSrv.getKickstartForm().subscribe(data => {
-      if (data){
-        this.hasKickstartForm = true;
-      } else {
-        this.hasKickstartForm = false;
-      }
-    });
   }
 
   private initalizeForm(): void {
     this.kickStartSrv.getKickstartForm().subscribe(data => {
-
-      if (this.monitorInterfaceSelector == undefined){
+      if (data === null || data === undefined){
+        this.hasKickstartForm = false;
         return;
       }
+
+      if (this.monitorInterfaceSelector == undefined){
+        this.hasKickstartForm = false;
+        return;
+      }
+
       this._map_to_form(data, this.kickStartForm);
-      //Fixes a bug so that I do not have to touch the box.
+      this.hasKickstartForm = true;
       this.kickStartForm.re_password.updateValueAndValidity();
+      this.kickStartForm.disable();
     });
   }
 
@@ -126,16 +118,21 @@ export class KickstartFormComponent implements OnInit {
       .subscribe(data => {
         this.deviceFacts = data;
         this.kickStartForm.setInterfaceSelections(this.deviceFacts);
+        this.initalizeForm();
       });
   }
 
-  restorePreviousForm(): void {
+  clearForm(): void {
     this.kickStartForm.reset();
-    this.initalizeForm();
+    this.kickStartForm.enable();
+  }
+
+  enableForm(): void {
+    this.kickStartForm.enable();
   }
 
   onSubmit(): void {
-    this.kickStartSrv.generateKickstartInventory(this.kickStartForm.value)
+    this.kickStartSrv.generateKickstartInventory(this.kickStartForm.getRawValue())
       .subscribe(data => {
         this.openConsole();
     });
@@ -184,8 +181,6 @@ export class KickstartFormComponent implements OnInit {
   }
 
   openRestoreModal(){
-    console.log('openRestoreModal')
-
     this.kickStartSrv.getArchivedKickstartForms().subscribe(data => {
       this.restoreModal.updateModal('Restore Form',
         'Please select an archived Kickstart form.  Keep in mind restoring a form will remove your current configuration.',
@@ -197,9 +192,12 @@ export class KickstartFormComponent implements OnInit {
     });
   }
 
-  resetForm(){
+  archiveForm(){
     this.kickStartForm.reset();
-    this.kickStartSrv.removeKickstartInventoryAndArchive().subscribe(data => {});
+    this.kickStartForm.enable();
+    this.kickStartSrv.removeKickstartInventoryAndArchive().subscribe(data => {
+      this.hasKickstartForm = false;
+    });
   }
 
   restoreForm(formId: string){

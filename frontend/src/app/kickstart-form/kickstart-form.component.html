@@ -1,4 +1,4 @@
-<app-modal-dialog [modal]="kickStartModal" (primaryButtonClick)="resetForm()"></app-modal-dialog>
+<app-modal-dialog [modal]="kickStartModal" (primaryButtonClick)="archiveForm()"></app-modal-dialog>
 <app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
 
 <div class="container" id="topheader">
@@ -7,9 +7,11 @@
       <div class="card">
         <div class="card-header">
             <button class="btn btn-primary" type="button" style="margin-right: 10px;" (click)="openConsole()"><i class="icon_desktop"></i> Open Console</button>
-            <button class="btn btn-secondary" type="button" [disabled]="!hasKickstartForm" (click)="restorePreviousForm()"><i class="icon_clipboard"></i> Restore Previous Form</button>
+            <button class="btn btn-secondary" type="button" style="margin-right: 10px;" (click)="clearForm()"><i class="icon_clipboard"></i> Clear Form</button>
+            <button class="btn btn-secondary" type="button" (click)="enableForm()"><i class="icon_clipboard"></i> Enable Form</button>
             <button class="btn btn-primary" style="float: right;" type="button" (click)="openRestoreModal()"><i class="icon_download"></i> Restore Form</button>
-            <button class="btn btn-danger" type="button" style="float: right;  margin-right: 10px;" (click)="openResetConfirmation()"><i class="icon_floppy_alt"></i> Archive Form</button>
+            <button class="btn btn-danger" type="button" style="float: right;  margin-right: 10px;"
+                    (click)="openResetConfirmation()"><i class="icon_floppy_alt"></i> Archive and Clear Form</button>
         </div>
         <div class="card-body">
           <h5>DHCP Settings</h5>
@@ -38,7 +40,8 @@
           <div class="card-header">
             <h5 class="mb-0">
               <button class="btn btn-link" type="button" (click)="toggleNode(node)">node {{ i + 1 }}</button>
-              <button class="btn btn-danger" type="button" (click)="removeNode(i)" style="float:right;"><i class="icon_close_alt2"></i> Remove</button>
+              <button [disabled]="node.isDisabled" class="btn btn-danger" type="button" 
+                      (click)="removeNode(i)" style="float:right;"><i class="icon_close_alt2"></i> Remove</button>
             </h5>
           </div>
           <div *ngIf="!node.hidden" class="card-body">

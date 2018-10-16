@@ -12,7 +12,7 @@ export interface Message {
 export class MySocket extends Socket {
  
   constructor() {
-    if (environment.production){
+    if (environment.production){      
       super({ url: window.location.origin, options: {} });      
     } else {
       super({ url: "http://" + window.location.hostname + ":5001", options: {} });

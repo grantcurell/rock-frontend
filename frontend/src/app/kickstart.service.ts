@@ -32,13 +32,7 @@ export class KickstartService {
     }    
   }
 
-  gatherDeviceFacts(management_ip: string, password: string): Observable<Object> { 
-    // const url = `/api/_gather_device_facts?management_ip=${management_ip}&password=${password}`
-    // return this.http.get(url)
-    //   .pipe(
-    //     catchError(this.handleError('gatherDeviceFacts', []))
-    //   );
-
+  gatherDeviceFacts(management_ip: string, password: string): Observable<Object> {
     const url = '/api/gather_device_facts';
     let post_payload = {"management_ip": management_ip, "password": password};
     return this.http.post(url, post_payload , HTTP_OPTIONS).pipe(
@@ -84,14 +78,6 @@ export class KickstartService {
       .pipe(
         catchError(this.handleError('gatherDeviceFacts', []))
       );
-  }
-  
-
-  generateKitInventory(kitForm: Object){
-    const url = '/api/generate_kit_inventory';
-    return this.http.post(url, kitForm, HTTP_OPTIONS).pipe(
-      catchError(this.handleError('generateKitInventory'))
-    );
   }
 
   /**

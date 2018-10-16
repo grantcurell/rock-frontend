@@ -60,7 +60,7 @@
     <hr>
     <h6 class="card-subtitle mb-2 text-muted">Home NET Settings</h6>
     <hr>
-    <button type="button" class="btn btn-primary" (click)="addHomeNet()" name="add_home_net">+ Add Home Net</button>
+    <button type="button" class="btn btn-primary" (click)="addHomeNet()" name="add_home_net" [disabled]="sensorResourceForm.isDisabled">+ Add Home Net</button>
     <hr>
     <div formArrayName="home_nets">
         <div *ngFor="let home_net of home_nets.controls; let i=index">
@@ -70,7 +70,7 @@
     <hr>
     <h6 class="card-subtitle mb-2 text-muted">External NET Settings</h6>
     <hr>
-    <button type="button" class="btn btn-primary" (click)="addExternalNet()" name="add_external_net">+ Add External Net</button>
+    <button type="button" class="btn btn-primary" (click)="addExternalNet()" name="add_external_net" [disabled]="sensorResourceForm.isDisabled">+ Add External Net</button>
     <hr>
     <div formArrayName="external_nets">
       <div *ngFor="let external_net of external_nets.controls; let i=index">

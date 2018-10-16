@@ -6,6 +6,7 @@ CLUSTERED_STORAGE_VALIDATED = false;
 ELASTICSEARCH_VALIDATED = false;
 SENSOR_RESOURCES_VALIDATED = false;
 
+//TODO the use of globals is bad practive and it is causing the ExpressionChangedAfterItHasBeenCheckedError
 export function SetClusteredStorageValidated(newValue: boolean){
     CLUSTERED_STORAGE_VALIDATED = newValue;
 }

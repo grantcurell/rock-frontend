@@ -20,7 +20,7 @@
          [placeholder]="input_control.placeholder"
          (keyup)="callParentKeyUp($event)">
   <div *ngIf="input_control.has_button" class="input-group-append">
-    <button class="{{ input_control.button_css }}" type="button" (click)="callParent()" name="btn_{{ controlName }}{{ uid }}">{{ input_control.button_text }}</button>
+    <button [hidden]="input_control.control_disabled" class="{{ input_control.button_css }}" type="button" (click)="callParent()" name="btn_{{ controlName }}{{ uid }}">{{ input_control.button_text }}</button>
   </div>
   <div *ngIf="input_control.invalid && (input_control.dirty || input_control.touched)" class="invalid-feedback2">
       <div *ngIf="input_control.errors.required">This field is required.</div>

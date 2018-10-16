@@ -1,12 +1,13 @@
 import { FormGroup, FormArray, AbstractControl } from '@angular/forms';
 import { ValidateKickStartInventoryForm } from './kickstart-form-validation';
-import { IP_CONSTRAINT, URL_CONSTRAINT, IP_CONSTRAINT_WITH_SUBNET, DESC_ROOT_PASSWORD, INVALID_FEEDBACK_IP } from '../frontend-constants';
-import { HtmlInput, HtmlDropDown, HtmlCheckBox, GenericHtmlButton, HtmlCardSelector } from '../html-elements';
+import { IP_CONSTRAINT, IP_CONSTRAINT_WITH_SUBNET, DESC_ROOT_PASSWORD, INVALID_FEEDBACK_IP } from '../frontend-constants';
+import { HtmlInput, HtmlDropDown, HtmlCardSelector } from '../html-elements';
 
 export class NodeFormGroup extends FormGroup {
   public hidden: boolean;
+  public isDisabled: boolean;
 
-  constructor(hidden: boolean) {
+  constructor(hidden: boolean, isDisabled: boolean = false) {
     super({});
     super.addControl('hostname', this.hostname);
     super.addControl('ip_address', this.ip_address);
@@ -15,6 +16,38 @@ export class NodeFormGroup extends FormGroup {
     super.addControl('pxe_type', this.pxe_type);
     super.addControl('node_type', this.node_type);
     this.hidden = hidden;
+    this.isDisabled = isDisabled;
+  }
+
+  /**
+   * Overridden method so that this FromGroup is properly disabled.
+   * 
+   * @param opts 
+   */
+  disable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    this.hostname.disable();
+    this.ip_address.disable();
+    this.mac_address.disable();
+    this.boot_drive.disable();
+    this.pxe_type.disable();
+    this.node_type.disable();
+    this.isDisabled = true;
+  }
+
+  enable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    this.hostname.enable();
+    this.ip_address.enable();
+    this.mac_address.enable();
+    this.boot_drive.enable();
+    this.pxe_type.enable();
+    this.node_type.enable();
+    this.isDisabled = false;
   }
 
   /**
@@ -183,6 +216,25 @@ export class KickstartInventoryForm extends FormGroup {
     super.reset({'netmask': this.netmask.default_value });
     this.advanced_settings.reset();
     this.clearNodes();
+  }
+
+  /**
+   * Overridden method
+   * @param opts 
+   */
+  disable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void{
+    this.dhcp_start.disable();
+    this.dhcp_end.disable();
+    this.gateway.disable();
+    this.netmask.disable();
+    this.root_password.disable();
+    this.re_password.disable();
+    this.controller_interface.disable();
+    this.nodes.disable();
+    this.advanced_settings.disable();
   }
 
   advanced_settings = new AdvancedSettingsFormGroup(true);
