@@ -17,6 +17,9 @@ export class CheckboxComponent implements OnInit {
   @Input()
   public controlName: string;
 
+  @Input()
+  public uid: string;
+
   @Output()
   is_checked: EventEmitter<any> = new EventEmitter();
 
@@ -38,7 +41,7 @@ export class CheckboxComponent implements OnInit {
     return this.parentForm.get(this.controlName) as HtmlCheckBox;
   }
 
-  callParent(event){    
+  callParent(event){
     this.is_checked.emit(this.input_control.value);
   }
 }

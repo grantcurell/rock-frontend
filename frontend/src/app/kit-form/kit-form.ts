@@ -7,7 +7,7 @@ import {
 import { HtmlInput, HtmlCheckBox, HtmlDropDown, HtmlCardSelector, HtmlHidden } from '../html-elements';
 import { SensorResourcesForm } from '../total-sensor-resources-card/total-sensor-resources-form';
 import { TotalServerResources } from '../total-server-resources-card/total-server-resources-form';
-import {  PERCENT_PLACEHOLDER, PERCENT_MIN_MAX, PERCENT_INVALID_FEEDBACK, 
+import {  PERCENT_PLACEHOLDER, PERCENT_MIN_MAX, PERCENT_INVALID_FEEDBACK,
           PERCENT_VALID_FEEDBACK, KUBE_CIDR_CONSTRAINT, IP_CONSTRAINT,
           CONSTRAINT_MIN_ONE, WHAT_IS_CEPH, MIN_ONE_INVALID_FEEDBACK,
           CONSTRAINT_MIN_ZERO, MIN_ZERO_INVALID_FEEDBACK,
@@ -22,13 +22,13 @@ import { TotalSystemResources } from '../total-system-resource-card/total-system
 import { ValidateKitInventory } from './kit-form-validation';
 
 export interface DeviceFactsContainerInterface{
-    deviceFacts: Object;    
+    deviceFacts: Object;
 }
 
 /**
  * Sets the drive selections based on the passed in deviceFacts.
- * 
- * @param deviceFacts 
+ *
+ * @param deviceFacts
  * @returns - [{value: "sdb", label: "sdb - 50 GB"}]
  */
 function SetDriveSelections(deviceFacts: Object) : Array<{value: string, label: string}> {
@@ -43,7 +43,7 @@ function SetDriveSelections(deviceFacts: Object) : Array<{value: string, label: 
             continue;
         }
         driveSelections.push({value: item["name"], label: item["name"] + " - " + item["size_gb"] + " GB"})
-    }
+     }
     return driveSelections;
 }
 
@@ -56,9 +56,9 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
 
     constructor(hidden: boolean, managementIP: string, sensor_type: string) {
         super({});
-        this.hidden = hidden;                
-        this.host_server.setDefaultValue(managementIP);
-        super.addControl('host_server', this.host_server);
+        this.hidden = hidden;
+        this.host_sensor.setDefaultValue(managementIP);
+        super.addControl('host_sensor', this.host_sensor);
         super.addControl('monitor_interface', this.monitor_interface);
         super.addControl('ceph_drives', this.ceph_drives);
         super.addControl('pcap_drives', this.pcap_drives);
@@ -73,7 +73,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         this.basicNodeResource = new BasicNodeResource();
         this.deviceFacts = null;
         this.interfaceSelections = new Array();
-        this.driveSelections = new Array();                
+        this.driveSelections = new Array();
     }
 
     hostname = new HtmlHidden('hostname', true);
@@ -84,8 +84,8 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
     public setSensorOptionsSelections(managementIp: string){
         if (this.deviceFacts == null){
             return;
-        }        
-        
+        }
+
         //Reset selections if user clicks on Gather facts twice.
         this.interfaceSelections = new Array();
         this.driveSelections = new Array();
@@ -102,11 +102,11 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
 
             this.interfaceSelections.push({value: item["name"], label: item["name"] + " - " + item["ip_address"]})
         }
-    }    
+    }
 
-    host_server = new HtmlInput (
-        'host_server',
-        'Management IP Address',      
+    host_sensor = new HtmlInput (
+        'host_sensor',
+        'Management IP Address',
         "Server's management IP address",
         'text',
         IP_CONSTRAINT,
@@ -135,7 +135,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
 
     ceph_drives = new HtmlCardSelector (
         'ceph_drives',
-        "Ceph Drives",      
+        "Ceph Drives",
         "Use this field to mark the disks you will use for Ceph. You can choose to select \
         none. In this case, Ceph will still be installed and active on the machine so that \
         Kubernetes works properly however, none of its disks will be in the Ceph cluster. \
@@ -153,7 +153,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
 
     pcap_drives = new HtmlCardSelector (
         'pcap_drives',
-        "PCAP Drives",      
+        "PCAP Drives",
         "TODO Add a PCAP description here.",
         "Select which drive you would like to use for PCAP storage.",
         "Note: The operating system's drive will not appear here. If a drive has the root file system mounted to it, it is excluded. This means you may only have one drive listed.",
@@ -167,7 +167,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         "1",
         'number',
         CONSTRAINT_MIN_ONE,
-        MIN_ONE_INVALID_FEEDBACK,      
+        MIN_ONE_INVALID_FEEDBACK,
         true,
         '0',
         "The number of bro workers to run on each sensor. The worker is the Bro process \
@@ -179,7 +179,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         undefined,
         true
     )
-   
+
     moloch_threads = new HtmlInput (
         'moloch_threads',
         'Number of Moloch Threads',
@@ -188,7 +188,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         CONSTRAINT_MIN_ONE,
         MIN_ONE_INVALID_FEEDBACK,
         true,
-        '0',      
+        '0',
         "Number of threads to use to process packets AFTER the reader has received \
         the packets. This also controls how many packet queues there are, since each \
         thread has its own queue. Basically how much CPU to dedicate to parsing the \
@@ -204,7 +204,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         '',
         'text',
         null,
-        '',   
+        '',
         true,
         'test',
         "Indicates if the sensor in question is a local or a remote sensor.",
@@ -221,7 +221,7 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
 
     constructor(hidden: boolean, managementIP: string) {
         super({});
-        this.hidden = hidden;                
+        this.hidden = hidden;
         this.host_server.setDefaultValue(managementIP);
         super.addControl('host_server', this.host_server);
         super.addControl('is_master_server', this.is_master_server);
@@ -240,7 +240,7 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
 
     host_server = new HtmlInput (
         'host_server',
-        'Management IP Address',      
+        'Management IP Address',
         "Server's management IP address",
         'text',
         IP_CONSTRAINT,
@@ -269,7 +269,7 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
     //TODO make this spot dry
     ceph_drives = new HtmlCardSelector (
         'ceph_drives',
-        "Ceph Drives",      
+        "Ceph Drives",
         "Use this field to mark the disks you will use for Ceph. You can choose to select \
         none. In this case, Ceph will still be installed and active on the machine so that \
         Kubernetes works properly however, none of its disks will be in the Ceph cluster. \
@@ -555,7 +555,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         null,
         undefined,
         false,
-        '',        
+        '',
         "See https://biot.com/capstats/bpf.html for a full description of different BPF \
         filters. We strongly recommend you test any BPF filters you choose to use with \
         tcpdump before you submit them here. There is no built in validator in this web \
@@ -628,7 +628,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         true,
         '262143',
         "Buffer size when writing pcap files. Should be a multiple of the raid 5/xfs \
-        stripe size and multiple of 4096 if using direct/thread-direct pcapWriteMethod",        
+        stripe size and multiple of 4096 if using direct/thread-direct pcapWriteMethod",
     )
 
     moloch_dbBulkSize = new HtmlInput (
@@ -637,7 +637,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         '',
         'number',
         CONSTRAINT_MIN_ONE,
-        MIN_ONE_INVALID_FEEDBACK,      
+        MIN_ONE_INVALID_FEEDBACK,
         true,
         '20000',
         "Size of indexing request to send to Elasticsearch. Increase if monitoring a \
@@ -650,12 +650,12 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         '',
         'number',
         CONSTRAINT_MIN_ONE,
-        MIN_ONE_INVALID_FEEDBACK,      
+        MIN_ONE_INVALID_FEEDBACK,
         true,
         '30',
         "Max number of connections to Elasticsearch from capture process"
     )
-   
+
     moloch_maxESRequests = new HtmlInput(
         'moloch_maxESRequests',
         'Moloch Maximum ES Requests',
@@ -710,14 +710,14 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         '200000',
         "See: https://github.com/aol/moloch/wiki/FAQ#why-am-i-dropping-packets"
     )
-   
+
 }
 
 export class SensorsFormArray extends FormArray {
     constructor(controls: AbstractControl[],
                 public hidden: boolean) {
         super(controls);
-    }    
+    }
 }
 
 export class ServersFormArray extends FormArray {
@@ -742,7 +742,7 @@ export class KitInventoryForm extends FormGroup {
         super.addControl('logstash_replicas', this.logstash_replicas);
         super.addControl('elastic_storage_percentage', this.elastic_storage_percentage);
         super.addControl('moloch_pcap_storage_percentage', this.moloch_pcap_storage_percentage);
-        super.addControl('kubernetes_services_cidr', this.kubernetes_services_cidr);        
+        super.addControl('kubernetes_services_cidr', this.kubernetes_services_cidr);
 
         this.servers = new ServersFormArray([], true);
         this.sensors = new SensorsFormArray([], true);
@@ -761,7 +761,7 @@ export class KitInventoryForm extends FormGroup {
         this.kubernetesCidrInfoText = "";
     }
 
-    public addServerFormGroup(managementIP: string){        
+    public addServerFormGroup(managementIP: string){
         this.servers.hidden = false;
         this.servers.push(new ServerFormGroup(false, managementIP));
     }
@@ -778,7 +778,7 @@ export class KitInventoryForm extends FormGroup {
     advanced_moloch_settings = new AdvancedMolochSettingsFormGroup();
     advanced_elasticsearch_settings = new AdvancedElasticSearchSettingsFormGroup();
     advanced_kafka_settings = new AdvancedKafkaSettingsFormGroup();
-    
+
     sensor_storage_type = new HtmlDropDown(
         'sensor_storage_type',
         'Sensor Storage Type',
@@ -881,8 +881,8 @@ export class KitInventoryForm extends FormGroup {
         '^[1-9]|[1-9]\\d+$',
         'Enter the number of elasticsearch master instances you would like',
         true,
-        '1',      
-        "This is the number of instances of Logstash you would like to run."      
+        '1',
+        "This is the number of instances of Logstash you would like to run."
     )
 
     elastic_storage_percentage = new HtmlInput (
@@ -913,7 +913,7 @@ export class KitInventoryForm extends FormGroup {
         PERCENT_MIN_MAX,
         PERCENT_INVALID_FEEDBACK,
         true,
-        '1',      
+        '1',
         "This is the percentage of the clustered storage which will be assigned to Moloch PCAP. \
         In general, we give this 60% and Elasticsearch 30%, but this depends heavily on \
         the amount of storage you have available. You can play with the values to see what \
@@ -935,7 +935,7 @@ export class KitInventoryForm extends FormGroup {
         kubernetes dashboard. This will use a /28 under the hood. This means it will take \
         whatever IP address you enter and create a range addresses from that IP +16. For example, \
         192.168.1.16 would become a range from 192.168.1.16-31."
-    )    
+    )
 
     dns_ip = new HtmlInput(
         'dns_ip',

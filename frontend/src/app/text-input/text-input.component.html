@@ -1,6 +1,6 @@
 <div [formGroup]="parentForm" class="input-group mb-3">
   <div class="input-group-prepend">
-    <a routerLink="/help" target="_blank" fragment="{{ input_control.anchor }}" name="tip_{{ controlName }}" 
+    <a routerLink="/help" target="_blank" fragment="{{ input_control.anchor }}" name="tip_{{ controlName }}"
        data-toggle="tooltip" data-placement="right" title="{{ input_control.description }}">
       <span class="input-group-text">{{ input_control.label }}</span>
     </a>
@@ -20,7 +20,7 @@
          [placeholder]="input_control.placeholder"
          (keyup)="callParentKeyUp($event)">
   <div *ngIf="input_control.has_button" class="input-group-append">
-    <button class="{{ input_control.button_css }}" type="button" (click)="callParent()">{{ input_control.button_text }}</button>
+    <button class="{{ input_control.button_css }}" type="button" (click)="callParent()" name="btn_{{ controlName }}{{ uid }}">{{ input_control.button_text }}</button>
   </div>
   <div *ngIf="input_control.invalid && (input_control.dirty || input_control.touched)" class="invalid-feedback2">
       <div *ngIf="input_control.errors.required">This field is required.</div>

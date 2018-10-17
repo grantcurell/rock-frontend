@@ -20,8 +20,8 @@ all:
     # DNS Server or the kit will break.
     dns_ip: {{ template_ctx.dns_ip }}
 
-    # You can set how many OSD are allowed to fail without losing data. For replicated pools, 
-    # it is the desired number of copies/replicas of an object. Our configuration stores an 
+    # You can set how many OSD are allowed to fail without losing data. For replicated pools,
+    # it is the desired number of copies/replicas of an object. Our configuration stores an
     # object and one additional copy, The check box will enable this.
     ceph_redundancy: {{ template_ctx.ceph_redundancy }}
 
@@ -268,7 +268,7 @@ all:
 
               # This is the management IP address of the node. Ex: 192.168.1.198
               # This is the address Ansible will use to communicate with.
-              management_ipv4: "{{ sensor.host_server }}"
+              management_ipv4: "{{ sensor.host_sensor }}"
 
               # This is the number of bro workers which will spawn on the sensor
               bro_workers: {{ sensor.bro_workers }}
@@ -307,7 +307,7 @@ all:
         #everything after the group name empty. Ex: you could have an inventory
         #with just "remote-sensors:", but no hosts defined.
         remote-sensors:
-        {% if template_ctx.sensor_remote_count > 0 %}        
+        {% if template_ctx.sensor_remote_count > 0 %}
           hosts:
             {% for sensor in template_ctx.sensors %}
             {{ sensor.hostname }}:
@@ -316,7 +316,7 @@ all:
               moloch_threads: {{ sensor.moloch_threads }}
               ceph_drive_list:
               pcap_disk: {{ "/dev/" + sensor.pcap_drives[0] }}
-              management_ipv4: "{{ sensor.host_server }}"
+              management_ipv4: "{{ sensor.host_sensor }}"
               sensor_monitor_interface:
                 {% for interface in sensor.monitor_interface %}
                 - {{ interface }}

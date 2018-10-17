@@ -6,7 +6,7 @@ import { CEPH_DRIVE_MIN_COUNT } from '../frontend-constants';
 
 /**
  * Ensures that the user has selected at least one server as a master.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
@@ -25,7 +25,7 @@ function _validateMasterServer(control: AbstractControl, errors: Array<string>):
 
 /**
  * Ensures that there are enough drives selected for the CEPH cluster configuration.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
@@ -47,31 +47,31 @@ function _validateCephDriveCount(control: AbstractControl, errors: Array<string>
             ceph_drive_count += sensor.ceph_drives.length;
         }
     }
-    
+
     if (ceph_drive_count < CEPH_DRIVE_MIN_COUNT){
         errors.push("- Ceph drives failed to validate. You have to have at least two drives in your Ceph cluster!");
-    }    
+    }
 }
- 
+
 /**
  * Ensures that at least one interface is selected for each sensor
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
 function _validateMonitorInterfaces(control: AbstractControl, errors: Array<string>): void {
     let sensors = control.get('sensors') as SensorsFormArray;
-    let error_message = "- Monitor interfaces failed to validate. You need to select at least one monitor interface on each sensor.";    
+    let error_message = "- Monitor interfaces failed to validate. You need to select at least one monitor interface on each sensor.";
 
     if (sensors != null){
         for (let i = 0; i < sensors.length; i++){
             let sensor = sensors.at(i) as SensorFormGroup;
-            if (sensor.monitor_interface.length == 0) {                
+            if (sensor.monitor_interface.length == 0) {
                 errors.push(error_message);
                 break;
             }
         }
-    } else {      
+    } else {
         errors.push(error_message);
     }
 }
@@ -79,7 +79,7 @@ function _validateMonitorInterfaces(control: AbstractControl, errors: Array<stri
 
 /**
  * Ensures the user entered the Kubernetes CIDR value.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
@@ -87,54 +87,54 @@ function _validateKubernetesCIDR(control: AbstractControl, errors: Array<string>
     let kubernetes = control.get('kubernetes_services_cidr') as HtmlInput;
     if (kubernetes != null && !kubernetes.valid){
         errors.push("- Kubernetes services CIDR failed to validate. Make sure you type in a valid Kubernetes services CIDR under Global Settings.");
-    }    
+    }
 }
 
 /**
  * Ensures at least home net is filled out.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
 function _validateHomeNet(control: AbstractControl, errors: Array<string>): void {
     let sensor_resources = control.get('sensor_resources');
-    
+
     if (sensor_resources != null){
         let home_nets = sensor_resources.get('home_nets') as FormArray;
-        
+
         for (let i = 0; i < home_nets.length; i++){
             if (!home_nets.at(i).valid){
                 errors.push("- Your home nets are not valid. You need at least one home net.");
                 return;
             }
         }
-    }    
+    }
 }
 
 /**
  * Ensures at least one external net is filled out.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
 function _validateExternalNet(control: AbstractControl, errors: Array<string>): void {
     let sensor_resources = control.get('sensor_resources');
-    
+
     if (sensor_resources != null){
         let external_nets = sensor_resources.get('external_nets') as FormArray;
-        
+
         for (let i = 0; i < external_nets.length; i++){
             if (!external_nets.at(i).valid){
                 errors.push("- Your external nets are not valid. Remove it or enter a valid value.");
                 return;
             }
         }
-    }    
+    }
 }
 
 /**
  * Validates that the user hit the "Gather Facts" button for each sensor and server.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
@@ -183,19 +183,19 @@ function _validateSensorAndServerCounts(control: AbstractControl, errors: Array<
 
 /**
  * Ensures that logstash replicas is set appropriatley.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
 function _validateLogstashReplicas(control: AbstractControl, errors: Array<string>): void {
     let servers = control.get('servers') as ServersFormArray;
     let sensors = control.get('sensors') as SensorsFormArray;
-    
+
     let number_of_servers = 0;
     let number_of_sensors = 0;
 
     if (servers != null) {
-        number_of_servers = servers.length;        
+        number_of_servers = servers.length;
     }
 
     if (sensors != null){
@@ -203,7 +203,7 @@ function _validateLogstashReplicas(control: AbstractControl, errors: Array<strin
             let sensor = sensors.at(i) as SensorFormGroup;
             if (sensor.sensor_type.value == 'Local'){
                 number_of_sensors += 1;
-            }            
+            }
         }
     }
 
@@ -212,16 +212,16 @@ function _validateLogstashReplicas(control: AbstractControl, errors: Array<strin
         if ((number_of_sensors + number_of_servers) < 3){
             if (logstash_replicas != 1) {
                 errors.push('- Logstash replicas failed to validate. This should be set to one when you have fewer than 3 nodes (discluding remote sensors).');
-            }    
+            }
         } else if (logstash_replicas > (number_of_sensors + number_of_servers)) {
             errors.push('- Logstash replicas failed to validate. You cannot have more replicas than there are nodes.')
-        } 
+        }
     }
 }
 
 /**
  * Validates IPs on KitForm page to ensure that a user does not have duplicate IPs for both sensors or servers.
- * 
+ *
  * @param control - The KitForm Group
  * @param errors - An array of strings to display.
  */
@@ -240,7 +240,7 @@ function _validateIps(control: AbstractControl, errors: Array<string>): void {
     if (sensors != null) {
         for (let i = 0; i < sensors.length; i++) {
             let sensor = sensors.at(i) as SensorFormGroup;
-            ips.push(sensor.host_server.value);
+            ips.push(sensor.host_sensor.value);
         }
     }
 
@@ -253,14 +253,14 @@ function _validateIps(control: AbstractControl, errors: Array<string>): void {
             if (ipA == ipB){
                 errors.push('- Duplicate ips have been detected. Please make sure you do not have duplicate ips in your form.')
                 return;
-            }            
+            }
         }
     }
 }
 
 /**
  * The main exported function that performs all the Form Level validation for the KitForm.
- * 
+ *
  * @param control - The KitForm Group
  * @returns - A array of error messages if there are errors.
  */
@@ -291,7 +291,7 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
         errors.push("- Your sensor resources failed to validate. Check the sensor resources and make sure you have sufficient CPU resources for Bro, Suricata, etc.");
     }
 
-    if (errors.length > 0){        
+    if (errors.length > 0){
         return { errors: errors};
     }
 

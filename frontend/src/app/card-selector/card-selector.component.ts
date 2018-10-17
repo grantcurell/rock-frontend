@@ -20,6 +20,9 @@ export class CardSelectorComponent implements OnInit {
   @Input()
   optionSelections: Array<{ value: string, label: string }>;
 
+  @Input()
+  public uid: string;
+
   @Output()
   onSelect: EventEmitter<any> = new EventEmitter();
 
@@ -30,7 +33,7 @@ export class CardSelectorComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {    
+  ngOnInit() {
     this.htmlCardSelectorFormArray = this.parentForm.get(this.controlName) as HtmlCardSelector;
     //Fixes a bug when we rerender the same card selector.
     this.clearFormArray();
@@ -58,10 +61,10 @@ export class CardSelectorComponent implements OnInit {
     }
   }
 
-  public setDefaultValues(selectedOptions: Array<string>){    
+  public setDefaultValues(selectedOptions: Array<string>){
     this.clearFormArray();
     this.clearSelectedOptionLabels();
-    
+
     for (let default_value of selectedOptions){
       this.set_selectedValue(default_value);
       for (let i = 0; i < this.optionSelections.length; i++){
@@ -72,15 +75,15 @@ export class CardSelectorComponent implements OnInit {
     }
   }
 
-  selectedButton(event, selection: { value: string, label: string }) {    
+  selectedButton(event, selection: { value: string, label: string }) {
     if (!this.htmlCardSelectorFormArray.is_multi_select) {
       this.clearFormArray();
       this.clearSelectedOptionLabels();
     }
-        
+
     if (selection.label.indexOf('selected') > -1){
       selection.label = selection.label.replace(' - selected', '');
-    }    
+    }
 
     if (event.srcElement.value.indexOf('selected') > -1) {
       //Only triggered when the selected word is in the value of the srcElement.
@@ -94,11 +97,11 @@ export class CardSelectorComponent implements OnInit {
     this.triggerOnSelectEvent();
   }
 
-  private triggerOnSelectEvent(){    
+  private triggerOnSelectEvent(){
     this.onSelect.emit(this.htmlCardSelectorFormArray.value);
   }
 
-  private set_selectedValue(newValue: string) {    
+  private set_selectedValue(newValue: string) {
     this.htmlCardSelectorFormArray.push(new FormControl(newValue));
   }
 

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { KitInventoryForm, ServersFormArray, ServerFormGroup, 
-         SensorFormGroup, SensorsFormArray, 
+import { KitInventoryForm, ServersFormArray, ServerFormGroup,
+         SensorFormGroup, SensorsFormArray,
          AdvancedElasticSearchSettingsFormGroup } from './kit-form';
 import { KickstartService } from '../kickstart.service';
-import { HtmlModalPopUp } from '../html-elements'; 
+import { HtmlModalPopUp } from '../html-elements';
 
 import { ElasticSearchCalculator } from './elasticsearch-calculations';
 import { StorageCalculator } from './storage-calculations';
@@ -30,7 +30,7 @@ export class KitFormComponent implements OnInit {
   sensors: SensorsFormArray;
   kitModal: HtmlModalPopUp;
   isAdvancedOptionsHidden: boolean;
-  isMolochPercentageHidden: boolean;  
+  isMolochPercentageHidden: boolean;
 
   constructor(private kickStartSrv: KickstartService, private title: Title, private router: Router) {
     this.kitForm = new KitInventoryForm();
@@ -39,8 +39,8 @@ export class KitFormComponent implements OnInit {
     this.sensors = this.kitForm.sensors;
     this.isAdvancedOptionsHidden = true;
     this.isMolochPercentageHidden = true;
-    this.kitModal = new HtmlModalPopUp('kit_modal');      
-    
+    this.kitModal = new HtmlModalPopUp('kit_modal');
+
     this.storageCalculator = new StorageCalculator(this.kitForm);
     this.molochBroCalculator = new MolochBroCalculator(this.kitForm);
     this.elasicSearchCalculator = new ElasticSearchCalculator(this.kitForm, this.storageCalculator);
@@ -57,7 +57,7 @@ export class KitFormComponent implements OnInit {
       this.kitForm.root_password.setDefaultValue(data["root_password"]);
 
       for (let node of data["nodes"]){
-        if (node["node_type"] === "Server"){          
+        if (node["node_type"] === "Server"){
           this.kitForm.addServerFormGroup(node["ip_address"]);
         } else if (node["node_type"] === "Sensor"){
           this.kitForm.addSensorFormGroup(node["ip_address"], 'Local');
@@ -65,15 +65,15 @@ export class KitFormComponent implements OnInit {
           this.kitForm.addSensorFormGroup(node["ip_address"], 'Remote');
         } else {
           console.error("Unknown Node type." + node["node_type"]);
-        } 
+        }
       }
     });
 
     this.storageCalculator.recalculate_storage_recommendation();
-    this.storageCalculator.validate_ceph_drive_count();    
+    this.storageCalculator.validate_ceph_drive_count();
   }
 
-  onSubmit(){    
+  onSubmit(){
     this.kickStartSrv.generateKitInventory(this.kitForm.value)
     .subscribe(data => {
       this.openConsole();
@@ -84,17 +84,21 @@ export class KitFormComponent implements OnInit {
     this.router.navigate(['/stdout/Kit'])
   }
 
-  toggleServer(server: ServerFormGroup) {    
+  toggleServer(server: ServerFormGroup) {
     server.hidden = !server.hidden;
   }
-  
-  toggleSensor(sensor: SensorFormGroup) {    
+
+  toggleSensor(sensor: SensorFormGroup) {
     sensor.hidden = !sensor.hidden;
-  }  
+  }
 
   gatherFacts(node: ServerFormGroup | SensorFormGroup) {
-    this.kickStartSrv.gatherDeviceFacts(node.value["host_server"], this.kitForm.root_password.value)
-    .subscribe(data => {      
+      let host_key: string = "host_server";
+      if (node instanceof SensorFormGroup){
+        host_key = "host_sensor";
+      }
+      this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value)
+      .subscribe(data => {
 
       if (data['error_message']) {
         this.kitModal.updateModal('Error',
@@ -105,16 +109,16 @@ export class KitFormComponent implements OnInit {
         this.kitModal.openModal();
         //End execution of this if we have errors.
         return;
-      } 
+      }
 
       let hasDeviceFacts: boolean = (node.deviceFacts != null);
       node.deviceFacts = data;
       if (node instanceof ServerFormGroup){
         node.setOptionSelections();
       } else if (node instanceof SensorFormGroup){
-        node.setSensorOptionsSelections(node.host_server.value);
+        node.setSensorOptionsSelections(node.host_sensor.value);
       }
-      
+
       node.basicNodeResource.setFromDeviceFacts(node.deviceFacts);
 
       //Ensures we do not add additional compute power and memory by accident.
@@ -133,7 +137,7 @@ export class KitFormComponent implements OnInit {
         } else if (node instanceof SensorFormGroup){
           this.kitForm.sensor_resources.setFromDeviceFacts(node.deviceFacts);
           this.molochBroCalculator.calculate_bro_and_moloch_threads();
-        }        
+        }
       }
     });
   }
@@ -148,7 +152,7 @@ export class KitFormComponent implements OnInit {
       this.kitForm.elastic_storage_percentage.setValue(30);
       this.kitForm.moloch_pcap_storage_percentage.setValue(60);
       this.isMolochPercentageHidden = false;
-      
+
       if (this.kitForm.disable_autocalculate.value){
         this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.enable();
       }
@@ -161,7 +165,7 @@ export class KitFormComponent implements OnInit {
       this.kitForm.moloch_pcap_storage_percentage.setValue(this.kitForm.moloch_pcap_storage_percentage.default_value);
       this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.setValue(0);
       this.isMolochPercentageHidden = true;
-      
+
       for (let i = 0; i < this.kitForm.sensors.length; i++){
         let sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
         this._remove_sensor_cluster_storage(sensor.deviceFacts);
@@ -171,7 +175,7 @@ export class KitFormComponent implements OnInit {
     this.elasicSearchCalculator.calculate();
     this.manualCalculator.validate_manual_entries();
     this.molochBroCalculator.calculate_bro_and_moloch_threads();
-    
+
     this.setSystemClusterStorageAvailable();
     this.storageCalculator.recalculate_storage_recommendation();
   }
@@ -184,7 +188,7 @@ export class KitFormComponent implements OnInit {
     } else if (node instanceof ServerFormGroup){
       this.kitForm.server_resources.calculateClusterStorageAvailable(drivesSelected, node.deviceFacts);
     }
-    
+
     this.setSystemClusterStorageAvailable();
     this.storageCalculator.recalculate_storage_recommendation();
     this.storageCalculator.validate_ceph_drive_count();
@@ -198,11 +202,11 @@ export class KitFormComponent implements OnInit {
 
   /**
    * Disables other "Is Kubernetes master server" checkboxes on the UI.
-   * 
+   *
    * @param isChecked - Is true if the checkbox has a check mark in it, false otherwise.
    * @param indexToIgnore - The server index to ignore
    */
-  disableOtherMasterOrReenable(isChecked: boolean, indexToIgnore: number){    
+  disableOtherMasterOrReenable(isChecked: boolean, indexToIgnore: number){
     for (let index = 0; index < this.kitForm.servers.length; index++){
       if (index == indexToIgnore){
         continue;
@@ -219,7 +223,7 @@ export class KitFormComponent implements OnInit {
   /**
    * When user clicks Disable Autocalculations under Advanced Settings,
    * this is triggered.
-   * 
+   *
    * @param isChecked Is true if the checkbox has a check mark in it, false otherwise.
    */
   toggleAutocalculate(isChecked: boolean){
@@ -273,7 +277,7 @@ export class KitFormComponent implements OnInit {
 
   /**
    * Triggered everytime a user adds input to the Kubernetes CIDR input
-   * 
+   *
    * @param event - A Keyboard event.
    */
   kubernetesInputEvent(event: any) {
@@ -287,7 +291,7 @@ export class KitFormComponent implements OnInit {
     let octet_3 = kubernetes_value.split('.')[2] + '.';
     let octet_4 = parseInt(kubernetes_value.split('.')[3]);
     let kubernetes_services_cidr_start = "";
-    
+
     if (isNaN(octet_4)) {
       this.kitForm.kubernetesCidrInfoText = "Incomplete IP Address";
     } else {
@@ -320,12 +324,12 @@ export class KitFormComponent implements OnInit {
   triggerValidations(event: any){
     this.manualCalculator.validate_manual_entries();
     this.elasicSearchCalculator.calculate();
-  }  
+  }
 
   private _remove_sensor_cluster_storage(deviceFacts: Object){
     if (deviceFacts != null){
-      this.kitForm.system_resources.calculateTotalCephDrives(0, deviceFacts);                
-      this.kitForm.sensor_resources.removeClusterStorage(deviceFacts);      
+      this.kitForm.system_resources.calculateTotalCephDrives(0, deviceFacts);
+      this.kitForm.sensor_resources.removeClusterStorage(deviceFacts);
       this.setSystemClusterStorageAvailable();
       this.storageCalculator.recalculate_storage_recommendation();
       this.storageCalculator.validate_ceph_drive_count();

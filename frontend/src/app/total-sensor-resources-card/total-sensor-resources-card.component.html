@@ -32,10 +32,10 @@
     <p class="card-text">Zookeeper CPUs:
       <span id="zookeeper_cpu_percentage_field_span">{{ sensorResourceForm.zookeeperCPUAllocation | number:'1.2-2' }}</span>
     </p>
-    
-    <app-text-input [parentForm]="sensorResourceForm" controlName="kafka_cpu_percentage" (keyupEvent)="resourceKeyup($event)" ></app-text-input>    
+
+    <app-text-input [parentForm]="sensorResourceForm" controlName="kafka_cpu_percentage" (keyupEvent)="resourceKeyup($event)" ></app-text-input>
     <app-text-input [parentForm]="sensorResourceForm" controlName="moloch_cpu_percentage"></app-text-input>
-    <app-text-input [parentForm]="sensorResourceForm" controlName="bro_cpu_percentage"></app-text-input>    
+    <app-text-input [parentForm]="sensorResourceForm" controlName="bro_cpu_percentage"></app-text-input>
     <app-text-input [parentForm]="sensorResourceForm" controlName="suricata_cpu_percentage"></app-text-input>
     <app-text-input [parentForm]="sensorResourceForm" controlName="zookeeper_cpu_percentage"></app-text-input>
 
@@ -54,27 +54,27 @@
     <p class="card-text">Percentage Allocated:
       <span id="sensor_resource_percentage_allocated">{{ sensorResourceForm.percentAllocated }}</span>
     </p>
-    
+
     <p *ngIf="sensorResourceForm.percentAllocated > 99" class="card-text text-danger">The sensor's total resources cannot exceeed 99!</p>
 
     <hr>
     <h6 class="card-subtitle mb-2 text-muted">Home NET Settings</h6>
     <hr>
-    <button type="button" class="btn btn-primary" (click)="addHomeNet()">+ Add Home Net</button>
+    <button type="button" class="btn btn-primary" (click)="addHomeNet()" name="add_home_net">+ Add Home Net</button>
     <hr>
     <div formArrayName="home_nets">
-        <div *ngFor="let home_net of home_nets.controls; let i=index">          
-          <app-text-input [parentForm]="home_net" controlName="home_net" (buttonClick)="removeHomeNet(i)"></app-text-input>          
+        <div *ngFor="let home_net of home_nets.controls; let i=index">
+          <app-text-input [parentForm]="home_net" controlName="home_net" (buttonClick)="removeHomeNet(i)" uid="{{ i }}"></app-text-input>
         </div>
     </div>
     <hr>
     <h6 class="card-subtitle mb-2 text-muted">External NET Settings</h6>
     <hr>
-    <button type="button" class="btn btn-primary" (click)="addExternalNet()">+ Add External Net</button>
+    <button type="button" class="btn btn-primary" (click)="addExternalNet()" name="add_external_net">+ Add External Net</button>
     <hr>
     <div formArrayName="external_nets">
-      <div *ngFor="let external_net of external_nets.controls; let i=index">          
-        <app-text-input [parentForm]="external_net" controlName="external_net" (buttonClick)="removeExternalNet(i)"></app-text-input>          
+      <div *ngFor="let external_net of external_nets.controls; let i=index">
+        <app-text-input [parentForm]="external_net" controlName="external_net" (buttonClick)="removeExternalNet(i)" uid="{{ i }}"></app-text-input>
       </div>
     </div>
   </div>

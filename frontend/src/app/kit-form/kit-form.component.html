@@ -1,5 +1,5 @@
 <app-modal-dialog [modal]="kitModal"></app-modal-dialog>
-<div class="container" id="topheader">  
+<div class="container" id="topheader">
   <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">
     <br>
     <div class="card">
@@ -9,13 +9,13 @@
       <div class="card-body">
         <h5 class="card-title">Global Settings</h5>
         <p class="card-text">
-          Dependent on your resources, these are generally sane defaults if you don't know what you are doing and just want to get started. 
-          Unlike the storage settings, you can always come back and adjust them if you change your mind. 
+          Dependent on your resources, these are generally sane defaults if you don't know what you are doing and just want to get started.
+          Unlike the storage settings, you can always come back and adjust them if you change your mind.
           The only field you *have* to fill out is Kubernetes Service IP Range Start.
         </p>
         <hr>
         <br>
-        
+
         <h5>Select Storage Type</h5>
         <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown>
         <h5>Credentials</h5>
@@ -52,7 +52,7 @@
     <br>
     <app-total-system-resource-card [totalSystemResources]="kitForm.system_resources"></app-total-system-resource-card>
     <br>
-    
+
     <app-total-server-resources-card [totalServerResources]="kitForm.controls.server_resources"></app-total-server-resources-card>
     <div formArrayName="servers">
       <div *ngIf="!servers.hidden">
@@ -68,13 +68,13 @@
           <div *ngIf="!server.hidden" class="card-body">
             <app-basic-node-resource-card title="Server {{ i + 1 }} resources" [basicNodeResource]="server.basicNodeResource"></app-basic-node-resource-card>
             <br>
-            <app-text-input [parentForm]="server" controlName="host_server" (buttonClick)="gatherFacts(server)"></app-text-input>
-            <app-checkbox [parentForm]="server" controlName="is_master_server" (is_checked)="disableOtherMasterOrReenable($event, i)"></app-checkbox>
+            <app-text-input [parentForm]="server" controlName="host_server" (buttonClick)="gatherFacts(server)" uid="{{ i }}"></app-text-input>
+            <app-checkbox [parentForm]="server" controlName="is_master_server" (is_checked)="disableOtherMasterOrReenable($event, i)" uid="{{ i }}"></app-checkbox>
             <br>
-            <div *ngIf="server.deviceFacts">                
-                  <app-card-selector [parentForm]="server" [optionSelections]="server.driveSelections" 
-                                      controlName="ceph_drives" (onSelect)="cephDriveSelected($event, server)"></app-card-selector>                
-            </div>              
+            <div *ngIf="server.deviceFacts">
+                  <app-card-selector [parentForm]="server" [optionSelections]="server.driveSelections"
+                                      controlName="ceph_drives" (onSelect)="cephDriveSelected($event, server)" uid="_server{{ i }}"></app-card-selector>
+            </div>
           </div>
         </div>
       </div>
@@ -95,12 +95,12 @@
               <button class="btn btn-link" type="button" (click)="toggleSensor(sensor)">Sensor {{ i + 1 }} - {{ sensor.hostname.value }}</button>
             </h5>
           </div>
-          
+
           <div *ngIf="!sensor.hidden" class="card-body">
             <app-basic-node-resource-card title="Sensor {{ i + 1 }} resources" [basicNodeResource]="sensor.basicNodeResource"></app-basic-node-resource-card>
             <br>
             <app-text-input [parentForm]="sensor" controlName="sensor_type"></app-text-input>
-            <app-text-input [parentForm]="sensor" controlName="host_server" (buttonClick)="gatherFacts(sensor)"></app-text-input>            
+            <app-text-input [parentForm]="sensor" controlName="host_sensor" (buttonClick)="gatherFacts(sensor)" uid="{{ i }}"></app-text-input>
             <br>
 
             <div *ngIf="!isAdvancedOptionsHidden">
@@ -111,16 +111,16 @@
             <div *ngIf="sensor.deviceFacts">
               <div class="form-row">
                 <div class="form-group col-md-6">
-                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local' && kitForm.sensor_storage_type.value == kitForm.sensor_storage_type.options[1]" [parentForm]="sensor" [optionSelections]="sensor.driveSelections" 
-                                     controlName="pcap_drives"></app-card-selector>
-                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local' && kitForm.sensor_storage_type.value == kitForm.sensor_storage_type.options[0]" [parentForm]="sensor" [optionSelections]="sensor.driveSelections" 
-                                     controlName="ceph_drives" (onSelect)="cephDriveSelected($event, sensor)"></app-card-selector>
+                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local' && kitForm.sensor_storage_type.value == kitForm.sensor_storage_type.options[1]" [parentForm]="sensor" [optionSelections]="sensor.driveSelections"
+                                     controlName="pcap_drives" uid="{{ i }}"></app-card-selector>
+                  <app-card-selector *ngIf="sensor.sensor_type.value == 'Local' && kitForm.sensor_storage_type.value == kitForm.sensor_storage_type.options[0]" [parentForm]="sensor" [optionSelections]="sensor.driveSelections"
+                                     controlName="ceph_drives" (onSelect)="cephDriveSelected($event, sensor)" uid="_sensor{{ i }}"></app-card-selector>
                   <app-card-selector *ngIf="sensor.sensor_type.value == 'Remote'" [parentForm]="sensor" [optionSelections]="sensor.driveSelections"
                                      controlName="pcap_drives"></app-card-selector>
                 </div>
                 <div class="form-group col-md-6">
-                  <app-card-selector [parentForm]="sensor" [optionSelections]="sensor.interfaceSelections" 
-                                     controlName="monitor_interface" style="float: right;"></app-card-selector>
+                  <app-card-selector [parentForm]="sensor" [optionSelections]="sensor.interfaceSelections"
+                                     controlName="monitor_interface" style="float: right;" uid="{{ i }}"></app-card-selector>
                 </div>
               </div>
             </div>
@@ -133,7 +133,7 @@
     <div class="form-row">
       <div class="form-group col-md-6">
         <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid">Execute Kit</button>
-      </div>        
+      </div>
       <div class="form-group col-md-6">
         <button class="btn btn-primary" type="button" (click)="toggleAdvancedSettings()" style="float:right;">Show/Hide Advanced Settings</button>
       </div>
@@ -147,10 +147,10 @@
           <p *ngIf="kitForm.valid" class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>
           <div *ngIf="kitForm.hasError('errors')">
             <p *ngFor="let error of kitForm.getError('errors');" class='text-danger'>{{ error }}</p>
-          </div>            
+          </div>
       </div>
     </div>
-    <br>    
+    <br>
     <div *ngIf="!isAdvancedOptionsHidden">
       <div class="card">
         <div class="card-header">
@@ -183,7 +183,7 @@
           <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_curator_threshold"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_cpus_per_instance_ideal" (keyupEvent)="triggerValidations($event)"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_elasticsearch_settings" controlName="elastic_cpus_to_mem_ratio" (keyupEvent)="triggerValidations($event)"></app-text-input>
-        </div>        
+        </div>
       </div>
       <br>
       <div class="card">
