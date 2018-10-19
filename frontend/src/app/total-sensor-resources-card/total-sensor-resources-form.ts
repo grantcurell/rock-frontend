@@ -1,7 +1,7 @@
 import { FormGroup, FormArray, FormControl } from '@angular/forms';
 import { HtmlInput, HtmlHidden } from '../html-elements';
-import { MIN_ONE_INVALID_FEEDBACK, 
-         CONSTRAINT_MIN_ONE, 
+import { MIN_ONE_INVALID_FEEDBACK,
+         CONSTRAINT_MIN_ONE,
          CIDR_CONSTRAINT,
          EXPLANATION } from '../frontend-constants';
 import { SetSensorResourcesValidated } from '../kit-form/kit-form-globals';
@@ -62,9 +62,9 @@ export class SensorResourcesForm extends FormGroup {
 
     //These fields are not part of the form but they displayed on the componets interface.
     cpuCoresAvailable: number;
-    memoryAvailable: number;    
-    clusterStorageAvailable: number;    
-    
+    memoryAvailable: number;
+    clusterStorageAvailable: number;
+
     percentAllocated: number;
     kafkaCPUAllocation: number;
     molochCPUAllocation: number;
@@ -84,21 +84,20 @@ export class SensorResourcesForm extends FormGroup {
         this.initializeAllocations();
         this.percentAllocated = 0;
         this.sensorDriveStorageCache = {};
-        
+
         super.addControl('kafka_cpu_percentage', this.kafka_cpu_percentage);
         super.addControl('moloch_cpu_percentage', this.moloch_cpu_percentage);
-        super.addControl('bro_cpu_percentage', this.bro_cpu_percentage);        
+        super.addControl('bro_cpu_percentage', this.bro_cpu_percentage);
         super.addControl('suricata_cpu_percentage', this.suricata_cpu_percentage);
         super.addControl('zookeeper_cpu_percentage', this.zookeeper_cpu_percentage);
         super.addControl('home_nets', this.home_nets);
         super.addControl('external_nets', this.external_nets);
         this.addHomeNet();
-        this.addExternalNet();
         this.setPercentAllocated();
 
         super.addControl('kafka_cpu_request', this.kafka_cpu_request);
         super.addControl('moloch_cpu_request', this.moloch_cpu_request);
-        super.addControl('bro_cpu_request', this.bro_cpu_request);        
+        super.addControl('bro_cpu_request', this.bro_cpu_request);
         super.addControl('suricata_cpu_request', this.suricata_cpu_request);
         super.addControl('zookeeper_cpu_request', this.zookeeper_cpu_request);
         this._lowest_cpus = -1;
@@ -163,16 +162,16 @@ export class SensorResourcesForm extends FormGroup {
      * If the percentage exceeds 99 an error will display to the user.
      */
     public setPercentAllocated() {
-        this.percentAllocated = (+this.kafka_cpu_percentage.value + 
-                                 +this.moloch_cpu_percentage.value + 
-                                 +this.bro_cpu_percentage.value + 
-                                 +this.suricata_cpu_percentage.value + 
+        this.percentAllocated = (+this.kafka_cpu_percentage.value +
+                                 +this.moloch_cpu_percentage.value +
+                                 +this.bro_cpu_percentage.value +
+                                 +this.suricata_cpu_percentage.value +
                                  +this.zookeeper_cpu_percentage.value);
     }
 
     /**
      * Called when a user clicks on the "Gather Facts" button on a given sensor
-     * 
+     *
      * @param deviceFacts - The Ansible JSON object returned from the REST API.
      */
     public setFromDeviceFacts(deviceFacts: Object) {
@@ -181,7 +180,7 @@ export class SensorResourcesForm extends FormGroup {
         } else if (this._lowest_cpus > deviceFacts["cpus_available"]){
             this.setLowestCpus(deviceFacts["cpus_available"]);
         }
-        
+
         this.cpuCoresAvailable += deviceFacts["cpus_available"];
         this.memoryAvailable += deviceFacts["memory_available"];
         this.memoryAvailable = parseFloat(this.memoryAvailable.toFixed(2));
@@ -190,7 +189,7 @@ export class SensorResourcesForm extends FormGroup {
 
     /**
      * Called when we remove a sensor from the kit inventory list.
-     * 
+     *
      * @param deviceFacts - The Ansible JSON object returned from the REST API.
      */
     public subtractFromDeviceFacts(deviceFacts: Object){
@@ -203,20 +202,20 @@ export class SensorResourcesForm extends FormGroup {
     /**
      * Subtracts the GBs from the selected sensorDriveStorageCache from the cache
      * and then sets the cache to for a specific host to 0.
-     * 
+     *
      * @param deviceFacts - The Ansible JSON object returned from the REST API.
      */
     public removeClusterStorage(deviceFacts: Object){
         if (this.sensorDriveStorageCache[deviceFacts["hostname"]] != undefined){
             this.clusterStorageAvailable -= this.sensorDriveStorageCache[deviceFacts["hostname"]];
-        } 
+        }
         this.sensorDriveStorageCache[deviceFacts["hostname"]] = 0;
     }
 
     /**
-     * Calulates and stores the cluster storage based on what the user selected 
+     * Calulates and stores the cluster storage based on what the user selected
      * and the passed in deviceFacts object .
-     * 
+     *
      * @param drivesSelected - An array of drives that have been selected
      * @param deviceFacts - The Ansible JSON object returned from the REST API.
      */
@@ -237,8 +236,8 @@ export class SensorResourcesForm extends FormGroup {
 
     /**
      * Private method that calculates a CPU allocation for the main display.
-     * 
-     * @param cpuPercentValue  
+     *
+     * @param cpuPercentValue
      */
     private setCPUAllocation(cpuPercentValue: number) : number {
         let allocationValue = this._lowest_cpus * (cpuPercentValue / 100)
@@ -256,8 +255,8 @@ export class SensorResourcesForm extends FormGroup {
      * Removes a HomeNet FormGroup from the homeNets Array by index.
      * At least home net is required so we do not allow deletion of the
      * last homenet.
-     * 
-     * @param index 
+     *
+     * @param index
      */
     public removeHomeNet(index: number){
         if (this.home_nets.length > 1){
@@ -276,10 +275,10 @@ export class SensorResourcesForm extends FormGroup {
      * Removes a External Net FormGroup from the external_nets Array by index.
      * At one external net is required so we do not allow deletion of the
      * last homenet.
-     * 
-     * @param index 
+     *
+     * @param index
      */
-    public removeExternalNet(index: number){        
+    public removeExternalNet(index: number){
         this.external_nets.removeAt(index);
     }
 
@@ -350,5 +349,5 @@ export class SensorResourcesForm extends FormGroup {
         true,
         '3',
         "The percentage of the sensor cores which will be allocated to Zookeeper." + EXPLANATION
-    )    
+    )
 }

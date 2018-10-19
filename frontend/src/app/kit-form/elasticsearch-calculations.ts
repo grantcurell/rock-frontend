@@ -389,6 +389,8 @@ export class ElasticSearchCalculator {
                     }
                 }
 
+                // This is based on the recommendation from Elasticsearch that we run 5 servers with all roles and if there are more than 5
+                // we start splitting it up with data nodes.
                 if (elasticsearch_successful_allocation_cpu && elasticsearch_successful_allocation_ram && logstash_successful_allocation) {
                     if (elastic_instances > 5) {
                         this.kitForm.advanced_elasticsearch_settings.elastic_masters.setValue(5);
@@ -408,6 +410,7 @@ export class ElasticSearchCalculator {
                     elastic_instances -= 1;
                 }
             } while ((!elasticsearch_successful_allocation_ram || !elasticsearch_successful_allocation_cpu || !logstash_successful_allocation) && elastic_instances >= elastic_minimum_instances);
+        
 
             if (elasticsearch_successful_allocation_ram) {
                 if (mem_warning_reached) {

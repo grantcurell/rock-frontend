@@ -132,10 +132,10 @@
     <br>
     <div class="form-row">
       <div class="form-group col-md-6">
-        <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid">Execute Kit</button>
+        <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid" name="execute_kit">Execute Kit</button>
       </div>
       <div class="form-group col-md-6">
-        <button class="btn btn-primary" type="button" (click)="toggleAdvancedSettings()" style="float:right;">Show/Hide Advanced Settings</button>
+        <button class="btn btn-primary" type="button" (click)="toggleAdvancedSettings()" name="advanced_settings" style="float:right;">Show/Hide Advanced Settings</button>
       </div>
     </div>
 
