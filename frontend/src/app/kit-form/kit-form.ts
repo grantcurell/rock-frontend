@@ -68,7 +68,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
 
         //this.sensor_type.
         this.sensor_type.setValue(sensor_type);
-        super.addControl('sensor_type', this.sensor_type);        
+        super.addControl('sensor_type', this.sensor_type);
         this.basicNodeResource = new BasicNodeResource();
         this.deviceFacts = null;
         this.interfaceSelections = new Array();
@@ -95,8 +95,8 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
     /**
      * When calling this make sure you call set_drive_selections
      * after you have set deviceFacts.
-     * 
-     * @param mObj 
+     *
+     * @param mObj
      */
     public from_object(mObj: Object){
         this.deviceFacts = mObj['deviceFacts'];
@@ -104,7 +104,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         this.host_sensor.setValue(mObj['host_sensor']);
         this.hostname.setValue(mObj['hostname']);
         this.moloch_threads.setValue(mObj['moloch_threads']);
-        this.sensor_type.setValue(mObj['sensor_type']);        
+        this.sensor_type.setValue(mObj['sensor_type']);
         this.monitor_interface.default_selections = mObj['monitor_interface'];
         this.ceph_drives.default_selections = mObj['ceph_drives'];
         this.pcap_drives.default_selections = mObj['pcap_drives'];
@@ -285,15 +285,15 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
     }
 
     /**
-     * After you call this make sure you set drive selections 
+     * After you call this make sure you set drive selections
      * after you have set deviceFacts.
-     * 
-     * @param mObj 
+     *
+     * @param mObj
      */
     public from_object(mObj: Object){
         this.deviceFacts = mObj['deviceFacts'];
         this.host_server.setValue(mObj['host_server']);
-        this.hostname.setValue(mObj['hostname']);        
+        this.hostname.setValue(mObj['hostname']);
         this.is_master_server.checked = mObj['is_master_server'];
         this.is_master_server.setValue(mObj['is_master_server']);
         this.ceph_drives.default_selections = mObj['ceph_drives'];
@@ -764,7 +764,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         CONSTRAINT_MIN_ONE,
         MIN_ONE_INVALID_FEEDBACK,
         true,
-        '20000',
+        '4000000',
         "Size of indexing request to send to Elasticsearch. Increase if monitoring a \
         high bandwidth network."
     )
@@ -814,7 +814,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         null,
         undefined,
         true,
-        'libmagic',
+        'basic',
         "(since 0.16.1) libfile can be VERY slow. Less accurate \"magicing\" \
         is available for http/smtp bodies. \
         'libmagic' = normal libmagic. \
@@ -858,7 +858,7 @@ export class KitInventoryForm extends FormGroup {
     kubernetesCidrInfoText;
 
     constructor() {
-        super({}, ValidateKitInventory);        
+        super({}, ValidateKitInventory);
         super.addControl('sensor_storage_type', this.sensor_storage_type);
         super.addControl('root_password', this.root_password);
         super.addControl('elastic_cpu_percentage', this.elastic_cpu_percentage);
@@ -892,22 +892,22 @@ export class KitInventoryForm extends FormGroup {
     reset(value?: any, options?: {
         onlySelf?: boolean;
         emitEvent?: boolean;
-    }): void {    
-        super.reset({'elastic_cpu_percentage': this.elastic_cpu_percentage.default_value, 
+    }): void {
+        super.reset({'elastic_cpu_percentage': this.elastic_cpu_percentage.default_value,
                      'elastic_memory_percentage': this.elastic_memory_percentage.default_value,
                      'logstash_cpu_percentage': this.logstash_cpu_percentage.default_value,
                      'elastic_storage_percentage': this.elastic_storage_percentage.default_value,
                      'sensor_storage_type': this.sensor_storage_type.default_value,
                      'logstash_replicas': this.logstash_replicas.default_value
-                    });        
+                    });
         this.clearNodes();
         this.system_resources.reinitalize();
     }
 
     /**
      * Overridden method
-     * 
-     * @param opts 
+     *
+     * @param opts
      */
     disable(opts?: {
         onlySelf?: boolean;
