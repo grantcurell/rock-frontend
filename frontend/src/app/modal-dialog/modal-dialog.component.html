@@ -38,7 +38,11 @@
           <div class="text-info">{{ modal.text }}</div>
           <br>
           <div>
-            <app-text-input *ngFor="let controlName of objectKeys(modal.modalForm.controls)" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-text-input>
+            <ng-container *ngFor="let controlName of objectKeys(modal.modalForm.controls)">
+              <app-text-input *ngIf="isTextInput(modal.modalForm.controls[controlName])" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-text-input>
+              <app-date-picker *ngIf="isDateInput(modal.modalForm.controls[controlName])" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-date-picker>
+              <app-time-picker *ngIf="isTimeInput(modal.modalForm.controls[controlName])" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-time-picker>
+            </ng-container>
           </div>
         </div>
         <div class="modal-footer">

@@ -27,6 +27,9 @@ import { SafePipe } from './globals';
 import { TerminalComponent } from './terminal/terminal.component';
 import { ConfigmapsComponent } from './configmaps/configmaps.component';
 import { ConfigmapEditorComponent } from './configmap-editor/configmap-editor.component'; 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { TimePickerComponent } from './time-picker/time-picker.component';
+import { DatePickerComponent } from './date-picker/date-picker.component';
 
 
 @NgModule({
@@ -53,14 +56,17 @@ import { ConfigmapEditorComponent } from './configmap-editor/configmap-editor.co
     SafePipe,
     TerminalComponent,
     ConfigmapsComponent,
-    ConfigmapEditorComponent
+    ConfigmapEditorComponent,
+    TimePickerComponent,
+    DatePickerComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule    
+    HttpClientModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -14,7 +14,7 @@ from datetime import datetime
 from flask import request, Response, jsonify
 from pymongo.collection import ReturnDocument
 from shared.constants import KIT_ID
-from shared.connection_mngs import KUBEDIR
+from shared.connection_mngs import KUBEDIR, FabricConnectionWrapper
 from typing import Dict, Tuple
 
 
@@ -79,6 +79,36 @@ def _replace_kit_inventory(payload: Dict) -> Tuple[bool, str]:
     return False, None
 
 
+def zero_pad(num: int) -> str:
+    """
+    Zeros pads the numers that are lower than 10.
+
+    :return: string of the new number.
+    """
+    if num < 10:
+        return "0" + str(num)
+    return num
+
+
+def _change_time_on_kubernetes_master(timeForm: Dict):
+    """
+    Sets the time on the kubernetes box.  This function throws an exception on failure.
+
+    :return: None
+    """
+    with FabricConnectionWrapper(conn_mng) as cmd:
+        ret_val = cmd.run('timedatectl set-timezone UTC')
+        time_cmd = "timedatectl set-time '{year}-{month}-{day} {hours}:{minutes}:00'".format(year=timeForm['date']['year'],
+                                                                                            month=zero_pad(timeForm['date']['month']),
+                                                                                            day=zero_pad(timeForm['date']['day']),
+                                                                                            hours=zero_pad(timeForm['time']['hour']),
+                                                                                            minutes=zero_pad(timeForm['time']['minute'])
+                                                                                           )
+        cmd.run('timedatectl set-ntp false')
+        cmd.run(time_cmd)
+        cmd.run('timedatectl set-ntp true')
+
+
 @app.route('/api/execute_kit_inventory', methods=['POST'])
 def execute_kit_inventory() -> Response:
     """
@@ -88,9 +118,10 @@ def execute_kit_inventory() -> Response:
     """
     payload = request.get_json()
     logger.debug(json.dumps(payload, indent=4, sort_keys=True))
-    isSucessful, root_password = _replace_kit_inventory(payload)
+    isSucessful, root_password = _replace_kit_inventory(payload['kitForm'])
     _delete_kubernetes_conf()
     if isSucessful:
+        _change_time_on_kubernetes_master(payload['timeForm'])
         cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + 
                           root_password + "' site.yml")
         spawn_job("Kit",

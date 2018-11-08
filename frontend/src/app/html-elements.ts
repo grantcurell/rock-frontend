@@ -1,6 +1,6 @@
 import { FormControl, Validators, AsyncValidatorFn, 
         ValidatorFn, AbstractControlOptions, 
-        FormArray, FormGroup } from '@angular/forms';
+        FormArray, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
 
 declare var $: any;
 
@@ -255,6 +255,83 @@ export class HtmlHidden extends FormControl {
   }
 }
 
+function pad(n) {
+  if (n < 10)
+      return "0" + n;
+  return n;
+}
+
+function validateDate(control: AbstractControl): ValidationErrors | null {
+  let ctrlVal = '';
+  let pat = new RegExp('^[0-9]{4}[-][0-9]{2}[-][0-9]{2}$');
+  if (control.value instanceof Object){
+    ctrlVal = control.value['year'] + '-' + pad(control.value['month']) + '-' + pad(control.value['day']);
+  } else {
+    ctrlVal = control.value;
+  }
+  let result = pat.test(ctrlVal);
+  if (!result){
+    return {"custom_error": "Invalid date format.  It must be in yyyy-mm-dd format."};
+  } 
+
+  return null;
+}
+
+function validateTime(control: AbstractControl): ValidationErrors | null {
+  if (control.value === null || control.value === undefined || control.value === ''){
+    return {"custom_error": "Invalid time.  Please select a valid time."};
+  }
+
+  return null;
+}
+
+export class HtmlDatePicker extends FormControl implements HelpPageInterface {
+  anchor: string;  
+
+  constructor(public form_name: string,
+    public label: string,
+    public required: boolean,
+    public description: string,
+    public default_value: string = '',
+    public placeholder: string = "yyyy-mm-dd",
+    public valid_feedback: string = 'Good to go!'
+  ) {
+    super('', null, null);
+    let validators = [];
+    if (required) {
+      validators.push(Validators.required);
+    }
+  
+    validators.push(validateDate);
+    super.setValidators(validators);
+    super.setValue(default_value);
+    this.anchor = 'anchor_' + this.form_name;
+  }
+}
+
+export class HtmlTimePicker extends FormControl implements HelpPageInterface {
+  anchor: string;
+  control_disabled: boolean;
+
+  constructor(public form_name: string,
+    public label: string,
+    public required: boolean,
+    public description: string,        
+    public valid_feedback: string = 'Good to go!',
+    disabled: boolean = false
+  ) {
+    super('', null, null);
+    let validators = [];
+    if (required) {
+      validators.push(Validators.required);
+    }  
+    super.setValidators(validateTime);
+    this.control_disabled = disabled;
+    this.anchor = 'anchor_' + this.form_name;
+  }
+}
+
+
 export class HtmlInput extends FormControl implements HtmlInputInterface, HelpPageInterface {
   anchor: string;
   control_disabled: boolean;
@@ -344,7 +421,6 @@ export class HtmlCardSelector extends FormArray implements HelpPageInterface, Ht
   ) {
     super([], null, null);
     this.anchor = 'anchor_' + form_name;
-    super.enable
   }
 
   /**

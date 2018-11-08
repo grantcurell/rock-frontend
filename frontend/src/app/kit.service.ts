@@ -31,9 +31,10 @@ export class KitService {
     return this.http.post(url, post_payload , HTTP_OPTIONS).pipe();
   }
 
-  executeKit(kitForm: Object){
+  executeKit(kitForm: Object, timeForm: Object){
     const url = '/api/execute_kit_inventory';
-    return this.http.post(url, kitForm, HTTP_OPTIONS).pipe();
+    let payload: Object = {'kitForm': kitForm, 'timeForm': timeForm};
+    return this.http.post(url, payload, HTTP_OPTIONS).pipe();
   }
 
   executeAddNode(kitForm: Object){

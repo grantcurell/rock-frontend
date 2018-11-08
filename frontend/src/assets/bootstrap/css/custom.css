@@ -207,3 +207,17 @@ a {
     color: #0f0;
     cursor: pointer;
 }
+
+.invalid-feedback2{
+    width: 100%; 
+    margin-top: 0.25rem; 
+    font-size: 14px; 
+    color: #dc3545;
+}
+
+.valid-feedback2 {    
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 14px;
+    color: #28a745;
+}

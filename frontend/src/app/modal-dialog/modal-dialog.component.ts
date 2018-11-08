@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { HtmlModalPopUp, ModalType } from '../html-elements';
+import { HtmlModalPopUp, ModalType, HtmlInput, HtmlDatePicker, HtmlTimePicker } from '../html-elements';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-modal-dialog',
@@ -49,5 +50,17 @@ export class ModalDialogComponent implements OnInit {
 
   isFormType() {
     return this.modal.type === ModalType.form;
+  }
+
+  isTextInput(formControl: FormControl){
+    return formControl instanceof HtmlInput;
+  }
+
+  isDateInput(formControl: FormControl){
+    return formControl instanceof HtmlDatePicker;
+  }
+
+  isTimeInput(formControl: FormControl){
+    return formControl instanceof HtmlTimePicker;
   }
 }

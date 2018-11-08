@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { KitInventoryForm, ServersFormArray, ServerFormGroup,
          SensorFormGroup, SensorsFormArray,
-         AdvancedElasticSearchSettingsFormGroup } from './kit-form';
+         AdvancedElasticSearchSettingsFormGroup,
+         ExecuteKitForm } from './kit-form';
 import { KickstartService } from '../kickstart.service';
 import { KitService } from '../kit.service';
-import { HtmlModalPopUp, HtmlDropDown, HtmlModalSelectDialog } from '../html-elements'; 
+import { HtmlModalPopUp, HtmlDropDown, HtmlModalSelectDialog, ModalType } from '../html-elements'; 
 import { FormArray, FormGroup, FormControl } from '@angular/forms';
 import { ElasticSearchCalculator } from './elasticsearch-calculations';
 import { StorageCalculator } from './storage-calculations';
@@ -22,6 +23,7 @@ import { HomeNetFormGroup, ExternalNetFormGroup } from '../total-sensor-resource
 })
 export class KitFormComponent implements OnInit {
   kitForm: KitInventoryForm;
+  executeKitForm: ExecuteKitForm;
   advancedElasticSearchForm: AdvancedElasticSearchSettingsFormGroup;
   elasicSearchCalculator: ElasticSearchCalculator;
   storageCalculator: StorageCalculator;
@@ -50,6 +52,7 @@ export class KitFormComponent implements OnInit {
               private kitSrv: KitService) 
   {
     this.kitForm = new KitInventoryForm();
+    this.executeKitForm = new ExecuteKitForm();
     this.advancedElasticSearchForm = this.kitForm.advanced_elasticsearch_settings;
     this.servers = this.kitForm.servers;
     this.sensors = this.kitForm.sensors;
@@ -218,10 +221,15 @@ export class KitFormComponent implements OnInit {
 
   onSubmit(){    
     this.executeKitModal.updateModal('WARNING',
-      'Are you sure you wan to execute this Kit configuration? Doing so will create a new cluster \
-      with the configuration you created.  All data will be wiped out if you are running this on an existing cluster!',
+      'Are you sure you want to execute this Kit configuration? Doing so will create a new cluster \
+      with the configuration you created.  All data will be wiped out if you are running this on an existing cluster! \
+      Before you can submit your Kit configuration, please make sure you enter the current UTC date and time below.  \
+      This will set the master server in the cluster to the appropriate time before configuring the rest \
+      of the Kit.',
       'Execute',
-      'Cancel'
+      'Cancel',
+      ModalType.form,
+      this.executeKitForm
     );
     this.executeKitModal.openModal();    
   }
@@ -236,7 +244,10 @@ export class KitFormComponent implements OnInit {
   }
 
   executeKit(){
-    this.kitSrv.executeKit(this.kitForm.getRawValue())
+    console.log(this.executeKitForm.getRawValue());
+    this.kitSrv.executeKit(this.kitForm.getRawValue(), 
+                           this.executeKitForm.getRawValue()
+                          )
     .subscribe(data => {
       this.openConsole();
     });

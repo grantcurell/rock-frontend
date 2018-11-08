@@ -4,7 +4,7 @@ import {
     FormControl
 } from '@angular/forms';
 
-import { HtmlInput, HtmlCheckBox, HtmlDropDown, HtmlCardSelector, HtmlHidden } from '../html-elements';
+import { HtmlInput, HtmlCheckBox, HtmlDropDown, HtmlCardSelector, HtmlHidden, HtmlDatePicker, HtmlTimePicker } from '../html-elements';
 import { SensorResourcesForm } from '../total-sensor-resources-card/total-sensor-resources-form';
 import { TotalServerResources } from '../total-server-resources-card/total-server-resources-form';
 import {  PERCENT_PLACEHOLDER, PERCENT_MIN_MAX, PERCENT_INVALID_FEEDBACK,
@@ -1155,5 +1155,29 @@ export class KitInventoryForm extends FormGroup {
         "You can set how many OSD are allowed to fail without losing data. For replicated pools, it is the \
         desired number of copies/replicas of an object. Our configuration stores an object and one \
         additional copy, The check box will enable this."
+    )
+}
+
+
+export class ExecuteKitForm extends FormGroup {    
+
+    constructor() {
+        super({});
+        super.addControl('date', this.date);
+        super.addControl('time', this.time);
+    }
+  
+    date = new HtmlDatePicker(
+        'date',
+        'Current Date',
+        true,
+        'This is the date used for your cluster.  Make sure it is correct before executing your kit configuration.',
+    )
+
+    time = new HtmlTimePicker(
+        'time',
+        'Current Time',
+        true,                        
+        'This is the time used for your cluster.  Make sure it is correct before executing your kit configuration.'
     )
 }
