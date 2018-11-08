@@ -1,6 +1,7 @@
 import { KitInventoryForm } from './kit-form';
 import { StorageCalculator } from './storage-calculations';
 import { SetElasticSearchValidated, SetClusteredStorageValidated } from './kit-form-globals';
+import { SetZookeeperReplicas } from './common-calculations'; 
 
 export class ManualCalculator {
     kitForm: KitInventoryForm;
@@ -14,6 +15,7 @@ export class ManualCalculator {
         if (!this.kitForm.disable_autocalculate.value){            
             return;
         }
+        SetZookeeperReplicas(this.kitForm);
 
         let number_of_masters = parseInt(this.kitForm.advanced_elasticsearch_settings.elastic_masters.value);
         let number_of_datas = parseInt(this.kitForm.advanced_elasticsearch_settings.elastic_datas.value);

@@ -1,5 +1,6 @@
 import { KitInventoryForm } from './kit-form';
 import { CEPH_DRIVE_MIN_COUNT } from '../frontend-constants';
+import { SetZookeeperReplicas } from './common-calculations';
 
 export class StorageCalculator {
     kitForm: KitInventoryForm;
@@ -28,6 +29,8 @@ export class StorageCalculator {
         if (this.kitForm.system_resources.clusterStorageAvailable === 0){
             return;
         }
+        
+        SetZookeeperReplicas(this.kitForm);
 
         let elastic_storage_percentage = this.kitForm.elastic_storage_percentage.value / 100;
 

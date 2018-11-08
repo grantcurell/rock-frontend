@@ -12,7 +12,6 @@ import {  PERCENT_PLACEHOLDER, PERCENT_MIN_MAX, PERCENT_INVALID_FEEDBACK,
           CONSTRAINT_MIN_ONE, WHAT_IS_CEPH, MIN_ONE_INVALID_FEEDBACK,
           CONSTRAINT_MIN_ZERO, MIN_ZERO_INVALID_FEEDBACK,
           CONSTRAINT_MIN_TWO, MIN_TWO_INVALID_FEEDBACK,
-          CONSTRAINT_MIN_EIGHT, MIN_EIGHT_INVALID_FEEDBACK,
           CONSTRAINT_MIN_THREE, MIN_THREE_INVALID_FEEDBACK,
           INVALID_FEEDBACK_INTERFACE, INVALID_FEEDBACK_IP
        } from '../frontend-constants';
@@ -602,8 +601,8 @@ export class AdvancedKafkaSettingsFormGroup extends FormGroup {
         'Zookeeper Replicas',
         "Number of Zookeeper instances",
         'number',
-        CONSTRAINT_MIN_THREE,
-        MIN_THREE_INVALID_FEEDBACK,
+        CONSTRAINT_MIN_ONE,
+        MIN_ONE_INVALID_FEEDBACK,
         true,
         '3',
         "This is the number of Zookeeper instances your kit will run. These are used for \
