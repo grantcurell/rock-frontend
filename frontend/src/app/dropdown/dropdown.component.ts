@@ -21,16 +21,16 @@ export class DropdownComponent implements OnInit {
   public uid: string;
 
   @Output()
-  dropDownChanged: EventEmitter<any> = new EventEmitter();
+  dropDownChanged: EventEmitter<any> = new EventEmitter();  
 
-  selectedValue: string;
+  htmlDropDown: HtmlDropDown;
 
   constructor() {
   }
 
   ngOnInit() {
-    let dropDown: HtmlDropDown = this.parentForm.get(this.controlName) as HtmlDropDown;
-    this.selectValue(dropDown.default_value);
+    this.htmlDropDown = this.parentForm.get(this.controlName) as HtmlDropDown;
+    this.selectValue(this.htmlDropDown.default_value);
   }
 
   ngAfterViewInit(){
@@ -43,8 +43,7 @@ export class DropdownComponent implements OnInit {
   }
 
   selectValue(newValue: string){
-    this.selectedValue = newValue;
-    this.parentForm.get(this.controlName).setValue(this.selectedValue);
+    this.htmlDropDown.setValue(newValue);
     this.triggerChangedEvent();
   }
 
@@ -53,6 +52,6 @@ export class DropdownComponent implements OnInit {
   }
 
   private triggerChangedEvent(){
-    this.dropDownChanged.emit(this.selectedValue);
+    this.dropDownChanged.emit(this.htmlDropDown.value);
   }
 }

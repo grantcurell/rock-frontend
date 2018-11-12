@@ -17,7 +17,7 @@
           name="{{ controlName }}{{ uid }}"
           class="btn btn-primary dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false" [value]="selectedValue">
+          aria-expanded="false" [value]="input_control.value">
     <div class="dropdown-menu" aria-labelledby="pxe_type_dropdown_2" x-placement="top-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, -84px, 0px);">
       <button *ngFor="let option of input_control.options" name="{{ option }}{{ uid }}" class="dropdown-item" type="button" (click)="selectValue(option)">{{ option }}</button>
     </div>

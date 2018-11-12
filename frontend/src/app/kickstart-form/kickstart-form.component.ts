@@ -43,15 +43,6 @@ export class KickstartFormComponent implements OnInit {
     }
   }
 
-  private _set_form_control(control: FormControl | HtmlDropDown, value: any){
-    if (control instanceof HtmlDropDown){
-      control.default_value = value;
-      control.setValue(value);
-    } else if (control instanceof FormControl){
-      control.setValue(value);
-    }
-  }
-
   /**
    * Maps our saved form object to view.
    *
@@ -62,7 +53,7 @@ export class KickstartFormComponent implements OnInit {
     for (let key in data){
       let someFormObject = formGroup.get(key);
       if (someFormObject instanceof FormControl){
-        this._set_form_control(someFormObject, data[key]);
+        someFormObject.setValue(data[key]);        
       } else if (someFormObject instanceof FormGroup){
         this._map_to_form(data[key], someFormObject);
       } else if (someFormObject instanceof HtmlCardSelector){
@@ -73,7 +64,7 @@ export class KickstartFormComponent implements OnInit {
         for (let index = 0; index < data[key].length; index++){
           let someFormArrayObj = someFormObject.at(index);
           if (someFormArrayObj instanceof FormControl){
-            this._set_form_control(someFormArrayObj, data[key][index]);
+            someFormArrayObj.setValue(data[key][index]);
           } else if (someFormArrayObj instanceof FormGroup){
             this._map_to_form(data[key][index], someFormArrayObj);
           }

@@ -4,11 +4,11 @@
   </div>
   <ul class="list-group list-group-flush">
     <li class="list-group-item">CPU Cores Available:
-      <span>{{ basicNodeResource.cpu_cores }}</span>
+      <span>{{ basicNodeResource.cpu_cores | number:'1.0-2' }}</span>
     </li>
     <li class="list-group-item">Memory Available:
-      <span id="server_1_memory_available">{{ basicNodeResource.memory }}</span> GB</li>
+      <span>{{ basicNodeResource.memory | number:'1.0-2' }}</span> GB</li>
     <li class="list-group-item border-bottom">Total Drive Space Available:
-      <span id="server_1_disk_space_available">{{ basicNodeResource.total_drive_space }}</span> GB</li>
+      <span>{{ basicNodeResource.total_drive_space | number:'1.0-2' }}</span> GB</li>
   </ul>
 </div>

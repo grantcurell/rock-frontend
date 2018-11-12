@@ -241,7 +241,7 @@ export class HtmlDropDown extends FormControl implements HtmlDropDownInterface, 
     onlySelf?: boolean;
     emitEvent?: boolean;
   }): void {
-    this.control_disabled = false;
+    this.control_disabled = false;   
   }
 }
 

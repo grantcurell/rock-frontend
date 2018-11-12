@@ -41,7 +41,7 @@ function SetDriveSelections(deviceFacts: Object) : Array<{value: string, label: 
         if (item["hasRoot"]){
             continue;
         }
-        driveSelections.push({value: item["name"], label: item["name"] + " - " + item["size_gb"] + " GB"})
+        driveSelections.push({value: item["name"], label: item["name"] + " - " + item["size_gb"].toFixed(2) + " GB"})
      }
     return driveSelections;
 }

@@ -4,33 +4,33 @@
   </div>
   <div class="card-body">
     <p class="card-text">CPU Cores Available:
-      <span id="sensor_cpus_available">{{ sensorResourceForm.cpuCoresAvailable }}</span>
+      <span id="sensor_cpus_available">{{ sensorResourceForm.cpuCoresAvailable | number:'1.0-2' }}</span>
     </p>
     <p class="card-text">Memory Available:
-      <span id="sensor_memory_available">{{ sensorResourceForm.memoryAvailable }}</span> GB</p>
+      <span id="sensor_memory_available">{{ sensorResourceForm.memoryAvailable | number:'1.0-2' }}</span> GB</p>
     <p class="card-text">Clustered Storage Available:
-      <span id="sensor_clustered_storage_available">{{ sensorResourceForm.clusterStorageAvailable }}</span> GB</p>
+      <span id="sensor_clustered_storage_available">{{ sensorResourceForm.clusterStorageAvailable | number:'1.0-2' }}</span> GB</p>
     <hr>
     <h6 class="card-subtitle mb-2 text-muted">Sensor Resource Allocations</h6>
     <hr>
 
     <p class="card-text">Kafka CPUs:
-      <span id="kafka_cpu_percentage_field_span">{{ sensorResourceForm.kafkaCPUAllocation | number:'1.2-2' }}</span>
+      <span id="kafka_cpu_percentage_field_span">{{ sensorResourceForm.kafkaCPUAllocation | number:'1.0-2' }}</span>
     </p>
 
     <p class="card-text">Moloch CPUs:
-      <span id="moloch_cpu_percentage_field_span">{{ sensorResourceForm.molochCPUAllocation | number:'1.2-2' }}</span>
+      <span id="moloch_cpu_percentage_field_span">{{ sensorResourceForm.molochCPUAllocation | number:'1.0-2' }}</span>
     </p>
 
     <p class="card-text">Bro CPUs:
-      <span id="bro_cpu_percentage_field_span">{{ sensorResourceForm.broCPUAllocation | number:'1.2-2' }}</span>
+      <span id="bro_cpu_percentage_field_span">{{ sensorResourceForm.broCPUAllocation | number:'1.0-2' }}</span>
     </p>
 
     <p class="card-text">Suricata CPUs:
-      <span id="suricata_cpu_percentage_field_span">{{ sensorResourceForm.suricataCPUAllocation | number:'1.2-2' }}</span>
+      <span id="suricata_cpu_percentage_field_span">{{ sensorResourceForm.suricataCPUAllocation | number:'1.0-2' }}</span>
     </p>
     <p class="card-text">Zookeeper CPUs:
-      <span id="zookeeper_cpu_percentage_field_span">{{ sensorResourceForm.zookeeperCPUAllocation | number:'1.2-2' }}</span>
+      <span id="zookeeper_cpu_percentage_field_span">{{ sensorResourceForm.zookeeperCPUAllocation | number:'1.0-2' }}</span>
     </p>
 
     <app-text-input [parentForm]="sensorResourceForm" controlName="kafka_cpu_percentage" (keyupEvent)="resourceKeyup($event)" ></app-text-input>
@@ -52,7 +52,7 @@
       use the sensor with the lowest CPU count for calculations. Keep in mind, this does not mean faster systems won't use
       that speed, the above are effectively ratios. See field descriptions for more information.</p>
     <p class="card-text">Percentage Allocated:
-      <span id="sensor_resource_percentage_allocated">{{ sensorResourceForm.percentAllocated }}</span>
+      <span id="sensor_resource_percentage_allocated">{{ sensorResourceForm.percentAllocated | number:'1.0-2' }}</span>
     </p>
 
     <p *ngIf="sensorResourceForm.percentAllocated > 99" class="card-text text-danger">The sensor's total resources cannot exceeed 99!</p>

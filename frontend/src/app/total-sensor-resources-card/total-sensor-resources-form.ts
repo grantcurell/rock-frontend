@@ -284,7 +284,6 @@ export class SensorResourcesForm extends FormGroup {
 
         this.cpuCoresAvailable += deviceFacts["cpus_available"];
         this.memoryAvailable += deviceFacts["memory_available"];
-        this.memoryAvailable = parseFloat(this.memoryAvailable.toFixed(2));
         this.setCPUAllocations();
     }
 
@@ -296,7 +295,6 @@ export class SensorResourcesForm extends FormGroup {
     public subtractFromDeviceFacts(deviceFacts: Object){
         this.cpuCoresAvailable -= deviceFacts["cpus_available"];
         this.memoryAvailable -= deviceFacts["memory_available"];
-        this.memoryAvailable = parseFloat(this.memoryAvailable.toFixed(2));
         this.setCPUAllocations();
     }
 
@@ -342,7 +340,7 @@ export class SensorResourcesForm extends FormGroup {
      */
     private setCPUAllocation(cpuPercentValue: number) : number {
         let allocationValue = this._lowest_cpus * (cpuPercentValue / 100)
-        return parseFloat(allocationValue.toFixed(2));
+        return allocationValue;
     }
 
     /**

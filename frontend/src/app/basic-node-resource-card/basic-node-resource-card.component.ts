@@ -23,16 +23,14 @@ export class BasicNodeResource {
   public setFromDeviceFacts(deviceFacts: Object) {
     this.initializeValues();
     this.cpu_cores = deviceFacts['cpus_available'];
-    this.memory = deviceFacts['memory_available'];
-    this.memory = parseFloat(this.memory.toFixed(2));
+    this.memory = deviceFacts['memory_available'];    
 
     let total_space: number = 0;
     for (let disk of deviceFacts["disks"]) {
       total_space += disk['size_gb'];
     }
 
-    this.total_drive_space = total_space;
-    this.total_drive_space = parseFloat(this.total_drive_space.toFixed(2));
+    this.total_drive_space = total_space;    
   }
 }
 

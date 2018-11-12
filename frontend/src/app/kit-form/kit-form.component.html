@@ -42,7 +42,7 @@
         <app-text-input [parentForm]="kitForm" controlName="logstash_replicas" (keyupEvent)="triggerValidations($event)"></app-text-input>
         <p class="text-info">Note: Elasticsearch only runs on servers. It will not run on sensors. The percentages above are only applicable to server resources - not sensor.</p>
         <app-text-input [parentForm]="kitForm" controlName="elastic_storage_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
-        <p>Storage Assigned to Elasticsearch (GBs): <span>{{ storageCalculator.elasticStorageAvailable }}</span></p>
+        <p>Storage Assigned to Elasticsearch (GBs): <span>{{ storageCalculator.elasticStorageAvailable | number:'1.0-2' }}</span></p>
         <p class="text-info">Note: The amount of storage assigned to Elasticsearch will update as you discover your hosts below. It will start at 0.</p>
         <br>
 

@@ -72,16 +72,6 @@ export class KitFormComponent implements OnInit {
     this.addNodeCache = new Array();
   }
 
-  private _set_form_control(control: FormControl | HtmlDropDown, value: any){
-    if (control instanceof HtmlDropDown){
-      control.default_value = value;
-      control.setValue(value);
-
-    } else if (control instanceof FormControl){
-      control.setValue(value);
-    }
-  }
-
   /**
    * Maps our saved form object to view.
    *
@@ -93,8 +83,7 @@ export class KitFormComponent implements OnInit {
       let someFormObject = formGroup.get(key);      
 
       if (someFormObject instanceof FormControl){
-        this._set_form_control(someFormObject, data[key]);
-
+        someFormObject.setValue(data[key]);
       } else if (someFormObject instanceof FormGroup){
         this._map_to_form(data[key], someFormObject, rootPassword);
 

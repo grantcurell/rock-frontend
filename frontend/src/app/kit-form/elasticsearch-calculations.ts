@@ -222,6 +222,7 @@ export class ElasticSearchCalculator {
                 if (isNaN(elastic_instances)){
                     elastic_instances = 0;
                 }
+                this.kitForm.server_resources.setTotalElasticSearchInstances(elastic_instances);
 
                 let elasticsearch_cpu_allocation = new Array(elastic_instances);
                 let elasticsearch_memory_allocation = new Array(elastic_instances);

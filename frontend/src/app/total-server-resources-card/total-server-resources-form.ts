@@ -21,7 +21,8 @@ export class TotalServerResources extends FormGroup {
     
     elasticSearchMemCss: string;
     elasticSearchMemErrorText: string;
-    assignedElasicSearchMemory: number;    
+    assignedElasicSearchMemory: number;
+    totalElasticSearchInstances: number;
 
     constructor(){
         super({}, null, null);
@@ -49,6 +50,7 @@ export class TotalServerResources extends FormGroup {
         this.assignedElasicSearchMemory = 0;
         this.elasticSearchMemCss = "";
         this.elasticSearchMemErrorText= "";
+        this.totalElasticSearchInstances = 0;
     }
 
     /**
@@ -70,6 +72,10 @@ export class TotalServerResources extends FormGroup {
         this.log_stash_cpu_request.setValue(this.assignedLogstashCpus);
     }
 
+    public setTotalElasticSearchInstances(elasticSearchInstances: number){
+        this.totalElasticSearchInstances = elasticSearchInstances;
+    }
+
     public setTotalAssignedElasticSearchCPUs(assignedCpus: number) {
         this.assignedElasticSearchCpus = assignedCpus;
     }
@@ -86,7 +92,6 @@ export class TotalServerResources extends FormGroup {
     public setFromDeviceFacts(deviceFacts: Object) {
         this.cpuCoresAvailable += deviceFacts["cpus_available"];
         this.memoryAvailable += deviceFacts["memory_available"];
-        this.memoryAvailable = parseFloat(this.memoryAvailable.toFixed(2));        
     }
 
     /**
@@ -98,7 +103,6 @@ export class TotalServerResources extends FormGroup {
         if (deviceFacts){
             this.cpuCoresAvailable -= deviceFacts["cpus_available"];
             this.memoryAvailable -= deviceFacts["memory_available"];
-            this.memoryAvailable = parseFloat(this.memoryAvailable.toFixed(2));
         }
     }
 
