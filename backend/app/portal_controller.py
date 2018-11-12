@@ -2,9 +2,28 @@
 Main module that controls the REST calls for the portal page.
 """
 from app import (app, conn_mng)
-from app.common import OK_RESPONSE
+from app.common import OK_RESPONSE, ERROR_RESPONSE
+from fabric.runners import Result
 from flask import jsonify, Response
+from shared.connection_mngs import FabricConnectionWrapper
 from shared.constants import PORTAL_ID
+
+
+DEFAULT_NAMES = ("elastichq.lan", "elasticsearch.lan", "kafka-manager.lan", "kibana.lan", "moloch-viewer.lan",
+                 "kubernetes-dashboard.lan", "monitoring-grafana.lan")
+
+
+def _get_defaults():
+    """
+    Gets the defaults for portal links in the event that we cannot 
+    connect to kubernetes master server.
+    
+    :return:
+    """    
+    portal_links = []
+    for default_dns in DEFAULT_NAMES:
+        portal_links.append({'ip': '', 'dns': default_dns})
+    return portal_links
 
 
 @app.route('/api/get_portal_links', methods=['GET'])
@@ -14,8 +33,18 @@ def get_portal_links() -> Response:
 
     :return:
     """
-    mongo_document = conn_mng.mongo_portal.find_one({"_id": PORTAL_ID})
-    if mongo_document is None:
-        return OK_RESPONSE
-
-    return jsonify(mongo_document["payload"])
+    try:   
+        with FabricConnectionWrapper(conn_mng) as ssh_conn:
+            portal_links = []
+            ret_val = ssh_conn.run('cat /etc/dnsmasq_kube_hosts', hide=True)  # type: Result
+            for line in ret_val.stdout.split('\n'):
+                try:
+                    ip, dns = line.split(' ')
+                    portal_links.append({'ip': ip, 'dns': dns})
+                except ValueError as e:
+                    pass
+            return jsonify(portal_links)
+    except Exception as e:
+        return jsonify(_get_defaults())
+    
+    return ERROR_RESPONSE

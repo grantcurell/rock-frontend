@@ -108,15 +108,6 @@ class MongoConnectionManager(object):
         """
         return self._tfplenum_database.console
 
-    @property
-    def mongo_portal(self) -> Collection:
-        """
-        Returns a mongo object that can do database manipulations.
-
-        :return:
-        """
-        return self._tfplenum_database.portal
-
     def close(self):
         """
         Closes the clients mongo collection gracefully.
