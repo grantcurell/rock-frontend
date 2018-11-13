@@ -52,8 +52,12 @@ export class KickstartFormComponent implements OnInit {
   private _map_to_form(data: Object, formGroup: FormGroup){    
     for (let key in data){
       let someFormObject = formGroup.get(key);
-      if (someFormObject instanceof FormControl){
-        someFormObject.setValue(data[key]);        
+      if (someFormObject instanceof HtmlDropDown){
+        setTimeout(()=> {
+          someFormObject.setValue(data[key]);
+        });
+      } else if (someFormObject instanceof FormControl){
+        someFormObject.setValue(data[key]);
       } else if (someFormObject instanceof FormGroup){
         this._map_to_form(data[key], someFormObject);
       } else if (someFormObject instanceof HtmlCardSelector){

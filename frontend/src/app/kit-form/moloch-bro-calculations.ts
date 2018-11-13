@@ -58,6 +58,10 @@ export class MolochBroCalculator {
                         bro_threads = Math.round(bro_request / 1000);
                     }
 
+                    if (moloch_threads > 24) {
+                        moloch_threads = 24;
+                    }
+
                     for (let i = 0; i < this.kitForm.sensors.length; i++) {
                         let sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
                         sensor.moloch_threads.setValue(moloch_threads);
