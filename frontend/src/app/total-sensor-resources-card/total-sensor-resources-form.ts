@@ -67,7 +67,9 @@ export class ExternalNetFormGroup extends FormGroup {
         'You must enter a CIDR IP in the x.x.x.x/xx format.',
         true,
         '',
-        "These are the values Bro for its external nets.",
+        "This will define the EXTERNAL_NET variable for all Suricata rules, essentially defining what Suricata sees as the external network. \
+        The default setting is \"!HOME_NET\", which means Suricata will define anything that is not HOME_NET as EXTERNAL_NET. It is recommended \
+        to keep this setting, but if you need to fine tune your Suricata installation then this could be useful.",
         undefined,
         undefined,
         true,

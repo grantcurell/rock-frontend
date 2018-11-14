@@ -104,9 +104,9 @@ def _change_time_on_kubernetes_master(timeForm: Dict):
                                                                                             hours=zero_pad(timeForm['time']['hour']),
                                                                                             minutes=zero_pad(timeForm['time']['minute'])
                                                                                            )
-        cmd.run('timedatectl set-ntp false')
+        cmd.run('timedatectl set-ntp false', warn=True)
         cmd.run(time_cmd)
-        cmd.run('timedatectl set-ntp true')
+        cmd.run('timedatectl set-ntp true', warn=True)
 
 
 @app.route('/api/execute_kit_inventory', methods=['POST'])
