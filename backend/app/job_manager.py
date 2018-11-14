@@ -154,18 +154,22 @@ class ProcJob(object):
             command_to_run = self.command
             if not self.is_shell:
                 command_to_run = shlex.split(self.command)
-                
+            
+            my_env = os.environ.copy()
+            my_env['HOME'] = '/root'
             if self.working_directory is None:
                 self.process = subprocess.Popen(command_to_run,
                                                 shell=self.is_shell,
                                                 stdout=subprocess.PIPE,
-                                                stderr=subprocess.PIPE)
+                                                stderr=subprocess.PIPE,
+                                                env=my_env)
             else:                
                 self.process = subprocess.Popen(command_to_run,
                                                 shell=self.is_shell,
                                                 stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE,
-                                                cwd=self.working_directory)
+                                                cwd=self.working_directory,
+                                                env=my_env)
             for ip in self.lock_ids:
                 LOCK_IDS[ip] = True
             logger.debug("IP_ADDRESS_LOCK size after add: %d" % len(LOCK_IDS))
