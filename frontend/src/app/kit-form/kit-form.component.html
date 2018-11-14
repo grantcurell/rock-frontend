@@ -144,7 +144,7 @@
       <div class="form-group col-md-6">
         <ng-container *ngIf="hasKitForm">
           <button *ngIf="isAddNodeInsteadOfNewKit" class="btn btn-primary" style="margin-right: 10px;" 
-                  type="button" [disabled]="!kitForm.valid" click="executeAddNode()">Execute Add Node</button>
+                  type="button" [disabled]="!kitForm.valid" (click)="executeAddNode()">Execute Add Node</button>
         </ng-container>
         <button class="btn btn-primary" type="submit" [disabled]="!kitForm.valid" name="execute_kit">Execute Kit</button>
       </div>
