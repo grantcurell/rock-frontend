@@ -130,7 +130,7 @@
                 </div>
                 <div class="form-group col-md-6">
                   <app-card-selector [parentForm]="sensor" [optionSelections]="sensor.interfaceSelections"
-                                     controlName="monitor_interface" style="float: right;" uid="{{ i }}"></app-card-selector>
+                                     controlName="monitor_interface" style="float: right;" uid="{{ i }}_{{ sensor.deviceFacts.interfaces[i].mac_address }}"></app-card-selector>
                 </div>
               </div>
             </div>

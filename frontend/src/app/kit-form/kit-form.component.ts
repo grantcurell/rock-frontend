@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { KitInventoryForm, ServersFormArray, ServerFormGroup,
          SensorFormGroup, SensorsFormArray,
          AdvancedElasticSearchSettingsFormGroup,
@@ -21,14 +21,14 @@ import { HomeNetFormGroup, ExternalNetFormGroup } from '../total-sensor-resource
   templateUrl: './kit-form.component.html',
   styleUrls: ['./kit-form.component.css']
 })
-export class KitFormComponent implements OnInit {
+export class KitFormComponent implements OnInit, AfterViewInit{
   kitForm: KitInventoryForm;
   executeKitForm: ExecuteKitForm;
   advancedElasticSearchForm: AdvancedElasticSearchSettingsFormGroup;
   elasicSearchCalculator: ElasticSearchCalculator;
   storageCalculator: StorageCalculator;
   molochBroCalculator: MolochBroCalculator;
-  manualCalculator: ManualCalculator
+  manualCalculator: ManualCalculator;
   hasKitForm: boolean;
 
   servers: ServersFormArray;
@@ -49,8 +49,7 @@ export class KitFormComponent implements OnInit {
   constructor(private kickStartSrv: KickstartService, 
               private title: Title, 
               private router: Router, 
-              private kitSrv: KitService) 
-  {
+              private kitSrv: KitService) {
     this.kitForm = new KitInventoryForm();
     this.executeKitForm = new ExecuteKitForm();
     this.advancedElasticSearchForm = this.kitForm.advanced_elasticsearch_settings;
@@ -78,9 +77,9 @@ export class KitFormComponent implements OnInit {
    * @param data - The data to map
    * @param formGroup - The form group we are mapping our data too.
    */
-  private _map_to_form(data: Object, formGroup: FormGroup, rootPassword: string){
+  private _map_to_form(data: Object, formGroup: FormGroup, rootPassword: string) {
     for (let key in data){
-      let someFormObject = formGroup.get(key);      
+      const someFormObject = formGroup.get(key);
 
       if (someFormObject instanceof HtmlDropDown){
         setTimeout(()=> {
@@ -93,11 +92,11 @@ export class KitFormComponent implements OnInit {
 
       } else if (someFormObject instanceof SensorsFormArray 
                  || someFormObject instanceof ServersFormArray) {
-        var nodeFormArray: FormArray = someFormObject as FormArray;
+        const nodeFormArray: FormArray = someFormObject as FormArray;
 
         for (let index = 0; index < data[key].length; index++) {          
           let srvFormGroup: SensorFormGroup | ServerFormGroup = new SensorFormGroup(false, null, null);
-          let host_key: string = "host_sensor";
+          let host_key = "host_sensor";
           if (someFormObject instanceof ServersFormArray){
             srvFormGroup = new ServerFormGroup(false, null);
             host_key = "host_server";
@@ -109,17 +108,15 @@ export class KitFormComponent implements OnInit {
             this.cephDriveSelected(data[key][index]['ceph_drives'], srvFormGroup);
           });
         }
-      } 
-
-      else if (key =='home_nets' && someFormObject instanceof FormArray){
+      } else if (key === 'home_nets' && someFormObject instanceof FormArray){
         for (let index = 0; index < data[key].length; index++){          
-          let homeNetFormGroup = new HomeNetFormGroup();
+          const homeNetFormGroup = new HomeNetFormGroup();
           homeNetFormGroup.home_net.setValue(data[key][index]['home_net']);
           someFormObject.push(homeNetFormGroup);
         }
       } else if (key === 'external_nets' && someFormObject instanceof FormArray){
         for (let index = 0; index < data[key].length; index++){
-          let externalNetFormGroup = new ExternalNetFormGroup();
+          const externalNetFormGroup = new ExternalNetFormGroup();
           externalNetFormGroup.external_net.setValue(data[key][index]['external_net']);
           someFormObject.push(externalNetFormGroup);
         }
@@ -168,7 +165,7 @@ export class KitFormComponent implements OnInit {
       }
 
       this.kitForm.root_password.setDefaultValue(data["root_password"]);
-      for (let node of data["nodes"]) {
+      for (const node of data["nodes"]) {
         this.appendNode(node);
       }
     });
@@ -182,7 +179,7 @@ export class KitFormComponent implements OnInit {
       you have entered on the existing page but it will archive the form.',
       "Yes",
       'Cancel'
-    )
+    );
     this.archiveKitModal.openModal();
   }
 
@@ -228,7 +225,7 @@ export class KitFormComponent implements OnInit {
   }
 
   executeAddNode(){    
-    let payload = {'kitForm': this.kitForm.getRawValue(), 'nodesToAdd': this.addNodeCache};
+    const payload = {'kitForm': this.kitForm.getRawValue(), 'nodesToAdd': this.addNodeCache};
     this.kitSrv.executeAddNode(payload)
     .subscribe(data => {
       this.openConsole();
@@ -247,7 +244,7 @@ export class KitFormComponent implements OnInit {
   }
 
   openConsole(){
-    this.router.navigate(['/stdout/Kit'])
+    this.router.navigate(['/stdout/Kit']);
   }
 
   private appendNode(node: Object, disableIsKubernetesMasterCheckbox: boolean=false){
@@ -287,15 +284,15 @@ export class KitFormComponent implements OnInit {
         this.kitForm.disable();
 
         outer:
-        for(let node of kickstartData['nodes']){
+        for(const node of kickstartData['nodes']){
 
-          for (let kitServer of kitData['servers']){
+          for (const kitServer of kitData['servers']){
             if (kitServer["host_server"] === node["ip_address"]){
               continue outer;
             }
           }
 
-          for (let kitServer of kitData['sensors']){
+          for (const kitServer of kitData['sensors']){
             if (kitServer["host_sensor"] === node["ip_address"]){
               continue outer;
             }
@@ -322,7 +319,8 @@ export class KitFormComponent implements OnInit {
   }
 
   //TODO gathering facts twice after restore causes issues.
-  private _gatherFacts(node: ServerFormGroup | SensorFormGroup, data: Object, host_key: string, runCalculations: boolean) {    
+  private _gatherFacts(node: ServerFormGroup | SensorFormGroup, data: Object, host_key: string, runCalculations: boolean) {
+    console.log(node);
     if (data['error_message']) {
       this.kitModal.updateModal('Error',
         data['error_message'],
@@ -364,13 +362,13 @@ export class KitFormComponent implements OnInit {
   }
 
   gatherFacts(node: ServerFormGroup | SensorFormGroup) {
-    let host_key: string = "host_server";
+    let host_key = "host_server";
     if (node instanceof SensorFormGroup) {
       host_key = "host_sensor";
     }
     this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value)
     .subscribe(data => {
-      let hasDeviceFacts: boolean = (node.deviceFacts != null);
+      const hasDeviceFacts: boolean = (node.deviceFacts != null);
       this._gatherFacts(node, data, host_key, !hasDeviceFacts);
     });
   }
@@ -381,7 +379,7 @@ export class KitFormComponent implements OnInit {
 
   sensorStorageChange(dropDownValue: string){
     // Ceph
-    if (dropDownValue == this.kitForm.sensor_storage_type.options[0]){
+    if (dropDownValue === this.kitForm.sensor_storage_type.options[0]){
       this.kitForm.elastic_storage_percentage.setValue(30);
       this.kitForm.moloch_pcap_storage_percentage.setValue(60);
       this.isMolochPercentageHidden = false;
@@ -400,7 +398,7 @@ export class KitFormComponent implements OnInit {
       this.isMolochPercentageHidden = true;
 
       for (let i = 0; i < this.kitForm.sensors.length; i++){
-        let sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
+        const sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
         this._remove_sensor_cluster_storage(sensor.deviceFacts);
       }
     }
@@ -444,10 +442,10 @@ export class KitFormComponent implements OnInit {
    */
   disableOtherMasterOrReenable(isChecked: boolean, indexToIgnore: number){
     for (let index = 0; index < this.kitForm.servers.length; index++){
-      if (index == indexToIgnore){
+      if (index === indexToIgnore){
         continue;
       }
-      let server = this.kitForm.servers.at(index) as ServerFormGroup;
+      const server = this.kitForm.servers.at(index) as ServerFormGroup;
       if (isChecked){
         server.is_master_server.disable();
       } else{
@@ -466,7 +464,7 @@ export class KitFormComponent implements OnInit {
 
     if (isChecked){
       //CEPH for PCAP option
-      if (this.kitForm.sensor_storage_type.value == this.kitForm.sensor_storage_type.options[0] ){
+      if (this.kitForm.sensor_storage_type.value === this.kitForm.sensor_storage_type.options[0] ){
         this.kitForm.advanced_moloch_settings.moloch_pcap_pv_size.enable();
       }
 
@@ -484,7 +482,7 @@ export class KitFormComponent implements OnInit {
       this.kitForm.advanced_elasticsearch_settings.elastic_cpus_to_mem_ratio.disable();
 
       for (let i = 0; i < this.kitForm.sensors.length; i++){
-        let sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
+        const sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
         sensor.bro_workers.enable();
         sensor.moloch_threads.enable();
       }
@@ -504,7 +502,7 @@ export class KitFormComponent implements OnInit {
       this.kitForm.advanced_elasticsearch_settings.elastic_cpus_to_mem_ratio.enable();
 
       for (let i = 0; i < this.kitForm.sensors.length; i++){
-        let sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
+        const sensor = this.kitForm.sensors.at(i) as SensorFormGroup;
         sensor.bro_workers.disable();
         sensor.moloch_threads.disable();
       }
@@ -517,15 +515,15 @@ export class KitFormComponent implements OnInit {
    * @param event - A Keyboard event.
    */
   kubernetesInputEvent(event: any) {
-    let kubernetes_value = this.kitForm.kubernetes_services_cidr.value;
-    if (kubernetes_value == undefined) {
+    const kubernetes_value = this.kitForm.kubernetes_services_cidr.value;
+    if (kubernetes_value === undefined) {
       return;
     }
 
-    let octet_1 = kubernetes_value.split('.')[0] + '.';
-    let octet_2 = kubernetes_value.split('.')[1] + '.';
-    let octet_3 = kubernetes_value.split('.')[2] + '.';
-    let octet_4 = parseInt(kubernetes_value.split('.')[3]);
+    const octet_1 = kubernetes_value.split('.')[0] + '.';
+    const octet_2 = kubernetes_value.split('.')[1] + '.';
+    const octet_3 = kubernetes_value.split('.')[2] + '.';
+    let octet_4 = parseInt(kubernetes_value.split('.')[3], 10);
     let kubernetes_services_cidr_start = "";
 
     if (isNaN(octet_4)) {
@@ -537,7 +535,7 @@ export class KitFormComponent implements OnInit {
         // base address for the range. If the number is evenly divisible by 16
         // that means we've found the base of the address range and 15 beyond that
         // is the maximum range.
-        if (octet_4 % 16 == 0) {
+        if (octet_4 % 16 === 0) {
           break;
         } else {
           octet_4 -= 1;
@@ -545,13 +543,15 @@ export class KitFormComponent implements OnInit {
       }
       // You can't have an address of 0 so Metallb will actually increment this by
       // 1 in this case.
-      if (octet_4 == 0) {
+      if (octet_4 === 0) {
         octet_4 = 1;
         kubernetes_services_cidr_start = octet_1 + octet_2 + octet_3 + String(octet_4);
-        this.kitForm.kubernetesCidrInfoText = "Kubernetes services range will be: " + kubernetes_services_cidr_start + "-" + String(octet_4 + 14);
+        this.kitForm.kubernetesCidrInfoText = "Kubernetes services range will be: "
+          + kubernetes_services_cidr_start + "-" + String(octet_4 + 14);
       } else {
         kubernetes_services_cidr_start = octet_1 + octet_2 + octet_3 + String(octet_4);
-        this.kitForm.kubernetesCidrInfoText = "Kubernetes services range will be: " + kubernetes_services_cidr_start + "-" + String(octet_4 + 15);
+        this.kitForm.kubernetesCidrInfoText = "Kubernetes services range will be: "
+          + kubernetes_services_cidr_start + "-" + String(octet_4 + 15);
       }
     }
 
