@@ -5,7 +5,7 @@ import json
 
 from app import (app, logger, conn_mng)
 from app.inventory_generator import KickstartInventoryGenerator
-from app.job_manager import spawn_job
+from app.job_manager import spawn_job, shell
 from app.socket_service import log_to_console
 from app.common import OK_RESPONSE, ERROR_RESPONSE
 from shared.constants import KICKSTART_ID
@@ -106,3 +106,38 @@ def get_kickstart_form() -> Response:
 
     mongo_document['_id'] = str(mongo_document['_id'])
     return jsonify(mongo_document["payload"])
+
+
+def _filter_ip(ipaddress: str) -> bool:
+    if ipaddress.endswith('0'):
+        return True
+    if ipaddress == '':
+        return True
+    return False
+
+
+def _netmask_to_cidr(netmask: str) -> int:
+    '''
+    :param netmask: netmask ip addr (eg: 255.255.255.0)
+    :return: equivalent cidr number to given netmask ip (eg: 24)
+    '''
+    return sum([bin(int(x)).count('1') for x in netmask.split('.')])
+
+
+@app.route('/api/get_unused_ip_addrs', methods=['POST'])
+def get_unused_ip_addrs() -> Response:
+    """
+    Gets unused IP Addresses from a given network.
+    :return:
+    """
+    payload = request.get_json()    
+    cidr = _netmask_to_cidr(payload['netmask'])    
+    if cidr <= 24:
+        command = "nmap -v -sn -n %s/24 -oG - | awk '/Status: Down/{print $2}'" % payload['mng_ip']
+    else:
+        command = "nmap -v -sn -n %s/%d -oG - | awk '/Status: Down/{print $2}'" % (payload['mng_ip'], cidr) 
+    
+    stdout_str, stderr_str = shell(command, use_shell=True)
+    available_ip_addresses = stdout_str.decode("utf-8").split('\n')
+    available_ip_addresses = [x for x in available_ip_addresses if not _filter_ip(x)]
+    return jsonify(available_ip_addresses)

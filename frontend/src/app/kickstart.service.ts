@@ -71,6 +71,15 @@ export class KickstartService {
       );
   }
 
+  getUnusedIPAddresses(mng_ip: string, netmask: string): Observable<Object> {
+    const url = '/api/get_unused_ip_addrs';
+    let post_payload = {'mng_ip': mng_ip, 'netmask': netmask};
+    return this.http.post(url, post_payload, HTTP_OPTIONS)
+      .pipe(
+        catchError(this.handleError('gatherDeviceFacts', []))
+      );
+  }
+
   restoreArchivedKickstartForm(archiveId: string): Observable<Object> {
     const url = '/api/restore_archived';
     let post_payload = {"_id": archiveId};

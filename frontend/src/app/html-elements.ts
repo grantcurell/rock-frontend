@@ -82,6 +82,7 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
   private _type: ModalType;
   private _primaryButtonCssClass: string;
   private _modalForm: FormGroup;
+  private _cacheData: any; //Any kind of data we want to cache.
 
   constructor(id: string,
   ) {
@@ -120,14 +121,19 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
     return this._modalForm;
   }
 
+  get cacheData(): any {
+    return this._cacheData;
+  }
+
   updateModal(title: string, text: string,
     primary_button_text: string, secondary_button_text?: string,    
-    type: ModalType = ModalType.general, modalForm: FormGroup = null) {    
+    type: ModalType = ModalType.general, modalForm: FormGroup = null, cacheData: any=null) {    
     this._title = title;
     this._text = text;
     this._primary_button_text = primary_button_text;
     this._secondary_button_text = secondary_button_text;
     this._type = type;
+    this._cacheData = cacheData;
 
     this._primaryButtonCssClass = "btn btn-primary";
     if (this._type === ModalType.error){
@@ -152,7 +158,7 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
 
 export class HtmlModalSelectDialog extends HtmlModalPopUp {
   private _selection: Object;
-  private _isDisabled: boolean;
+  private _isDisabled: boolean;  
 
   constructor(id: string) {
     super(id);

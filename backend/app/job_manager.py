@@ -249,21 +249,30 @@ def _async_read(fd):
             pass
 
 
-def shell(command: str, async: bool=False, working_dir=None) -> Tuple[bytes, bytes]:
+def shell(command: str, async: bool=False, working_dir=None, use_shell=False) -> Tuple[bytes, bytes]:
     """
     Runs a command and returns std out and stderr.
 
     :param command: The command to be run.
     :param async: If set to true the output is gathered will the process is running otherwise it blocks and return
+    :param use_shell: If set to true.  the command will be run as is without shlex module through the shell.
     :return:
     """
     sout = None
     serr = None
     proc = None
-    if working_dir:
-        proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir)
-    else:    
-        proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    if use_shell:
+        if working_dir:
+            proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir)
+        else:    
+            proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    else:
+        if working_dir:
+            proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=working_dir)
+        else:    
+            proc = subprocess.Popen(shlex.split(command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
     if async:
         _async_read(proc.stdout)
     else:

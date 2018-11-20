@@ -83,10 +83,10 @@ def get_pod_info() -> Response:
         with KubernetesWrapper(conn_mng) as kube_apiv1:
             api_response = kube_apiv1.list_pod_for_all_namespaces(watch=False)
             return jsonify(api_response.to_dict()['items'])
-    except KitFormNotFound as e:
+    except Exception as e:
         logger.exception(e)
-        return jsonify([])
-    return ERROR_RESPONSE
+
+    return jsonify([])    
 
 
 @app.route('/api/get_node_statuses', methods=['GET'])
@@ -107,8 +107,7 @@ def get_node_statuses() -> Response:
                     logger.warn(item)
                     logger.exception(e)
             return jsonify(ret_val)
-    except KitFormNotFound as e:
+    except Exception as e:
         logger.exception(e)
-        return jsonify([])
 
-    return ERROR_RESPONSE
+    return jsonify([])

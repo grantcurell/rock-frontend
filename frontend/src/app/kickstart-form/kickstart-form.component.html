@@ -1,5 +1,7 @@
 <app-modal-dialog [modal]="kickStartModal" (primaryButtonClick)="archiveForm()"></app-modal-dialog>
+<app-modal-dialog [modal]="messageModal"></app-modal-dialog>
 <app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
+<app-modal-ip-select-dialog [modal]="ipSelectorModal" (primaryButtonClick)="ipAddressSelected($event)"></app-modal-ip-select-dialog>
 
 <div class="container" id="topheader">
   <div id="main_form">
@@ -47,7 +49,7 @@
           <div *ngIf="!node.hidden" class="card-body">
             <app-dropdown [parentForm]="node" controlName="node_type" (dropDownChanged)="nodeTypeChange($event, i)" uid="{{ i }}"></app-dropdown>
             <app-text-input [parentForm]="node" controlName="hostname" uid="{{ i }}"></app-text-input>
-            <app-text-input [parentForm]="node" controlName="ip_address" uid="{{ i }}"></app-text-input>
+            <app-text-input [parentForm]="node" controlName="ip_address" uid="{{ i }}" (buttonClick)="openIPSelector(i)"></app-text-input>
             <app-text-input [parentForm]="node" controlName="mac_address" uid="{{ i }}"></app-text-input>
             <app-text-input [parentForm]="node" controlName="boot_drive" uid="{{ i }}"></app-text-input>
             <app-dropdown [parentForm]="node" controlName="pxe_type" uid="{{ i }}"></app-dropdown>

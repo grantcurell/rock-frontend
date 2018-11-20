@@ -84,7 +84,11 @@ export class NodeFormGroup extends FormGroup {
     INVALID_FEEDBACK_IP,
     true,
     '',
-    "The node ip address is used during the kickstart process to statically assign the node's interface."
+    "The node ip address is used during the kickstart process to statically assign the node's interface.",
+    undefined,
+    false,
+    true,
+    'Select IP'
   )
 
   mac_address = new HtmlInput(

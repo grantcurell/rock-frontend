@@ -16,9 +16,11 @@ const NODE_PATTERN = new RegExp('^(server|sensor)[0-9]+[.]lan$');
 })
 export class KickstartFormComponent implements OnInit {
   kickStartModal: HtmlModalPopUp;
+  messageModal: HtmlModalPopUp;
   kickStartForm: KickstartInventoryForm;
   hasKickstartForm: boolean;
   restoreModal: HtmlModalSelectDialog;
+  ipSelectorModal: HtmlModalSelectDialog;
   advancedSettingsFormGroup: AdvancedSettingsFormGroup;
   deviceFacts: Object;
 
@@ -33,7 +35,9 @@ export class KickstartFormComponent implements OnInit {
     this.kickStartForm = new KickstartInventoryForm();
     this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');
+    this.messageModal = new HtmlModalPopUp('message_modal');
     this.restoreModal = new HtmlModalSelectDialog('restore_modal');
+    this.ipSelectorModal = new HtmlModalSelectDialog('ip_modal');
     this.hasKickstartForm = false;
   }
 
@@ -241,6 +245,44 @@ export class KickstartFormComponent implements OnInit {
 
     this._resetNodes(sensorArray, false);
     this._resetNodes(serverArray, true);
+  }
+
+  openIPSelector(node_index: number){
+    let mng_ip: Array<string> = this.kickStartForm.controller_interface.value;
+    let netmask: string = this.kickStartForm.netmask.value
+    
+    if (mng_ip.length === 0){
+      this.messageModal.updateModal("ERROR", "Failed to open IP selector because you \
+      do not have a controller interface selected.", "Close");
+      this.messageModal.openModal();
+      return;
+    }
+
+    if (!this.kickStartForm.netmask.valid){
+      this.messageModal.updateModal("ERROR", "Failed to open IP selector because the \
+      netmask you entered is invalid.", "Close");
+      this.messageModal.openModal();
+      return;
+    }
+
+    this.kickStartSrv.getUnusedIPAddresses(mng_ip[0], netmask).subscribe(data => {
+      this.ipSelectorModal.updateModal('Select IP',
+        'Please select a IP address.',
+        "Select",
+        'Cancel',
+        undefined,
+        undefined,
+        node_index
+      );
+      this.ipSelectorModal.updateModalSelection(data);
+      this.ipSelectorModal.openModal();
+    });
+  }
+
+  ipAddressSelected(ip_address: string){
+    const node_index = this.ipSelectorModal.cacheData;
+    let node = this.kickStartForm.nodes.at(node_index) as NodeFormGroup;
+    node.ip_address.setValue(ip_address);
   }
 
 }
