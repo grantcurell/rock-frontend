@@ -32,15 +32,6 @@ function use_laprepos() {
         fi    
         yum clean all > /dev/null
         rm -rf /var/cache/yum/ > /dev/null
-		npm config set registry http://nexus.labrepo.lan/repository/npm/
-		mkdir -p /root/.pip/
-
-cat <<EOF > /root/.pip/pip.conf
-[global]
-index-url = http://nexus.labrepo.lan/repository/pypi/simple
-trusted-host = nexus.labrepo.lan
-EOF
-
     fi
 }
 
@@ -69,6 +60,7 @@ function _install_nodejs(){
 	run_cmd rm -f node-v8.11.4-linux-x64.tar.xz
     run_cmd node -v
     run_cmd npm -v
+	npm config set registry http://nexus.labrepo.lan/repository/npm/
 }
 
 function _install_angular(){
@@ -89,6 +81,13 @@ function _open_firewall_ports(){
 function _install_python36(){
 	run_cmd yum install -y gcc
 	run_cmd yum install -y python36 python36-devel
+	mkdir -p /root/.pip/
+
+cat <<EOF > /root/.pip/pip.conf
+[global]
+index-url = http://nexus.labrepo.lan/repository/pypi/simple
+trusted-host = nexus.labrepo.lan
+EOF
 }
 
 function _setup_pythonenv {
