@@ -126,11 +126,11 @@
                   <app-card-selector *ngIf="sensor.sensor_type.value == 'Local' && kitForm.sensor_storage_type.value == kitForm.sensor_storage_type.options[0]" [parentForm]="sensor" [optionSelections]="sensor.driveSelections"
                                      controlName="ceph_drives" (onSelect)="cephDriveSelected($event, sensor)" uid="_sensor{{ i }}"></app-card-selector>
                   <app-card-selector *ngIf="sensor.sensor_type.value == 'Remote'" [parentForm]="sensor" [optionSelections]="sensor.driveSelections"
-                                     controlName="pcap_drives"></app-card-selector>
+                                     controlName="pcap_drives" uid="{{ i }}"></app-card-selector>
                 </div>
                 <div class="form-group col-md-6">
                   <app-card-selector [parentForm]="sensor" [optionSelections]="sensor.interfaceSelections"
-                                     controlName="monitor_interface" style="float: right;" uid="{{ i }}_{{ sensor.deviceFacts.interfaces[i].mac_address }}"></app-card-selector>
+                                     controlName="monitor_interface" style="float: right;" uid="{{ i }}"></app-card-selector>
                 </div>
               </div>
             </div>

@@ -234,7 +234,6 @@ export class KitFormComponent implements OnInit, AfterViewInit{
   }
 
   executeKit(){
-    console.log(this.executeKitForm.getRawValue());
     this.kitSrv.executeKit(this.kitForm.getRawValue(), 
                            this.executeKitForm.getRawValue()
                           )
@@ -319,8 +318,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
   }
 
   //TODO gathering facts twice after restore causes issues.
-  private _gatherFacts(node: ServerFormGroup | SensorFormGroup, data: Object, host_key: string, runCalculations: boolean) {
-    console.log(node);
+  private _gatherFacts(node: ServerFormGroup | SensorFormGroup, data: Object, host_key: string, runCalculations: boolean) {    
     if (data['error_message']) {
       this.kitModal.updateModal('Error',
         data['error_message'],
