@@ -108,6 +108,13 @@ class MongoConnectionManager(object):
         """
         return self._tfplenum_database.console
 
+    @property
+    def mongo_last_jobs(self) -> Collection:
+        """
+        Returns a mongo object that can do manipulate the last jobs completed by the system.
+        """
+        return self._tfplenum_database.last_jobs
+
     def close(self):
         """
         Closes the clients mongo collection gracefully.

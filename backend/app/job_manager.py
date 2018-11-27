@@ -2,7 +2,7 @@ import fcntl
 import os
 import sys
 import shlex
-from app import logger, socketio
+from app import logger, socketio, conn_mng
 from uuid import uuid4
 from datetime import datetime, timedelta
 import psutil
@@ -294,6 +294,19 @@ def _log_queues() -> None:
             logger.debug(str(job))
 
 
+def _save_job(job: ProcJob, job_retval: int, message: str) -> None:
+    """
+    Saves a to the mongo database so that we can check it on the integration side.
+    :return:
+    """
+    conn_mng.mongo_last_jobs.find_one_and_replace({"_id": job.job_name},
+                                                  {"_id": job.job_name, 
+                                                   "return_code": job_retval, 
+                                                   "date_completed": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                                                   "message": message},
+                                                   upsert=True)  # type: InsertOneResult
+
+
 def _spawn_jobqueue() -> None:
     """
     Spawns a job queue:
@@ -325,15 +338,20 @@ def _spawn_jobqueue() -> None:
                     logger.debug("Completed: %s" % str(job))
                     if job_retval != 0:
                         logger.debug("Job return value was not 0. It was %d" % int(job_retval))
+                        _save_job(job, job_retval, "Failed to execute with unknown error.")
+                    else:
+                        _save_job(job, job_retval, "Successfully executed job.")
                     
                     job.run_funcs_after_proc_completion()
                     job.run_job_clean_up(index)
                 elif job.is_zombie():
                     logger.warn("ZOMBIE process cleanup %s" % str(job))
+                    _save_job(job, 600, "Job became a zombie somehow.")
                     job.run_job_clean_up(index)
                     # Clean zombie has to happen after we garbage collect the popen object
             except Exception as e:
                 logger.exception(e)
+                _save_job(job, 500, str(e.message))
                 job.run_job_clean_up(index)
 
 
