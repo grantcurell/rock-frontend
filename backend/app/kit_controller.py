@@ -96,13 +96,14 @@ def _change_time_on_kubernetes_master(timeForm: Dict):
 
     :return: None
     """
+    hours, minutes = timeForm['time'].split(':')
     with FabricConnectionWrapper(conn_mng) as cmd:
         ret_val = cmd.run('timedatectl set-timezone UTC')
         time_cmd = "timedatectl set-time '{year}-{month}-{day} {hours}:{minutes}:00'".format(year=timeForm['date']['year'],
                                                                                             month=zero_pad(timeForm['date']['month']),
                                                                                             day=zero_pad(timeForm['date']['day']),
-                                                                                            hours=zero_pad(timeForm['time']['hour']),
-                                                                                            minutes=zero_pad(timeForm['time']['minute'])
+                                                                                            hours=hours,
+                                                                                            minutes=minutes
                                                                                            )
         cmd.run('timedatectl set-ntp false', warn=True)
         cmd.run(time_cmd)
@@ -117,7 +118,7 @@ def execute_kit_inventory() -> Response:
     :return: Response object
     """
     payload = request.get_json()
-    logger.debug(json.dumps(payload, indent=4, sort_keys=True))
+    logger.debug(json.dumps(payload, indent=4, sort_keys=True))    
     isSucessful, root_password = _replace_kit_inventory(payload['kitForm'])
     _delete_kubernetes_conf()
     if isSucessful:

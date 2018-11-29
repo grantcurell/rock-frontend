@@ -28,7 +28,6 @@ import { TerminalComponent } from './terminal/terminal.component';
 import { ConfigmapsComponent } from './configmaps/configmaps.component';
 import { ConfigmapEditorComponent } from './configmap-editor/configmap-editor.component'; 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { TimePickerComponent } from './time-picker/time-picker.component';
 import { DatePickerComponent } from './date-picker/date-picker.component';
 import { ModalIpSelectDialogComponent } from './modal-ip-select-dialog/modal-ip-select-dialog.component';
 
@@ -58,7 +57,6 @@ import { ModalIpSelectDialogComponent } from './modal-ip-select-dialog/modal-ip-
     TerminalComponent,
     ConfigmapsComponent,
     ConfigmapEditorComponent,
-    TimePickerComponent,
     DatePickerComponent,
     ModalIpSelectDialogComponent
   ],

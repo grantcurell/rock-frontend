@@ -41,13 +41,12 @@
             <ng-container *ngFor="let controlName of objectKeys(modal.modalForm.controls)">
               <app-text-input *ngIf="isTextInput(modal.modalForm.controls[controlName])" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-text-input>
               <app-date-picker *ngIf="isDateInput(modal.modalForm.controls[controlName])" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-date-picker>
-              <app-time-picker *ngIf="isTimeInput(modal.modalForm.controls[controlName])" [parentForm]="modal.modalForm" controlName="{{ controlName }}"></app-time-picker>
             </ng-container>
           </div>
         </div>
         <div class="modal-footer">
-          <button *ngIf="modal.secondary_button_text" type="button" class="btn btn-secondary" data-dismiss="modal">{{ modal.secondary_button_text }}</button>
-          <button *ngIf="modal.primary_button_text" class="btn btn-primary" type="submit" [disabled]="!modal.modalForm.valid">{{ modal.primary_button_text }}</button>
+          <button *ngIf="modal.secondary_button_text" type="button" class="btn btn-secondary" data-dismiss="modal" name="secondary_btn_{{ modal.id  }}">{{ modal.secondary_button_text }}</button>
+          <button *ngIf="modal.primary_button_text" class="btn btn-primary" type="submit" [disabled]="!modal.modalForm.valid" name="primary_btn_{{ modal.id }}">{{ modal.primary_button_text }}</button>
         </div>
       </form>
     </div>

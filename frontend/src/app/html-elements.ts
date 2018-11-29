@@ -283,14 +283,6 @@ function validateDate(control: AbstractControl): ValidationErrors | null {
   return null;
 }
 
-function validateTime(control: AbstractControl): ValidationErrors | null {
-  if (control.value === null || control.value === undefined || control.value === ''){
-    return {"custom_error": "Invalid time.  Please select a valid time."};
-  }
-
-  return null;
-}
-
 export class HtmlDatePicker extends FormControl implements HelpPageInterface {
   anchor: string;  
 
@@ -314,29 +306,6 @@ export class HtmlDatePicker extends FormControl implements HelpPageInterface {
     this.anchor = 'anchor_' + this.form_name;
   }
 }
-
-export class HtmlTimePicker extends FormControl implements HelpPageInterface {
-  anchor: string;
-  control_disabled: boolean;
-
-  constructor(public form_name: string,
-    public label: string,
-    public required: boolean,
-    public description: string,        
-    public valid_feedback: string = 'Good to go!',
-    disabled: boolean = false
-  ) {
-    super('', null, null);
-    let validators = [];
-    if (required) {
-      validators.push(Validators.required);
-    }  
-    super.setValidators(validateTime);
-    this.control_disabled = disabled;
-    this.anchor = 'anchor_' + this.form_name;
-  }
-}
-
 
 export class HtmlInput extends FormControl implements HtmlInputInterface, HelpPageInterface {
   anchor: string;

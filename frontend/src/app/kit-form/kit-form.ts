@@ -4,7 +4,7 @@ import {
     FormControl
 } from '@angular/forms';
 
-import { HtmlInput, HtmlCheckBox, HtmlDropDown, HtmlCardSelector, HtmlHidden, HtmlDatePicker, HtmlTimePicker } from '../html-elements';
+import { HtmlInput, HtmlCheckBox, HtmlDropDown, HtmlCardSelector, HtmlHidden, HtmlDatePicker } from '../html-elements';
 import { SensorResourcesForm } from '../total-sensor-resources-card/total-sensor-resources-form';
 import { TotalServerResources } from '../total-server-resources-card/total-server-resources-form';
 import {  PERCENT_PLACEHOLDER, PERCENT_MIN_MAX, PERCENT_INVALID_FEEDBACK,
@@ -1174,10 +1174,15 @@ export class ExecuteKitForm extends FormGroup {
         'This is the date used for your cluster.  Make sure it is correct before executing your kit configuration.',
     )
 
-    time = new HtmlTimePicker(
+    time = new HtmlInput(
         'time',
-        'Current Time',
-        true,                        
+        'Current UTC Time',
+        'HH:MM in military time',
+        'text',
+        '^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$',
+        'Invalid. The proper format should be HH:MM in military time.',
+        true,
+        '',
         'This is the time used for your cluster.  Make sure it is correct before executing your kit configuration.'
     )
 }
