@@ -154,9 +154,10 @@ class ProcJob(object):
             command_to_run = self.command
             if not self.is_shell:
                 command_to_run = shlex.split(self.command)
-            
+
             my_env = os.environ.copy()
             my_env['HOME'] = '/root'
+
             if self.working_directory is None:
                 self.process = subprocess.Popen(command_to_run,
                                                 shell=self.is_shell,
