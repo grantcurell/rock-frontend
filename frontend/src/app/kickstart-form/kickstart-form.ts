@@ -67,8 +67,8 @@ export class NodeFormGroup extends FormGroup {
     'Hostname',
     "Enter a node hostname ending with .lan",
     'text',
-    "(.*\\.lan$)",
-    'You must enter a valid hostname ending with .lan',
+    "^[a-zA-Z]([a-zA-Z]|[0-9]|[-])*[.]lan$",
+    'Hostnames must be alphanumeric and end with .lan. Special characters are not allowed with the exception of dashes (IE -).',
     true,
     '',
     "The hostname is the nodes name that will be assigned during the installation of the operating system.  \
