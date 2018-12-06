@@ -178,91 +178,87 @@ class Node(object):
 
         :return: Node object as specified above
         """
-        try:
-            # Get Disk
-            ansible_devices = json_object['ansible_facts']['ansible_devices']
-            disks = []
-            partition_links = {}
-            for i, k in ansible_devices.items():
-                # We only want logical volume disks
-                if k['model'] != None and k['removable'] != "1":
-                    disk = Disk(i)
-                    disk.set_size(k['size'])
-                    disks.append(disk)
-                for j in k['partitions']:
-                    partition_links[j] = i
-            # Get Disk links
-            disk_links = {}
-            master_links = {}
-            for i in json_object['ansible_facts']['ansible_device_links']['uuids']:
-                for k in json_object['ansible_facts']['ansible_device_links']['uuids'][i]:
-                    disk_links[k] = i
+        # Get Disk
+        ansible_devices = json_object['ansible_facts']['ansible_devices']
+        disks = []
+        partition_links = {}
+        for i, k in ansible_devices.items():
+            # We only want logical volume disks
+            if k['model'] != None and k['removable'] != "1":
+                disk = Disk(i)
+                disk.set_size(k['size'])
+                disks.append(disk)
+            for j in k['partitions']:
+                partition_links[j] = i
+        # Get Disk links
+        disk_links = {}
+        master_links = {}
+        for i in json_object['ansible_facts']['ansible_device_links']['uuids']:
+            for k in json_object['ansible_facts']['ansible_device_links']['uuids'][i]:
+                disk_links[k] = i
 
-            for i in json_object['ansible_facts']['ansible_device_links']['masters']:
-                for k in json_object['ansible_facts']['ansible_device_links']['masters'][i]:
-                    master_links[k] = i
-            # Get Interfaces
-            interfaces = []
-            for i in json_object['ansible_facts']['ansible_interfaces']:
-                ip = ""
-                mac = ""
-                # Do not return interfaces with veth, cni, docker or flannel
-                if "veth" not in i and "cni" not in i and "docker" \
-                        not in i and "flannel" not in i and "virbr0" not in i:
-                    try:
-                        name = "ansible_" + i
-                        interface = json_object['ansible_facts'][name]
-                        if 'ipv4' in interface:
-                            ip = interface['ipv4']['address']
-                        if 'macaddress' in interface:
-                            mac = interface['macaddress']
-                        if 'speed' in interface:
-                            speed = interface['speed']
-                        interfaces.append(Interface(i, ip, mac, speed))
-                    except:
-                        pass
+        for i in json_object['ansible_facts']['ansible_device_links']['masters']:
+            for k in json_object['ansible_facts']['ansible_device_links']['masters'][i]:
+                master_links[k] = i
+        # Get Interfaces
+        interfaces = []
+        for i in json_object['ansible_facts']['ansible_interfaces']:
+            ip = ""
+            mac = ""
+            # Do not return interfaces with veth, cni, docker or flannel
+            if "veth" not in i and "cni" not in i and "docker" \
+                    not in i and "flannel" not in i and "virbr0" not in i:
+                try:
+                    name = "ansible_" + i
+                    interface = json_object['ansible_facts'][name]
+                    if 'ipv4' in interface:
+                        ip = interface['ipv4']['address']
+                    if 'macaddress' in interface:
+                        mac = interface['macaddress']
+                    if 'speed' in interface:
+                        speed = interface['speed']
+                    interfaces.append(Interface(i, ip, mac, speed))
+                except:
+                    pass
 
-            # Determine location of root
-            for i in json_object['ansible_facts']['ansible_mounts']:
-                if i["mount"] == "/" or i["mount"] == "/boot":
-                    # Use the established reverse dictionaries to get our partition
-                    part_val = disk_links.get(i['uuid'])
+        # Determine location of root
+        for i in json_object['ansible_facts']['ansible_mounts']:
+            if i["mount"] == "/" or i["mount"] == "/boot":
+                # Use the established reverse dictionaries to get our partition
+                part_val = disk_links.get(i['uuid'])
 
-                    found_disk = next((x for x in disks if x.name == part_val), None)
-                    if found_disk is not None:
-                        found_disk.hasRoot = True
+                found_disk = next((x for x in disks if x.name == part_val), None)
+                if found_disk is not None:
+                    found_disk.hasRoot = True
 
-                    master_part_val = master_links.get(part_val)
-                    top_part_val = partition_links.get(part_val)
-                    found_disk = next((x for x in disks if x.name == top_part_val), None)
-                    if found_disk is not None:
-                        found_disk.hasRoot = True
-                    found_disk = next((x for x in disks if x.name == master_part_val), None)
-                    if found_disk is not None:
-                        found_disk.hasRoot = True
-                    top_part_val = partition_links.get(master_part_val)
-                    found_disk = next((x for x in disks if x.name == top_part_val), None)
-                    if found_disk is not None:
-                        found_disk.hasRoot = True
+                master_part_val = master_links.get(part_val)
+                top_part_val = partition_links.get(part_val)
+                found_disk = next((x for x in disks if x.name == top_part_val), None)
+                if found_disk is not None:
+                    found_disk.hasRoot = True
+                found_disk = next((x for x in disks if x.name == master_part_val), None)
+                if found_disk is not None:
+                    found_disk.hasRoot = True
+                top_part_val = partition_links.get(master_part_val)
+                found_disk = next((x for x in disks if x.name == top_part_val), None)
+                if found_disk is not None:
+                    found_disk.hasRoot = True
 
-            # Get Memory
-            memory = json_object['ansible_facts']['ansible_memory_mb']['real']['total']
+        # Get Memory
+        memory = json_object['ansible_facts']['ansible_memory_mb']['real']['total']
 
-            # Get Cores
-            cores = json_object['ansible_facts']['ansible_processor_vcpus']
+        # Get Cores
+        cores = json_object['ansible_facts']['ansible_processor_vcpus']
 
-            # Get FQDN
-            fqdn = json_object['ansible_facts']['ansible_fqdn']
+        # Get FQDN
+        fqdn = json_object['ansible_facts']['ansible_fqdn']
 
-            # Create node object
-            self.hostname = fqdn
-            self.set_memory(memory)
-            self.set_interfaces(interfaces)
-            self.set_cpu_cores(cores)
-            self.set_disks(disks)
-        except KeyError:
-            raise KeyError("Error: Unable to create a "
-                           "Node object and process ansible json.")
+        # Create node object
+        self.hostname = fqdn
+        self.set_memory(memory)
+        self.set_interfaces(interfaces)
+        self.set_cpu_cores(cores)
+        self.set_disks(disks)        
 
 
 def ansible_setup(server_ip: str, password: str) -> Dict:
