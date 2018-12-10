@@ -44,9 +44,10 @@
       Pod Health
     </div>
     <ul class="nav nav-tabs" style="margin-top: 10px;">
-      <li class="nav-item" *ngFor="let node of nodeStatuses">
-        <a *ngIf="isActiveNodeTab(node.metadata.public_ip)" class="nav-link active" (click)="setActiveIp(node.metadata.public_ip)">{{ node.metadata.name }}</a>
-        <a *ngIf="!isActiveNodeTab(node.metadata.public_ip)" class="nav-link" (click)="setActiveIp(node.metadata.public_ip)">{{ node.metadata.name }}</a>
+      <li class="nav-item" *ngFor="let node of nodeStatuses; let i=index">        
+          <a *ngIf="isActiveNodeTab(node.metadata.public_ip)" class="nav-link active" (click)="setActiveIp(node.metadata.public_ip)">{{ node.metadata.name }}</a>
+          <a *ngIf="!isActiveNodeTab(node.metadata.public_ip)" class="nav-link" (click)="setActiveIp(node.metadata.public_ip)">{{ node.metadata.name }}</a>      
+          <a *ngIf="nodeStatuses.length === (i + 1)" class="nav-link" (click)="setActiveIp(null)">Unassigned Pods</a>
       </li>                            
     </ul>
     <div class="card-body">
@@ -72,7 +73,8 @@
                   <span *ngIf="container.status !== 'running'" style="color: #E74C3C; font-weight: bold;">{{ container.status }}</span>
                 </div>
               </td>
-              <td>{{ pod.status.container_statuses[0].restart_count }}</td>
+              <td *ngIf="pod.status.container_statuses">{{ pod.status.container_statuses[0].restart_count }}</td>
+              <td *ngIf="!pod.status.container_statuses">N/A</td>
               <td><button title="Click to run describe pod." data-toggle="tooltip" data-placement="left" class="btn btn-primary" (click)="describePod(pod.metadata.name)"><i class="icon_info_alt"></i></button></td>
             </ng-container>
           </tr>

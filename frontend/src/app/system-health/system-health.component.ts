@@ -44,6 +44,8 @@ export class SystemHealthComponent implements OnInit {
   setActiveIp(ipAddress: string){
     if (ipAddress) {
       this.activeIPAddress = ipAddress;
+    } else {
+      this.activeIPAddress = null;
     }    
   }
 
@@ -92,8 +94,15 @@ export class SystemHealthComponent implements OnInit {
   }
 
   getPostStatus(stateObj: Object): Array<{name: string, status: string}> {
-    let containerStatuses = stateObj['container_statuses'];
     let retVal: Array<{name: string, status: string}> = [];
+
+    if (stateObj["phase"] === "Pending"){
+      let item = {name: '', status: 'Pending'};
+      retVal.push(item);
+      return retVal;
+    }
+
+    let containerStatuses = stateObj['container_statuses'];
     for (let status of containerStatuses){
       let item = {name: '', status: ''};
       for (let key in status['state']) {
