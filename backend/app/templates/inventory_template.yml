@@ -257,7 +257,7 @@ all:
           hosts:
 
           {% for sensor in template_ctx.sensors %}
-
+            {% if sensor.sensor_type == "Local" %}
             # This is the hostname of the sensor. Whatever you put here will be
             # used to overwrite the current hostname.
             {{ sensor.hostname }}:
@@ -298,7 +298,8 @@ all:
               ceph_drive_list:
               {% for drive in sensor.ceph_drives %}
                 - {{ "/dev/" + drive }}{% endfor %}
-
+                
+            {% endif %}
           {% endfor %}
           {% endif %}
 
@@ -313,6 +314,7 @@ all:
         {% if template_ctx.sensor_remote_count > 0 %}
           hosts:
             {% for sensor in template_ctx.sensors %}
+            {% if sensor.sensor_type == "Remote" %}
             {{ sensor.hostname }}:
               ansible_user: root
               bro_workers: {{ sensor.bro_workers }}
@@ -324,6 +326,7 @@ all:
                 {% for interface in sensor.monitor_interface %}
                 - {{ interface }}
                 {% endfor %}
+            {% endif %}
         {% endfor %}
         {% endif %}
 
