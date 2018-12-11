@@ -628,6 +628,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         super.addControl('moloch_packetsPerPoll', this.moloch_packetsPerPoll);
         super.addControl('moloch_magicMode', this.moloch_magicMode);
         super.addControl('moloch_maxPacketsInQueue', this.moloch_maxPacketsInQueue);
+        super.addControl('moloch_packet_v3_block_size', this.moloch_packet_v3_block_size);
     }
 
     /**
@@ -649,9 +650,22 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
             'moloch_maxESRequests': this.moloch_maxESRequests.default_value,
             'moloch_packetsPerPoll': this.moloch_packetsPerPoll.default_value,
             'moloch_magicMode': this.moloch_magicMode.default_value,
-            'moloch_maxPacketsInQueue': this.moloch_maxPacketsInQueue.default_value
+            'moloch_maxPacketsInQueue': this.moloch_maxPacketsInQueue.default_value,
+            'moloch_packet_v3_block_size': this.moloch_packet_v3_block_size.default_value
         });
     }
+
+    moloch_packet_v3_block_size = new HtmlInput(
+        'moloch_packet_v3_block_size',
+        'T PacketV3 Block Size',
+        '',
+        'number',
+        CONSTRAINT_MIN_ONE,
+        MIN_ZERO_INVALID_FEEDBACK,
+        true,
+        '8388608',
+        'The block size in bytes used for reads from each interface. There are 120 blocks per interface.'
+    )
 
     moloch_pcap_pv_size = new HtmlInput(
         'moloch_pcap_pv_size',
