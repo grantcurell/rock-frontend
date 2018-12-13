@@ -1,14 +1,15 @@
 import {
     FormGroup, FormArray,
     AbstractControl,
-    FormControl
+    FormControl,
+    ValidationErrors
 } from '@angular/forms';
 
 import { HtmlInput, HtmlCheckBox, HtmlDropDown, HtmlCardSelector, HtmlHidden, HtmlDatePicker } from '../html-elements';
 import { SensorResourcesForm } from '../total-sensor-resources-card/total-sensor-resources-form';
 import { TotalServerResources } from '../total-server-resources-card/total-server-resources-form';
 import {  PERCENT_PLACEHOLDER, PERCENT_MIN_MAX, PERCENT_INVALID_FEEDBACK,
-          PERCENT_VALID_FEEDBACK, KUBE_CIDR_CONSTRAINT, IP_CONSTRAINT,
+          PERCENT_VALID_FEEDBACK, KUBE_CIDR_CONSTRAINT, IP_CONSTRAINT, HOST_CONSTRAINT,
           CONSTRAINT_MIN_ONE, WHAT_IS_CEPH, MIN_ONE_INVALID_FEEDBACK,
           CONSTRAINT_MIN_ZERO, MIN_ZERO_INVALID_FEEDBACK,
           CONSTRAINT_MIN_TWO, MIN_TWO_INVALID_FEEDBACK,
@@ -629,6 +630,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         super.addControl('moloch_magicMode', this.moloch_magicMode);
         super.addControl('moloch_maxPacketsInQueue', this.moloch_maxPacketsInQueue);
         super.addControl('moloch_packet_v3_block_size', this.moloch_packet_v3_block_size);
+        super.addControl('moloch_packet_v3_num_threads', this.moloch_packet_v3_num_threads);
     }
 
     /**
@@ -651,7 +653,8 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
             'moloch_packetsPerPoll': this.moloch_packetsPerPoll.default_value,
             'moloch_magicMode': this.moloch_magicMode.default_value,
             'moloch_maxPacketsInQueue': this.moloch_maxPacketsInQueue.default_value,
-            'moloch_packet_v3_block_size': this.moloch_packet_v3_block_size.default_value
+            'moloch_packet_v3_block_size': this.moloch_packet_v3_block_size.default_value,
+            'moloch_packet_v3_num_threads': this.moloch_packet_v3_num_threads.default_value
         });
     }
 
@@ -661,10 +664,23 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         '',
         'number',
         CONSTRAINT_MIN_ONE,
-        MIN_ZERO_INVALID_FEEDBACK,
+        MIN_ONE_INVALID_FEEDBACK,
         true,
         '8388608',
         'The block size in bytes used for reads from each interface. There are 120 blocks per interface.'
+    )
+
+    moloch_packet_v3_num_threads = new HtmlInput(
+        'moloch_packet_v3_num_threads',
+        'T PacketV3 Num Threads',
+        '',
+        'number',
+        CONSTRAINT_MIN_ONE,
+        MIN_ONE_INVALID_FEEDBACK,
+        true,
+        '3',
+        'The number of threads used to read packets from each interface. These threads take the packets \
+        from the AF packet interface and place them into the packet queues.'
     )
 
     moloch_pcap_pv_size = new HtmlInput(
@@ -865,9 +881,37 @@ export class ServersFormArray extends FormArray {
     }
 }
 
+function validateIPOrHost(control: AbstractControl): ValidationErrors | null {
+    console.log("validateIPOrHost");
+    let ctrl = control as HtmlInput;    
+    let patterns: Array<string> = [IP_CONSTRAINT, HOST_CONSTRAINT];
+    let isValid = false;
+
+    if (!ctrl.required && control.value === ""){
+        return null;
+    }
+
+    for (let pattern of patterns){
+        let pat = new RegExp(pattern);
+        let result = pat.test(control.value);
+
+        if (!isValid){
+            isValid = result;
+        }
+    }
+
+    if (!isValid){
+        
+        return {"custom_error": ctrl.invalid_feedback};
+    } 
+
+    return null;
+  }
+
 export class KitInventoryForm extends FormGroup {
     servers: ServersFormArray;
     sensors: ServersFormArray;
+    endgame_warning: string;
     kubernetesCidrInfoText;
 
     constructor() {
@@ -884,6 +928,7 @@ export class KitInventoryForm extends FormGroup {
 
         this.servers = new ServersFormArray([], true);
         this.sensors = new SensorsFormArray([], true);
+        this.endgame_warning = '';
         super.addControl('servers', this.servers);
         super.addControl('sensors', this.sensors);
         super.addControl('sensor_resources', this.sensor_resources);
@@ -895,7 +940,7 @@ export class KitInventoryForm extends FormGroup {
         super.addControl('dns_ip', this.dns_ip);
         super.addControl('disable_autocalculate', this.disable_autocalculate);
         super.addControl('ceph_redundancy', this.ceph_redundancy);
-
+        super.addControl('endgame_iporhost', this.endgame_iporhost);
         this.kubernetesCidrInfoText = "";
     }
 
@@ -947,6 +992,7 @@ export class KitInventoryForm extends FormGroup {
         this.dns_ip.disable();
         this.disable_autocalculate.disable();
         this.ceph_redundancy.disable();
+        this.endgame_iporhost.disable();
     }
 
     public clearNodes() {
@@ -1011,6 +1057,18 @@ export class KitInventoryForm extends FormGroup {
         '',
         "The root password will be how to log into each node after the kickstart process completes.  \
         Do not forget this password or you will not be able to complete the system installation."
+    )
+
+    endgame_iporhost = new HtmlInput(
+        'endgame_iporhost',
+        'Endgame IP or Hostname',
+        'Optional field.  This is only required if you want to setup Endgame integration with your Kit configuration.',
+        'text',
+        validateIPOrHost,
+        'You must enter a valid hostname or IP address for the Endgame server.',
+        false,
+        '',
+        "Setting this enables a script which will pull Endgame data into Elasticsearch for easier pivoting/maneuver on Endgame data."
     )
 
     elastic_cpu_percentage = new HtmlInput(

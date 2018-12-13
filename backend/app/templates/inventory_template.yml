@@ -53,8 +53,12 @@ all:
     # the bpfs.
     moloch_dontSaveBPFs: "{{ template_ctx.advanced_moloch_settings.moloch_dontSaveBPFs }}"
 
-    # The block size in bytes used for reads from each interface. There are 120 blocks per interface.
+    # The number of threads used to read packets from each interface. These threads take the packets
+    # from the AF packet interface and place them into the packet queues.
     moloch_packet_v3_block_size: {{ template_ctx.advanced_moloch_settings.moloch_packet_v3_block_size }}
+
+    # The block size in bytes used for reads from each interface. There are 120 blocks per interface.
+    moloch_packet_v3_num_threads: {{ template_ctx.advanced_moloch_settings.moloch_packet_v3_num_threads }}
 
     # There are two storage types available on the system. One is clustered storage
     # and the other is Direct Attached Storage (DAS). Using clustered storage
@@ -173,6 +177,12 @@ all:
     # the kubernetes dashboard. This range must be at least a /28. Ex: "192.168.1.16/28"
     kubernetes_services_cidr: "{{ template_ctx.kubernetes_services_cidr }}"
 
+    #############################
+    # End Game Settings       #
+    #############################
+
+    endgame_host: "{{ template_ctx.endgame_iporhost }}"
+    
     #############################
     # Software Locations        #
     #############################

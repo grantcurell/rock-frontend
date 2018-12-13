@@ -58,6 +58,15 @@ class KitInventoryGenerator:
     def __init__(self, json_dict: Dict):
         self._template_ctx = json_dict
 
+    def _set_defaults(self) -> None:
+        """
+        Sets the defaults for fields that need to be set before template rendering.
+
+        :return:
+        """
+        if not self._template_ctx["endgame_iporhost"]:
+            self._template_ctx["endgame_iporhost"] = ''        
+
     def _map_ceph_redundancy(self) -> None:
         """
         Sets the ceph_redundancy value to the appropriate value before 
@@ -75,6 +84,7 @@ class KitInventoryGenerator:
         :return:
         """
         self._map_ceph_redundancy()
+        self._set_defaults()
         template = JINJA_ENV.get_template('inventory_template.yml')
         kit_template = template.render(template_ctx=self._template_ctx)
 
