@@ -57,6 +57,9 @@
         <h5>Kubernetes Settings</h5>
         <app-text-input [parentForm]="kitForm" controlName="kubernetes_services_cidr" (keyupEvent)="kubernetesInputEvent($event)"></app-text-input>
         <div>{{ kitForm.kubernetesCidrInfoText }}</div>
+
+        <h5>Endgame Settings</h5>
+        <app-text-input [parentForm]="kitForm" controlName="endgame_iporhost"></app-text-input>
       </div>
     </div>
     <br>
@@ -162,6 +165,9 @@
           <div *ngIf="kitForm.hasError('errors')">
             <p *ngFor="let error of kitForm.getError('errors');" class='text-danger'>{{ error }}</p>
           </div>
+          <div *ngIf="kitForm.endgame_warning">
+            <p class='text-warning'>{{ kitForm.endgame_warning }}</p>
+          </div>
       </div>
     </div>
     <br>
@@ -218,6 +224,7 @@
           <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_magicMode"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_maxPacketsInQueue"></app-text-input>
           <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_packet_v3_block_size"></app-text-input>
+          <app-text-input [parentForm]="kitForm.controls.advanced_moloch_settings" controlName="moloch_packet_v3_num_threads"></app-text-input>
         </div>
       </div>
       <br>

@@ -264,7 +264,7 @@ function _validateIps(control: AbstractControl, errors: Array<string>): void {
     }
 }
 
-    // Returns true if there is enough storage available and false otherwise
+// Returns true if there is enough storage available and false otherwise
 function _validate_clustered_storage_committed(control: AbstractControl, errors: Array<string>) {
     let kitForm = control as KitInventoryForm;
     if (kitForm === undefined || kitForm === null || kitForm.system_resources === undefined){
@@ -306,6 +306,18 @@ function _validate_ceph_drive_count(control: AbstractControl, errors: Array<stri
     }
 }
 
+function _validate_endgame_ip(control: AbstractControl){
+    let kitForm = control as KitInventoryForm;
+    if (kitForm === undefined || kitForm === null || kitForm.endgame_warning === undefined){
+        return;
+    }
+    if (kitForm.endgame_iporhost.value === null || kitForm.endgame_iporhost.value === ""){
+        kitForm.endgame_warning = "- Endgame IP or Hostname field is not set.  Without this being set, Endgame will not be integrated with this Kit configuration.";        
+    } else {
+        kitForm.endgame_warning = null;
+    }
+}
+
 /**
  * The main exported function that performs all the Form Level validation for the KitForm.
  *
@@ -314,7 +326,6 @@ function _validate_ceph_drive_count(control: AbstractControl, errors: Array<stri
  */
 export function ValidateKitInventory(control: AbstractControl): { errors: Array<string> } {
     let errors: Array<string> = [];
-
     _validateMonitorInterfaces(control, errors);
     _validateCephDriveCount(control, errors);
     _validateMasterServer(control, errors);
@@ -326,6 +337,8 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
     _validateLogstashReplicas(control, errors);
     _validateSensorAndServerCounts(control, errors);
     _validate_clustered_storage_committed(control, errors);
+    _validate_ceph_drive_count(control, errors);
+    _validate_endgame_ip(control);
 
     // TODO elastic search math is messed up.  This needs to be fixed before we uncomment the validation checks.
     if (!GetElasticSearchValidated()){

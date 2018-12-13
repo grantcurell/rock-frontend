@@ -18,6 +18,7 @@ export const CONSTRAINT_MIN_EIGHT: string = '^[8-9]|[0-9]\\d+$';
 export const CONSTRAINT_MIN_ZERO: string = '^[0-9]|[0-9]\\d+$';
 export const PERCENT_MIN_MAX: string = '^([1-9]|[1-9][0-9])$';
 export const IP_CONSTRAINT: string = "^((2[0-2][0-3])|(1\\d\\d)|([1-9]?\\d))(\\.((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){2}\\.((25[0-4])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))$";
+export const HOST_CONSTRAINT = "^[a-zA-Z]([a-zA-Z]|[0-9]|[-])*$"
 export const IP_CONSTRAINT_WITH_SUBNET: string = "((^|\\.)((25[0-5])|(2[0-4]\\d)|(1\\d\\d)|([1-9]?\\d))){4}$";
 export const URL_CONSTRAINT: string = "^(ftp:\\/\\/.|http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?\\.iso$";
 export const CIDR_CONSTRAINT: string = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/(3[0-2]|[1-2]?[0-9])";

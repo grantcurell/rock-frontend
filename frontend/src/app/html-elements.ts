@@ -36,7 +36,7 @@ export interface HtmlInputInterface {
   placeholder: string;
   input_type: string;
   disabled: boolean;
-  html5_constraint: string;
+  html5_constraint: string | ValidatorFn;
   invalid_feedback: string;
   required: boolean;
   default_value: string;
@@ -315,7 +315,7 @@ export class HtmlInput extends FormControl implements HtmlInputInterface, HelpPa
     public label: string,
     public placeholder: string,
     public input_type: string,
-    public html5_constraint: string,
+    public html5_constraint: string | ValidatorFn,
     public invalid_feedback: string,
     public required: boolean,
     public default_value: string,
@@ -334,7 +334,11 @@ export class HtmlInput extends FormControl implements HtmlInputInterface, HelpPa
       validators.push(Validators.required);
     }
     if (html5_constraint) {
-      validators.push(Validators.pattern(html5_constraint));
+      if (typeof html5_constraint === "string"){
+        validators.push(Validators.pattern(html5_constraint));
+      } else {
+        validators.push(html5_constraint);
+      }      
     }
     super.setValidators(validators);
     super.setValue(default_value);
