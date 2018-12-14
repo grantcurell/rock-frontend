@@ -941,6 +941,8 @@ export class KitInventoryForm extends FormGroup {
         super.addControl('disable_autocalculate', this.disable_autocalculate);
         super.addControl('ceph_redundancy', this.ceph_redundancy);
         super.addControl('endgame_iporhost', this.endgame_iporhost);
+        super.addControl('endgame_username', this.endgame_username);
+        super.addControl('endgame_password', this.endgame_password);
         this.kubernetesCidrInfoText = "";
     }
 
@@ -993,6 +995,8 @@ export class KitInventoryForm extends FormGroup {
         this.disable_autocalculate.disable();
         this.ceph_redundancy.disable();
         this.endgame_iporhost.disable();
+        this.endgame_username.disable();
+        this.endgame_password.disable();
     }
 
     public clearNodes() {
@@ -1069,6 +1073,30 @@ export class KitInventoryForm extends FormGroup {
         false,
         '',
         "Setting this enables a script which will pull Endgame data into Elasticsearch for easier pivoting/maneuver on Endgame data."
+    )
+
+    endgame_username = new HtmlInput(
+        'endgame_username',
+        'Endgame Username',
+        'Optional field.  This is only required if you want to setup Endgame integration with your Kit configuration.',
+        'text',
+        null,
+        '',
+        false,
+        '',
+        "The username needed for Endgame integration."
+    )
+
+    endgame_password = new HtmlInput(
+        'endgame_password',
+        'Endgame Password',
+        'Optional field.  This is only required if you want to setup Endgame integration with your Kit configuration.',
+        'text',
+        null,
+        '',
+        false,
+        '',
+        "The password needed for Endgame integration."
     )
 
     elastic_cpu_percentage = new HtmlInput(

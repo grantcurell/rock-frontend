@@ -65,8 +65,14 @@ class KitInventoryGenerator:
         :return:
         """
         if not self._template_ctx["endgame_iporhost"]:
-            self._template_ctx["endgame_iporhost"] = ''        
+            self._template_ctx["endgame_iporhost"] = ''
 
+        if not self._template_ctx["endgame_username"]:
+            self._template_ctx["endgame_username"] = ''
+
+        if not self._template_ctx["endgame_password"]:
+            self._template_ctx["endgame_password"] = ''
+            
     def _map_ceph_redundancy(self) -> None:
         """
         Sets the ceph_redundancy value to the appropriate value before 
