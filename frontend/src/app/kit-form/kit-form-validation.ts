@@ -311,8 +311,10 @@ function _validate_endgame_ip(control: AbstractControl){
     if (kitForm === undefined || kitForm === null || kitForm.endgame_warning === undefined){
         return;
     }
-    if (kitForm.endgame_iporhost.value === null || kitForm.endgame_iporhost.value === ""){
-        kitForm.endgame_warning = "- Endgame IP or Hostname field is not set.  Without this being set, Endgame will not be integrated with this Kit configuration.";        
+    if (kitForm.endgame_iporhost.value === null || kitForm.endgame_iporhost.value === "" ||
+        kitForm.endgame_username.value === null || kitForm.endgame_username.value === "" ||
+        kitForm.endgame_password.value === null || kitForm.endgame_password.value === ""){
+        kitForm.endgame_warning = "- Endgame IP, Username and/or Password fields are not set.  Without these being set, Endgame will not be integrated with this Kit configuration.";
     } else {
         kitForm.endgame_warning = null;
     }

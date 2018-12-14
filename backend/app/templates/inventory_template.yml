@@ -182,6 +182,8 @@ all:
     #############################
 
     endgame_host: "{{ template_ctx.endgame_iporhost }}"
+    endgame_username: "{{ template_ctx.endgame_username }}"
+    endgame_password: "{{ template_ctx.endgame_password }}"
     
     #############################
     # Software Locations        #
