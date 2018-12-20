@@ -243,7 +243,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         'test',
         "Indicates if the sensor in question is a local or a remote sensor.",
         undefined,
-        true
+        true        
     )
 }
 
@@ -964,6 +964,14 @@ export class KitInventoryForm extends FormGroup {
         this.system_resources.reinitalize();
     }
 
+    enable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        super.enable(opts);
+        this.sensor_storage_type.disable();
+    }
+
     /**
      * Overridden method
      *
@@ -1047,7 +1055,8 @@ export class KitInventoryForm extends FormGroup {
         decision, this only applies to PCAP. Everything else will use clustered storage \
         with Ceph. Though, that traffic is only a fraction of what PCAP consumes in most \
         cases.",
-        'Use hard drive for PCAP storage'
+        'Use hard drive for PCAP storage',
+        true
     )
 
     root_password = new HtmlInput(
