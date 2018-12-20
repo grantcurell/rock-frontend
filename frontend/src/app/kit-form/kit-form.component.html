@@ -27,7 +27,8 @@
         <br>
 
         <h5>Select Storage Type</h5>
-        <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown>
+        <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" ></app-dropdown>
+        <!-- DO NOT DELETE <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown> -->
         <h5>Credentials</h5>
         <app-text-input [parentForm]="kitForm" controlName="root_password"></app-text-input>
         <br>
