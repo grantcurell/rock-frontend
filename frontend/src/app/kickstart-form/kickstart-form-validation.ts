@@ -2,6 +2,7 @@ import {  FormArray, AbstractControl } from '@angular/forms';
 import { HtmlInput } from '../html-elements';
 import { INVALID_PASSWORD_MISMATCH } from '../frontend-constants'; 
 import { NodeFormGroup } from './kickstart-form';
+import { CheckForInvalidControls } from '../globals';
 
 function _compare_field(nodes: FormArray, fieldName: string): { hasError: boolean, conflict: string } {
   if (nodes != null && nodes.length >= 2){
@@ -23,41 +24,12 @@ function _compare_field(nodes: FormArray, fieldName: string): { hasError: boolea
   return {hasError: false, conflict: null };
 }
 
-function _validateDhcp(control: AbstractControl, errors: Array<string>): void {
-    let dhcp_start_ctrl = control.get('dhcp_start');
-    let dhcp_end_ctrl = control.get('dhcp_end');
-
-    if (dhcp_start_ctrl == null || dhcp_end_ctrl == null || 
-        dhcp_start_ctrl.value == null || dhcp_end_ctrl.value == null){
-        return;
-    }
-
-    let dhcp_start = dhcp_start_ctrl.value.split('.').map(Number);
-    let dhcp_end = dhcp_end_ctrl.value.split('.').map(Number);
-
-    if(dhcp_start[0] == dhcp_end[0] && dhcp_start[1] == dhcp_end[1] && dhcp_start[2] == dhcp_end[2]){
-        if(dhcp_start[3] < dhcp_end[3]){
-            return;
-        }
-    }
-    errors.push("- Invalid DHCP Range - Verify dhcp start and end fields.");
-}
-
-function _validateGateway(control: AbstractControl, errors: Array<string>): void{
-    let gateway_ctrl = control.get('gateway');
-    if (gateway_ctrl == null){
-        return;        
-    }
-
-    if (!gateway_ctrl.valid){
-        errors.push("- Invalid Gateway - It is either missing or did not validate correctly.");
-    }
-}
-
 function _validateDhcpRange(control: AbstractControl, errors: Array<string>): void {
 
     let controller_interface_ctrl = control.get('controller_interface') as FormArray;
-    if (controller_interface_ctrl == null || controller_interface_ctrl.at(0) == null){
+    if (controller_interface_ctrl == null || 
+        controller_interface_ctrl.at(0) == null ||
+        controller_interface_ctrl.at(0).value == null){
         return;
     }
 
@@ -74,7 +46,12 @@ function _validateDhcpRange(control: AbstractControl, errors: Array<string>): vo
     let dhcp_end = dhcp_end_ctrl.value.split('.').map(Number);
     let controller_ip = controller_interface_ip.split('.').map(Number);
 
-    if (controller_ip[0] == dhcp_start[0] && controller_ip[1] == dhcp_start[1] && controller_ip[2] == dhcp_start[2] && controller_ip[0] == dhcp_end[0] && controller_ip[1] == dhcp_end[1] && controller_ip[2] == dhcp_end[2]) {
+    if (controller_ip[0] == dhcp_start[0] && 
+        controller_ip[1] == dhcp_start[1] && 
+        controller_ip[2] == dhcp_start[2] && 
+        controller_ip[0] == dhcp_end[0] && 
+        controller_ip[1] == dhcp_end[1] && 
+        controller_ip[2] == dhcp_end[2]) {
         if (controller_ip[3] < dhcp_start[3] || controller_ip[3] > dhcp_end[3]) {
             return;
         } else {
@@ -155,10 +132,9 @@ export function ValidateKickStartInventoryForm(control: AbstractControl){
     } 
   }
 
-  _validateDhcp(control, errors);
   _validateDhcpRange(control, errors);
-  _validateNodes(control, errors);
-  _validateGateway(control, errors);
+  _validateNodes(control, errors);  
+  CheckForInvalidControls(control, errors);
 
   if (errors.length > 0){
     return { errors: errors};

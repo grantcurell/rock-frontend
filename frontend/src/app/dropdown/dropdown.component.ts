@@ -30,7 +30,9 @@ export class DropdownComponent implements OnInit {
 
   ngOnInit() {
     this.htmlDropDown = this.parentForm.get(this.controlName) as HtmlDropDown;
-    this.selectValue(this.htmlDropDown.default_value);
+    if (this.htmlDropDown.value === null || this.htmlDropDown.value === ''){
+      this.selectValue(this.htmlDropDown.default_value);
+    }
   }
 
   ngAfterViewInit(){

@@ -113,7 +113,7 @@ export class NodeFormGroup extends FormGroup {
     "",
     '',
     true,
-    '',
+    'sda',
     "The boot drive is the disk name that will have the operating system installed during the kickstart process.  \
        By default, the Supermicro will use sda and the HP DL160 will use sdb."
   )

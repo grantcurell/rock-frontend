@@ -42,7 +42,6 @@ export class KickstartService {
   }
 
   generateKickstartInventory(kickStartForm: Object){
-    this.log(kickStartForm);
     const url = '/api/generate_kickstart_inventory';    
     
     return this.http.post(url, kickStartForm, HTTP_OPTIONS).pipe(

@@ -113,6 +113,7 @@ pre code {
     word-wrap: break-word;
     white-space: normal;
     text-align: left;
+    border-radius: unset;
 }
 
 dt {
@@ -131,26 +132,23 @@ p {
     background-color: #101010;
 }
 
-.btn-primary {
-    /* background-color: #0C2B4C;
-    border-color: #0C2B4C; */
-    background-color: #007053;
+.btn-primary {    
+    background-color: #5f9ea0;
     border-color: #006400;
 }
 
-.btn-primary:hover {
-    background-color: #006400;
-    border-color: #007053;
+.btn-primary:hover {    
+    background-color: #6495ed;
 }
 
 .btn-primary.disabled, .btn-primary:disabled { 
-    background-color: #007053;
-    border-color: #006400;
+    background-color: #5f9ea0;
+    border-color: #5f9ea0;
 }
 
 .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show>.btn-primary.dropdown-toggle {
-    background-color: #006400;
-    border-color: #007053;
+    background-color: #6495ed;
+    border-color: #6495ed;
 }
 
 .btn-secondary {
@@ -164,13 +162,13 @@ p {
 }
 
 .btn-danger {
-    background-color: #e12e1c;
-    border-color: #d62c1a;
+    background-color: #8b0000;
+    border-color: #8b0000;
 }
 
 .btn-danger:hover {
     background-color: #B22222;
-    border-color: #E74C3C;
+    border-color: #B22222;
 }
 
 .tooltip-inner {
@@ -180,7 +178,7 @@ p {
 }
 
 body {
-    background-color: #111111;
+    background-color: #222222;
 }
 
 hr {
@@ -220,4 +218,24 @@ a {
     margin-top: 0.25rem;
     font-size: 14px;
     color: #28a745;
+
+}
+
+/*
+Fixes Chromes webkit color overrides for auto filling forms.
+*/
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px #222 inset;
+    -webkit-text-fill-color: #28a745;
+} 
+
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px lightgrey inset;
+    -webkit-text-fill-color: #444;
+}
+
+input.form-control {
+    border-color: #222;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }

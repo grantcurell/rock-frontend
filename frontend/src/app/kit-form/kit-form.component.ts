@@ -304,7 +304,6 @@ export class KitFormComponent implements OnInit, AfterViewInit{
           //different from our kit configuration.
           this.isAddNodeInsteadOfNewKit = true;
         }
-
       });
     });    
   }

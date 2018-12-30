@@ -32,6 +32,13 @@ export class TotalServerResources extends FormGroup {
         super.addControl('elastic_search_cpu_request', this.elastic_search_cpu_request);
     }
 
+    disable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+    }): void {
+        // Override do nothing!
+    }
+
     private initalize(){
         this.cpuCoresAvailable = 0;
         this.memoryAvailable = 0;
