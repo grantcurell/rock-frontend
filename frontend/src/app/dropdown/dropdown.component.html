@@ -6,7 +6,7 @@
       <span class="input-group-text">{{ input_control.label }}</span>
     </a>
   </div>
-  <div *ngIf="input_control.control_disabled">
+  <div *ngIf="input_control.control_disabled" style="padding-top: 5px;">
     <input type="hidden"
            formControlName="{{ controlName }}"
            [required]="input_control.required">

@@ -19,8 +19,8 @@ export class TopNavbarComponent implements OnInit {
   
   constructor(private confluenceSrv: ConfluenceService,
               private route: ActivatedRoute) { 
-    this.isMatrixOn = true;
-    this.matrixText = "Turn off matrix";
+    this.isMatrixOn = false;
+    this.matrixText = "Turn on matrix";
   }
 
   ngOnInit() {

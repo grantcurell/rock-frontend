@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, 
+         EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { HtmlCardSelector } from '../html-elements';
 
@@ -32,7 +33,7 @@ export class CardSelectorComponent implements OnInit {
   private htmlCardSelectorFormArray: HtmlCardSelector;
 
   constructor() { }
-
+  
   ngOnInit() {
     this.htmlCardSelectorFormArray = this.parentForm.get(this.controlName) as HtmlCardSelector;
     //Fixes a bug when we rerender the same card selector.
@@ -55,7 +56,7 @@ export class CardSelectorComponent implements OnInit {
     }
   }
 
-  private clearSelectedOptionLabels(){
+  private clearSelectedOptionLabels(){    
     for (let i = 0; i < this.optionSelections.length; i++){
       this.optionSelections[i].label = this.optionSelections[i].label.replace(' - selected', '');
     }

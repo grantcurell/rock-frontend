@@ -10,6 +10,7 @@ declare var $: any;
 export interface HelpPageInterface {
   description: string;
   anchor: string;
+  label: string;
 }
 
 export interface HtmlCheckBoxInterface {
@@ -292,7 +293,7 @@ export class HtmlDatePicker extends FormControl implements HelpPageInterface {
     public description: string,
     public default_value: string = '',
     public placeholder: string = "yyyy-mm-dd",
-    public valid_feedback: string = 'Good to go!'
+    public valid_feedback: string = 'Valid input'
   ) {
     super('', null, null);
     let validators = [];
@@ -320,7 +321,7 @@ export class HtmlInput extends FormControl implements HtmlInputInterface, HelpPa
     public required: boolean,
     public default_value: string,
     public description: string,
-    public valid_feedback: string = 'Good to go!',
+    public valid_feedback: string = 'Valid input',
     disabled: boolean = false,
     public has_button: boolean = false,
     public button_text: string = 'Submit',

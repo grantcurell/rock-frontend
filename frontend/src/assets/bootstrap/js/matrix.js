@@ -1,23 +1,32 @@
-IS_MATRIX_ON = true;
+IS_MATRIX_ON = false;
+IS_MATRIX_RENDERED = false;
+
 var c = document.getElementById("matrix");
 var ctx = c.getContext("2d");
-
-//making the canvas full screen
-c.height = window.innerHeight;
-c.width = window.innerWidth;
+var font_size = 10;
+var drops = [];
 
 var message = "TFPLENUM";
-//converting the string into an array of single characters
 message = message.split("");
 
-var font_size = 10;
-var columns = c.width/font_size; //number of columns for the rain
-//an array of drops - one per column
-var drops = [];
-//x below is the x coordinate
-//1 = y co-ordinate of the drop(same for every drop initially)
-for(var x = 0; x < columns; x++)
-	drops[x] = 1; 
+function render(){
+	//making the canvas full screen
+	c.height = window.innerHeight;
+	c.width = window.innerWidth;	
+
+	//Ensures that letters do not fall below a certain size.
+	if (c.width < 1920){
+		c.width = 1920;
+	}
+		
+	var columns = c.width/font_size; //number of columns for the rain
+	//an array of drops - one per column
+
+	//x below is the x coordinate
+	//1 = y co-ordinate of the drop(same for every drop initially)
+	for(var x = 0; x < columns; x++)
+		drops[x] = 1; 
+}
 
 //drawing the characters
 function draw()
@@ -25,7 +34,12 @@ function draw()
 	if (!IS_MATRIX_ON){
 		ctx.clearRect(0, 0, c.width, c.height);
 		return;
-	}	
+	}
+
+	if (!IS_MATRIX_RENDERED){
+		render();
+		IS_MATRIX_RENDERED = true;
+	}
 	//Black BG for the canvas
 	//translucent BG to show trail
 	ctx.fillStyle = "rgba(0, 0, 0, 0.05)";

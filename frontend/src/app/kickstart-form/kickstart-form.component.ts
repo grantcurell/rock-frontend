@@ -123,6 +123,7 @@ export class KickstartFormComponent implements OnInit {
 
   clearForm(): void {
     this.kickStartForm.reset();
+    this.monitorInterfaceSelector.setDefaultValues([]);
     this.kickStartForm.enable();
   }
 
@@ -153,8 +154,9 @@ export class KickstartFormComponent implements OnInit {
     this.kickStartForm.nodes.removeAt(index);
   }
 
-  addNode(){
+  addNode(){    
     this.kickStartForm.addNodeGroup();
+    this.nodeTypeChange();
   }
 
   toggleNode(node: NodeFormGroup) {
@@ -229,7 +231,7 @@ export class KickstartFormComponent implements OnInit {
    * @param value - The new value of the dropdown.
    * @param index - The current index the node is in the list.
    */
-  nodeTypeChange(value: string, index: number): void {
+  nodeTypeChange(): void {
     let sensorArray:Array<NodeFormGroup> = [];
     let serverArray:Array<NodeFormGroup> = [];
 
@@ -238,7 +240,7 @@ export class KickstartFormComponent implements OnInit {
 
       if (node.node_type.value == "Server"){
         serverArray.push(node);
-      } else if  (node.node_type.value == "Sensor"){
+      } else if  (node.node_type.value == "Sensor" || node.node_type.value == "Remote Sensor"){
         sensorArray.push(node);
       }
     }
@@ -267,7 +269,7 @@ export class KickstartFormComponent implements OnInit {
 
     this.kickStartSrv.getUnusedIPAddresses(mng_ip[0], netmask).subscribe(data => {
       this.ipSelectorModal.updateModal('Select IP',
-        'Please select a IP address.',
+        'Please select an unused IP address.',
         "Select",
         'Cancel',
         undefined,

@@ -882,7 +882,6 @@ export class ServersFormArray extends FormArray {
 }
 
 function validateIPOrHost(control: AbstractControl): ValidationErrors | null {
-    console.log("validateIPOrHost");
     let ctrl = control as HtmlInput;    
     let patterns: Array<string> = [IP_CONSTRAINT, HOST_CONSTRAINT];
     let isValid = false;
@@ -958,7 +957,8 @@ export class KitInventoryForm extends FormGroup {
                      'logstash_cpu_percentage': this.logstash_cpu_percentage.default_value,
                      'elastic_storage_percentage': this.elastic_storage_percentage.default_value,
                      'sensor_storage_type': this.sensor_storage_type.default_value,
-                     'logstash_replicas': this.logstash_replicas.default_value
+                     'logstash_replicas': this.logstash_replicas.default_value,
+                     'moloch_pcap_storage_percentage': this.moloch_pcap_storage_percentage.default_value
                     });
         this.clearNodes();
         this.system_resources.reinitalize();

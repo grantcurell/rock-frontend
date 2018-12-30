@@ -3,6 +3,7 @@ import { HtmlInput } from '../html-elements';
 import { ServerFormGroup, SensorFormGroup, SensorsFormArray, ServersFormArray, KitInventoryForm } from './kit-form';
 import { GetElasticSearchValidated, GetSensorResourcesValidated } from './kit-form-globals';
 import { CEPH_DRIVE_MIN_COUNT } from '../frontend-constants';
+import { CheckForInvalidControls } from '../globals';
 
 /**
  * Ensures that the user has selected at least one server as a master.
@@ -36,7 +37,7 @@ function _validateCephDriveCount(control: AbstractControl, errors: Array<string>
 
     if (servers != null) {
         for (let i = 0; i < servers.length; i++) {
-            let server = servers.at(i) as ServerFormGroup;
+            let server = servers.at(i) as ServerFormGroup;            
             ceph_drive_count += server.ceph_drives.length;
         }
     }
@@ -49,8 +50,25 @@ function _validateCephDriveCount(control: AbstractControl, errors: Array<string>
     }
 
     if (ceph_drive_count < CEPH_DRIVE_MIN_COUNT){
-        errors.push("- Ceph drives failed to validate. You have to have at least two drives in your Ceph cluster!");
+        errors.push("- Ceph drives failed to validate. You have to have at least two drives in your Ceph cluster.");
     }
+}
+
+function _validate_pcap_drives(control: AbstractControl, errors: Array<string>): void {
+    let kitForm = control as KitInventoryForm;
+    let sensors = control.get('sensors') as SensorsFormArray;
+    let pcap_drive_count = 0;
+    
+    if (sensors != null && kitForm.sensor_storage_type != null){
+        for (let i = 0; i < sensors.length; i++){
+            let sensor = sensors.at(i) as SensorFormGroup;
+            if(sensor.pcap_drives.length !== 1 &&
+               kitForm.sensor_storage_type.value === kitForm.sensor_storage_type.options[1]){
+                errors.push("- PCAP drives failed to validate. You need to select at one PCAP drive on each sensor.")
+            }
+        }
+    }
+    
 }
 
 /**
@@ -330,6 +348,7 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
     let errors: Array<string> = [];
     _validateMonitorInterfaces(control, errors);
     _validateCephDriveCount(control, errors);
+    _validate_pcap_drives(control, errors);
     _validateMasterServer(control, errors);
     _validateKubernetesCIDR(control, errors);
     _validateHomeNet(control, errors);
@@ -341,8 +360,8 @@ export function ValidateKitInventory(control: AbstractControl): { errors: Array<
     _validate_clustered_storage_committed(control, errors);
     _validate_ceph_drive_count(control, errors);
     _validate_endgame_ip(control);
+    CheckForInvalidControls(control, errors);
 
-    // TODO elastic search math is messed up.  This needs to be fixed before we uncomment the validation checks.
     if (!GetElasticSearchValidated()){
         errors.push("- Elasticsearch failed to validate. Check the server section and make sure Elasticsearch has enough RAM and CPU resources.");
     }
