@@ -82,9 +82,15 @@ export class ConfluenceComponent implements OnInit {
     }    
 
     if (event){
-      event.srcElement.style.fontWeight = "bold";
-      event.srcElement.style.color = "lightgreen";
-      this.lastElement = event.srcElement;
+      //Fixes a Firefox bug
+      let srcElement = event.srcElement;
+      if (srcElement === undefined){
+        srcElement = event.target;
+      }
+      
+      srcElement.style.fontWeight = "bold";
+      srcElement.style.color = "lightgreen";
+      this.lastElement = srcElement;
     }
 
     this.confluenceSrv.getConfluencePage(this.spaceID, page_id).subscribe(data => {

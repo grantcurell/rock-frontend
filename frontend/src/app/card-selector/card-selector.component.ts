@@ -85,13 +85,18 @@ export class CardSelectorComponent implements OnInit {
     if (selection.label.indexOf('selected') > -1){
       selection.label = selection.label.replace(' - selected', '');
     }
+    
+    let srcElement = event.srcElement;
+    if (srcElement === undefined){
+      srcElement = event.target;
+    }
 
-    if (event.srcElement.value.indexOf('selected') > -1) {
+    if (srcElement.value.indexOf('selected') > -1) {
       //Only triggered when the selected word is in the value of the srcElement.
-      event.srcElement.value = selection.label;
+      srcElement.value = selection.label;
       this.deSelectValue(selection.value);
     } else {
-      event.srcElement.value = selection.label + ' - selected';
+      srcElement.value = selection.label + ' - selected';
       this.set_selectedValue(selection.value);
     }
 

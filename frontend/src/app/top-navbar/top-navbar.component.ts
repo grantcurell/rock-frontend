@@ -41,7 +41,12 @@ export class TopNavbarComponent implements OnInit {
   setActive(event: any){
     this.clearPreviousActive();
     if (event){
-      event['srcElement']['className'] = "nav-link active";
+      // Fixes a Firefox bug
+      let srcElement = event.srcElement;
+      if (srcElement === undefined){
+        srcElement = event.target;
+      }
+      srcElement['className'] = "nav-link active";
     }
   }
 
