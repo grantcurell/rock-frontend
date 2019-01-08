@@ -41,7 +41,7 @@ function _install_deps(){
 	fi
 
 	yum -y install wget
-	yum -y install ansible cockpit nmap
+	yum -y install cockpit nmap
 }
 
 function _install_nodejs(){
