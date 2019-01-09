@@ -29,7 +29,7 @@ function use_laprepos() {
             run_cmd curl -m 10 -s -o /etc/yum.repos.d/labrepo-centos.repo http://yum.labrepo.lan/labrepo-centos.repo
         else
             run_cmd curl -m 10 -s -o /etc/yum.repos.d/labrepo-rhel.repo http://yum.labrepo.lan/labrepo-rhel.repo
-        fi    
+        fi
         yum clean all > /dev/null
         rm -rf /var/cache/yum/ > /dev/null
     fi
@@ -40,8 +40,7 @@ function _install_deps(){
 		yum -y install epel-release
 	fi
 
-	yum -y install wget
-	yum -y install cockpit nmap
+	yum -y install wget cockpit nmap
 }
 
 function _install_nodejs(){
@@ -49,25 +48,27 @@ function _install_nodejs(){
 	if [ "$TFPLENUM_LABREPO" == true ]; then
 		run_cmd wget http://misc.labrepo.lan/node-v8.11.4-linux-x64.tar.xz
 	else
-		run_cmd wget https://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.xz	
+		run_cmd wget https://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.xz
 	fi
-    
+
     run_cmd tar xf node-v8.11.4-linux-x64.tar.xz
     run_cmd cd node-v8.11.4-linux-x64/
-    run_cmd cp -R * /usr/local/    		
+    run_cmd cp -R * /usr/local/
     run_cmd cd ..
 	run_cmd rm -rf node-v8.11.4-linux-x64/
 	run_cmd rm -f node-v8.11.4-linux-x64.tar.xz
     run_cmd node -v
     run_cmd npm -v
-	npm config set registry http://nexus.labrepo.lan/repository/npm/
+    if [ "$TFPLENUM_LABREPO" == true ]; then
+      npm config set registry http://nexus.labrepo.lan/repository/npm/
+    fi
 }
 
 function _install_angular(){
     run_cmd npm install -g @angular/cli
 	pushd $FRONTEND_DIR/frontend > /dev/null
 	run_cmd npm update -g
-    run_cmd npm install --save-dev @angular-devkit/build-angular	
+    run_cmd npm install --save-dev @angular-devkit/build-angular
     run_cmd npm install
 	popd > /dev/null
 }
@@ -83,11 +84,13 @@ function _install_python36(){
 	run_cmd yum install -y python36 python36-devel
 	mkdir -p /root/.pip/
 
+  if [ "$TFPLENUM_LABREPO" == true ]; then
 cat <<EOF > /root/.pip/pip.conf
 [global]
 index-url = http://nexus.labrepo.lan/repository/pypi/simple
 trusted-host = nexus.labrepo.lan
 EOF
+  fi
 }
 
 function _setup_pythonenv {
@@ -99,7 +102,7 @@ function _setup_pythonenv {
 	popd > /dev/null
 }
 
-function _configure_httpd {	
+function _configure_httpd {
 	local private_key="/etc/ssl/private/apache-selfsigned.key"
 	local certificate="/etc/ssl/certs/apache-selfsigned.crt"
 	run_cmd yum -y install httpd
@@ -120,9 +123,9 @@ function _configure_httpd {
 	run_cmd cp -v ./tfplenum.conf /etc/httpd/conf.d/
 }
 
-function _install_and_configure_gunicorn {	
+function _install_and_configure_gunicorn {
 	cp ./tfplenum-frontend.service /etc/systemd/system/
-	run_cmd systemctl daemon-reload	
+	run_cmd systemctl daemon-reload
 	run_cmd systemctl enable tfplenum-frontend.service
 }
 
