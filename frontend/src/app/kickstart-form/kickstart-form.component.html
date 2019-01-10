@@ -4,7 +4,7 @@
 <app-modal-ip-select-dialog [modal]="ipSelectorModal" (primaryButtonClick)="ipAddressSelected($event)"></app-modal-ip-select-dialog>
 
 <div class="container" id="topheader">
-  <div id="main_form">
+  <div id="main_form">    
     <form [formGroup]="kickStartForm" (ngSubmit)="onSubmit()">
       <div class="card">
         <div class="card-header">
@@ -16,6 +16,25 @@
                     (click)="openResetConfirmation()"><i class="icon_floppy_alt"></i> Archive and Clear Form</button>
         </div>
         <div class="card-body">
+          <div class="card">
+            <div class="card-body" style="border: 1px solid green;border-radius: 1rem;">
+                <h5>Page Instructions</h5>
+                <p class="card-text">
+                  Fill out the form and click "Add Node" button at the bottom of the page to add Servers and Sensors.  The validation box at the botton 
+                  of the page will guide you through filling out the form correctly.
+                </p>
+                <p class="card-text">
+                  The "Open Console" button opens the logs of the last Kickstart run.
+                </p>
+                <p class="card-text">
+                  If the current Kickstart form loads and is disabled, you have an active configuration.
+                  If you want to start a new configuration, click "Archive and Clear Form" button at the top of the page.  This will save the current configuration if you want to restore it later.
+                  If you want to change the existing configuration, click "Enable Form" button at the top of the page and make your edits before clicking "Execute Kickstart".
+                  If you want to add a new node, scroll to the bottom of the page and click the "Add Node" button.
+                </p>
+            </div>
+          </div>
+          <br>
           <h5>DHCP Settings</h5>
           <app-text-input [parentForm]="kickStartForm" controlName="dhcp_start"></app-text-input>
           <app-text-input [parentForm]="kickStartForm" controlName="dhcp_end"></app-text-input>
@@ -67,7 +86,7 @@
           Validation
         </div>
         <div class="card-body" id="validation">
-            <p *ngIf="kickStartForm.valid" class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>
+            <p *ngIf="kickStartForm.valid" class='text-success'>Looks good! Press 'Execute Kickstart' whenever you're ready!</p>
             <div *ngIf="kickStartForm.hasError('errors')">
               <p *ngFor="let error of kickStartForm.getError('errors');" class='text-danger'>{{ error }}</p>
             </div>

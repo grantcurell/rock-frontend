@@ -103,7 +103,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
           }
           nodeFormArray.push(srvFormGroup);
           srvFormGroup.from_object(data[key][index]);
-          this._gatherFacts(srvFormGroup, srvFormGroup.deviceFacts, host_key, true);
+          this._gatherFacts(srvFormGroup, srvFormGroup.deviceFacts, host_key);
           setTimeout(()=> {
             this.cephDriveSelected(data[key][index]['ceph_drives'], srvFormGroup);
           });
@@ -317,7 +317,8 @@ export class KitFormComponent implements OnInit, AfterViewInit{
   }
 
   //TODO gathering facts twice after restore causes issues.
-  private _gatherFacts(node: ServerFormGroup | SensorFormGroup, data: Object, host_key: string, runCalculations: boolean) {    
+  private _gatherFacts(node: ServerFormGroup | SensorFormGroup, 
+                       data: Object, host_key: string) {    
     if (data['error_message']) {
       this.kitModal.updateModal('Error',
         data['error_message'],
@@ -329,32 +330,45 @@ export class KitFormComponent implements OnInit, AfterViewInit{
       return;
     }
     
+    // Clear resources on every run of gather facts.
+    if (node.deviceFacts){
+      this.kitForm.system_resources.subtractFromDeviceFacts(node.deviceFacts);
+      this.kitForm.system_resources.calculateTotalCephDrives(0, node.deviceFacts);
+      node.clearSelectors();
+      if (node instanceof ServerFormGroup) {
+        this.kitForm.server_resources.subtractFromDeviceFacts(node.deviceFacts);
+        this.kitForm.server_resources.removeClusterStorage(node.deviceFacts);
+      } else if (node instanceof SensorFormGroup) {
+        this.kitForm.sensor_resources.subtractFromDeviceFacts(node.deviceFacts);
+        this.kitForm.sensor_resources.removeClusterStorage(node.deviceFacts);
+      }
+    }
+
+    //Set device facts after resource reset
     node.deviceFacts = data;
     //Ensures we do not add additional compute power and memory by accident.
-    if (runCalculations) {
-      if (node instanceof ServerFormGroup) {
-        node.setOptionSelections();
-      } else if (node instanceof SensorFormGroup) {
-        node.setSensorOptionsSelections(node[host_key].value);
-      }
-      node.basicNodeResource.setFromDeviceFacts(node.deviceFacts);
+    if (node instanceof ServerFormGroup) {
+      node.setOptionSelections();
+    } else if (node instanceof SensorFormGroup) {
+      node.setSensorOptionsSelections(node[host_key].value);
+    }
 
-      this.kitForm.system_resources.setFromDeviceFacts(node.deviceFacts);
-      node.hostname.setValue(node.deviceFacts["hostname"]);
+    node.basicNodeResource.setFromDeviceFacts(node.deviceFacts);
+    this.kitForm.system_resources.setFromDeviceFacts(node.deviceFacts);
+    node.hostname.setValue(node.deviceFacts["hostname"]);
 
-      if (node instanceof ServerFormGroup) {
-        this.kitForm.server_resources.setFromDeviceFacts(node.deviceFacts);
-        this.kitForm.server_resources.setErrorsOrSuccesses(
-          this.advancedElasticSearchForm.elastic_masters.value,
-          this.advancedElasticSearchForm.elastic_datas.value,
-          this.advancedElasticSearchForm.elastic_cpus.value,
-          this.advancedElasticSearchForm.elastic_memory.value);
-        this.elasicSearchCalculator.calculate();
-        this.manualCalculator.validate_manual_entries();
-      } else if (node instanceof SensorFormGroup) {
-        this.kitForm.sensor_resources.setFromDeviceFacts(node.deviceFacts);
-        this.molochBroCalculator.calculate_bro_and_moloch_threads();
-      }
+    if (node instanceof ServerFormGroup) {
+      this.kitForm.server_resources.setFromDeviceFacts(node.deviceFacts);
+      this.kitForm.server_resources.setErrorsOrSuccesses(
+        this.advancedElasticSearchForm.elastic_masters.value,
+        this.advancedElasticSearchForm.elastic_datas.value,
+        this.advancedElasticSearchForm.elastic_cpus.value,
+        this.advancedElasticSearchForm.elastic_memory.value);
+      this.elasicSearchCalculator.calculate();
+      this.manualCalculator.validate_manual_entries();
+    } else if (node instanceof SensorFormGroup) {
+      this.kitForm.sensor_resources.setFromDeviceFacts(node.deviceFacts);
+      this.molochBroCalculator.calculate_bro_and_moloch_threads();
     }
   }
 
@@ -365,8 +379,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
     }
     this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value)
     .subscribe(data => {
-      const hasDeviceFacts: boolean = (node.deviceFacts != null);
-      this._gatherFacts(node, data, host_key, !hasDeviceFacts);
+      this._gatherFacts(node, data, host_key);
     });
   }
 
