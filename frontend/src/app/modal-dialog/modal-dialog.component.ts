@@ -1,6 +1,9 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { HtmlModalPopUp, ModalType, HtmlInput, HtmlDatePicker } from '../html-elements';
 import { FormControl } from '@angular/forms';
+import { ExecuteKitForm } from "../kit-form/kit-form";
+import { formatDate } from "@angular/common";
+
 
 @Component({
   selector: 'app-modal-dialog',
@@ -13,7 +16,7 @@ export class ModalDialogComponent implements OnInit {
   modal: HtmlModalPopUp;
   
   @Output()
-  primaryButtonClick: EventEmitter<any> = new EventEmitter();  
+  primaryButtonClick: EventEmitter<any> = new EventEmitter();
 
   constructor() {}
 
@@ -58,5 +61,12 @@ export class ModalDialogComponent implements OnInit {
 
   isDateInput(formControl: FormControl){
     return formControl instanceof HtmlDatePicker;
+  }
+
+  setUTCTime(){
+    if (this.modal.modalForm instanceof ExecuteKitForm){
+      const date_picker = this.modal.modalForm as ExecuteKitForm;
+      date_picker.time.setValue(formatDate(Date.now(), 'HH:mm', 'en-US', '+0000'));
+    }
   }
 }
