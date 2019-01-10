@@ -75,6 +75,20 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         this.driveSelections = new Array();
     }
 
+    clearSelectors(){
+        while (this.pcap_drives.length !== 0) {
+            this.pcap_drives.removeAt(0);
+        }
+
+        while (this.ceph_drives.length !== 0) {
+            this.ceph_drives.removeAt(0);
+        }
+
+        while (this.monitor_interface.length !== 0) {
+            this.monitor_interface.removeAt(0);
+        }
+    }
+
     getRawValue(): any {
         let rawValue = super.getRawValue();
         rawValue['deviceFacts'] = this.deviceFacts;
@@ -134,7 +148,7 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
                 continue;
             }
 
-            this.interfaceSelections.push({value: item["name"], label: item["name"] + " - " + item["ip_address"]})
+            this.interfaceSelections.push({value: item["name"], label: item["name"]})
         }
     }
 
@@ -267,6 +281,12 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
         this.basicNodeResource = new BasicNodeResource();
         this.driveSelections = new Array();
         this.deviceFacts = null;
+    }
+
+    clearSelectors(){
+        while (this.ceph_drives.length !== 0) {
+            this.ceph_drives.removeAt(0);
+        }
     }
 
     disable(opts?: {

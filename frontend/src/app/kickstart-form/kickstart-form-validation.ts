@@ -92,6 +92,15 @@ function _validateNodes(control: AbstractControl, errors: Array<string>): void {
         errors.push("- A minium of one server and one sensor is required for the Kickstart configuration.");
     }    
 }
+
+function _validateContorllerInterface(control: AbstractControl, errors: Array<string>): void {
+    let ctrl_interface = control.get('controller_interface') as FormArray;
+    if (ctrl_interface !== null){        
+        if (ctrl_interface.length === 0) {
+            errors.push("- Controller interfaces failed to validate. You need to select one.");
+        }        
+    } 
+}
   
 export function ValidateKickStartInventoryForm(control: AbstractControl){
   let dhcp_start = control.get('dhcp_start');
@@ -132,6 +141,7 @@ export function ValidateKickStartInventoryForm(control: AbstractControl){
     } 
   }
 
+  _validateContorllerInterface(control, errors);
   _validateDhcpRange(control, errors);
   _validateNodes(control, errors);  
   CheckForInvalidControls(control, errors);

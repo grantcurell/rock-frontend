@@ -16,6 +16,29 @@
                 (click)="openArchiveConfirmation()"><i class="icon_floppy_alt"></i> Archive and Clear Form</button>
       </div>
       <div class="card-body">
+        <div class="card">
+          <div class="card-body" style="border: 1px solid green;border-radius: 1rem;">
+            <h5>Page Instructions</h5>
+            <p class="card-text">
+              Before fill out the form, make sure you have added all of your nodes to the Kickstart page.  
+              The validation box at the botton of the page will guide you through filling out the form correctly.
+            </p>
+            <p class="card-text">
+              The "Open Console" button opens the logs of the last Kit configuration run.
+            </p>
+            <p class="card-text">
+              If the current Kit form loads and is disabled, you have an active configuration.
+              If you want to start a new configuration, click "Archive and Clear Form" button at the top of the page.  This will save the current configuration if you want to restore it later.
+              If you want to change the existing configuration, click "Enable Form" button at the top of the page and make your edits before clicking "Execute Kit".
+            </p>
+            <p class="card-text">
+              If you have an active configuration (IE: Form is disabled), and want to add a node to the Kit.  
+              First add the node to Kickstart page, then come back to this page to finish the rest of the configuration.
+              Click "Add Node" at the botton of the page to execute. NOTE: The "Add Node" button will not be visible until the procedures are executed correctly.
+            </p>
+          </div>
+        </div>
+        <br>
         <h5 class="card-title">Global Settings</h5>
         <p class="card-text">
           Dependent on your resources, these are generally sane defaults if you don't know what you are doing and just want to get started.
@@ -149,7 +172,7 @@
         Validation
       </div>
       <div class="card-body" id="validation">
-          <p *ngIf="kitForm.valid" class='text-success'>Looks good! Press 'Generate Inventory' whenever you're ready!</p>
+          <p *ngIf="kitForm.valid" class='text-success'>Looks good! Press 'Execute Kit' whenever you're ready!</p>
           <div *ngIf="kitForm.hasError('errors')">
             <p *ngFor="let error of kitForm.getError('errors');" class='text-danger'>{{ error }}</p>
           </div>
