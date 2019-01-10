@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { HtmlDatePicker } from '../html-elements';
+import { NgbDate } from "@ng-bootstrap/ng-bootstrap";
+import { DatePickerService} from "./date-picker.service";
 
 declare var $: any;
 
@@ -20,20 +22,27 @@ export class DatePickerComponent implements OnInit {
   @Input()
   public uid: string;
 
-  constructor() { }
+  constructor(private _DatePickerService: DatePickerService) {
+  }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.setUTCDate();
+  }
 
   ngAfterViewInit(){
     this.update_tooltip();
   }
 
   private update_tooltip(){
-    let selector = $('[name="tip_'+this.controlName+'"]')
+    const selector = $('[name="tip_'+this.controlName+'"]')
     selector.tooltip();
   }
 
   get input_control(): HtmlDatePicker {
     return this.parentForm.get(this.controlName) as HtmlDatePicker;
+  }
+
+  setUTCDate() {
+    this._DatePickerService.setDate();
   }
 }

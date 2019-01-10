@@ -1,5 +1,5 @@
 <app-modal-dialog [modal]="kitModal"></app-modal-dialog>
-<app-modal-dialog [modal]="executeKitModal" (primaryButtonClick)="executeKit()"></app-modal-dialog>
+<app-modal-dialog #dateModal [modal]="executeKitModal" (primaryButtonClick)="executeKit()"></app-modal-dialog>
 <app-modal-dialog [modal]="archiveKitModal" (primaryButtonClick)="archiveForm()"></app-modal-dialog>
 <app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
 

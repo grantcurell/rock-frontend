@@ -7,7 +7,8 @@
   </div>
   <input class="form-control" [placeholder]="input_control.placeholder" 
          name="{{ controlName }}{{ uid }}" 
-         formControlName="{{ controlName }}" ngbDatepicker #d="ngbDatepicker">
+         formControlName="{{ controlName }}" ngbDatepicker #d="ngbDatepicker"
+         [(ngModel)]="_DatePickerService.date">
   <div class="input-group-append">
     <button class="btn btn-outline-secondary icon_calendar" (click)="d.toggle()" type="button"></button>
   </div>

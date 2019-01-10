@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { KitInventoryForm, ServersFormArray, ServerFormGroup,
          SensorFormGroup, SensorsFormArray,
          AdvancedElasticSearchSettingsFormGroup,
@@ -14,6 +14,7 @@ import { ManualCalculator } from './manual-calculations';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { HomeNetFormGroup, ExternalNetFormGroup } from '../total-sensor-resources-card/total-sensor-resources-form';
+import { ModalDialogComponent } from '../modal-dialog/modal-dialog.component';
 
 
 @Component({
@@ -45,6 +46,10 @@ export class KitFormComponent implements OnInit, AfterViewInit{
 
   //The addNodeCache
   addNodeCache: Array<Object>;
+
+
+  @ViewChild('dateModal')
+  dateModal: ModalDialogComponent;
 
   constructor(private kickStartSrv: KickstartService, 
               private title: Title, 
@@ -221,7 +226,8 @@ export class KitFormComponent implements OnInit, AfterViewInit{
       ModalType.form,
       this.executeKitForm
     );
-    this.executeKitModal.openModal();    
+    this.dateModal.setUTCTime();
+    this.executeKitModal.openModal();
   }
 
   executeAddNode(){    
@@ -423,7 +429,6 @@ export class KitFormComponent implements OnInit, AfterViewInit{
 
   private _cephDriveSelected(drivesSelected: Array<string>, node: SensorFormGroup | ServerFormGroup): void {
     this.kitForm.system_resources.calculateTotalCephDrives(drivesSelected.length, node.deviceFacts);
-
     if (node instanceof SensorFormGroup){
       this.kitForm.sensor_resources.calculateClusterStorageAvailable(drivesSelected, node.deviceFacts);
     } else if (node instanceof ServerFormGroup){
