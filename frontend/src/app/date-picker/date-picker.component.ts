@@ -22,7 +22,7 @@ export class DatePickerComponent implements OnInit {
   @Input()
   public uid: string;
 
-  constructor(private _DatePickerService: DatePickerService) {
+  constructor(public _DatePickerService: DatePickerService) {
   }
 
   ngOnInit() {
