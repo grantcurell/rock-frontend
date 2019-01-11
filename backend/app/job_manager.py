@@ -175,6 +175,15 @@ class ProcJob(object):
                 LOCK_IDS[ip] = True
             logger.debug("IP_ADDRESS_LOCK size after add: %d" % len(LOCK_IDS))
 
+    def kill_myself(self, index: int) -> None:
+        """
+        Kills itself and it even cleans up after its dead self.
+
+        :return:
+        """
+        if self.process:
+            self.process.kill()
+
     def run_funcs_before_proc_completion(self) -> None:
         """
         Runs functions before the process completes.
@@ -213,13 +222,13 @@ class ProcJob(object):
             for line in lines:
                 self.funcToOperateOnOuput(self.job_name, self.job_id, line)
 
-    def run_job_clean_up(self, index):
+    def run_job_clean_up(self, index: int):
         """
         Cleans up the job queue and locks that the job had.
 
         :param index:
         :return:
-        """ 
+        """
         while True:
             if _async_read2(self):
                 break
@@ -393,6 +402,17 @@ def spawn_job(job_name: str, command: str,
                   funcs_after, lock_ids, silent, working_directory, is_shell)
     JOB_QUEUE.append(job)
     logger.debug("QUEUE size after add: %d" % len(JOB_QUEUE))
+
+
+def kill_job_in_queue(job_name: str) -> None:
+    """
+    Finds a particular job in the queue and removes it.
+
+    :return: None or throws exception on failure.
+    """
+    for index, job in enumerate(JOB_QUEUE):
+        if job_name == job.job_name:
+            job.kill_myself(index)
 
 
 def get_running_jobs() -> List:

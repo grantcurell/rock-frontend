@@ -87,7 +87,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
       const someFormObject = formGroup.get(key);
 
       if (someFormObject instanceof HtmlDropDown){
-        setTimeout(()=> {
+        setTimeout(()=> { 
           someFormObject.setValue(data[key]);
         });
       } else if (someFormObject instanceof FormControl){

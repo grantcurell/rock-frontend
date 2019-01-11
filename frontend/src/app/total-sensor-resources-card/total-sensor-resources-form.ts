@@ -295,8 +295,13 @@ export class SensorResourcesForm extends FormGroup {
      * @param deviceFacts - The Ansible JSON object returned from the REST API.
      */
     public subtractFromDeviceFacts(deviceFacts: Object){
-        this.cpuCoresAvailable -= deviceFacts["cpus_available"];
-        this.memoryAvailable -= deviceFacts["memory_available"];
+        if(this.cpuCoresAvailable > 0){
+            this.cpuCoresAvailable -= deviceFacts["cpus_available"];
+        }
+        
+        if (this.memoryAvailable > 0){
+            this.memoryAvailable -= deviceFacts["memory_available"];
+        }
         this.setCPUAllocations();
     }
 
@@ -308,7 +313,9 @@ export class SensorResourcesForm extends FormGroup {
      */
     public removeClusterStorage(deviceFacts: Object){
         if (this.sensorDriveStorageCache[deviceFacts["hostname"]] != undefined){
-            this.clusterStorageAvailable -= this.sensorDriveStorageCache[deviceFacts["hostname"]];
+            if (this.clusterStorageAvailable > 0){
+                this.clusterStorageAvailable -= this.sensorDriveStorageCache[deviceFacts["hostname"]];
+            }
         }
         this.sensorDriveStorageCache[deviceFacts["hostname"]] = 0;
     }

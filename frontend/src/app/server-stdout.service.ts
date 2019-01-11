@@ -47,4 +47,10 @@ export class ServerStdoutService {
     const url = '/api/remove_console_output';
     return this.http.post(url, id_obj);
   }
+
+  killJob(jobName: string){
+    const url = '/api/kill_job';
+    let payload = { jobName: jobName };
+    return this.http.post(url, payload);
+  }
 }

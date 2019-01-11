@@ -6,6 +6,8 @@ import json
 from app import app, logger
 from app.node_facts import get_system_info
 from flask import request, jsonify, Response
+from app.common import ERROR_RESPONSE, OK_RESPONSE
+from app.job_manager import kill_job_in_queue
 
 
 MIN_MBPS = 1000
@@ -44,3 +46,19 @@ def gather_device_facts() -> Response:
     except Exception as e:
         logger.exception(e)
         return jsonify(error_message=str(e))
+
+
+@app.route('/api/kill_job', methods=['POST'])
+def kill_job() -> Response:
+    """
+    Kills the job before it finishes processing.
+
+    :return: OK response on success or server 500 on failure.
+    """
+    payload = request.get_json()
+    try:
+        kill_job_in_queue(payload['jobName'])
+        return OK_RESPONSE
+    except Exception as e:
+        logger.exception(e)
+    return ERROR_RESPONSE
