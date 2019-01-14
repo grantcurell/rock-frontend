@@ -95,6 +95,7 @@ EOF
 
 function _setup_pythonenv {
 	pushd $FRONTEND_DIR/ > /dev/null
+  systemctl is-active tfplenum-frontend && systemctl stop tfplenum-frontend # If it's running, it needs to be stopped
 	run_cmd rm -rf /opt/tfplenum-frontend/tfp-env
 	run_cmd python3.6 -m venv tfp-env
 	run_cmd /opt/tfplenum-frontend/tfp-env/bin/pip install --upgrade pip
@@ -145,6 +146,7 @@ EOF
 	run_cmd systemctl enable mongod
 }
 
+rm -rf ~/.pip
 mkdir -p /var/log/tfplenum/
 use_laprepos
 _install_deps
