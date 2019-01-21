@@ -800,7 +800,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         null,
         'This must be at least 4096.',
         true,
-        '262143',
+        '2560000',
         "Buffer size when writing pcap files. Should be a multiple of the raid 5/xfs \
         stripe size and multiple of 4096 if using direct/thread-direct pcapWriteMethod",
     )
@@ -813,7 +813,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         CONSTRAINT_MIN_ONE,
         MIN_ONE_INVALID_FEEDBACK,
         true,
-        '4000000',
+        '400000',
         "Size of indexing request to send to Elasticsearch. Increase if monitoring a \
         high bandwidth network."
     )
