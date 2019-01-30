@@ -79,7 +79,7 @@
               </td>
               <td *ngIf="pod.status.container_statuses">{{ pod.status.container_statuses[0].restart_count }}</td>
               <td *ngIf="!pod.status.container_statuses">N/A</td>
-              <td><button title="Click to run describe pod." data-toggle="tooltip" data-placement="left" class="btn btn-primary" (click)="describePod(pod.metadata.name)"><i class="icon_info_alt"></i></button></td>
+              <td><button title="Click to run describe pod." data-toggle="tooltip" data-placement="left" class="btn btn-primary" (click)="describePod(pod.metadata)"><i class="icon_info_alt"></i></button></td>
             </ng-container>
           </tr>
         </tbody>

@@ -14,15 +14,15 @@ from flask import request, Response, jsonify
 from shared.connection_mngs import KubernetesWrapper, objectify, KitFormNotFound
 
 
-@app.route('/api/describe_pod/<pod_name>', methods=['GET'])
-def describe_pod(pod_name: str) -> Response:
+@app.route('/api/describe_pod/<pod_name>/<namespace>', methods=['GET'])
+def describe_pod(pod_name: str, namespace: str) -> Response:
     """
     Runs a command and pulls the pods describe command output.
 
     :param pod_name: The name of the pod of cource.  
                      You can get it with 'kubectl get pods' on the main server node.
     """
-    command = '/opt/tfplenum-frontend/tfp-env/bin/python describe_kubernetes_pod.py %s' % pod_name
+    command = '/opt/tfplenum-frontend/tfp-env/bin/python describe_kubernetes_pod.py %s %s' % (pod_name, namespace)
     stdout, stderr = shell(command, working_dir="/opt/tfplenum-frontend/backend/fabfiles")
 
     if stdout:

@@ -69,9 +69,9 @@ export class SystemHealthComponent implements OnInit {
     this.router.navigate(['/stdout/SystemsCheck'])
   }
 
-  describePod(podName: string) {
-    this.healthSrv.describePod(podName).subscribe(data => {      
-      this.podDescribeModal.updateModal(podName, data['stdout'], 'Close', undefined, ModalType.code);
+  describePod(podMetadata: any) {
+    this.healthSrv.describePod(podMetadata.name, podMetadata.namespace).subscribe(data => {      
+      this.podDescribeModal.updateModal(podMetadata.name, data['stdout'], 'Close', undefined, ModalType.code);
       this.podDescribeModal.openModal();
     });
   }
