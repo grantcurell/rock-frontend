@@ -88,7 +88,7 @@ export class NodeFormGroup extends FormGroup {
     undefined,
     false,
     true,
-    'Select IP'
+    'Select unused IP'
   )
 
   mac_address = new HtmlInput(
@@ -137,35 +137,6 @@ export class NodeFormGroup extends FormGroup {
   )
 }
 
-export class AdvancedSettingsFormGroup extends FormGroup {
-
-  constructor(public hidden: boolean) {
-    super({});
-    super.addControl('timezone', this.timezone);
-  }
-
-  /**
-   * Overridden method for form reset functionality.
-   * 
-   * @param value 
-   * @param options 
-   */
-  reset(value?: any, options?: {
-    onlySelf?: boolean;
-    emitEvent?: boolean;
-  }): void {
-    super.reset({'timezone': this.timezone.default_value });    
-  }
-
-  timezone = new HtmlDropDown(
-    'timezone',
-    'Timezone',
-    ['Chicago', 'Los_Angeles', 'New_York', 'UTC'],
-    "This option is sets each node's timezone during the kickstart provisioning process (Automated Operating System installation).",
-    'UTC'
-  )
-}
-
 export class NodesFormArray extends FormArray {
   constructor(controls: AbstractControl[],
     public hidden: boolean) {
@@ -189,7 +160,6 @@ export class KickstartInventoryForm extends FormGroup {
     super.addControl('controller_interface', this.controller_interface);    
     this.nodes = new NodesFormArray([], true);
     super.addControl('nodes', this.nodes);
-    super.addControl('advanced_settings', this.advanced_settings);
     this.interfaceSelections = new Array();
   }
 
@@ -218,7 +188,6 @@ export class KickstartInventoryForm extends FormGroup {
     emitEvent?: boolean;
   }): void {    
     super.reset({'netmask': this.netmask.default_value });
-    this.advanced_settings.reset();
     this.clearNodes();
   }
 
@@ -237,12 +206,9 @@ export class KickstartInventoryForm extends FormGroup {
     this.root_password.disable();
     this.re_password.disable();
     this.controller_interface.disable();
-    this.nodes.disable();
-    this.advanced_settings.disable();
+    this.nodes.disable();    
   }
-
-  advanced_settings = new AdvancedSettingsFormGroup(true);
-
+  
   dhcp_start = new HtmlInput(
     'dhcp_start',
     'DHCP Starting Ip Address',

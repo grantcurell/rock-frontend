@@ -11,25 +11,26 @@
            [required]="input_control.required">
     <span style="margin-left: 10px;">{{ input_control.value }}</span>
   </div>
-  <input *ngIf="!input_control.control_disabled"
-         name="{{ controlName }}{{ uid }}"
-         formControlName="{{ controlName }}"
-         class="form-control"
-         [required]="input_control.required"
-         [type]="input_control.input_type"
-         [placeholder]="input_control.placeholder"
-         (keyup)="callParentKeyUp($event)">
-  <div *ngIf="input_control.has_button" class="input-group-append">
-    <button [hidden]="input_control.control_disabled" class="{{ input_control.button_css }}" type="button" (click)="callParent()" name="btn_{{ controlName }}{{ uid }}">{{ input_control.button_text }}</button>
-  </div>
-  <div *ngIf="input_control.invalid && (input_control.dirty || input_control.touched)" class="invalid-feedback2">
+  <ng-container *ngIf="!input_control.control_disabled">
+    <input name="{{ controlName }}{{ uid }}"
+      formControlName="{{ controlName }}"
+      class="form-control"
+      [required]="input_control.required"
+      [type]="input_control.input_type"
+      [placeholder]="input_control.placeholder"
+      (keyup)="callParentKeyUp($event)">
+    <div *ngIf="input_control.has_button" class="input-group-append">
+      <button [hidden]="input_control.control_disabled" class="{{ input_control.button_css }}" type="button" (click)="callParent()" name="btn_{{ controlName }}{{ uid }}">{{ input_control.button_text }}</button>
+    </div>
+    <div *ngIf="input_control.invalid && (input_control.dirty || input_control.touched)" class="invalid-feedback2">
       <div *ngIf="input_control.errors.required">Required field</div>
       <div *ngIf="input_control.errors.pattern">{{ input_control.invalid_feedback }}</div>
       <div *ngIf="input_control.hasError('custom_error')">
         <div>{{ input_control.getError('custom_error') }}</div>
       </div>
-  </div>
-  <div *ngIf="input_control.valid" class="valid-feedback2">
+    </div>
+    <div *ngIf="input_control.valid" class="valid-feedback2">
     {{ input_control.valid_feedback }}
-  </div>
+    </div>
+  </ng-container>
 </div>

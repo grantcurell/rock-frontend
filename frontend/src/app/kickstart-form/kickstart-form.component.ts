@@ -20,8 +20,7 @@ export class KickstartFormComponent implements OnInit {
   kickStartForm: KickstartInventoryForm;
   hasKickstartForm: boolean;
   restoreModal: HtmlModalSelectDialog;
-  ipSelectorModal: HtmlModalSelectDialog;
-  advancedSettingsFormGroup: AdvancedSettingsFormGroup;
+  ipSelectorModal: HtmlModalSelectDialog;  
   deviceFacts: Object;
 
   @ViewChild('cardSelector')
@@ -32,8 +31,7 @@ export class KickstartFormComponent implements OnInit {
               private title: Title,
               private router: Router)
   {
-    this.kickStartForm = new KickstartInventoryForm();
-    this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;
+    this.kickStartForm = new KickstartInventoryForm();    
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');
     this.messageModal = new HtmlModalPopUp('message_modal');
     this.restoreModal = new HtmlModalSelectDialog('restore_modal');
@@ -134,7 +132,15 @@ export class KickstartFormComponent implements OnInit {
   onSubmit(): void {
     this.kickStartSrv.generateKickstartInventory(this.kickStartForm.getRawValue())
       .subscribe(data => {
-        this.openConsole();
+        if (data['error_message']){
+          this.messageModal.updateModal('Error',
+            data['error_message'],
+            undefined,
+            'Close');
+          this.messageModal.openModal();
+        } else{
+          this.openConsole();
+        }        
     });
   }
 
@@ -161,11 +167,7 @@ export class KickstartFormComponent implements OnInit {
 
   toggleNode(node: NodeFormGroup) {
     node.hidden = !node.hidden;
-  }
-
-  toggleAdvancedSettings(){
-    this.advancedSettingsFormGroup.hidden = !this.advancedSettingsFormGroup.hidden;
-  }
+  }  
 
   get nodes() {
     return this.kickStartForm.get('nodes') as FormArray;
@@ -268,7 +270,7 @@ export class KickstartFormComponent implements OnInit {
     }
 
     this.kickStartSrv.getUnusedIPAddresses(mng_ip[0], netmask).subscribe(data => {
-      this.ipSelectorModal.updateModal('Select IP',
+      this.ipSelectorModal.updateModal('Select unused IP',
         'Please select an unused IP address.',
         "Select",
         'Cancel',

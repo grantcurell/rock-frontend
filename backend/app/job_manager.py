@@ -297,9 +297,9 @@ def _log_queues() -> None:
     :return:
     """
     jobqueue_len = len(JOB_QUEUE)
-    logger.info("JOB_QUEUE size: %d" % jobqueue_len)
-    logger.info("IP_ADDRESS_LOCK size: %d" % len(LOCK_IDS))
     if jobqueue_len > 0:
+        logger.info("JOB_QUEUE size: %d" % jobqueue_len)
+        logger.info("IP_ADDRESS_LOCK size: %d" % len(LOCK_IDS))
         for job in JOB_QUEUE:
             logger.debug(str(job))
 

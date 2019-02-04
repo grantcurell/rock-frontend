@@ -15,6 +15,23 @@ from pymongo.results import InsertOneResult
 from bson import ObjectId
 
 
+def _is_valid_ip(ip_address: str) -> bool:
+    """
+    Ensures that the IP passed in is valid.
+
+    :param ip_address: Some ip address (IE: 192.168.1.1).
+
+    :return:
+    """
+    command = "nmap -v -sn -n %s/32 -oG - | awk '/Status: Down/{print $2}'" % ip_address
+    stdout_str, stderr_str = shell(command, use_shell=True)
+    if stdout_str != b'':
+        available_ip_addresses = stdout_str.decode("utf-8").split('\n')
+        if len(available_ip_addresses) > 0:            
+            return True        
+    return False
+
+
 @app.route('/api/generate_kickstart_inventory', methods=['POST'])
 def generate_kickstart_inventory() -> Response:
     """
@@ -24,7 +41,21 @@ def generate_kickstart_inventory() -> Response:
     :return:
     """
     payload = request.get_json()
-    logger.debug(json.dumps(payload, indent=4, sort_keys=True))
+    invalid_ips = []
+    for node in payload["nodes"]:
+        if not _is_valid_ip(node["ip_address"]):
+            invalid_ips.append(node["ip_address"])
+
+    invalid_ips_len = len(invalid_ips)
+    if invalid_ips_len > 0:
+        if invalid_ips_len == 1:
+            return jsonify(error_message="The IP {} is already being used on this network. Please use a different IP address."
+                                         .format(', '.join(invalid_ips)))
+        else:
+            return jsonify(error_message="The IPs {} are already being used on this network. Please use different IP addresses."
+                                         .format(', '.join(invalid_ips)))
+
+    # logger.debug(json.dumps(payload, indent=4, sort_keys=True))
     conn_mng.mongo_kickstart.find_one_and_replace({"_id": KICKSTART_ID},
                                                   {"_id": KICKSTART_ID, "payload": payload},
                                                   upsert=True)  # type: InsertOneResult
