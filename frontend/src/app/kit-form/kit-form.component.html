@@ -48,9 +48,6 @@
         <hr>
         <br>
 
-        <h5>Select Storage Type</h5>
-        <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" ></app-dropdown>
-        <!-- DO NOT DELETE <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown> -->
         <h5>Credentials</h5>
         <app-text-input [parentForm]="kitForm" controlName="root_password"></app-text-input>
         <br>
@@ -202,9 +199,14 @@
               use cases.
           </p>
           <p class="card-text text-danger">
+            Changing the Sensor Storage Type could affect performance of moloch full PCAP capture.  Only change to Ceph storage 
+            if you are not going to need more than 2 Gbps for your sensors.
+          </p>
+          <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown>
+          <p class="card-text text-danger">
             Unless you really know what you are doing here, you should not change the DNS. Seriously, there's only an incredibly niche
             case for changing this and chances are you aren't in it.
-          </p>
+          </p>          
           <app-text-input [parentForm]="kitForm" controlName="dns_ip"></app-text-input>
           <app-checkbox [parentForm]="kitForm" controlName="disable_autocalculate" (is_checked)="toggleAutocalculate($event)"></app-checkbox>
         </div>

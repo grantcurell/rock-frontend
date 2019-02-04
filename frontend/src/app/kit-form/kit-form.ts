@@ -988,8 +988,7 @@ export class KitInventoryForm extends FormGroup {
         onlySelf?: boolean;
         emitEvent?: boolean;
     }): void {
-        super.enable(opts);
-        this.sensor_storage_type.disable();
+        super.enable(opts);        
     }
 
     /**
@@ -1075,8 +1074,7 @@ export class KitInventoryForm extends FormGroup {
         decision, this only applies to PCAP. Everything else will use clustered storage \
         with Ceph. Though, that traffic is only a fraction of what PCAP consumes in most \
         cases.",
-        'Use hard drive for PCAP storage',
-        true
+        'Use hard drive for PCAP storage'
     )
 
     root_password = new HtmlInput(
