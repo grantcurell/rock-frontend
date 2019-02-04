@@ -7,13 +7,15 @@
       <thead>
         <tr>          
           <th scope="col">IP</th>
-          <th scope="col">URL</th>          
+          <th scope="col">URL</th>
+          <th scope="col">Default user/password</th>
         </tr>
       </thead>
       <tbody #selections >
         <tr *ngFor="let link of links">          
           <td><a href="{{ link.ip }}" target="_blank">{{ link.ip }}</a></td>
           <td><a href="{{ link.dns }}" target="_blank">{{ link.dns }}</a></td>
+          <td>{{ link.logins }}</td>
         </tr>             
       </tbody>
     </table>
