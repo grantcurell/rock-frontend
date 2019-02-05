@@ -10,47 +10,13 @@ fi
 pushd $SCRIPT_DIR > /dev/null
 source ./common.in
 
-function use_laprepos() {
-    if [ -z "$TFPLENUM_LABREPO" ]; then
-        echo "Do you want to use labrepo for downloads? (Requires Dev Network)"
-        select cr in "YES" "NO"; do
-            case $cr in
-                YES ) export TFPLENUM_LABREPO=true; break;;
-                NO ) export TFPLENUM_LABREPO=false; break;;
-            esac
-        done
-    fi
-
-    if [ "$TFPLENUM_LABREPO" == true ]; then
-        local os_id=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
-        rm -rf /etc/yum.repos.d/*offline* > /dev/null
-        rm -rf /etc/yum.repos.d/labrepo* > /dev/null
-        if [ "$os_id" == '"centos"' ]; then
-            run_cmd curl -m 10 -s -o /etc/yum.repos.d/labrepo-centos.repo http://yum.labrepo.lan/labrepo-centos.repo
-        else
-            run_cmd curl -m 10 -s -o /etc/yum.repos.d/labrepo-rhel.repo http://yum.labrepo.lan/labrepo-rhel.repo
-        fi
-        yum clean all > /dev/null
-        rm -rf /var/cache/yum/ > /dev/null
-    fi
-}
-
 function _install_deps(){
-	if [ "$TFPLENUM_LABREPO" == false ]; then
-		yum -y install epel-release
-	fi
-
+	yum -y install epel-release
 	yum -y install wget nmap
 }
 
-function _install_nodejs(){
-
-	if [ "$TFPLENUM_LABREPO" == true ]; then
-		run_cmd wget http://misc.labrepo.lan/node-v8.11.4-linux-x64.tar.xz
-	else
-		run_cmd wget https://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.xz
-	fi
-
+function _install_nodejs(){	
+	run_cmd wget https://nodejs.org/dist/v8.11.4/node-v8.11.4-linux-x64.tar.xz
     run_cmd tar xf node-v8.11.4-linux-x64.tar.xz
     run_cmd cd node-v8.11.4-linux-x64/
     run_cmd cp -R * /usr/local/
@@ -58,10 +24,7 @@ function _install_nodejs(){
 	run_cmd rm -rf node-v8.11.4-linux-x64/
 	run_cmd rm -f node-v8.11.4-linux-x64.tar.xz
     run_cmd node -v
-    run_cmd npm -v
-    if [ "$TFPLENUM_LABREPO" == true ]; then
-      npm config set registry http://nexus.labrepo.lan/repository/npm/
-    fi
+    run_cmd npm -v    
 }
 
 function _install_angular(){
@@ -83,14 +46,6 @@ function _install_python36(){
 	run_cmd yum install -y gcc
 	run_cmd yum install -y python36 python36-devel
 	mkdir -p /root/.pip/
-
-  if [ "$TFPLENUM_LABREPO" == true ]; then
-cat <<EOF > /root/.pip/pip.conf
-[global]
-index-url = http://nexus.labrepo.lan/repository/pypi/simple
-trusted-host = nexus.labrepo.lan
-EOF
-  fi
 }
 
 function _setup_pythonenv {
@@ -131,8 +86,7 @@ function _install_and_configure_gunicorn {
 	run_cmd systemctl enable tfplenum-frontend.service
 }
 
-function _install_and_start_mongo40 {
-	if [ "$TFPLENUM_LABREPO" == false ]; then
+function _install_and_start_mongo40 {		
 cat <<EOF > /etc/yum.repos.d/mongodb-org-4.0.repo
 [mongodb-org-4.0]
 name=MongoDB Repository
@@ -141,15 +95,12 @@ gpgcheck=1
 enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-4.0.asc
 EOF
-	fi
-
 	run_cmd yum install -y mongodb-org
 	run_cmd systemctl enable mongod
 }
 
 rm -rf ~/.pip
 mkdir -p /var/log/tfplenum/
-use_laprepos
 _install_deps
 _install_nodejs
 _install_angular
