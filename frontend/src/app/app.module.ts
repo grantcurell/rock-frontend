@@ -24,7 +24,6 @@ import { ModalSelectDialogComponent } from './modal-select-dialog/modal-select-d
 import { PortalComponent } from './portal/portal.component';
 import { SystemHealthComponent } from './system-health/system-health.component';
 import { SafePipe } from './globals';
-import { TerminalComponent } from './terminal/terminal.component';
 import { ConfigmapsComponent } from './configmaps/configmaps.component';
 import { ConfigmapEditorComponent } from './configmap-editor/configmap-editor.component'; 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -53,8 +52,7 @@ import { ModalIpSelectDialogComponent } from './modal-ip-select-dialog/modal-ip-
     ModalSelectDialogComponent,
     PortalComponent,
     SystemHealthComponent,
-    SafePipe,
-    TerminalComponent,
+    SafePipe,    
     ConfigmapsComponent,
     ConfigmapEditorComponent,
     DatePickerComponent,

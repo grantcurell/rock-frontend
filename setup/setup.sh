@@ -40,7 +40,7 @@ function _install_deps(){
 		yum -y install epel-release
 	fi
 
-	yum -y install wget cockpit nmap
+	yum -y install wget nmap
 }
 
 function _install_nodejs(){
@@ -161,7 +161,5 @@ _install_and_configure_gunicorn
 _install_and_start_mongo40
 _restart_services
 _open_firewall_ports
-run_cmd systemctl enable cockpit.service
-run_cmd systemctl start cockpit.service
 
 popd > /dev/null
