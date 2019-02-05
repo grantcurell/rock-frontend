@@ -132,7 +132,7 @@ export class KickstartFormComponent implements OnInit {
   onSubmit(): void {
     this.kickStartSrv.generateKickstartInventory(this.kickStartForm.getRawValue())
       .subscribe(data => {
-        if (data['error_message']){
+        if (data !== null && data['error_message']){
           this.messageModal.updateModal('Error',
             data['error_message'],
             undefined,
