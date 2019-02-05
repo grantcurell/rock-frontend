@@ -226,7 +226,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
       ModalType.form,
       this.executeKitForm
     );
-    this.dateModal.setUTCTime();
+    this.dateModal.setTime();
     this.executeKitModal.openModal();
   }
 

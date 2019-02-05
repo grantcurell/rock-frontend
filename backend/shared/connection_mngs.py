@@ -1,7 +1,7 @@
 import os
 
 from datetime import datetime
-from fabric import Connection
+from fabric import Connection, Config
 from kubernetes import client, config
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -236,4 +236,47 @@ class KubernetesWrapper():
         return self._kube_apiv1
 
     def __exit__(self, *exc) -> None:
+        self.close()
+
+
+class FabricConnectionManager:
+
+    def __init__(self, username: str, password: str, ipaddress: str):
+        """
+        Initializes the fabric connection manager.
+
+        :param username: The username of the box we wish to connect too
+        :param password: The password of the user account
+        :param ipaddress: The Ip we are trying to gain access too.
+        """
+        self._connection = None  # type: Connection
+        self._username = username
+        self._password = password
+        self._ipaddress = ipaddress
+        self._establish_fabric_connection()
+
+    def _establish_fabric_connection(self) -> None:
+        if not self._connection:
+            config = Config(overrides={'sudo': {'password': self._password}})
+            self._connection = Connection(self._ipaddress,
+                                          config=config,
+                                          user=self._username,
+                                          connect_timeout=CONNECTION_TIMEOUT,
+                                          connect_kwargs={'password': self._password,
+                                                          'allow_agent': False,
+                                                          'look_for_keys': False})            
+
+    @property
+    def connection(self):
+        return self._connection
+
+    def close(self):
+        if self._connection:
+            self._connection.close()
+
+    def __enter__(self):
+        self._establish_fabric_connection()
+        return self._connection
+
+    def __exit__(self, *exc):
         self.close()

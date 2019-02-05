@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HtmlModalPopUp, HtmlDropDown, HtmlCardSelector, HtmlModalSelectDialog } from '../html-elements';
-import { KickstartInventoryForm, NodeFormGroup, AdvancedSettingsFormGroup } from './kickstart-form';
+import { KickstartInventoryForm, NodeFormGroup } from './kickstart-form';
 import { KickstartService } from '../kickstart.service';
 import { FormArray, FormGroup, FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';

@@ -1,7 +1,6 @@
 import {
     FormGroup, FormArray,
     AbstractControl,
-    FormControl,
     ValidationErrors
 } from '@angular/forms';
 
@@ -14,7 +13,8 @@ import {  PERCENT_PLACEHOLDER, PERCENT_MIN_MAX, PERCENT_INVALID_FEEDBACK,
           CONSTRAINT_MIN_ZERO, MIN_ZERO_INVALID_FEEDBACK,
           CONSTRAINT_MIN_TWO, MIN_TWO_INVALID_FEEDBACK,
           CONSTRAINT_MIN_THREE, MIN_THREE_INVALID_FEEDBACK,
-          INVALID_FEEDBACK_INTERFACE, INVALID_FEEDBACK_IP
+          INVALID_FEEDBACK_INTERFACE, INVALID_FEEDBACK_IP,
+          TIMEZONES
        } from '../frontend-constants';
 
 import { BasicNodeResource, BasicNodeResourceInterface } from '../basic-node-resource-card/basic-node-resource-card.component';
@@ -1292,6 +1292,7 @@ export class ExecuteKitForm extends FormGroup {
         super({});
         super.addControl('date', this.date);
         super.addControl('time', this.time);
+        super.addControl('timezone', this.timezone);
     }
   
     date = new HtmlDatePicker(
@@ -1303,7 +1304,7 @@ export class ExecuteKitForm extends FormGroup {
 
     time = new HtmlInput(
         'time',
-        'Current UTC Time',
+        'Current Time',
         'HH:MM in military time',
         'text',
         '^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$',
@@ -1311,5 +1312,13 @@ export class ExecuteKitForm extends FormGroup {
         true,
         '',
         'This is the time used for your cluster.  Make sure it is correct before executing your kit configuration.'
+    )
+
+    timezone = new HtmlDropDown(
+        'timezone',
+        'Timezone',
+        TIMEZONES,
+        "This option is sets each node's timezone during the kickstart provisioning process (Automated Operating System installation).",
+        'UTC'
     )
 }

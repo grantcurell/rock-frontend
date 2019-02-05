@@ -14,7 +14,7 @@ from datetime import datetime
 from flask import request, Response, jsonify
 from pymongo.collection import ReturnDocument
 from shared.constants import KIT_ID
-from shared.connection_mngs import KUBEDIR, FabricConnectionWrapper
+from shared.connection_mngs import KUBEDIR, FabricConnectionManager
 from typing import Dict, Tuple
 
 
@@ -90,24 +90,44 @@ def zero_pad(num: int) -> str:
     return num
 
 
-def _change_time_on_kubernetes_master(timeForm: Dict):
+def _execute_cmds(timeForm: Dict, password: str, ip_address: str) -> None:
     """
-    Sets the time on the kubernetes box.  This function throws an exception on failure.
+    Executes commands
 
-    :return: None
+    :param timeForm: The time form from the main payload passed in from the Kit configuration page.
+    :param password: The ssh password of the box.
+    :param ip_address: The IP Address of the node.
+
+    :return:
     """
     hours, minutes = timeForm['time'].split(':')
-    with FabricConnectionWrapper(conn_mng) as cmd:
-        ret_val = cmd.run('timedatectl set-timezone UTC')
+    with FabricConnectionManager('root', password, ip_address) as cmd:
+        ret_val = cmd.run('timedatectl set-timezone {}'.format(timeForm['timezone']))
         time_cmd = "timedatectl set-time '{year}-{month}-{day} {hours}:{minutes}:00'".format(year=timeForm['date']['year'],
-                                                                                            month=zero_pad(timeForm['date']['month']),
-                                                                                            day=zero_pad(timeForm['date']['day']),
-                                                                                            hours=hours,
-                                                                                            minutes=minutes
-                                                                                           )
+                                                                                             month=zero_pad(timeForm['date']['month']),
+                                                                                             day=zero_pad(timeForm['date']['day']),
+                                                                                             hours=hours,
+                                                                                             minutes=minutes
+                                                                                            )
         cmd.run('timedatectl set-ntp false', warn=True)
         cmd.run(time_cmd)
         cmd.run('timedatectl set-ntp true', warn=True)
+
+
+def _change_time_on_nodes(payload: Dict) -> None:
+    """
+    Sets the time on the nodes.  This function throws an exception on failure.
+
+    :param payload: The dictionary object containing the payload.
+    :return: None
+    """
+    timeForm = payload['timeForm']    
+    password = payload['kitForm']["root_password"]
+    for server in payload['kitForm']["servers"]:        
+        _execute_cmds(timeForm, password, server["host_server"])
+
+    for sensor in payload['kitForm']["sensors"]:
+        _execute_cmds(timeForm, password, server["host_server"])    
 
 
 @app.route('/api/execute_kit_inventory', methods=['POST'])
@@ -118,11 +138,11 @@ def execute_kit_inventory() -> Response:
     :return: Response object
     """
     payload = request.get_json()
-    logger.debug(json.dumps(payload, indent=4, sort_keys=True))    
-    isSucessful, root_password = _replace_kit_inventory(payload['kitForm'])
+    # logger.debug(json.dumps(payload, indent=4, sort_keys=True))    
+    isSucessful, root_password = _replace_kit_inventory(payload['kitForm'])    
     _delete_kubernetes_conf()
-    if isSucessful:
-        _change_time_on_kubernetes_master(payload['timeForm'])
+    if isSucessful:        
+        _change_time_on_nodes(payload)
         cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + 
                           root_password + "' site.yml")
         spawn_job("Kit",

@@ -1,8 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { HtmlModalPopUp, ModalType, HtmlInput, HtmlDatePicker } from '../html-elements';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { HtmlModalPopUp, ModalType, 
+        HtmlInput, HtmlDatePicker, HtmlDropDown } from '../html-elements';
 import { FormControl } from '@angular/forms';
 import { ExecuteKitForm } from "../kit-form/kit-form";
 import { formatDate } from "@angular/common";
+import { DatePickerService } from "../date-picker/date-picker.service";
 
 
 @Component({
@@ -18,7 +20,7 @@ export class ModalDialogComponent implements OnInit {
   @Output()
   primaryButtonClick: EventEmitter<any> = new EventEmitter();
 
-  constructor() {}
+  constructor(public _DatePickerService: DatePickerService) {}
 
   ngOnInit() {}
 
@@ -63,10 +65,27 @@ export class ModalDialogComponent implements OnInit {
     return formControl instanceof HtmlDatePicker;
   }
 
-  setUTCTime(){
+  isDropdownInput(formControl: FormControl){
+    return formControl instanceof HtmlDropDown;
+  }
+
+  triggerCallback(timezone: string){
+    if (this.modal.modalForm instanceof ExecuteKitForm){
+      if (timezone === "Browser"){
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;  
+      }      
+      this._DatePickerService.setDate(timezone);
+      this.setTime(timezone);
+    }
+  }
+
+  setTime(timezone: string='UTC'){
     if (this.modal.modalForm instanceof ExecuteKitForm){
       const date_picker = this.modal.modalForm as ExecuteKitForm;
-      date_picker.time.setValue(formatDate(Date.now(), 'HH:mm', 'en-US', '+0000'));
+      let date = new Date();
+      let time_formated = date.toLocaleString('en-US', {hour: '2-digit', minute: '2-digit', 
+                                                        hour12: false, timeZone: timezone });
+      date_picker.time.setValue(time_formated);
     }
   }
 }

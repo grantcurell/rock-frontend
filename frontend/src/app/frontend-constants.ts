@@ -70,3 +70,13 @@ export const HELP_ME_DECIDE = {"label": "Help me decide", "description": "If you
 
 // MISC
 export const CEPH_DRIVE_MIN_COUNT: number = 2;
+
+export const TIMEZONES = [  
+  'UTC',
+  'Browser',
+  'America/Chicago',
+  'America/Denver',
+  'America/Detroit',
+  'America/Los_Angeles',
+  'America/New_York'
+];

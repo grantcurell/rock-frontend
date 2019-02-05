@@ -20,13 +20,6 @@
         <dt class="col-sm-3">{{ kickstartNode[key].label }}<a id="{{ kickstartNode[key].anchor }}"></a></dt>
         <dd class="col-sm-9">{{ kickstartNode[key].description }}</dd>
     </dl>
-
-    <h2>Advanced Kickstart Settings</h2>
-    <hr>
-    <dl *ngFor="let key of objectKeys(kickstart.advanced_settings)" class="row">      
-        <dt class="col-sm-3">{{ kickstart.advanced_settings[key].label }}<a id="{{ kickstart.advanced_settings[key].anchor }}"></a></dt>
-        <dd class="col-sm-9">{{ kickstart.advanced_settings[key].description }}</dd>
-    </dl>
     
     <h2>Kit Form Settings</h2>
     <hr>
