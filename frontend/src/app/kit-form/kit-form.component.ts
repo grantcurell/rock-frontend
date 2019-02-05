@@ -1,8 +1,8 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { KitInventoryForm, ServersFormArray, ServerFormGroup,
-         SensorFormGroup, SensorsFormArray,
-         AdvancedElasticSearchSettingsFormGroup,
+         SensorFormGroup, SensorsFormArray,         
          ExecuteKitForm } from './kit-form';
+import { AdvancedElasticSearchSettingsFormGroup } from './kit-advanced-form';
 import { KickstartService } from '../kickstart.service';
 import { KitService } from '../kit.service';
 import { HtmlModalPopUp, HtmlDropDown, HtmlModalSelectDialog, ModalType } from '../html-elements'; 

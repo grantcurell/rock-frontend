@@ -206,9 +206,10 @@
           <p class="card-text text-danger">
             Unless you really know what you are doing here, you should not change the DNS. Seriously, there's only an incredibly niche
             case for changing this and chances are you aren't in it.
-          </p>          
+          </p>
           <app-text-input [parentForm]="kitForm" controlName="dns_ip"></app-text-input>
           <app-checkbox [parentForm]="kitForm" controlName="disable_autocalculate" (is_checked)="toggleAutocalculate($event)"></app-checkbox>
+          <app-checkbox [parentForm]="kitForm" controlName="install_grr"></app-checkbox>
         </div>
       </div>
       <br>

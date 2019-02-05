@@ -143,13 +143,16 @@ def execute_kit_inventory() -> Response:
     _delete_kubernetes_conf()
     if isSucessful:        
         _change_time_on_nodes(payload)
-        cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + 
-                          root_password + "' site.yml")
+        cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + root_password + "' site.yml")
+        if payload["kitForm"]["install_grr"]:
+            cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + root_password + "' site.yml; "
+                              "ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + root_password + "' grr-only.yml")
         spawn_job("Kit",
                 cmd_to_execute,
                 ["kit"],
                 log_to_console,
                 working_directory="/opt/tfplenum/playbooks")
+        
         return OK_RESPONSE
 
     logger.error("Executing Kit configuration has failed.")
