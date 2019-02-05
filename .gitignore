@@ -7,3 +7,4 @@ ceph-deploy/\.remote-sync\.json
 *.orig
 .vscode/
 frontend/src/assets/confluence/
+frontend/package-lock.json
