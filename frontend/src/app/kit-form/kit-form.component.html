@@ -20,7 +20,7 @@
           <div class="card-body" style="border: 1px solid green;border-radius: 1rem;">
             <h5>Page Instructions</h5>
             <p class="card-text">
-              Before fill out the form, make sure you have added all of your nodes to the Kickstart page.  
+              Before filling out the form, make sure you have added all of your nodes to the Kickstart page.  
               The validation box at the botton of the page will guide you through filling out the form correctly.
             </p>
             <p class="card-text">
@@ -50,10 +50,7 @@
 
         <h5>Credentials</h5>
         <app-text-input [parentForm]="kitForm" controlName="root_password"></app-text-input>
-        <br>
-        <h5>Ceph Settings</h5>
-        <app-checkbox [parentForm]="kitForm" controlName="ceph_redundancy"></app-checkbox>
-        <br>
+        <br>        
         <h5>Elasticsearch Settings</h5>
         <app-text-input [parentForm]="kitForm" controlName="elastic_cpu_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
         <app-text-input [parentForm]="kitForm" controlName="elastic_memory_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
@@ -75,13 +72,8 @@
         </div>
 
         <h5>Kubernetes Settings</h5>
-        <app-text-input [parentForm]="kitForm" controlName="kubernetes_services_cidr" (keyupEvent)="kubernetesInputEvent($event)"></app-text-input>
-        <div>{{ kitForm.kubernetesCidrInfoText }}</div>
-
-        <h5>Endgame Settings</h5>
-        <app-text-input [parentForm]="kitForm" controlName="endgame_iporhost"></app-text-input>
-        <app-text-input [parentForm]="kitForm" controlName="endgame_username"></app-text-input>
-        <app-text-input [parentForm]="kitForm" controlName="endgame_password"></app-text-input>
+        <app-dropdown [parentForm]="kitForm" controlName="kubernetes_services_cidr" (dropDownChanged)="kubernetesInputEvent($event)" uid="kube_dropdown"></app-dropdown>
+        <div>{{ kitForm.kubernetesCidrInfoText }}</div>        
       </div>
     </div>
     <br>
@@ -208,8 +200,25 @@
             case for changing this and chances are you aren't in it.
           </p>
           <app-text-input [parentForm]="kitForm" controlName="dns_ip"></app-text-input>
-          <app-checkbox [parentForm]="kitForm" controlName="disable_autocalculate" (is_checked)="toggleAutocalculate($event)"></app-checkbox>
+          <app-checkbox [parentForm]="kitForm" controlName="disable_autocalculate" (is_checked)="toggleAutocalculate($event)"></app-checkbox>          
+          <h5>Ceph Settings</h5>
+          <app-checkbox [parentForm]="kitForm" controlName="ceph_redundancy"></app-checkbox>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-header">
+          Endpoint Settings
+        </div>        
+        <div class="card-body">
+          <p class="font-weight-light">
+            Below are settings for enabling a service for pulling Endgame data into Elasticsearch and/or 
+            installing Google Rapid Response as part of your Kit deployment.
+          </p>
           <app-checkbox [parentForm]="kitForm" controlName="install_grr"></app-checkbox>
+          <app-text-input [parentForm]="kitForm" controlName="endgame_iporhost"></app-text-input>
+          <app-text-input [parentForm]="kitForm" controlName="endgame_username"></app-text-input>
+          <app-text-input [parentForm]="kitForm" controlName="endgame_password"></app-text-input>
         </div>
       </div>
       <br>

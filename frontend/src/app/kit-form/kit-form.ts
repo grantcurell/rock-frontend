@@ -720,20 +720,15 @@ export class KitInventoryForm extends FormGroup {
         PERCENT_VALID_FEEDBACK
     )
 
-    kubernetes_services_cidr = new HtmlInput(
+    kubernetes_services_cidr = new HtmlDropDown(
         'kubernetes_services_cidr',
         'Kubernetes Service IP Range Start',
-        "Put your Kubernetes Services CIDR here.",
-        'text',
-        KUBE_CIDR_CONSTRAINT,
-        INVALID_FEEDBACK_IP,
-        true,
-        undefined,
+        [],
         "Services_cidr is the range of addresses kubernetes will use for external services \
         This includes cockpit (a front end for Kubernetes), Moloch viewer, Kibana, elastichq, kafka-manager, and the \
         kubernetes dashboard. This will use a /28 under the hood. This means it will take \
         whatever IP address you enter and create a range addresses from that IP +16. For example, \
-        192.168.1.16 would become a range from 192.168.1.16-31."
+        192.168.1.16 would become a range from 192.168.1.16-31."        
     )
 
     dns_ip = new HtmlInput(
@@ -777,7 +772,7 @@ export class KitInventoryForm extends FormGroup {
         "install_grr",
         "Install Google Rapid Response",
         "WARNING: Installing Google Rapid Response is an alpha feature.  \
-        Google Rapid Response is an agent based endpoint protection platform.  \
+        Google Rapid Response is an open sourced, agent based, endpoint protection platform.  \
         You can use to to hunt for threats on host systems."
     )
 }

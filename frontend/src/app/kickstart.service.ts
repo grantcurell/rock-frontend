@@ -32,6 +32,11 @@ export class KickstartService {
     }    
   }
 
+  getAvailableIPBlocks(): Observable<Object> {
+    const url = '/api/get_available_ip_blocks';
+    return this.http.get(url).pipe();
+  }
+
   gatherDeviceFacts(management_ip: string, password: string): Observable<Object> {
     const url = '/api/gather_device_facts';
     let post_payload = {"management_ip": management_ip, "password": password};

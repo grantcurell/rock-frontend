@@ -142,7 +142,6 @@ function _validateNodeIps(control: AbstractControl, errors: Array<string>): void
     for (let i = 0; i < nodes.length; i++){
         let node = nodes.at(i) as NodeFormGroup;
         if (form.controller_interface.value[0] !== undefined && 
-            pat.test(node.ip_address.value) && 
             pat.test(node.ip_address.value)){
             if (! isIp4InCidrs(node.ip_address.value, [form.controller_interface.value[0] + '/' + maskSize]) ){
                 errors.push("- The " + node.ip_address.value + " passed in is not in the correct subnet.");

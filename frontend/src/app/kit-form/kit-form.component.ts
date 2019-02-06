@@ -145,11 +145,13 @@ export class KitFormComponent implements OnInit, AfterViewInit{
     this.kitForm.enable();
     this.hasKitForm = false;
     this.isAddNodeInsteadOfNewKit = false;
-    this.prepopulateFromKickstart();    
+    this.prepopulateFromKickstart();
+    this.setKubernetesCIDRRange();
   }
 
   enableForm(){
     this.kitForm.enable();
+    this.setKubernetesCIDRRange(false);
   }
 
   private openKickstartErrorModal(): void {
@@ -191,6 +193,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
   archiveForm(): void {
     this.clearForm();
     this.kitSrv.removeKitInventoryAndArchive().subscribe(data => {});
+    this.setKubernetesCIDRRange();
   }
 
   openRestoreModal(){
@@ -268,19 +271,43 @@ export class KitFormComponent implements OnInit, AfterViewInit{
     }
   }
 
+  private setKubernetesCIDRRange(setValue: boolean=true){
+    while (this.kitForm.kubernetes_services_cidr.options.length !== 0){
+      this.kitForm.kubernetes_services_cidr.options.pop();
+    }
+
+    this.kickStartSrv.getAvailableIPBlocks().subscribe(ipblocks => {
+      let avaiable_ip_addrs = ipblocks as Array<string>;
+      if (avaiable_ip_addrs.length > 0){
+        for (let ip of avaiable_ip_addrs) {
+          this.kitForm.kubernetes_services_cidr.options.push(ip);
+        } 
+        if (setValue)         
+          this.kitForm.kubernetes_services_cidr.default_value = this.kitForm.kubernetes_services_cidr.options[0];          
+      } else {
+        if (setValue)
+          this.kitForm.kubernetes_services_cidr.default_value = ''
+      }
+      if (setValue)
+        this.kitForm.kubernetes_services_cidr.setValue(this.kitForm.kubernetes_services_cidr.default_value);
+      this.kubernetesInputEvent(null);
+    });
+  }
+
   private initalizeForm(): void {
 
     this.kickStartSrv.getKickstartForm().subscribe(kickstartData => {
       if (!kickstartData) {
-        this.openKickstartErrorModal();        
+        this.openKickstartErrorModal();
         return;
-      }
+      }      
 
       this.kitSrv.getKitForm().subscribe(kitData => {
         if (kitData === null || kitData === undefined) {
           this.prepopulateFromKickstart();
           this.hasKitForm = false;
           this.isAddNodeInsteadOfNewKit = false;
+          this.setKubernetesCIDRRange();
           return;
         }
 

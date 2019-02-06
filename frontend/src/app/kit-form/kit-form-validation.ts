@@ -1,8 +1,8 @@
 import {  FormArray, AbstractControl } from '@angular/forms';
-import { HtmlInput } from '../html-elements';
+import { HtmlDropDown } from '../html-elements';
 import { ServerFormGroup, SensorFormGroup, SensorsFormArray, ServersFormArray, KitInventoryForm } from './kit-form';
 import { GetElasticSearchValidated, GetSensorResourcesValidated } from './kit-form-globals';
-import { CEPH_DRIVE_MIN_COUNT } from '../frontend-constants';
+import { CEPH_DRIVE_MIN_COUNT, IP_CONSTRAINT } from '../frontend-constants';
 import { CheckForInvalidControls } from '../globals';
 
 /**
@@ -102,9 +102,12 @@ function _validateMonitorInterfaces(control: AbstractControl, errors: Array<stri
  * @param errors - An array of strings to display.
  */
 function _validateKubernetesCIDR(control: AbstractControl, errors: Array<string>): void {
-    let kubernetes = control.get('kubernetes_services_cidr') as HtmlInput;
-    if (kubernetes != null && !kubernetes.valid){
-        errors.push("- Kubernetes services CIDR failed to validate. Make sure you type in a valid Kubernetes services CIDR under Global Settings.");
+    let kubernetes = control.get('kubernetes_services_cidr') as HtmlDropDown;
+    if (kubernetes != null){
+        let pat = new RegExp(IP_CONSTRAINT);
+        if (!pat.test(kubernetes.value)){
+            errors.push("- Kubernetes services CIDR failed to validate. Make sure you type in a valid Kubernetes services CIDR under Global Settings.");
+        }        
     }
 }
 
