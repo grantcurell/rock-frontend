@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HtmlModalPopUp, ModalType, 
-        HtmlInput, HtmlDatePicker, HtmlDropDown } from '../html-elements';
+        HtmlInput, HtmlDatePicker, HtmlDropDown, HtmlTextArea } from '../html-elements';
 import { FormControl } from '@angular/forms';
 import { ExecuteKitForm } from "../kit-form/kit-form";
 import { formatDate } from "@angular/common";
@@ -67,6 +67,10 @@ export class ModalDialogComponent implements OnInit {
 
   isDropdownInput(formControl: FormControl){
     return formControl instanceof HtmlDropDown;
+  }
+
+  isTextArea(formControl: FormControl){
+    return formControl instanceof HtmlTextArea;
   }
 
   triggerCallback(timezone: string){

@@ -133,8 +133,8 @@ def get_available_ip_blocks() -> Response:
     if mongo_document is None:
         return jsonify([])
     
-    mng_ip = mongo_document["payload"]["controller_interface"][0]
-    cidr = netmask_to_cidr(mongo_document["payload"]["netmask"])
+    mng_ip = mongo_document["form"]["controller_interface"][0]
+    cidr = netmask_to_cidr(mongo_document["form"]["netmask"])
     if cidr <= 24:
         command = "nmap -v -sn -n %s/24 -oG - | awk '/Status: Down/{print $2}'" % mng_ip
         cidr = 24

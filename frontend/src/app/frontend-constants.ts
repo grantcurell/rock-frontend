@@ -80,3 +80,8 @@ export const TIMEZONES = [
   'America/Los_Angeles',
   'America/New_York'
 ];
+
+
+export const KIT_ID = "kit_form"
+export const PORTAL_ID = 'portal_links'
+export const KICKSTART_ID = "kickstart_form"

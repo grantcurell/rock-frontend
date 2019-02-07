@@ -6,7 +6,7 @@ from kubernetes import client, config
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo import MongoClient
-from shared.constants import KIT_ID
+from shared.constants import KIT_ID, DATE_FORMAT_STR
 from typing import Dict, Tuple
 
 KUBEDIR = "/root/.kube"
@@ -30,13 +30,13 @@ def objectify(some_dict: Dict) -> Dict:
         if some_dict[key] is None:
             del some_dict[key]
         elif isinstance(some_dict[key], datetime):
-            some_dict[key] = some_dict[key].strftime('%Y-%m-%d %H:%M:%S')
+            some_dict[key] = some_dict[key].strftime(DATE_FORMAT_STR)
         elif isinstance(some_dict[key], list):
             for index, item in enumerate(some_dict[key]):
                 if item is None:
                     some_dict[key].pop(index)
                 elif isinstance(item, datetime):
-                    some_dict[key][index] = item.strftime('%Y-%m-%d %H:%M:%S')
+                    some_dict[key][index] = item.strftime(DATE_FORMAT_STR)
                 elif isinstance(item, dict):
                     objectify(item)
         elif isinstance(some_dict[key], dict):
@@ -165,7 +165,7 @@ class FabricConnectionWrapper():
     def _establish_fabric_connection(self, conn_mongo: MongoConnectionManager) -> None:
         kit_form = conn_mongo.mongo_kit.find_one({"_id": KIT_ID})
         if kit_form:
-            master_ip, password = get_master_node_ip_and_password(kit_form['payload'])
+            master_ip, password = get_master_node_ip_and_password(kit_form['form'])
             self._connection = Connection(master_ip, 
                                           user=USERNAME, 
                                           connect_timeout=CONNECTION_TIMEOUT,

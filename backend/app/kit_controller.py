@@ -5,6 +5,7 @@ import json
 import os
 
 from app import app, logger, conn_mng
+from app.archive_controller import archive_form
 from app.common import OK_RESPONSE
 from app.inventory_generator import KitInventoryGenerator
 from app.job_manager import spawn_job
@@ -56,15 +57,19 @@ def _replace_kit_inventory(payload: Dict) -> Tuple[bool, str]:
     Replaces the kit inventory if one exists.
 
     :param payload: The kit payload received from the frontend
-    :return: True if successfull, False otherwise.    
+    :return: True if successfull, False otherwise.        
     """
+    current_kit_configuration = conn_mng.mongo_kit.find_one({"_id": KIT_ID})
+    if current_kit_configuration:
+        archive_form(current_kit_configuration['form'], True, conn_mng.mongo_kit_archive)
+
     current_kit_configuration = conn_mng.mongo_kit.find_one_and_replace({"_id": KIT_ID},
-                                            {"_id": KIT_ID, "payload": payload},
+                                            {"_id": KIT_ID, "form": payload},
                                             upsert=True,
                                             return_document=ReturnDocument.AFTER)  # type: InsertOneResult
 
     if current_kit_configuration:
-        if current_kit_configuration["payload"] and current_kit_configuration["payload"]["root_password"]:
+        if current_kit_configuration["form"] and current_kit_configuration["form"]["root_password"]:
             payload['kubernetes_services_cidr'] = payload['kubernetes_services_cidr'] + "/28"
             if payload['dns_ip'] is None:
                 payload['dns_ip'] = ''
@@ -75,7 +80,7 @@ def _replace_kit_inventory(payload: Dict) -> Tuple[bool, str]:
             _set_sensor_type_counts(payload)
             kit_generator = KitInventoryGenerator(payload)
             kit_generator.generate()
-            return True, current_kit_configuration["payload"]["root_password"]
+            return True, current_kit_configuration["form"]["root_password"]
     return False, None
 
 
@@ -200,56 +205,4 @@ def get_kit_form() -> Response:
         return OK_RESPONSE
 
     mongo_document['_id'] = str(mongo_document['_id'])
-    return jsonify(mongo_document["payload"])
-
-
-@app.route('/api/remove_and_archive_kit', methods=['POST'])
-def remove_and_archive_kit() -> Response:
-    """
-    Removes the kickstart inventory from the main collection and then
-    archives it in a separate collection.
-
-    :return:
-    """
-    kit_form = conn_mng.mongo_kit.find_one({"_id": KIT_ID})
-    if kit_form is not None:
-        del kit_form['_id']
-        kit_form['archive_date'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        conn_mng.mongo_kit_archive.insert_one(kit_form)
-        conn_mng.mongo_kit.delete_one({"_id": KIT_ID})
-    return OK_RESPONSE
-
-
-@app.route('/api/get_kit_archived')
-def get_archived_kit_ids() -> Response:
-    """
-    Returns all the archived Kit Configuration form ids and their associated archive dates.
-    :return:
-    """
-    ret_val = []
-    result = conn_mng.mongo_kit_archive.find({})
-    if result:
-        for item in result:
-            item["_id"] = str(item["_id"])
-            ret_val.append(item)
-
-    return jsonify(ret_val)
-
-
-@app.route('/api/restore_archived_kit', methods=['POST'])
-def restore_archived_kit() -> Response:
-    """
-    Restores archived Kit form from the archived collection.
-
-    :return:
-    """
-    payload = request.get_json()
-    logger.debug(json.dumps(payload, indent=4, sort_keys=True))
-
-    kit_form = conn_mng.mongo_kit_archive.find_one_and_delete({"_id": ObjectId(payload["_id"])})
-    if kit_form:
-        conn_mng.mongo_kit.find_one_and_replace({"_id": KIT_ID},
-                                                {"_id": KIT_ID, "payload": kit_form['payload']},
-                                                upsert=True)  # type: InsertOneResult
-        return OK_RESPONSE
-    return ERROR_RESPONSE
+    return jsonify(mongo_document["form"])

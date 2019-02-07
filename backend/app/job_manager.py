@@ -3,6 +3,7 @@ import os
 import sys
 import shlex
 from app import logger, socketio, conn_mng
+from shared.constants import DATE_FORMAT_STR
 from uuid import uuid4
 from datetime import datetime, timedelta
 import psutil
@@ -312,7 +313,7 @@ def _save_job(job: ProcJob, job_retval: int, message: str) -> None:
     conn_mng.mongo_last_jobs.find_one_and_replace({"_id": job.job_name},
                                                   {"_id": job.job_name, 
                                                    "return_code": job_retval, 
-                                                   "date_completed": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                                                   "date_completed": datetime.utcnow().strftime(DATE_FORMAT_STR),
                                                    "message": message},
                                                    upsert=True)  # type: InsertOneResult
 

@@ -1,7 +1,7 @@
 <app-modal-dialog [modal]="kitModal"></app-modal-dialog>
 <app-modal-dialog #dateModal [modal]="executeKitModal" (primaryButtonClick)="executeKit()"></app-modal-dialog>
-<app-modal-dialog [modal]="archiveKitModal" (primaryButtonClick)="archiveForm()"></app-modal-dialog>
-<app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
+<app-modal-dialog [modal]="archiveKitModal" (primaryButtonClick)="archiveForm($event)"></app-modal-dialog>
+<app-modal-archive-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)" config_id="kit_form"></app-modal-archive-dialog>
 
 <div class="container" id="topheader">
   <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">    
@@ -13,7 +13,7 @@
         <button class="btn btn-primary" style="float: right;" type="button" 
                 (click)="openRestoreModal()"><i class="icon_download"></i> Restore Form</button>
         <button class="btn btn-danger" type="button" style="float: right;  margin-right: 10px;" 
-                (click)="openArchiveConfirmation()"><i class="icon_floppy_alt"></i> Archive and Clear Form</button>
+                (click)="openArchiveConfirmation()"><i class="icon_floppy_alt"></i> Save Form</button>
       </div>
       <div class="card-body">
         <div class="card">
@@ -95,12 +95,15 @@
           <div *ngIf="!server.hidden" class="card-body">
             <app-basic-node-resource-card title="Server {{ i + 1 }} resources" [basicNodeResource]="server.basicNodeResource"></app-basic-node-resource-card>
             <br>
-            <app-text-input [parentForm]="server" controlName="host_server" (buttonClick)="gatherFacts(server)" uid="{{ i }}"></app-text-input>
+            <app-text-input [parentForm]="server" controlName="host_server"></app-text-input>
             <app-checkbox [parentForm]="server" controlName="is_master_server" (is_checked)="disableOtherMasterOrReenable($event, i)" uid="{{ i }}"></app-checkbox>
             <br>
             <div *ngIf="server.deviceFacts">
                   <app-card-selector [parentForm]="server" [optionSelections]="server.driveSelections"
                                       controlName="ceph_drives" (onSelect)="cephDriveSelected($event, server)" uid="_server{{ i }}"></app-card-selector>
+            </div>
+            <div *ngIf="!server.deviceFacts">
+              <h3>Loading...</h3>
             </div>
           </div>
         </div>
@@ -127,7 +130,7 @@
             <app-basic-node-resource-card title="Sensor {{ i + 1 }} resources" [basicNodeResource]="sensor.basicNodeResource"></app-basic-node-resource-card>
             <br>
             <app-text-input [parentForm]="sensor" controlName="sensor_type"></app-text-input>
-            <app-text-input [parentForm]="sensor" controlName="host_sensor" (buttonClick)="gatherFacts(sensor)" uid="{{ i }}"></app-text-input>
+            <app-text-input [parentForm]="sensor" controlName="host_sensor"></app-text-input>
             <br>
 
             <div *ngIf="!isAdvancedOptionsHidden">
@@ -150,6 +153,9 @@
                                      controlName="monitor_interface" style="float: right;" uid="{{ i }}"></app-card-selector>
                 </div>
               </div>
+            </div>
+            <div *ngIf="!sensor.deviceFacts">
+              <h3>Loading...</h3>
             </div>
           </div>
         </div>

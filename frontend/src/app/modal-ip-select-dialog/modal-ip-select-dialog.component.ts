@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
-import { HtmlModalSelectDialog } from '../html-elements';
+import { HtmlModalIPSelectDialog } from '../html-elements';
 
 @Component({
   selector: 'app-modal-ip-select-dialog',
@@ -12,7 +12,7 @@ export class ModalIpSelectDialogComponent implements OnInit {
   selections: ElementRef;
 
   @Input()
-  modal: HtmlModalSelectDialog;
+  modal: HtmlModalIPSelectDialog;
 
   @Output()
   primaryButtonClick: EventEmitter<any> = new EventEmitter();  

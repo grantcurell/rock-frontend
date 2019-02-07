@@ -63,9 +63,9 @@ def perform_systems_check() -> Response:
     """
     current_kit_configuration = conn_mng.mongo_kit.find_one({"_id": KIT_ID})
     if current_kit_configuration:
-        if current_kit_configuration["payload"] and current_kit_configuration["payload"]["root_password"]:
+        if current_kit_configuration["form"] and current_kit_configuration["form"]["root_password"]:
             cmd_to_execute = ("ansible-playbook -i /opt/tfplenum/playbooks/inventory.yml -e ansible_ssh_pass='" + 
-                              current_kit_configuration["payload"]["root_password"] + "' site.yml")
+                              current_kit_configuration["form"]["root_password"] + "' site.yml")
             spawn_job("SystemsCheck",
                     cmd_to_execute,
                     ["systems_check"],

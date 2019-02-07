@@ -1,7 +1,7 @@
 import { FormGroup, FormArray, AbstractControl } from '@angular/forms';
 import { ValidateKickStartInventoryForm } from './kickstart-form-validation';
 import { IP_CONSTRAINT, IP_CONSTRAINT_WITH_SUBNET, DESC_ROOT_PASSWORD, INVALID_FEEDBACK_IP } from '../frontend-constants';
-import { HtmlInput, HtmlDropDown, HtmlCardSelector } from '../html-elements';
+import { HtmlInput, HtmlDropDown, HtmlCardSelector, HtmlTextArea } from '../html-elements';
 
 export class NodeFormGroup extends FormGroup {
   public hidden: boolean;
@@ -291,4 +291,21 @@ export class KickstartInventoryForm extends FormGroup {
     false
   )
 
+}
+
+export class CommentForm extends FormGroup {
+
+  constructor(){
+    super({});
+    super.addControl('comment', this.comment);
+  }
+
+  comment = new HtmlTextArea(
+    'comment',
+    'Comment',
+    'Enter a reminder as to what this configuration is for.',
+    '',
+    'A useful comment for remembering what this form is for.',
+    true
+  )
 }

@@ -100,13 +100,22 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         onlySelf?: boolean;
         emitEvent?: boolean;
     }): void {
-        this.host_sensor.disable();
         this.monitor_interface.disable();
         this.ceph_drives.disable();
         this.pcap_drives.disable();
         this.bro_workers.disable();
         this.moloch_threads.disable();
     }
+
+    enable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+      }): void{
+        super.enable(opts);
+        this.host_sensor.disable();
+        this.sensor_type.disable();
+    }
+
     /**
      * When calling this make sure you call set_drive_selections
      * after you have set deviceFacts.
@@ -163,10 +172,8 @@ export class SensorFormGroup extends FormGroup implements BasicNodeResourceInter
         true,
         undefined,
         '',
-        'Looks good! Now hit \"Gather Facts\"!',
         undefined,
-        true,
-        'Gather Facts'
+        true
     )
 
     monitor_interface = new HtmlCardSelector(
@@ -294,9 +301,16 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
         onlySelf?: boolean;
         emitEvent?: boolean;
     }): void {
-        this.host_server.disable();
         this.is_master_server.disable();
         this.ceph_drives.disable();
+    }
+
+    enable(opts?: {
+        onlySelf?: boolean;
+        emitEvent?: boolean;
+      }): void{
+        super.enable(opts);
+        this.host_server.disable();
     }
 
     getRawValue(): any {
@@ -336,10 +350,8 @@ export class ServerFormGroup extends FormGroup implements BasicNodeResourceInter
         true,
         undefined,
         '',
-        'Looks good! Now hit \"Gather Facts\"!',
         undefined,
-        true,
-        'Gather Facts'
+        true        
     )
 
     is_master_server = new HtmlCheckBox(

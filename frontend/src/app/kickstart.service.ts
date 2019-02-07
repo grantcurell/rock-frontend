@@ -52,25 +52,12 @@ export class KickstartService {
     return this.http.post(url, kickStartForm, HTTP_OPTIONS).pipe(
       catchError(this.handleError('generateKickstartInventory'))
     );
-  }
-
-  removeKickstartInventoryAndArchive(){
-    const url = '/api/remove_and_archive_kickstart';
-    return this.http.post(url, null);
-  }
+  }  
 
   getKickstartForm(){
     const url = '/api/get_kickstart_form';
     return this.http.get(url)
       .pipe(        
-        catchError(this.handleError('gatherDeviceFacts', []))
-      );
-  }
-
-  getArchivedKickstartForms(): Observable<Object> {
-    const url = '/api/get_kickstart_archived';
-    return this.http.get(url)
-      .pipe(
         catchError(this.handleError('gatherDeviceFacts', []))
       );
   }
@@ -82,16 +69,7 @@ export class KickstartService {
       .pipe(
         catchError(this.handleError('gatherDeviceFacts', []))
       );
-  }
-
-  restoreArchivedKickstartForm(archiveId: string): Observable<Object> {
-    const url = '/api/restore_archived';
-    let post_payload = {"_id": archiveId};
-    return this.http.post(url, post_payload , HTTP_OPTIONS)
-      .pipe(
-        catchError(this.handleError('gatherDeviceFacts', []))
-      );
-  }
+  }  
 
   /**
    * Handle Http operation that failed.
