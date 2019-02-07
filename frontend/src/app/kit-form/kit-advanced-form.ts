@@ -334,7 +334,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         CONSTRAINT_MIN_ONE,
         MIN_ONE_INVALID_FEEDBACK,
         true,
-        '3',
+        '8',
         'The number of threads used to read packets from each interface. These threads take the packets \
         from the AF packet interface and place them into the packet queues.'
     )
@@ -486,7 +486,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         CONSTRAINT_MIN_ONE,
         MIN_ONE_INVALID_FEEDBACK,
         true,
-        '50000',
+        '500000',
         "Number of packets to ask libnids/libpcap to read per poll/spin. Increasing may \
         hurt stats and ES performance. Decreasing may cause more dropped packets"
     )
@@ -517,7 +517,7 @@ export class AdvancedMolochSettingsFormGroup extends FormGroup {
         CONSTRAINT_MIN_ONE,
         MIN_ONE_INVALID_FEEDBACK,
         true,
-        '200000',
+        '400000',
         "See: https://github.com/aol/moloch/wiki/FAQ#why-am-i-dropping-packets"
     )
 
