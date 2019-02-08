@@ -137,14 +137,14 @@ def get_available_ip_blocks() -> Response:
     cidr = netmask_to_cidr(mongo_document["payload"]["netmask"])
     if cidr <= 24:
         command = "nmap -v -sn -n %s/24 -oG - | awk '/Status: Down/{print $2}'" % mng_ip
+        cidr = 24
     else:
         command = "nmap -v -sn -n %s/%d -oG - | awk '/Status: Down/{print $2}'" % (mng_ip, cidr) 
-    
+   
     stdout_str, stderr_str = shell(command, use_shell=True)
     available_ip_addresses = stdout_str.decode("utf-8").split('\n')
     available_ip_addresses = [x for x in available_ip_addresses if not filter_ip(x)]
     ip_address_blocks = _get_ip_blocks(cidr)    
-
     available_ip_blocks = []
     for index, ip in enumerate(available_ip_addresses):
         pos = ip.rfind('.') + 1
@@ -152,5 +152,4 @@ def get_available_ip_blocks() -> Response:
         if last_octet in ip_address_blocks:
             if _is_valid_ip_block(available_ip_addresses, index):
                 available_ip_blocks.append(ip)
-        
     return jsonify(available_ip_blocks)
