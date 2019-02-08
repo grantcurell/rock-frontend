@@ -8,7 +8,6 @@ import json
 import os
 from typing import Dict, List
 
-
 class Interface(object):
     """
     An interface object which represents an interface on a server with the
@@ -206,20 +205,21 @@ class Node(object):
             ip = ""
             mac = ""
             # Do not return interfaces with veth, cni, docker or flannel
-            if "veth" not in i and "cni" not in i and "docker" \
-                    not in i and "flannel" not in i and "virbr0" not in i:
-                try:
-                    name = "ansible_" + i
-                    interface = json_object['ansible_facts'][name]
-                    if 'ipv4' in interface:
-                        ip = interface['ipv4']['address']
-                    if 'macaddress' in interface:
-                        mac = interface['macaddress']
-                    if 'speed' in interface:
-                        speed = interface['speed']
+            exclude = ["veth", "cni", "docker", "flannel", "virbr0", "lo"]
+            if not any([special in i for special in exclude]):
+                name = "ansible_" + i
+                interface = json_object['ansible_facts'][name]
+                speed = '0'
+                ip = ''
+                mac = ''
+                if 'ipv4' in interface:
+                    ip = interface['ipv4']['address']
+                if 'macaddress' in interface:
+                    mac = interface['macaddress']
+                if 'speed' in interface:
+                    speed = interface['speed']
+                if ip != "127.0.0.1":
                     interfaces.append(Interface(i, ip, mac, speed))
-                except:
-                    pass
 
         # Determine location of root
         for i in json_object['ansible_facts']['ansible_mounts']:
