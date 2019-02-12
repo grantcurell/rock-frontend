@@ -37,9 +37,9 @@ export class KickstartService {
     return this.http.get(url).pipe();
   }
 
-  gatherDeviceFacts(management_ip: string, password: string): Observable<Object> {
+  gatherDeviceFacts(management_ip: string): Observable<Object> {
     const url = '/api/gather_device_facts';
-    let post_payload = {"management_ip": management_ip, "password": password};
+    let post_payload = {"management_ip": management_ip};
     return this.http.post(url, post_payload , HTTP_OPTIONS).pipe(
       tap(data => this.mapDeviceFacts(data)),
       catchError(this.handleError('gatherDeviceFacts'))

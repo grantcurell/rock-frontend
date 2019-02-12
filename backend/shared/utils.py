@@ -2,6 +2,9 @@
 This module is for storing standard functions which can be reused anywhere within the application.
 
 """
+import base64
+
+
 def netmask_to_cidr(netmask: str) -> int:
     '''
     Converts a standards netmask to the associated CIDR notation.
@@ -22,3 +25,21 @@ def filter_ip(ipaddress: str) -> bool:
     if ipaddress == '':
         return True
     return False
+
+
+def encode_password(password: str) -> str:
+    """
+    Encodes a password and garbles is up.
+
+    :param password: The password we wish to encode
+    """
+    return base64.b64encode(bytes(password, 'utf-8')).decode('utf-8')
+
+
+def decode_password(password_enc: str) -> str:
+    """
+    Decodes a password.
+
+    :param password_enc: The encoded password.
+    """
+    return base64.b64decode(bytes(password_enc, 'utf-8')).decode('utf-8')

@@ -14,8 +14,9 @@ from bson import ObjectId
 from datetime import datetime
 from flask import request, Response, jsonify
 from pymongo.collection import ReturnDocument
-from shared.constants import KIT_ID
+from shared.constants import KIT_ID, KICKSTART_ID
 from shared.connection_mngs import KUBEDIR, FabricConnectionManager
+from shared.utils import decode_password
 from typing import Dict, Tuple
 
 
@@ -68,8 +69,9 @@ def _replace_kit_inventory(payload: Dict) -> Tuple[bool, str]:
                                             upsert=True,
                                             return_document=ReturnDocument.AFTER)  # type: InsertOneResult
 
-    if current_kit_configuration:
-        if current_kit_configuration["form"] and current_kit_configuration["form"]["root_password"]:
+    current_kickstart_config = conn_mng.mongo_kickstart.find_one({"_id": KICKSTART_ID})
+    if current_kit_configuration and current_kickstart_config:
+        if current_kit_configuration["form"] and current_kickstart_config["form"]["root_password"]:
             payload['kubernetes_services_cidr'] = payload['kubernetes_services_cidr'] + "/28"
             if payload['dns_ip'] is None:
                 payload['dns_ip'] = ''
@@ -80,7 +82,7 @@ def _replace_kit_inventory(payload: Dict) -> Tuple[bool, str]:
             _set_sensor_type_counts(payload)
             kit_generator = KitInventoryGenerator(payload)
             kit_generator.generate()
-            return True, current_kit_configuration["form"]["root_password"]
+            return True, decode_password(current_kickstart_config["form"]["root_password"])
     return False, None
 
 
@@ -119,20 +121,19 @@ def _execute_cmds(timeForm: Dict, password: str, ip_address: str) -> None:
         cmd.run('timedatectl set-ntp true', warn=True)
 
 
-def _change_time_on_nodes(payload: Dict) -> None:
+def _change_time_on_nodes(payload: Dict, password: str) -> None:
     """
     Sets the time on the nodes.  This function throws an exception on failure.
 
     :param payload: The dictionary object containing the payload.
     :return: None
     """
-    timeForm = payload['timeForm']    
-    password = payload['kitForm']["root_password"]
-    for server in payload['kitForm']["servers"]:        
+    timeForm = payload['timeForm']
+    for server in payload['kitForm']["servers"]:
         _execute_cmds(timeForm, password, server["host_server"])
 
     for sensor in payload['kitForm']["sensors"]:
-        _execute_cmds(timeForm, password, server["host_server"])    
+        _execute_cmds(timeForm, password, server["host_server"])
 
 
 @app.route('/api/execute_kit_inventory', methods=['POST'])
@@ -147,7 +148,7 @@ def execute_kit_inventory() -> Response:
     isSucessful, root_password = _replace_kit_inventory(payload['kitForm'])    
     _delete_kubernetes_conf()
     if isSucessful:        
-        _change_time_on_nodes(payload)
+        _change_time_on_nodes(payload, root_password)
         cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + root_password + "' site.yml")
         if payload["kitForm"]["install_grr"]:
             cmd_to_execute = ("ansible-playbook -i inventory.yml -e ansible_ssh_pass='" + root_password + "' site.yml; "

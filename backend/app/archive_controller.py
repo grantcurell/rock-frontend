@@ -6,6 +6,7 @@ import json
 from app import (app, logger, conn_mng)
 from app.common import OK_RESPONSE, ERROR_RESPONSE
 from bson import ObjectId
+from shared.utils import encode_password
 from datetime import datetime
 from flask import request, jsonify, Response
 from pymongo.collection import Collection
@@ -65,6 +66,8 @@ def delete_archive(config_id: str, archiveId: str) -> Response:
 
     :param config_id: config ID we want to interact with.
     :param archiveId: The mongo ID of the document stored in the database.
+
+    :return: An http response
     """
     _, archive_mongo_collection = _get_mongo_collections(config_id)
     result = archive_mongo_collection.delete_one({"_id": ObjectId(archiveId)}) # type: DeleteResult
@@ -73,6 +76,29 @@ def delete_archive(config_id: str, archiveId: str) -> Response:
     else:
         logger.warning("Failed to delete archive ID %s" % archiveId)    
     return ERROR_RESPONSE
+
+
+def _is_completed_form(config_id: str, some_form: Dict, some_form2: Dict) -> bool:
+    """
+    Ensures that two forms are the same. It ignores password fields on the Kickstart
+    form
+
+    :param config_id: The config ID we want to interact with.
+    :param some_form: A form dictionary
+    :param some_form2: A form dictionary2
+
+    :return: true if they match false otherwise.
+    """
+    form_cpy = some_form.copy()
+    form_cpy2 = some_form2.copy()
+
+    if config_id == KICKSTART_ID:
+        del form_cpy['root_password']
+        del form_cpy['re_password']
+        del form_cpy2['root_password']
+        del form_cpy2['re_password']
+    
+    return json.dumps(form_cpy, sort_keys=True) == json.dumps(form_cpy2, sort_keys=True)
 
 
 @app.route('/api/archive_form', methods=['POST'])
@@ -85,12 +111,15 @@ def archive_form_api() -> Response:
     """
     payload = request.get_json()
     config_id = payload["config_id"]
+    if config_id == KICKSTART_ID:
+        payload["form"]["re_password"] = encode_password(payload["form"]["re_password"])
+        payload["form"]["root_password"] = encode_password(payload["form"]["root_password"])
+
     config_mongo_collection, archive_mongo_collection = _get_mongo_collections(config_id)
     current_config = config_mongo_collection.find_one({"_id": config_id})
     is_completed_form = False
     if current_config is not None:
-        if json.dumps(payload['form'], sort_keys=True) == json.dumps(current_config['form'], sort_keys=True):
-            is_completed_form = True
+        is_completed_form = _is_completed_form(config_id, payload['form'], current_config['form'])
     
     archive_form(payload['form'], is_completed_form, archive_mongo_collection, payload['comment'])
     return OK_RESPONSE

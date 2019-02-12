@@ -8,7 +8,7 @@ from app.common import ERROR_RESPONSE, OK_RESPONSE
 from app.job_manager import kill_job_in_queue, shell
 from app.node_facts import get_system_info
 from shared.constants import KICKSTART_ID
-from shared.utils import filter_ip, netmask_to_cidr
+from shared.utils import filter_ip, netmask_to_cidr, decode_password
 from flask import request, jsonify, Response
 from typing import List
 
@@ -27,7 +27,12 @@ def gather_device_facts() -> Response:
     try:
         payload = request.get_json()
         management_ip = payload.get('management_ip')
-        password = payload.get('password')
+        current_config = conn_mng.mongo_kit.find_one({"_id": KICKSTART_ID})
+        if current_config:
+            password = decode_password(current_config["form"]["root_password"])
+        else:
+            password = ''
+
         node = get_system_info(management_ip, password)
         potential_monitor_interfaces = []
 

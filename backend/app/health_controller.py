@@ -6,6 +6,7 @@ import pymongo
 from app import app, logger, conn_mng
 from app.job_manager import shell
 from shared.constants import KIT_ID
+from shared.utils import decode_password
 
 from app.job_manager import spawn_job
 from app.socket_service import log_to_console
@@ -65,7 +66,7 @@ def perform_systems_check() -> Response:
     if current_kit_configuration:
         if current_kit_configuration["form"] and current_kit_configuration["form"]["root_password"]:
             cmd_to_execute = ("ansible-playbook -i /opt/tfplenum/playbooks/inventory.yml -e ansible_ssh_pass='" + 
-                              current_kit_configuration["form"]["root_password"] + "' site.yml")
+                              decode_password(current_kit_configuration["form"]["root_password"]) + "' site.yml")
             spawn_job("SystemsCheck",
                     cmd_to_execute,
                     ["systems_check"],

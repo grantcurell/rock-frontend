@@ -119,7 +119,7 @@ export class KickstartFormComponent implements OnInit {
 
   private initializeView(): void {
     //This is asynchronous so the browser will not block until this returns.
-    this.kickStartSrv.gatherDeviceFacts("localhost", "")
+    this.kickStartSrv.gatherDeviceFacts("localhost")
       .subscribe(data => {
         this.deviceFacts = data;
         this.kickStartForm.setInterfaceSelections(this.deviceFacts);
@@ -210,9 +210,7 @@ export class KickstartFormComponent implements OnInit {
       archiveForm, 
       this.kickStartForm.getRawValue(),
       KICKSTART_ID
-    ).subscribe(data => {      
-      this.kickStartForm.enable();
-    });
+    ).subscribe(data => {});
   }
 
   restoreForm(formId: string){

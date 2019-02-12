@@ -435,7 +435,6 @@ export class KitInventoryForm extends FormGroup {
     constructor() {
         super({}, ValidateKitInventory);
         super.addControl('sensor_storage_type', this.sensor_storage_type);
-        super.addControl('root_password', this.root_password);
         super.addControl('elastic_cpu_percentage', this.elastic_cpu_percentage);
         super.addControl('elastic_memory_percentage', this.elastic_memory_percentage);
         super.addControl('logstash_cpu_percentage', this.logstash_cpu_percentage);
@@ -501,7 +500,6 @@ export class KitInventoryForm extends FormGroup {
         emitEvent?: boolean;
     }): void {
         this.sensor_storage_type.disable();
-        this.root_password.disable();
         this.elastic_cpu_percentage.disable();
         this.elastic_memory_percentage.disable();
         this.logstash_cpu_percentage.disable();
@@ -576,20 +574,7 @@ export class KitInventoryForm extends FormGroup {
         with Ceph. Though, that traffic is only a fraction of what PCAP consumes in most \
         cases.",
         'Use hard drive for PCAP storage'
-    )
-
-    root_password = new HtmlInput(
-        'root_password',
-        'Root Password',
-        '',
-        'password',
-        '^.{6,}$',
-        'You must enter a root password with a minimum length of 6 characters.',
-        true,
-        '',
-        "The root password will be how to log into each node after the kickstart process completes.  \
-        Do not forget this password or you will not be able to complete the system installation."
-    )
+    )    
 
     endgame_iporhost = new HtmlInput(
         'endgame_iporhost',

@@ -12,7 +12,7 @@ from app.common import OK_RESPONSE, ERROR_RESPONSE
 from flask import request, jsonify, Response
 from pymongo.results import InsertOneResult
 from shared.constants import KICKSTART_ID
-from shared.utils import netmask_to_cidr, filter_ip
+from shared.utils import netmask_to_cidr, filter_ip, encode_password
 
 
 def _is_valid_ip(ip_address: str) -> bool:
@@ -55,11 +55,13 @@ def generate_kickstart_inventory() -> Response:
             return jsonify(error_message="The IPs {} are already being used on this network. Please use different IP addresses."
                                          .format(', '.join(invalid_ips)))
 
-    # logger.debug(json.dumps(payload, indent=4, sort_keys=True))
+    #logger.debug(json.dumps(payload, indent=4, sort_keys=True))
     current_config = conn_mng.mongo_kickstart.find_one({"_id": KICKSTART_ID})
     if current_config:
         archive_form(current_config['form'], True, conn_mng.mongo_kickstart_archive)
 
+    payload["re_password"] = encode_password(payload["re_password"])
+    payload["root_password"] = encode_password(payload["root_password"])
     conn_mng.mongo_kickstart.find_one_and_replace({"_id": KICKSTART_ID},
                                                   {"_id": KICKSTART_ID, "form": payload},
                                                   upsert=True)  # type: InsertOneResult
@@ -87,6 +89,8 @@ def get_kickstart_form() -> Response:
         return OK_RESPONSE
 
     mongo_document['_id'] = str(mongo_document['_id'])
+    mongo_document["form"]["re_password"] = ""
+    mongo_document["form"]["root_password"] = ""
     return jsonify(mongo_document["form"])
 
 

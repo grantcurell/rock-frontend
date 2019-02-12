@@ -86,7 +86,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
    * @param data - The data to map
    * @param formGroup - The form group we are mapping our data too.
    */
-  private _map_to_form(data: Object, formGroup: FormGroup, rootPassword: string) {
+  private _map_to_form(data: Object, formGroup: FormGroup) {
     for (let key in data){
       const someFormObject = formGroup.get(key);
 
@@ -97,13 +97,12 @@ export class KitFormComponent implements OnInit, AfterViewInit{
       } else if (someFormObject instanceof FormControl){
         someFormObject.setValue(data[key]);
       } else if (someFormObject instanceof FormGroup){
-        this._map_to_form(data[key], someFormObject, rootPassword);
-
-      } else if (someFormObject instanceof SensorsFormArray 
+        this._map_to_form(data[key], someFormObject);
+      } else if (someFormObject instanceof SensorsFormArray
                  || someFormObject instanceof ServersFormArray) {
         const nodeFormArray: FormArray = someFormObject as FormArray;
 
-        for (let index = 0; index < data[key].length; index++) {          
+        for (let index = 0; index < data[key].length; index++) {
           let srvFormGroup: SensorFormGroup | ServerFormGroup = new SensorFormGroup(false, null, null);
           let host_key = "host_sensor";
           if (someFormObject instanceof ServersFormArray){
@@ -174,8 +173,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
         this.openKickstartErrorModal();
         return;
       }
-
-      this.kitForm.root_password.setDefaultValue(data["root_password"]);
+      
       for (const node of data["nodes"]) {
         this.appendNode(node);
       }
@@ -199,9 +197,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
   }
 
   archiveForm(archiveForm: Object): void {    
-    this.archiveSrv.archiveForm(archiveForm, this.kitForm.getRawValue(), KIT_ID).subscribe(data => {
-      this.kitForm.enable();
-    });    
+    this.archiveSrv.archiveForm(archiveForm, this.kitForm.getRawValue(), KIT_ID).subscribe(data => {});    
     this.setKubernetesCIDRRange();    
   }
   
@@ -314,7 +310,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
       return;
     }
 
-    this._map_to_form(kitData, this.kitForm, kitData['root_password']);
+    this._map_to_form(kitData, this.kitForm);
     this.hasKitForm = true;
 
     if (isCompleted){
@@ -430,7 +426,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
     if (node instanceof SensorFormGroup) {
       host_key = "host_sensor";
     }
-    this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value)
+    this.kickStartSrv.gatherDeviceFacts(node.value[host_key])
     .subscribe(data => {
       this._gatherFacts(node, data, host_key);
     });
@@ -441,7 +437,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
     for (let i = 0; i < this.kitForm.sensors.length; i++){
       let host_key = "host_sensor";
       let node = this.kitForm.sensors.at(i) as SensorFormGroup;
-      this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value).subscribe(data => {
+      this.kickStartSrv.gatherDeviceFacts(node.value[host_key]).subscribe(data => {
         console.log(node);
         this._gatherFacts(node, data, host_key);
       });      
@@ -450,7 +446,7 @@ export class KitFormComponent implements OnInit, AfterViewInit{
     for (let i = 0; i < this.kitForm.servers.length; i++){
       let host_key = "host_server";
       let node = this.kitForm.servers.at(i) as ServerFormGroup;
-      this.kickStartSrv.gatherDeviceFacts(node.value[host_key], this.kitForm.root_password.value).subscribe(data => {
+      this.kickStartSrv.gatherDeviceFacts(node.value[host_key]).subscribe(data => {
         console.log(node);
         this._gatherFacts(node, data, host_key);
       });      

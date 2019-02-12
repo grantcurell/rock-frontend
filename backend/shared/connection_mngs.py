@@ -6,7 +6,8 @@ from kubernetes import client, config
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo import MongoClient
-from shared.constants import KIT_ID, DATE_FORMAT_STR
+from shared.constants import KIT_ID, DATE_FORMAT_STR, KICKSTART_ID
+from shared.utils import decode_password
 from typing import Dict, Tuple
 
 KUBEDIR = "/root/.kube"
@@ -139,7 +140,7 @@ class MongoConnectionManager(object):
         self.close()
 
 
-def get_master_node_ip_and_password(kit_form: Dict) -> Tuple[str, str]:
+def get_master_node_ip_and_password(kit_form: Dict) -> str:
     """
     Returns a the IP address and root password of the master node from the kit form passed in.
 
@@ -149,7 +150,7 @@ def get_master_node_ip_and_password(kit_form: Dict) -> Tuple[str, str]:
     for server in kit_form["servers"]:
         try:
             if server["is_master_server"]:
-                return server["host_server"], kit_form["root_password"]
+                return server["host_server"]
         except KeyError:
             pass
 
@@ -164,8 +165,10 @@ class FabricConnectionWrapper():
 
     def _establish_fabric_connection(self, conn_mongo: MongoConnectionManager) -> None:
         kit_form = conn_mongo.mongo_kit.find_one({"_id": KIT_ID})
-        if kit_form:
-            master_ip, password = get_master_node_ip_and_password(kit_form['form'])
+        kickstart_form = conn_mongo.mongo_kickstart.find_one({"_id": KICKSTART_ID})
+        if kit_form and kickstart_form:
+            master_ip = get_master_node_ip_and_password(kit_form['form'])
+            password = decode_password(kickstart_form['form']['root_password'])
             self._connection = Connection(master_ip, 
                                           user=USERNAME, 
                                           connect_timeout=CONNECTION_TIMEOUT,
