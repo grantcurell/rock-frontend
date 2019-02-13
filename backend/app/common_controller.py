@@ -27,7 +27,7 @@ def gather_device_facts() -> Response:
     try:
         payload = request.get_json()
         management_ip = payload.get('management_ip')
-        current_config = conn_mng.mongo_kit.find_one({"_id": KICKSTART_ID})
+        current_config = conn_mng.mongo_kickstart.find_one({"_id": KICKSTART_ID})
         if current_config:
             password = decode_password(current_config["form"]["root_password"])
         else:
@@ -35,7 +35,6 @@ def gather_device_facts() -> Response:
 
         node = get_system_info(management_ip, password)
         potential_monitor_interfaces = []
-
         for interface in node.interfaces:
             if interface.ip_address != management_ip:
                 potential_monitor_interfaces.append(interface.name)

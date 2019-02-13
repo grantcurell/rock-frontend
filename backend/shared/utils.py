@@ -33,6 +33,8 @@ def encode_password(password: str) -> str:
 
     :param password: The password we wish to encode
     """
+    if password is None or len(password) == 0:
+        return ''
     return base64.b64encode(bytes(password, 'utf-8')).decode('utf-8')
 
 
@@ -42,4 +44,6 @@ def decode_password(password_enc: str) -> str:
 
     :param password_enc: The encoded password.
     """
+    if password_enc is None or len(password_enc) == 0:
+        return ''
     return base64.b64decode(bytes(password_enc, 'utf-8')).decode('utf-8')

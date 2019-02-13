@@ -9,7 +9,8 @@
     <input type="hidden"
            formControlName="{{ controlName }}"
            [required]="input_control.required">
-    <span style="margin-left: 10px;">{{ input_control.value }}</span>
+    <span *ngIf="input_control.input_type != 'password'" style="margin-left: 10px;">{{ input_control.value }}</span>
+    <span *ngIf="input_control.input_type == 'password'" style="margin-left: 10px;">**********</span>
   </div>
   <ng-container *ngIf="!input_control.control_disabled">
     <input name="{{ controlName }}{{ uid }}"

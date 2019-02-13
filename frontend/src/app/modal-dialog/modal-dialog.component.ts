@@ -76,7 +76,8 @@ export class ModalDialogComponent implements OnInit {
   triggerCallback(timezone: string){
     if (this.modal.modalForm instanceof ExecuteKitForm){
       if (timezone === "Browser"){
-        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;  
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        this.modal.modalForm.timezone.setValue(timezone);
       }      
       this._DatePickerService.setDate(timezone);
       this.setTime(timezone);

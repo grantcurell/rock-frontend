@@ -433,12 +433,10 @@ export class KitFormComponent implements OnInit, AfterViewInit{
   }
 
   private gatherAllFacts(){
-    console.log("gatherAllFacts()");
     for (let i = 0; i < this.kitForm.sensors.length; i++){
       let host_key = "host_sensor";
       let node = this.kitForm.sensors.at(i) as SensorFormGroup;
-      this.kickStartSrv.gatherDeviceFacts(node.value[host_key]).subscribe(data => {
-        console.log(node);
+      this.kickStartSrv.gatherDeviceFacts(node.value[host_key]).subscribe(data => {        
         this._gatherFacts(node, data, host_key);
       });      
     }
@@ -447,7 +445,6 @@ export class KitFormComponent implements OnInit, AfterViewInit{
       let host_key = "host_server";
       let node = this.kitForm.servers.at(i) as ServerFormGroup;
       this.kickStartSrv.gatherDeviceFacts(node.value[host_key]).subscribe(data => {
-        console.log(node);
         this._gatherFacts(node, data, host_key);
       });      
     }

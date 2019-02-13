@@ -12,7 +12,7 @@ from app.common import OK_RESPONSE, ERROR_RESPONSE
 from flask import request, jsonify, Response
 from pymongo.results import InsertOneResult
 from shared.constants import KICKSTART_ID
-from shared.utils import netmask_to_cidr, filter_ip, encode_password
+from shared.utils import netmask_to_cidr, filter_ip, encode_password, decode_password
 
 
 def _is_valid_ip(ip_address: str) -> bool:
@@ -89,8 +89,8 @@ def get_kickstart_form() -> Response:
         return OK_RESPONSE
 
     mongo_document['_id'] = str(mongo_document['_id'])
-    mongo_document["form"]["re_password"] = ""
-    mongo_document["form"]["root_password"] = ""
+    mongo_document["form"]["re_password"] = decode_password(mongo_document["form"]["re_password"])
+    mongo_document["form"]["root_password"] = decode_password(mongo_document["form"]["root_password"])
     return jsonify(mongo_document["form"])
 
 

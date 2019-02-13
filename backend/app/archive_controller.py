@@ -6,7 +6,7 @@ import json
 from app import (app, logger, conn_mng)
 from app.common import OK_RESPONSE, ERROR_RESPONSE
 from bson import ObjectId
-from shared.utils import encode_password
+from shared.utils import encode_password, decode_password
 from datetime import datetime
 from flask import request, jsonify, Response
 from pymongo.collection import Collection
@@ -137,14 +137,13 @@ def restore_archived() -> Response:
     config_mongo_collection, archive_mongo_collection = _get_mongo_collections(config_id)
     archived_form = archive_mongo_collection.find_one({"_id": ObjectId(payload["_id"])})
     if archived_form:
-        # current_config = config_mongo_collection.find_one({"_id": config_id})
-        # if current_config:
-        #     archive_form(current_config['form'], True, archive_mongo_collection)
-
         if archived_form['is_completed_form']:
             config_mongo_collection.find_one_and_replace({"_id": config_id},
                                                          {"_id": config_id, "form": archived_form['form']},
                                                          upsert=True)  # type: InsertOneResult
+        if config_id == KICKSTART_ID:
+            archived_form['form']['root_password'] = decode_password(archived_form['form']['root_password'])
+            archived_form['form']['re_password'] = decode_password(archived_form['form']['re_password'])
         archived_form['_id'] = str(archived_form['_id'])                
         return jsonify(archived_form)
     return ERROR_RESPONSE
