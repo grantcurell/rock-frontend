@@ -57,13 +57,13 @@ def get_portal_links() -> Response:
                         continue
 
                     if dns == "grr-frontend.lan":
-                        portal_links.append({'ip': 'https://' + ip, 'dns': dns, 'logins': 'admin/password'})
+                        portal_links.append({'ip': 'https://' + ip, 'dns': 'https://' + dns, 'logins': 'admin/password'})
                     elif dns == "moloch-viewer.lan":
-                        portal_links.append({'ip': 'http://' + ip, 'dns': dns, 'logins': 'assessor/password'})
+                        portal_links.append({'ip': 'http://' + ip, 'dns': 'http://' + dns, 'logins': 'assessor/password'})
                     elif dns == "kubernetes-dashboard.lan":
-                        portal_links.append({'ip': 'https://' + ip, 'dns': dns, 'logins': ''})
+                        portal_links.append({'ip': 'https://' + ip, 'dns': 'https://' + dns, 'logins': ''})
                     else:
-                        portal_links.append({'ip': 'http://' + ip, 'dns': dns, 'logins': ''})
+                        portal_links.append({'ip': 'http://' + ip, 'dns': 'http://' + dns, 'logins': ''})
                 except ValueError as e:
                     pass
             return jsonify(portal_links)
