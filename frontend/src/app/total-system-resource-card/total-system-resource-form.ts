@@ -50,8 +50,12 @@ export class TotalSystemResources {
      */
     public subtractFromDeviceFacts(deviceFacts: Object){
         if (deviceFacts){
-            this.cpuCoresAvailable -= deviceFacts["cpus_available"];
-            this.memoryAvailable -= deviceFacts["memory_available"];
+            if (this.cpuCoresAvailable > 0){
+                this.cpuCoresAvailable -= deviceFacts["cpus_available"];
+            }
+            if (this.memoryAvailable > 0){
+                this.memoryAvailable -= deviceFacts["memory_available"];
+            }
         }        
     }
 

@@ -8,7 +8,7 @@ export class PortalService {
 
   constructor(private http: HttpClient) { }
 
-  getPortalLinks(){
+  getPortalLinks(){    
     const url = '/api/get_portal_links';
     return this.http.get(url).pipe();
   }

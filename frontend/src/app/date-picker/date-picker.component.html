@@ -10,7 +10,7 @@
          formControlName="{{ controlName }}" ngbDatepicker #d="ngbDatepicker"
          [(ngModel)]="_DatePickerService.date">
   <div class="input-group-append">
-    <button class="btn btn-outline-secondary icon_calendar" (click)="d.toggle()" type="button"></button>
+    <button class="btn btn-outline-secondary icon_calendar" style="color: white;" (click)="d.toggle()" type="button"></button>
   </div>
   <div *ngIf="input_control.invalid && (input_control.dirty || input_control.touched)" class="invalid-feedback2">
       <div *ngIf="input_control.errors.required">Required field</div>

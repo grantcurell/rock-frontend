@@ -6,6 +6,7 @@ import pymongo
 from app import app, logger, conn_mng
 from app.job_manager import shell
 from shared.constants import KIT_ID
+from shared.utils import decode_password
 
 from app.job_manager import spawn_job
 from app.socket_service import log_to_console
@@ -14,15 +15,15 @@ from flask import request, Response, jsonify
 from shared.connection_mngs import KubernetesWrapper, objectify, KitFormNotFound
 
 
-@app.route('/api/describe_pod/<pod_name>', methods=['GET'])
-def describe_pod(pod_name: str) -> Response:
+@app.route('/api/describe_pod/<pod_name>/<namespace>', methods=['GET'])
+def describe_pod(pod_name: str, namespace: str) -> Response:
     """
     Runs a command and pulls the pods describe command output.
 
     :param pod_name: The name of the pod of cource.  
                      You can get it with 'kubectl get pods' on the main server node.
     """
-    command = '/opt/tfplenum-frontend/tfp-env/bin/python describe_kubernetes_pod.py %s' % pod_name
+    command = '/opt/tfplenum-frontend/tfp-env/bin/python describe_kubernetes_pod.py %s %s' % (pod_name, namespace)
     stdout, stderr = shell(command, working_dir="/opt/tfplenum-frontend/backend/fabfiles")
 
     if stdout:
@@ -63,9 +64,9 @@ def perform_systems_check() -> Response:
     """
     current_kit_configuration = conn_mng.mongo_kit.find_one({"_id": KIT_ID})
     if current_kit_configuration:
-        if current_kit_configuration["payload"] and current_kit_configuration["payload"]["root_password"]:
+        if current_kit_configuration["form"] and current_kit_configuration["form"]["root_password"]:
             cmd_to_execute = ("ansible-playbook -i /opt/tfplenum/playbooks/inventory.yml -e ansible_ssh_pass='" + 
-                              current_kit_configuration["payload"]["root_password"] + "' site.yml")
+                              decode_password(current_kit_configuration["form"]["root_password"]) + "' site.yml")
             spawn_job("SystemsCheck",
                     cmd_to_execute,
                     ["systems_check"],

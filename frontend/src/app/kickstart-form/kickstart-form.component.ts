@@ -1,11 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { HtmlModalPopUp, HtmlDropDown, HtmlCardSelector, HtmlModalSelectDialog } from '../html-elements';
-import { KickstartInventoryForm, NodeFormGroup, AdvancedSettingsFormGroup } from './kickstart-form';
+import { HtmlModalPopUp, HtmlDropDown, HtmlCardSelector,
+         HtmlModalIPSelectDialog, HtmlModalRestoreArchiveDialog, ModalType } from '../html-elements';
+import { KickstartInventoryForm, NodeFormGroup, CommentForm } from './kickstart-form';
 import { KickstartService } from '../kickstart.service';
+import { ArchiveService } from '../archive.service';
 import { FormArray, FormGroup, FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { CardSelectorComponent } from '../card-selector/card-selector.component';
 import { Router } from '@angular/router';
+import { KICKSTART_ID } from '../frontend-constants';
 
 const NODE_PATTERN = new RegExp('^(server|sensor)[0-9]+[.]lan$');
 
@@ -18,10 +21,8 @@ export class KickstartFormComponent implements OnInit {
   kickStartModal: HtmlModalPopUp;
   messageModal: HtmlModalPopUp;
   kickStartForm: KickstartInventoryForm;
-  hasKickstartForm: boolean;
-  restoreModal: HtmlModalSelectDialog;
-  ipSelectorModal: HtmlModalSelectDialog;
-  advancedSettingsFormGroup: AdvancedSettingsFormGroup;
+  restoreModal: HtmlModalRestoreArchiveDialog;
+  ipSelectorModal: HtmlModalIPSelectDialog;  
   deviceFacts: Object;
 
   @ViewChild('cardSelector')
@@ -29,16 +30,15 @@ export class KickstartFormComponent implements OnInit {
 
   //Magically Injected by Angular
   constructor(private kickStartSrv: KickstartService,
+              private archiveSrv: ArchiveService,
               private title: Title,
               private router: Router)
   {
-    this.kickStartForm = new KickstartInventoryForm();
-    this.advancedSettingsFormGroup = this.kickStartForm.get('advanced_settings') as AdvancedSettingsFormGroup;
+    this.kickStartForm = new KickstartInventoryForm();    
     this.kickStartModal = new HtmlModalPopUp('kickstart_modal');
     this.messageModal = new HtmlModalPopUp('message_modal');
-    this.restoreModal = new HtmlModalSelectDialog('restore_modal');
-    this.ipSelectorModal = new HtmlModalSelectDialog('ip_modal');
-    this.hasKickstartForm = false;
+    this.restoreModal = new HtmlModalRestoreArchiveDialog('restore_modal');
+    this.ipSelectorModal = new HtmlModalIPSelectDialog('ip_modal');
   }
 
   private _fill_up_array(formArrayLength: number){
@@ -92,34 +92,40 @@ export class KickstartFormComponent implements OnInit {
     this.initializeView();
   }
 
+  private setupForm(data: Object, isCompleted: boolean=true){
+    if (data === null || data === undefined){      
+      return;
+    }
+
+    if (this.monitorInterfaceSelector == undefined){      
+      return;
+    }
+
+    this._map_to_form(data, this.kickStartForm);    
+    this.kickStartForm.re_password.updateValueAndValidity();
+
+    if (isCompleted){
+      this.kickStartForm.disable();
+    } else{
+      this.kickStartForm.enable();
+    }
+  }
+
   private initalizeForm(): void {
     this.kickStartSrv.getKickstartForm().subscribe(data => {
-      if (data === null || data === undefined){
-        this.hasKickstartForm = false;
-        return;
-      }
-
-      if (this.monitorInterfaceSelector == undefined){
-        this.hasKickstartForm = false;
-        return;
-      }
-
-      this._map_to_form(data, this.kickStartForm);
-      this.hasKickstartForm = true;
-      this.kickStartForm.re_password.updateValueAndValidity();
-      this.kickStartForm.disable();
+      this.setupForm(data);
     });
   }
 
   private initializeView(): void {
     //This is asynchronous so the browser will not block until this returns.
-    this.kickStartSrv.gatherDeviceFacts("localhost", "")
+    this.kickStartSrv.gatherDeviceFacts("localhost")
       .subscribe(data => {
         this.deviceFacts = data;
         this.kickStartForm.setInterfaceSelections(this.deviceFacts);
         this.initalizeForm();
       });
-  }
+  }  
 
   clearForm(): void {
     this.kickStartForm.reset();
@@ -134,7 +140,15 @@ export class KickstartFormComponent implements OnInit {
   onSubmit(): void {
     this.kickStartSrv.generateKickstartInventory(this.kickStartForm.getRawValue())
       .subscribe(data => {
-        this.openConsole();
+        if (data !== null && data['error_message']){
+          this.messageModal.updateModal('Error',
+            data['error_message'],
+            undefined,
+            'Close');
+          this.messageModal.openModal();
+        } else{
+          this.openConsole();
+        }        
     });
   }
 
@@ -161,50 +175,48 @@ export class KickstartFormComponent implements OnInit {
 
   toggleNode(node: NodeFormGroup) {
     node.hidden = !node.hidden;
-  }
-
-  toggleAdvancedSettings(){
-    this.advancedSettingsFormGroup.hidden = !this.advancedSettingsFormGroup.hidden;
-  }
+  }  
 
   get nodes() {
     return this.kickStartForm.get('nodes') as FormArray;
   }
 
-  openResetConfirmation() {
+  openArchiveConfirmation() {
     this.kickStartModal.updateModal('WARNING',
       'Are you sure you want to archive this form? Doing so will erase any fields \
       you have entered on the existing page but it will archive the form.',
       "Yes",
-      'Cancel'
+      'Cancel',
+      ModalType.form,
+      new CommentForm()
     )
     this.kickStartModal.openModal();
   }
 
   openRestoreModal(){
-    this.kickStartSrv.getArchivedKickstartForms().subscribe(data => {
+    this.archiveSrv.getArchivedForms(KICKSTART_ID).subscribe(data => {
       this.restoreModal.updateModal('Restore Form',
         'Please select an archived Kickstart form.  Keep in mind restoring a form will remove your current configuration.',
         "Restore",
         'Cancel'
       );
-      this.restoreModal.updateModalSelection(data);
+      this.restoreModal.updateModalSelection(data as Array<Object>);
       this.restoreModal.openModal();
     });
   }
 
-  archiveForm(){
-    this.kickStartForm.reset();
-    this.kickStartForm.enable();
-    this.kickStartSrv.removeKickstartInventoryAndArchive().subscribe(data => {
-      this.hasKickstartForm = false;
-    });
+  archiveForm(archiveForm: Object){
+    this.archiveSrv.archiveForm(
+      archiveForm, 
+      this.kickStartForm.getRawValue(),
+      KICKSTART_ID
+    ).subscribe(data => {});
   }
 
   restoreForm(formId: string){
-    this.kickStartSrv.restoreArchivedKickstartForm(formId).subscribe(data => {
+    this.archiveSrv.restoreArchivedForm(KICKSTART_ID, formId).subscribe(data => {
       this.kickStartForm.reset();
-      this.initalizeForm();
+      this.setupForm(data['form'], data['is_completed_form']);
     });
   }
 
@@ -268,7 +280,7 @@ export class KickstartFormComponent implements OnInit {
     }
 
     this.kickStartSrv.getUnusedIPAddresses(mng_ip[0], netmask).subscribe(data => {
-      this.ipSelectorModal.updateModal('Select IP',
+      this.ipSelectorModal.updateModal('Select unused IP',
         'Please select an unused IP address.',
         "Select",
         'Cancel',
@@ -276,7 +288,7 @@ export class KickstartFormComponent implements OnInit {
         undefined,
         node_index
       );
-      this.ipSelectorModal.updateModalSelection(data);
+      this.ipSelectorModal.updateModalSelection(data as Array<string>);
       this.ipSelectorModal.openModal();
     });
   }

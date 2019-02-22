@@ -4,15 +4,32 @@ Main module for handling all of the Kickstart Configuration REST calls.
 import json
 
 from app import (app, logger, conn_mng)
+from app.archive_controller import archive_form
 from app.inventory_generator import KickstartInventoryGenerator
 from app.job_manager import spawn_job, shell
 from app.socket_service import log_to_console
 from app.common import OK_RESPONSE, ERROR_RESPONSE
-from shared.constants import KICKSTART_ID
-from datetime import datetime
 from flask import request, jsonify, Response
 from pymongo.results import InsertOneResult
-from bson import ObjectId
+from shared.constants import KICKSTART_ID
+from shared.utils import netmask_to_cidr, filter_ip, encode_password, decode_password
+
+
+def _is_valid_ip(ip_address: str) -> bool:
+    """
+    Ensures that the IP passed in is valid.
+
+    :param ip_address: Some ip address (IE: 192.168.1.1).
+
+    :return:
+    """
+    command = "nmap -v -sn -n %s/32 -oG - | awk '/Status: Down/{print $2}'" % ip_address
+    stdout_str, stderr_str = shell(command, use_shell=True)
+    if stdout_str != b'':
+        available_ip_addresses = stdout_str.decode("utf-8").split('\n')
+        if len(available_ip_addresses) > 0:            
+            return True        
+    return False
 
 
 @app.route('/api/generate_kickstart_inventory', methods=['POST'])
@@ -24,11 +41,30 @@ def generate_kickstart_inventory() -> Response:
     :return:
     """
     payload = request.get_json()
-    logger.debug(json.dumps(payload, indent=4, sort_keys=True))
-    conn_mng.mongo_kickstart.find_one_and_replace({"_id": KICKSTART_ID},
-                                                  {"_id": KICKSTART_ID, "payload": payload},
-                                                  upsert=True)  # type: InsertOneResult
+    invalid_ips = []
+    for node in payload["nodes"]:
+        if not _is_valid_ip(node["ip_address"]):
+            invalid_ips.append(node["ip_address"])
 
+    invalid_ips_len = len(invalid_ips)
+    if invalid_ips_len > 0:
+        if invalid_ips_len == 1:
+            return jsonify(error_message="The IP {} is already being used on this network. Please use a different IP address."
+                                         .format(', '.join(invalid_ips)))
+        else:
+            return jsonify(error_message="The IPs {} are already being used on this network. Please use different IP addresses."
+                                         .format(', '.join(invalid_ips)))
+
+    #logger.debug(json.dumps(payload, indent=4, sort_keys=True))
+    current_config = conn_mng.mongo_kickstart.find_one({"_id": KICKSTART_ID})
+    if current_config:
+        archive_form(current_config['form'], True, conn_mng.mongo_kickstart_archive)
+
+    payload["re_password"] = encode_password(payload["re_password"])
+    payload["root_password"] = encode_password(payload["root_password"])
+    conn_mng.mongo_kickstart.find_one_and_replace({"_id": KICKSTART_ID},
+                                                  {"_id": KICKSTART_ID, "form": payload},
+                                                  upsert=True)  # type: InsertOneResult
     kickstart_generator = KickstartInventoryGenerator(payload)
     kickstart_generator.generate()
 
@@ -38,58 +74,6 @@ def generate_kickstart_inventory() -> Response:
               log_to_console,
               working_directory="/opt/tfplenum-deployer/playbooks")
     return OK_RESPONSE
-
-
-@app.route('/api/remove_and_archive_kickstart', methods=['POST'])
-def remove_and_archive() -> Response:
-    """
-    Removes the kickstart inventory from the main collection and then
-    archives it in a separate collection.
-
-    :return:
-    """
-    kickstart_form = conn_mng.mongo_kickstart.find_one({"_id": KICKSTART_ID})
-    if kickstart_form is not None:
-        del kickstart_form['_id']
-        kickstart_form['archive_date'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-        conn_mng.mongo_kickstart_archive.insert_one(kickstart_form)
-        conn_mng.mongo_kickstart.delete_one({"_id": KICKSTART_ID})
-    return OK_RESPONSE
-
-
-@app.route('/api/restore_archived', methods=['POST'])
-def restore_archived() -> Response:
-    """
-    Restores archived form from the archived collection.
-
-    :return:
-    """
-    payload = request.get_json()
-    logger.debug(json.dumps(payload, indent=4, sort_keys=True))
-
-    kickstart_form = conn_mng.mongo_kickstart_archive.find_one_and_delete({"_id": ObjectId(payload["_id"])})
-    if kickstart_form:
-        conn_mng.mongo_kickstart.find_one_and_replace({"_id": KICKSTART_ID},
-                                                      {"_id": KICKSTART_ID, "payload": kickstart_form['payload']},
-                                                      upsert=True)  # type: InsertOneResult
-        return OK_RESPONSE
-    return ERROR_RESPONSE
-
-
-@app.route('/api/get_kickstart_archived')
-def get_archived_ids() -> Response:
-    """
-    Returns all the archived Kickstart Configuration form ids and their associated archive dates.
-    :return:
-    """
-    ret_val = []
-    result = conn_mng.mongo_kickstart_archive.find({})  # , projection={"_id": True, "archive_date": True}
-    if result:
-        for item in result:
-            item["_id"] = str(item["_id"])
-            ret_val.append(item)
-
-    return jsonify(ret_val)
 
 
 @app.route('/api/get_kickstart_form', methods=['GET'])
@@ -105,23 +89,9 @@ def get_kickstart_form() -> Response:
         return OK_RESPONSE
 
     mongo_document['_id'] = str(mongo_document['_id'])
-    return jsonify(mongo_document["payload"])
-
-
-def _filter_ip(ipaddress: str) -> bool:
-    if ipaddress.endswith('0'):
-        return True
-    if ipaddress == '':
-        return True
-    return False
-
-
-def _netmask_to_cidr(netmask: str) -> int:
-    '''
-    :param netmask: netmask ip addr (eg: 255.255.255.0)
-    :return: equivalent cidr number to given netmask ip (eg: 24)
-    '''
-    return sum([bin(int(x)).count('1') for x in netmask.split('.')])
+    mongo_document["form"]["re_password"] = decode_password(mongo_document["form"]["re_password"])
+    mongo_document["form"]["root_password"] = decode_password(mongo_document["form"]["root_password"])
+    return jsonify(mongo_document["form"])
 
 
 @app.route('/api/get_unused_ip_addrs', methods=['POST'])
@@ -131,7 +101,7 @@ def get_unused_ip_addrs() -> Response:
     :return:
     """
     payload = request.get_json()    
-    cidr = _netmask_to_cidr(payload['netmask'])    
+    cidr = netmask_to_cidr(payload['netmask'])    
     if cidr <= 24:
         command = "nmap -v -sn -n %s/24 -oG - | awk '/Status: Down/{print $2}'" % payload['mng_ip']
     else:
@@ -139,5 +109,5 @@ def get_unused_ip_addrs() -> Response:
     
     stdout_str, stderr_str = shell(command, use_shell=True)
     available_ip_addresses = stdout_str.decode("utf-8").split('\n')
-    available_ip_addresses = [x for x in available_ip_addresses if not _filter_ip(x)]
+    available_ip_addresses = [x for x in available_ip_addresses if not filter_ip(x)]
     return jsonify(available_ip_addresses)

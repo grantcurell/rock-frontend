@@ -9,6 +9,7 @@ import { KickstartFormComponent } from './kickstart-form/kickstart-form.componen
 import { AppRoutingModule } from './/app-routing.module';
 import { HelpComponent } from './help/help.component';
 import { TextInputComponent } from './text-input/text-input.component';
+import { TextAreaInputComponent } from './textarea-input/textarea-input.component';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { CheckboxComponent } from './checkbox/checkbox.component';
 import { ModalDialogComponent } from './modal-dialog/modal-dialog.component';
@@ -20,11 +21,10 @@ import { CardSelectorComponent } from './card-selector/card-selector.component';
 import { TotalSystemResourceCardComponent } from './total-system-resource-card/total-system-resource-card.component';
 import { ServerStdoutComponent } from './server-stdout/server-stdout.component';
 import { ConfluenceComponent } from './confluence/confluence.component';
-import { ModalSelectDialogComponent } from './modal-select-dialog/modal-select-dialog.component';
+import { ModalArchiveDialogComponent } from './modal-archive-dialog/modal-archive-dialog.component';
 import { PortalComponent } from './portal/portal.component';
 import { SystemHealthComponent } from './system-health/system-health.component';
 import { SafePipe } from './globals';
-import { TerminalComponent } from './terminal/terminal.component';
 import { ConfigmapsComponent } from './configmaps/configmaps.component';
 import { ConfigmapEditorComponent } from './configmap-editor/configmap-editor.component'; 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -39,6 +39,7 @@ import { ModalIpSelectDialogComponent } from './modal-ip-select-dialog/modal-ip-
     KickstartFormComponent,
     HelpComponent,
     TextInputComponent,
+    TextAreaInputComponent,
     DropdownComponent,
     CheckboxComponent,
     ModalDialogComponent,
@@ -50,11 +51,10 @@ import { ModalIpSelectDialogComponent } from './modal-ip-select-dialog/modal-ip-
     TotalSystemResourceCardComponent,
     ServerStdoutComponent,
     ConfluenceComponent,
-    ModalSelectDialogComponent,
+    ModalArchiveDialogComponent,
     PortalComponent,
     SystemHealthComponent,
-    SafePipe,
-    TerminalComponent,
+    SafePipe,    
     ConfigmapsComponent,
     ConfigmapEditorComponent,
     DatePickerComponent,

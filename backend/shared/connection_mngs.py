@@ -1,12 +1,13 @@
 import os
 
 from datetime import datetime
-from fabric import Connection
+from fabric import Connection, Config
 from kubernetes import client, config
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo import MongoClient
-from shared.constants import KIT_ID
+from shared.constants import KIT_ID, DATE_FORMAT_STR, KICKSTART_ID
+from shared.utils import decode_password
 from typing import Dict, Tuple
 
 KUBEDIR = "/root/.kube"
@@ -30,13 +31,13 @@ def objectify(some_dict: Dict) -> Dict:
         if some_dict[key] is None:
             del some_dict[key]
         elif isinstance(some_dict[key], datetime):
-            some_dict[key] = some_dict[key].strftime('%Y-%m-%d %H:%M:%S')
+            some_dict[key] = some_dict[key].strftime(DATE_FORMAT_STR)
         elif isinstance(some_dict[key], list):
             for index, item in enumerate(some_dict[key]):
                 if item is None:
                     some_dict[key].pop(index)
                 elif isinstance(item, datetime):
-                    some_dict[key][index] = item.strftime('%Y-%m-%d %H:%M:%S')
+                    some_dict[key][index] = item.strftime(DATE_FORMAT_STR)
                 elif isinstance(item, dict):
                     objectify(item)
         elif isinstance(some_dict[key], dict):
@@ -139,7 +140,7 @@ class MongoConnectionManager(object):
         self.close()
 
 
-def get_master_node_ip_and_password(kit_form: Dict) -> Tuple[str, str]:
+def get_master_node_ip_and_password(kit_form: Dict) -> str:
     """
     Returns a the IP address and root password of the master node from the kit form passed in.
 
@@ -149,7 +150,7 @@ def get_master_node_ip_and_password(kit_form: Dict) -> Tuple[str, str]:
     for server in kit_form["servers"]:
         try:
             if server["is_master_server"]:
-                return server["host_server"], kit_form["root_password"]
+                return server["host_server"]
         except KeyError:
             pass
 
@@ -164,8 +165,10 @@ class FabricConnectionWrapper():
 
     def _establish_fabric_connection(self, conn_mongo: MongoConnectionManager) -> None:
         kit_form = conn_mongo.mongo_kit.find_one({"_id": KIT_ID})
-        if kit_form:
-            master_ip, password = get_master_node_ip_and_password(kit_form['payload'])
+        kickstart_form = conn_mongo.mongo_kickstart.find_one({"_id": KICKSTART_ID})
+        if kit_form and kickstart_form:
+            master_ip = get_master_node_ip_and_password(kit_form['form'])
+            password = decode_password(kickstart_form['form']['root_password'])
             self._connection = Connection(master_ip, 
                                           user=USERNAME, 
                                           connect_timeout=CONNECTION_TIMEOUT,
@@ -236,4 +239,47 @@ class KubernetesWrapper():
         return self._kube_apiv1
 
     def __exit__(self, *exc) -> None:
+        self.close()
+
+
+class FabricConnectionManager:
+
+    def __init__(self, username: str, password: str, ipaddress: str):
+        """
+        Initializes the fabric connection manager.
+
+        :param username: The username of the box we wish to connect too
+        :param password: The password of the user account
+        :param ipaddress: The Ip we are trying to gain access too.
+        """
+        self._connection = None  # type: Connection
+        self._username = username
+        self._password = password
+        self._ipaddress = ipaddress
+        self._establish_fabric_connection()
+
+    def _establish_fabric_connection(self) -> None:
+        if not self._connection:
+            config = Config(overrides={'sudo': {'password': self._password}})
+            self._connection = Connection(self._ipaddress,
+                                          config=config,
+                                          user=self._username,
+                                          connect_timeout=CONNECTION_TIMEOUT,
+                                          connect_kwargs={'password': self._password,
+                                                          'allow_agent': False,
+                                                          'look_for_keys': False})            
+
+    @property
+    def connection(self):
+        return self._connection
+
+    def close(self):
+        if self._connection:
+            self._connection.close()
+
+    def __enter__(self):
+        self._establish_fabric_connection()
+        return self._connection
+
+    def __exit__(self, *exc):
         self.close()

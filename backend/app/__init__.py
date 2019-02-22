@@ -66,3 +66,4 @@ from app import confluence_controller
 from app import portal_controller
 from app import health_controller
 from app import configmap_controller
+from app import archive_controller

@@ -45,11 +45,7 @@ all:
     root_password: "{{ template_ctx.root_password }}"
     # timezone: Set the timezone for each node.
     # Define: America/Chicago
-    {% if template_ctx.advanced_settings['timezone'] == 'Chicago' or template_ctx.advanced_settings['timezone'] == 'Los_Angeles' or template_ctx.advanced_settings['timezone'] == 'New_York' %}
-    timezone: America/{{ template_ctx.advanced_settings['timezone'] }}
-    {% else %}
     timezone: 'UTC'
-    {% endif %}
 
     # default_boot_drive: This is the default drive used for operating system installation.
     # Default: sda

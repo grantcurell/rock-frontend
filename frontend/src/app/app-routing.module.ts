@@ -7,13 +7,11 @@ import { ServerStdoutComponent } from './server-stdout/server-stdout.component';
 import { ConfluenceComponent } from './confluence/confluence.component';
 import { PortalComponent } from './portal/portal.component';
 import { SystemHealthComponent } from './system-health/system-health.component';
-import { TerminalComponent } from './terminal/terminal.component';
 import { ConfigmapsComponent } from './configmaps/configmaps.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/portal', pathMatch: 'full' },
-  { path: 'portal', component:  PortalComponent},
-  { path: 'terminal', component:  TerminalComponent},
+  { path: 'portal', component:  PortalComponent},  
   { path: 'health', component:  SystemHealthComponent},
   { path: 'kickstart', component: KickstartFormComponent },
   { path: 'kit_configuration', component: KitFormComponent },

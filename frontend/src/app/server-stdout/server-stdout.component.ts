@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular
 import { ServerStdoutService } from '../server-stdout.service';
 import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import { HtmlModalPopUp } from '../html-elements';
 
 @Component({
   selector: 'app-server-stdout',
@@ -13,6 +14,7 @@ export class ServerStdoutComponent implements OnInit {
   @ViewChild('console')
   private consoleDiv: ElementRef;
   private jobName: string;
+  killModal: HtmlModalPopUp;
 
   messages: Array<{msg: string, color: string}>;
   constructor(private stdoutService: ServerStdoutService, 
@@ -22,6 +24,7 @@ export class ServerStdoutComponent implements OnInit {
     this.title.setTitle("Console Output");
     this.messages = new Array<{msg: string, color: string}>();
     this.jobName = null;
+    this.killModal = new HtmlModalPopUp('kill_modal');
   }
 
   /**
@@ -83,5 +86,18 @@ export class ServerStdoutComponent implements OnInit {
   clearConsole() {
     this.messages = new Array<{msg: string, color: string}>();
     this.stdoutService.removeConsoleOutput({jobName: this.jobName, jobid: "Not Implemented"}).subscribe();
+  }
+
+  openKillModal(){
+    this.killModal.updateModal('WARNING',
+      'Are you sure you want to kill this job?',
+      "Yes",
+      'Cancel'
+    )
+    this.killModal.openModal();
+  }
+
+  killJob() {
+    this.stdoutService.killJob(this.jobName).subscribe();
   }
 }

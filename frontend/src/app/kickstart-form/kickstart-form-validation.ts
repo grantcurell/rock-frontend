@@ -1,8 +1,9 @@
 import {  FormArray, AbstractControl } from '@angular/forms';
 import { HtmlInput } from '../html-elements';
-import { INVALID_PASSWORD_MISMATCH } from '../frontend-constants'; 
+import { INVALID_PASSWORD_MISMATCH, IP_CONSTRAINT } from '../frontend-constants'; 
 import { NodeFormGroup } from './kickstart-form';
 import { CheckForInvalidControls } from '../globals';
+import { KickstartInventoryForm } from './kickstart-form';
 
 function _compare_field(nodes: FormArray, fieldName: string): { hasError: boolean, conflict: string } {
   if (nodes != null && nodes.length >= 2){
@@ -64,7 +65,7 @@ function _validateDhcpRange(control: AbstractControl, errors: Array<string>): vo
 }
 
 function _validateNodes(control: AbstractControl, errors: Array<string>): void {
-    let nodes = control.get('nodes') as FormArray;
+    let nodes = control.get('nodes') as FormArray;    
     let has_servers = false;
     let has_sensors = false;
 
@@ -94,7 +95,7 @@ function _validateNodes(control: AbstractControl, errors: Array<string>): void {
 }
 
 function _validateContorllerInterface(control: AbstractControl, errors: Array<string>): void {
-    let ctrl_interface = control.get('controller_interface') as FormArray;
+    let ctrl_interface = control.get('controller_interface') as FormArray;    
     if (ctrl_interface !== null){        
         if (ctrl_interface.length === 0) {
             errors.push("- Controller interfaces failed to validate. You need to select one.");
@@ -102,6 +103,53 @@ function _validateContorllerInterface(control: AbstractControl, errors: Array<st
     } 
 }
   
+
+var netmask2CIDR = (netmask) => (netmask.split('.').map(Number)
+      .map(part => (part >>> 0).toString(2))
+      .join('')).split('1').length -1;
+
+var CDIR2netmask = (bitCount) => {
+  var mask=[];
+  for(var i=0;i<4;i++) {
+    var n = Math.min(bitCount, 8);
+    mask.push(256 - Math.pow(2, 8-n));
+    bitCount -= n;
+  }
+  return mask.join('.');
+}
+
+const ip4ToInt = ip =>
+  ip.split('.').reduce((int, oct) => (int << 8) + parseInt(oct, 10), 0) >>> 0;
+
+const isIp4InCidr = ip => cidr => {
+  const [range, bits = 32] = cidr.split('/');
+  const mask = ~(2 ** (32 - bits) - 1);
+  return (ip4ToInt(ip) & mask) === (ip4ToInt(range) & mask);
+};
+
+const isIp4InCidrs = (ip, cidrs) => cidrs.some(isIp4InCidr(ip));
+
+function _validateNodeIps(control: AbstractControl, errors: Array<string>): void {
+    let nodes = control.get('nodes') as FormArray;
+    let form  = control as KickstartInventoryForm;
+    
+    if (nodes === undefined || nodes === null){
+        return;
+    }
+
+    let maskSize = netmask2CIDR(form.netmask.value);
+    let pat = new RegExp(IP_CONSTRAINT);
+    for (let i = 0; i < nodes.length; i++){
+        let node = nodes.at(i) as NodeFormGroup;
+        if (form.controller_interface.value[0] !== undefined && 
+            pat.test(node.ip_address.value)){
+            if (! isIp4InCidrs(node.ip_address.value, [form.controller_interface.value[0] + '/' + maskSize]) ){
+                errors.push("- The " + node.ip_address.value + " passed in is not in the correct subnet.");
+            }
+        }
+    }
+}
+
 export function ValidateKickStartInventoryForm(control: AbstractControl){
   let dhcp_start = control.get('dhcp_start');
   let dhcp_end = control.get('dhcp_end');
@@ -144,6 +192,7 @@ export function ValidateKickStartInventoryForm(control: AbstractControl){
   _validateContorllerInterface(control, errors);
   _validateDhcpRange(control, errors);
   _validateNodes(control, errors);  
+  _validateNodeIps(control, errors);
   CheckForInvalidControls(control, errors);
 
   if (errors.length > 0){

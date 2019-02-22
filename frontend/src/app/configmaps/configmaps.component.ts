@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ConfigmapsService } from '../configmaps.service';
 import { HtmlModalPopUp, ModalType } from '../html-elements';
 import { AddConfigDataForm, AddConfigMapForm } from './configmaps.form';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-configmaps',
@@ -25,7 +26,7 @@ export class ConfigmapsComponent implements OnInit {
   addConfigMapDataModal: HtmlModalPopUp;
   addConfigMapModal: HtmlModalPopUp;
 
-  constructor(private configMapSrv: ConfigmapsService) {
+  constructor(private configMapSrv: ConfigmapsService, private title: Title) {
     this.isUserEditing = false;
     this.isConfigMapVisible = new Array();
     this.configMaps = new Array();
@@ -39,6 +40,7 @@ export class ConfigmapsComponent implements OnInit {
    }
 
   ngOnInit() {
+    this.title.setTitle("Config Maps");
     this.configMapSrv.getConfigMaps().subscribe(data => {
       if (data['items']){
         this.configMaps = data['items'];

@@ -13,6 +13,22 @@ export interface HelpPageInterface {
   label: string;
 }
 
+export interface FormField {
+  form_name: string;
+  label: string;
+  description: string;
+  anchor: string;
+  disabled: boolean;
+}
+
+export interface TextFormField extends FormField {
+  required: boolean;
+  placeholder: string;
+  valid_feedback: string;
+  default_value: string;
+  invalid_feedback: string;
+}
+
 export interface HtmlCheckBoxInterface {
   form_name: string;
   label: string;
@@ -31,18 +47,18 @@ export interface HtmlDropDownInterface {
   default_value: string;
 }
 
-export interface HtmlInputInterface {
-  form_name: string;
-  label: string;
-  placeholder: string;
+export interface HtmlInputInterface extends TextFormField {
+  // form_name: string;
+  // label: string;
+  // placeholder: string;
   input_type: string;
-  disabled: boolean;
+  // disabled: boolean;
   html5_constraint: string | ValidatorFn;
-  invalid_feedback: string;
-  required: boolean;
-  default_value: string;
-  valid_feedback: string;
-  anchor: string;
+  // invalid_feedback: string;
+  // required: boolean;
+  // default_value: string;
+  // valid_feedback: string;
+  // anchor: string;
 
   setDefaultValue(someValue: string);
 }
@@ -157,20 +173,51 @@ export class HtmlModalPopUp implements HtmlModalPopUpInterface {
   }
 }
 
-export class HtmlModalSelectDialog extends HtmlModalPopUp {
-  private _selection: Object;
+//TODO rename to archive select modal dialog.
+export class HtmlModalRestoreArchiveDialog extends HtmlModalPopUp {
+  private _selection: Array<Object>;
   private _isDisabled: boolean;  
 
   constructor(id: string) {
     super(id);
   }
 
-  updateModalSelection(selection: Object, isPrimaryBtnDisabled=true){
+  updateModalSelection(selection: Array<Object>, isPrimaryBtnDisabled=true){
     this._selection = selection;
-    this._isDisabled = isPrimaryBtnDisabled;    
+    for (let item of this._selection){
+      item["confirmArchiveDeletion"] = false;
+      item["isVisible"] = false;
+    }
+    this._isDisabled = isPrimaryBtnDisabled;
   }
 
-  get selection(): Object {
+  get selection(): Array<Object> {
+    return this._selection;
+  }
+
+  set isDisabled(newValue: boolean){
+    this._isDisabled = newValue;
+  }
+
+  get isDisabled(): boolean {
+    return this._isDisabled;
+  }
+}
+
+export class HtmlModalIPSelectDialog extends HtmlModalPopUp {
+  private _selection: Array<string>;
+  private _isDisabled: boolean;  
+
+  constructor(id: string) {
+    super(id);
+  }
+
+  updateModalSelection(selection: Array<string>, isPrimaryBtnDisabled=true){
+    this._selection = selection;
+    this._isDisabled = isPrimaryBtnDisabled;
+  }
+
+  get selection(): Array<string> {
     return this._selection;
   }
 
@@ -368,6 +415,61 @@ export class HtmlInput extends FormControl implements HtmlInputInterface, HelpPa
    * 
    * @param opts 
    */
+  enable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void{
+    this.control_disabled = false;
+  }
+
+  setDefaultValue(someValue: string) {
+    this.default_value = someValue;
+    super.setValue(this.default_value);
+  }
+}
+
+export class HtmlTextArea extends FormControl implements TextFormField, HelpPageInterface {
+  anchor: string;
+  control_disabled: boolean;
+
+  constructor(public form_name: string,
+    public label: string,
+    public placeholder: string,    
+    public default_value: string,
+    public description: string,    
+    public required: boolean = false,
+    public html5_constraint: string | ValidatorFn = null,
+    public invalid_feedback: string = 'Invalid input',
+    public valid_feedback: string = 'Valid input',
+    disabled: boolean = false    
+  ) {
+    super('');
+    let validators = [];
+    if (required) {
+      validators.push(Validators.required);
+    }    
+    super.setValidators(validators);
+    super.setValue(default_value);
+
+    this.control_disabled = disabled;
+    this.anchor = 'anchor_' + this.form_name;
+
+    if (html5_constraint) {
+      if (typeof html5_constraint === "string"){
+        validators.push(Validators.pattern(html5_constraint));
+      } else {
+        validators.push(html5_constraint);
+      }      
+    }
+  }
+  
+  disable(opts?: {
+    onlySelf?: boolean;
+    emitEvent?: boolean;
+  }): void {
+    this.control_disabled = true;
+  }
+  
   enable(opts?: {
     onlySelf?: boolean;
     emitEvent?: boolean;

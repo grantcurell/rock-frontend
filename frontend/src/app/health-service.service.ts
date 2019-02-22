@@ -25,8 +25,9 @@ export class HealthServiceService {
     return this.http.get(url).pipe();
   }
   
-  describePod(podName: string): Observable<Object> {
-    const url = `/api/describe_pod/${podName}`
+  describePod(podName: string, namespace: string): Observable<Object> {
+    const url = `/api/describe_pod/${podName}/${namespace}`
+    console.log(url);
     return this.http.get(url).pipe();
   }
 

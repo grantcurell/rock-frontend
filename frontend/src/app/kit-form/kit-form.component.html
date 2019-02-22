@@ -1,7 +1,7 @@
 <app-modal-dialog [modal]="kitModal"></app-modal-dialog>
 <app-modal-dialog #dateModal [modal]="executeKitModal" (primaryButtonClick)="executeKit()"></app-modal-dialog>
-<app-modal-dialog [modal]="archiveKitModal" (primaryButtonClick)="archiveForm()"></app-modal-dialog>
-<app-modal-select-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)"></app-modal-select-dialog>
+<app-modal-dialog [modal]="archiveKitModal" (primaryButtonClick)="archiveForm($event)"></app-modal-dialog>
+<app-modal-archive-dialog [modal]="restoreModal" (primaryButtonClick)="restoreForm($event)" config_id="kit_form"></app-modal-archive-dialog>
 
 <div class="container" id="topheader">
   <form [formGroup]="kitForm" (ngSubmit)="onSubmit()">    
@@ -13,14 +13,14 @@
         <button class="btn btn-primary" style="float: right;" type="button" 
                 (click)="openRestoreModal()"><i class="icon_download"></i> Restore Form</button>
         <button class="btn btn-danger" type="button" style="float: right;  margin-right: 10px;" 
-                (click)="openArchiveConfirmation()"><i class="icon_floppy_alt"></i> Archive and Clear Form</button>
+                (click)="openArchiveConfirmation()"><i class="icon_floppy_alt"></i> Save Form</button>
       </div>
       <div class="card-body">
         <div class="card">
           <div class="card-body" style="border: 1px solid green;border-radius: 1rem;">
             <h5>Page Instructions</h5>
             <p class="card-text">
-              Before fill out the form, make sure you have added all of your nodes to the Kickstart page.  
+              Before filling out the form, make sure you have added all of your nodes to the Kickstart page.  
               The validation box at the botton of the page will guide you through filling out the form correctly.
             </p>
             <p class="card-text">
@@ -47,16 +47,6 @@
         </p>
         <hr>
         <br>
-
-        <h5>Select Storage Type</h5>
-        <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" ></app-dropdown>
-        <!-- DO NOT DELETE <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown> -->
-        <h5>Credentials</h5>
-        <app-text-input [parentForm]="kitForm" controlName="root_password"></app-text-input>
-        <br>
-        <h5>Ceph Settings</h5>
-        <app-checkbox [parentForm]="kitForm" controlName="ceph_redundancy"></app-checkbox>
-        <br>
         <h5>Elasticsearch Settings</h5>
         <app-text-input [parentForm]="kitForm" controlName="elastic_cpu_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
         <app-text-input [parentForm]="kitForm" controlName="elastic_memory_percentage" (keyupEvent)="triggerValidations($event)"></app-text-input>
@@ -78,13 +68,8 @@
         </div>
 
         <h5>Kubernetes Settings</h5>
-        <app-text-input [parentForm]="kitForm" controlName="kubernetes_services_cidr" (keyupEvent)="kubernetesInputEvent($event)"></app-text-input>
-        <div>{{ kitForm.kubernetesCidrInfoText }}</div>
-
-        <h5>Endgame Settings</h5>
-        <app-text-input [parentForm]="kitForm" controlName="endgame_iporhost"></app-text-input>
-        <app-text-input [parentForm]="kitForm" controlName="endgame_username"></app-text-input>
-        <app-text-input [parentForm]="kitForm" controlName="endgame_password"></app-text-input>
+        <app-dropdown [parentForm]="kitForm" controlName="kubernetes_services_cidr" (dropDownChanged)="kubernetesInputEvent($event)" uid="kube_dropdown"></app-dropdown>
+        <div>{{ kitForm.kubernetesCidrInfoText }}</div>        
       </div>
     </div>
     <br>
@@ -106,12 +91,15 @@
           <div *ngIf="!server.hidden" class="card-body">
             <app-basic-node-resource-card title="Server {{ i + 1 }} resources" [basicNodeResource]="server.basicNodeResource"></app-basic-node-resource-card>
             <br>
-            <app-text-input [parentForm]="server" controlName="host_server" (buttonClick)="gatherFacts(server)" uid="{{ i }}"></app-text-input>
+            <app-text-input [parentForm]="server" controlName="host_server"></app-text-input>
             <app-checkbox [parentForm]="server" controlName="is_master_server" (is_checked)="disableOtherMasterOrReenable($event, i)" uid="{{ i }}"></app-checkbox>
             <br>
             <div *ngIf="server.deviceFacts">
                   <app-card-selector [parentForm]="server" [optionSelections]="server.driveSelections"
                                       controlName="ceph_drives" (onSelect)="cephDriveSelected($event, server)" uid="_server{{ i }}"></app-card-selector>
+            </div>
+            <div *ngIf="!server.deviceFacts">
+              <h3>Loading...</h3>
             </div>
           </div>
         </div>
@@ -138,7 +126,7 @@
             <app-basic-node-resource-card title="Sensor {{ i + 1 }} resources" [basicNodeResource]="sensor.basicNodeResource"></app-basic-node-resource-card>
             <br>
             <app-text-input [parentForm]="sensor" controlName="sensor_type"></app-text-input>
-            <app-text-input [parentForm]="sensor" controlName="host_sensor" (buttonClick)="gatherFacts(sensor)" uid="{{ i }}"></app-text-input>
+            <app-text-input [parentForm]="sensor" controlName="host_sensor"></app-text-input>
             <br>
 
             <div *ngIf="!isAdvancedOptionsHidden">
@@ -161,6 +149,9 @@
                                      controlName="monitor_interface" style="float: right;" uid="{{ i }}"></app-card-selector>
                 </div>
               </div>
+            </div>
+            <div *ngIf="!sensor.deviceFacts">
+              <h3>Loading...</h3>
             </div>
           </div>
         </div>
@@ -202,11 +193,34 @@
               use cases.
           </p>
           <p class="card-text text-danger">
+            Changing the Sensor Storage Type could affect performance of moloch full PCAP capture.  Only change to Ceph storage 
+            if you are not going to need more than 2 Gbps for your sensors.
+          </p>
+          <app-dropdown [parentForm]="kitForm" controlName="sensor_storage_type" (dropDownChanged)="sensorStorageChange($event)"></app-dropdown>
+          <p class="card-text text-danger">
             Unless you really know what you are doing here, you should not change the DNS. Seriously, there's only an incredibly niche
             case for changing this and chances are you aren't in it.
           </p>
           <app-text-input [parentForm]="kitForm" controlName="dns_ip"></app-text-input>
-          <app-checkbox [parentForm]="kitForm" controlName="disable_autocalculate" (is_checked)="toggleAutocalculate($event)"></app-checkbox>
+          <app-checkbox [parentForm]="kitForm" controlName="disable_autocalculate" (is_checked)="toggleAutocalculate($event)"></app-checkbox>          
+          <h5>Ceph Settings</h5>
+          <app-checkbox [parentForm]="kitForm" controlName="ceph_redundancy"></app-checkbox>
+        </div>
+      </div>
+      <br>
+      <div class="card">
+        <div class="card-header">
+          Endpoint Settings
+        </div>        
+        <div class="card-body">
+          <p class="font-weight-light">
+            Below are settings for enabling a service for pulling Endgame data into Elasticsearch and/or 
+            installing Google Rapid Response as part of your Kit deployment.
+          </p>
+          <app-checkbox [parentForm]="kitForm" controlName="install_grr"></app-checkbox>
+          <app-text-input [parentForm]="kitForm" controlName="endgame_iporhost"></app-text-input>
+          <app-text-input [parentForm]="kitForm" controlName="endgame_username"></app-text-input>
+          <app-text-input [parentForm]="kitForm" controlName="endgame_password"></app-text-input>
         </div>
       </div>
       <br>

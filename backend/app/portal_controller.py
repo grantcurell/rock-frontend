@@ -9,8 +9,10 @@ from shared.connection_mngs import FabricConnectionWrapper
 from shared.constants import PORTAL_ID
 
 
-DEFAULT_NAMES = ("elastichq.lan", "elasticsearch.lan", "kafka-manager.lan", "kibana.lan", "moloch-viewer.lan",
+DEFAULT_NAMES = ("grr-frontend.lan", "kafka-manager.lan", "kibana.lan", "moloch-viewer.lan",
                  "kubernetes-dashboard.lan", "monitoring-grafana.lan")
+
+DISCLUDES = ("elasticsearch.lan", "mysql.lan", "mumble-server.lan")
 
 
 def _get_defaults():
@@ -25,6 +27,17 @@ def _get_defaults():
         portal_links.append({'ip': '', 'dns': default_dns})
     return portal_links
 
+def _isDiscluded(dns: str) -> bool:
+    """
+    Checks to see if the link should be discluded or included.
+
+    :param dns: The dns name we are checking against the DISCLUDES list.
+    :return:
+    """
+    for item in DISCLUDES:
+        if dns == item:
+            return True
+    return False
 
 @app.route('/api/get_portal_links', methods=['GET'])
 def get_portal_links() -> Response:
@@ -33,14 +46,24 @@ def get_portal_links() -> Response:
 
     :return:
     """
-    try:   
+    try:
         with FabricConnectionWrapper(conn_mng) as ssh_conn:
             portal_links = []
             ret_val = ssh_conn.run('cat /etc/dnsmasq_kube_hosts', hide=True)  # type: Result
             for line in ret_val.stdout.split('\n'):
                 try:
                     ip, dns = line.split(' ')
-                    portal_links.append({'ip': ip, 'dns': dns})
+                    if _isDiscluded(dns):
+                        continue
+
+                    if dns == "grr-frontend.lan":
+                        portal_links.append({'ip': 'https://' + ip, 'dns': 'https://' + dns, 'logins': 'admin/password'})
+                    elif dns == "moloch-viewer.lan":
+                        portal_links.append({'ip': 'http://' + ip, 'dns': 'http://' + dns, 'logins': 'assessor/password'})
+                    elif dns == "kubernetes-dashboard.lan":
+                        portal_links.append({'ip': 'https://' + ip, 'dns': 'https://' + dns, 'logins': ''})
+                    else:
+                        portal_links.append({'ip': 'http://' + ip, 'dns': 'http://' + dns, 'logins': ''})
                 except ValueError as e:
                     pass
             return jsonify(portal_links)

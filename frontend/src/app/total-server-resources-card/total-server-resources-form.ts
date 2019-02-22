@@ -108,8 +108,13 @@ export class TotalServerResources extends FormGroup {
      */
     public subtractFromDeviceFacts(deviceFacts: Object){
         if (deviceFacts){
-            this.cpuCoresAvailable -= deviceFacts["cpus_available"];
-            this.memoryAvailable -= deviceFacts["memory_available"];
+            if (this.cpuCoresAvailable > 0){
+                this.cpuCoresAvailable -= deviceFacts["cpus_available"];
+            }
+            
+            if (this.memoryAvailable > 0){
+                this.memoryAvailable -= deviceFacts["memory_available"];
+            }
         }
     }
 
@@ -121,8 +126,10 @@ export class TotalServerResources extends FormGroup {
      */
     public removeClusterStorage(deviceFacts: Object){
         if (this.serverDriveStorageCache[deviceFacts["hostname"]] != undefined){
-            this.clusterStorageAvailable -= this.serverDriveStorageCache[deviceFacts["hostname"]];
-        } 
+            if (this.clusterStorageAvailable > 0){
+                this.clusterStorageAvailable -= this.serverDriveStorageCache[deviceFacts["hostname"]];
+            }
+        }
         this.serverDriveStorageCache[deviceFacts["hostname"]] = 0;
     }
 
