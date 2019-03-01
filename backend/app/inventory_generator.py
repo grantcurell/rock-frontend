@@ -44,10 +44,10 @@ class KickstartInventoryGenerator:
         template = JINJA_ENV.get_template('kickstart_inventory.yml')
         kickstart_template = template.render(template_ctx=self._template_ctx)
 
-        if not os.path.exists("/opt/tfplenum-deployer/playbooks/"):
-            os.makedirs("/opt/tfplenum-deployer/playbooks/")
+        if not os.path.exists("/opt/rock-deployer/playbooks/"):
+            os.makedirs("/opt/rock-deployer/playbooks/")
 
-        with open("/opt/tfplenum-deployer/playbooks/inventory.yml", "w") as kickstart_file:
+        with open("/opt/rock-deployer/playbooks/inventory.yml", "w") as kickstart_file:
             kickstart_file.write(kickstart_template)
 
 
@@ -94,8 +94,8 @@ class KitInventoryGenerator:
         template = JINJA_ENV.get_template('inventory_template.yml')
         kit_template = template.render(template_ctx=self._template_ctx)
 
-        if not os.path.exists("/opt/tfplenum/playbooks/"):
-            os.makedirs("/opt/tfplenum/playbooks/")
+        if not os.path.exists("/opt/rock/playbooks/"):
+            os.makedirs("/opt/rock/playbooks/")
 
-        with open("/opt/tfplenum/playbooks/inventory.yml", "w") as kit_file:
+        with open("/opt/rock/playbooks/inventory.yml", "w") as kit_file:
             kit_file.write(kit_template)

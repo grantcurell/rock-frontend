@@ -25,8 +25,8 @@ APP_DIR = Path(__file__).parent  # type: Path
 TEMPLATE_DIR = APP_DIR / 'templates'  # type: Path
 
 conn_mng = MongoConnectionManager()
-LOG_FILENAME = "/var/log/tfplenum/tfplenum.log"
-logger = logging.getLogger('tfplenum_logger')
+LOG_FILENAME = "/var/log/rock/rock.log"
+logger = logging.getLogger('rock_logger')
 
 
 def setup_logger(log_handle: Logger, max_bytes: int=10000000, backup_count: int=10):

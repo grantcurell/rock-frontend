@@ -23,8 +23,8 @@ def describe_pod(pod_name: str, namespace: str) -> Response:
     :param pod_name: The name of the pod of cource.  
                      You can get it with 'kubectl get pods' on the main server node.
     """
-    command = '/opt/tfplenum-frontend/tfp-env/bin/python describe_kubernetes_pod.py %s %s' % (pod_name, namespace)
-    stdout, stderr = shell(command, working_dir="/opt/tfplenum-frontend/backend/fabfiles")
+    command = '/opt/rock-frontend/tfp-env/bin/python describe_kubernetes_pod.py %s %s' % (pod_name, namespace)
+    stdout, stderr = shell(command, working_dir="/opt/rock-frontend/backend/fabfiles")
 
     if stdout:
         stdout = stdout.decode('utf-8')        
@@ -43,8 +43,8 @@ def describe_node(node_name: str) -> Response:
     :param node_name: The name of the node of cource.  
                       You can get it with 'kubectl get nodes' on the main server node.
     """
-    command = '/opt/tfplenum-frontend/tfp-env/bin/python describe_kubernetes_node.py %s' % node_name
-    stdout, stderr = shell(command, working_dir="/opt/tfplenum-frontend/backend/fabfiles")        
+    command = '/opt/rock-frontend/tfp-env/bin/python describe_kubernetes_node.py %s' % node_name
+    stdout, stderr = shell(command, working_dir="/opt/rock-frontend/backend/fabfiles")        
 
     if stdout:
         stdout = stdout.decode('utf-8')        
@@ -65,13 +65,13 @@ def perform_systems_check() -> Response:
     current_kit_configuration = conn_mng.mongo_kit.find_one({"_id": KIT_ID})
     if current_kit_configuration:
         if current_kit_configuration["form"] and current_kit_configuration["form"]["root_password"]:
-            cmd_to_execute = ("ansible-playbook -i /opt/tfplenum/playbooks/inventory.yml -e ansible_ssh_pass='" + 
+            cmd_to_execute = ("ansible-playbook -i /opt/rock/playbooks/inventory.yml -e ansible_ssh_pass='" + 
                               decode_password(current_kit_configuration["form"]["root_password"]) + "' site.yml")
             spawn_job("SystemsCheck",
                     cmd_to_execute,
                     ["systems_check"],
                     log_to_console,
-                    working_directory="/opt/tfplenum-integration-testing/playbooks")
+                    working_directory="/opt/rock-integration-testing/playbooks")
             return OK_RESPONSE
 
     logger.warn("Perform systems check failed because the Kit configuration was not found in the mongo database.")

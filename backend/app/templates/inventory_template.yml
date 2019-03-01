@@ -397,8 +397,8 @@ all:
     nodes_to_remove:
       # Example: (you need to define your own hosts)
       #hosts:
-      #  tfplenumsensor1.lan:
-      #  tfplenumserver2.lan:
-      #  tfplenumserver1.lan:
+      #  rocksensor1.lan:
+      #  rockserver2.lan:
+      #  rockserver1.lan:
 
 ...

@@ -1,0 +1,10 @@
+[Unit]
+Description=Starts rock Frontend
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/rock-frontend/backend
+ExecStart=/opt/rock-frontend/tfp-env/bin/gunicorn --config ../setup/gunicorn_config.py app:app
+
+[Install]
+WantedBy=multi-user.target

@@ -72,7 +72,7 @@ def generate_kickstart_inventory() -> Response:
               "make",
               ["kickstart"],
               log_to_console,
-              working_directory="/opt/tfplenum-deployer/playbooks")
+              working_directory="/opt/rock-deployer/playbooks")
     return OK_RESPONSE
 
 

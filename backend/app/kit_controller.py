@@ -157,7 +157,7 @@ def execute_kit_inventory() -> Response:
                 cmd_to_execute,
                 ["kit"],
                 log_to_console,
-                working_directory="/opt/tfplenum/playbooks")
+                working_directory="/opt/rock/playbooks")
         
         return OK_RESPONSE
 
@@ -185,7 +185,7 @@ def execute_add_node() -> Response:
                     cmd_to_execute,
                     ["kit"],
                     log_to_console,
-                    working_directory="/opt/tfplenum/playbooks",
+                    working_directory="/opt/rock/playbooks",
                     is_shell=True)
         return OK_RESPONSE
 

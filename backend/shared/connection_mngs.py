@@ -53,7 +53,7 @@ class MongoConnectionManager(object):
 
     def __init__(self):
         self._client = MongoClient('mongodb://localhost:27017/')
-        self._tfplenum_database = self._client.tfplenum_database  # type: Database
+        self._rock_database = self._client.rock_database  # type: Database
 
     @property
     def mongo_database(self) -> Database:
@@ -62,7 +62,7 @@ class MongoConnectionManager(object):
 
         :return:
         """
-        return self._tfplenum_database
+        return self._rock_database
 
     @property
     def mongo_kickstart(self) -> Collection:
@@ -71,7 +71,7 @@ class MongoConnectionManager(object):
 
         :return:
         """
-        return self._tfplenum_database.kickstart
+        return self._rock_database.kickstart
 
     @property
     def mongo_kit(self) -> Collection:
@@ -80,7 +80,7 @@ class MongoConnectionManager(object):
 
         :return:
         """
-        return self._tfplenum_database.kit
+        return self._rock_database.kit
 
     @property
     def mongo_kit_archive(self) -> Collection:
@@ -89,7 +89,7 @@ class MongoConnectionManager(object):
 
         :return:
         """
-        return self._tfplenum_database.kit_archive
+        return self._rock_database.kit_archive
 
     @property
     def mongo_kickstart_archive(self) -> Collection:
@@ -98,7 +98,7 @@ class MongoConnectionManager(object):
 
         :return:
         """
-        return self._tfplenum_database.kickstart_archive
+        return self._rock_database.kickstart_archive
 
     @property
     def mongo_console(self) -> Collection:
@@ -107,14 +107,14 @@ class MongoConnectionManager(object):
 
         :return:
         """
-        return self._tfplenum_database.console
+        return self._rock_database.console
 
     @property
     def mongo_last_jobs(self) -> Collection:
         """
         Returns a mongo object that can do manipulate the last jobs completed by the system.
         """
-        return self._tfplenum_database.last_jobs
+        return self._rock_database.last_jobs
 
     def close(self):
         """

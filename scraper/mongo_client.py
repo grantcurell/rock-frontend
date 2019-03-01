@@ -15,13 +15,13 @@ class MongoClientWrapper:
     def __init__(self):
         print("__init__")
         self._client = None
-        self._tfplenum_database = None
+        self._rock_database = None
         self._collection_name = None
 
     def __enter__(self):
         print("__enter__")
         self._client = MongoClient('mongodb://localhost:27017/')
-        self._tfplenum_database = self._client.tfplenum_database  # type: Database
+        self._rock_database = self._client.rock_database  # type: Database
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -44,9 +44,9 @@ class MongoClientWrapper:
         Creates a new mongo collection based on the passed in name.
         :return:
         """
-        #self._tfplenum_database[self._collection_name].update({}, {})
-        self._tfplenum_database[self._collection_name].drop()
-        self._tfplenum_database[MONGO_COL_TREE_NAME].drop()
+        #self._rock_database[self._collection_name].update({}, {})
+        self._rock_database[self._collection_name].drop()
+        self._rock_database[MONGO_COL_TREE_NAME].drop()
 
     def insert_page(self, document: Dict):
         """
@@ -55,9 +55,9 @@ class MongoClientWrapper:
         :param document:
         :return:
         """
-        mongo_col = self._tfplenum_database[self._collection_name]  # type: Collection
+        mongo_col = self._rock_database[self._collection_name]  # type: Collection
         mongo_col.insert_one(document)
 
     def insert_tree(self, confluence_space_id: str, nav_tree: List):
-        mongo_col = self._tfplenum_database[MONGO_COL_TREE_NAME]  # type: Collection
+        mongo_col = self._rock_database[MONGO_COL_TREE_NAME]  # type: Collection
         mongo_col.insert_one({"_id": confluence_space_id, "nav_tree": nav_tree})

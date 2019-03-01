@@ -6,7 +6,7 @@ var ctx = c.getContext("2d");
 var font_size = 10;
 var drops = [];
 
-var message = "TFPLENUM";
+var message = "rock";
 message = message.split("");
 
 function render(){

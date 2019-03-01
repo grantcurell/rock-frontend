@@ -18,6 +18,6 @@ function _deploy_angular_application {
 
 function _restart_services {
 	run_cmd systemctl restart httpd
-	run_cmd systemctl restart tfplenum-frontend.service
+	run_cmd systemctl restart rock-frontend.service
 	run_cmd systemctl restart mongod
 }
